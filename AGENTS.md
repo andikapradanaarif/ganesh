@@ -20,7 +20,7 @@ The initial empty commit on `main` only established the base history needed for 
 - Do not invent project, client, model, budget, provenance or test-result identifiers. Unknown evidence stays unknown.
 - Keep raw transcripts, secrets, captured payloads, local databases and held-out answers out of version control. Enroll sources only under their explicit processing/disclosure permissions.
 - Use Nexus as an architectural reference, not an automatically enrolled source or evaluation corpus.
-- Go is proposed, not an accepted implementation decision. Record changes to the recommendation and their evidence.
+- Go is selected for the bounded S0 tooling. See `docs/s0-local-tooling.md` for the implementation and evidence limits; later service choices remain conditional on the roadmap gates.
 
 ## Engineering guidance
 
