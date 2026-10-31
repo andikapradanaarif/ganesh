@@ -6,6 +6,8 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"reflect"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -88,5 +90,61 @@ func TestInvalidRecordsDoNotEchoTheirContents(t *testing.T) {
 		if err == nil || bytes.Contains(output.Bytes(), []byte("SYNTHETIC_SECRET")) || bytes.Contains([]byte(err.Error()), []byte("SYNTHETIC_SECRET")) {
 			t.Fatal("unsafe parser output")
 		}
+	}
+}
+
+func TestRunRecordReadabilityWarningIsAdvisoryAndReadOnly(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("POSIX file-mode expectations do not attest Windows ACLs")
+	}
+	r, err := s0.NewRun(time.Now(), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, name := range []string{"fixture-one", "fixture-two", "fixture-three"} {
+		r.Projects = append(r.Projects, s0.Project{Path: filepath.Join(t.TempDir(), name), LocalReadPermission: "allowed"})
+	}
+	value := "fixture-selection-and-permission-reference"
+	r.Capture = s0.Capture{Client: &value, Build: &value, Installation: &value, TranscriptAccess: &value}
+	body, err := json.Marshal(r)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, mode := range []os.FileMode{0600, 0400, 0640, 0604, 0644} {
+		t.Run(mode.String(), func(t *testing.T) {
+			path := filepath.Join(t.TempDir(), "ghp_SYNTHETIC_SECRET.json")
+			if err := os.WriteFile(path, body, 0600); err != nil {
+				t.Fatal(err)
+			}
+			if err := os.Chmod(path, mode); err != nil {
+				t.Fatal(err)
+			}
+			var output bytes.Buffer
+			if err := run(context.Background(), []string{"s0", "check", "--input", path}, &output); err != nil {
+				t.Fatal(err)
+			}
+			var result s0.Readiness
+			if err := json.Unmarshal(output.Bytes(), &result); err != nil {
+				t.Fatal(err)
+			}
+			wantWarnings := []string{}
+			if mode&0044 != 0 {
+				wantWarnings = append(wantWarnings, "run_record_group_or_other_readable")
+			}
+			if !reflect.DeepEqual(result.Warnings, wantWarnings) || !result.InputsPresent || result.PermissionsIndependentlyVerified || result.FrozenEvidenceIndependentlyVerified || result.ProductionNarrativeEnabled {
+				t.Fatalf("warning changed trust or readiness: %+v", result)
+			}
+			if strings.Contains(output.String(), "SYNTHETIC_SECRET") || strings.Contains(output.String(), value) {
+				t.Fatal("warning leaked a path or record content")
+			}
+			after, err := os.ReadFile(path)
+			if err != nil || !bytes.Equal(body, after) {
+				t.Fatal("check modified the run record")
+			}
+			info, err := os.Stat(path)
+			if err != nil || info.Mode().Perm() != mode {
+				t.Fatal("check changed file permissions")
+			}
+		})
 	}
 }

@@ -76,6 +76,7 @@ type Readiness struct {
 	Phase                               string   `json:"phase"`
 	InputsPresent                       bool     `json:"inputs_present"`
 	Missing                             []string `json:"missing"`
+	Warnings                            []string `json:"warnings"`
 	PermissionsIndependentlyVerified    bool     `json:"permissions_independently_verified"`
 	FrozenEvidenceIndependentlyVerified bool     `json:"frozen_evidence_independently_verified"`
 	ProductionNarrativeEnabled          bool     `json:"production_narrative_enabled"`
@@ -84,7 +85,7 @@ type Readiness struct {
 // Check checks declared input presence only. It never reads the named project
 // or evidence paths, proves permission, verifies freezing, or starts a run.
 func Check(r Run, phase string) (Readiness, error) {
-	result := Readiness{Phase: phase, Missing: []string{}}
+	result := Readiness{Phase: phase, Missing: []string{}, Warnings: []string{}}
 	if r.SchemaVersion != 1 {
 		return result, errors.New("unsupported run schema")
 	}
@@ -137,6 +138,17 @@ func Check(r Run, phase string) (Readiness, error) {
 			result.Missing = append(result.Missing, item.name)
 		}
 	}
+	// Keep diagnostics concise without changing which checks fail or their
+	// first-occurrence order. Several projects can fail the same predicate.
+	seenReasons := map[string]bool{}
+	unique := result.Missing[:0]
+	for _, reason := range result.Missing {
+		if !seenReasons[reason] {
+			seenReasons[reason] = true
+			unique = append(unique, reason)
+		}
+	}
+	result.Missing = unique
 	result.InputsPresent = len(result.Missing) == 0
 	return result, nil
 }

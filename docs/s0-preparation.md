@@ -18,6 +18,8 @@ Flags are scoped to each command: `prepare` accepts `--dir`; `check` accepts `--
 
 `doctor` probes only `go version`, `codex --version`, `claude --version`, `devin --version` and `crush --version`, using binaries found on PATH. Each probe has a two-second timeout and 2 KiB stdout limit. Only an exact recognized version string is recorded; raw output and stderr are discarded. Devin's reported build hash and Crush's fork/prerelease/build suffixes are preserved in the version identity. Missing binaries are `not_on_path`, not proof that the client is absent everywhere. These are discovery candidates, not a supported-client list: no observation selects a client or grants capture eligibility. Other clients and runners remain unknown until inspected.
 
+If a probe's context has expired when its result is checked, it is conservatively reported as `probe_cancelled`, even if valid-looking version output arrived at that boundary.
+
 `prepare` creates a new 0700 workspace containing 0600 `run.json` and `targets.json` files. The parent must already exist; existing workspaces are never reused or overwritten. A failed preparation can leave partial files for inspection and is never reported as successful. This configuration writer makes no capture or remote-durability promise.
 
 `run.json` has an actual generated run identity and preparation timestamp. Project selection, capture installation, transcript permission evidence, configuration/measurements, models, budgets, frozen evidence and the optional A2.3 caps remain unknown. `screen_started_at` remains null. `targets.json` starts empty and `not_screened`; preparation does not start the one-hour screen or establish any origin counts.
@@ -41,6 +43,10 @@ bin/ganesh s0 check --input .local/s0/day-one/run.json --phase heldout
 This additionally requires declared capture configuration/measurement references (with gaps explicitly recorded), exact answering/grading IDs and grading family, spend/time/output/reasoning/retry limits, and a reference to the frozen corpus/tasks/rubrics/permissions/variants/order/seeds/digest. Optional A2.3 funding fields do not block S0; blank caps remain unfunded. Apply its separate funding deadline and decision before any A2.3 setup or model work.
 
 Both checks are **presence checks**. They do not independently verify permissions, source provenance, model-family independence, sample/rubric completeness, frozen files or capture coverage. A successful check never grants production narrative eligibility or launches work. The full execution-sheet conditions still govern each run.
+
+Repeated missing-input reasons appear once, in first-occurrence order. Project-path deduplication compares `filepath.Clean` strings case-sensitively; it does not inspect filesystem identity, symlinks or case aliases. Those checks belong to later permitted source mapping.
+
+The JSON result also includes `warnings`. If the opened `run.json` mode grants group or other read permission, `run_record_group_or_other_readable` is emitted without the path or content. This is advisory: it does not change readiness, chmod the file or grant permission. It checks descriptor mode bits only, not ACLs, parent-directory access or effective privacy; an empty warning list is not a privacy attestation.
 
 ## Remaining day-one work
 
