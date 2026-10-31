@@ -1,0 +1,7 @@
+/bin/
+/.local/
+/runs/
+/coverage.out
+*.db
+*.db-shm
+*.db-wal
