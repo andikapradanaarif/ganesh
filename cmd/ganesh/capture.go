@@ -12,6 +12,8 @@ import (
 	"github.com/andikapradanaarif/ganesh/internal/processclock"
 )
 
+const captureBudget = 750 * time.Millisecond
+
 func captureCommand(parent context.Context, args []string, input io.Reader, output io.Writer) error {
 	f := flag.NewFlagSet("capture", flag.ContinueOnError)
 	f.SetOutput(io.Discard)
@@ -27,10 +29,10 @@ func captureCommand(parent context.Context, args []string, input io.Reader, outp
 		return err
 	}
 	elapsed := time.Since(start)
-	if elapsed < 0 || elapsed >= 750*time.Millisecond {
+	if elapsed < 0 || elapsed >= captureBudget {
 		return errors.New("capture process-start deadline exceeded or clock invalid")
 	}
-	ctx, cancel := context.WithTimeout(parent, 750*time.Millisecond-elapsed)
+	ctx, cancel := context.WithTimeout(parent, captureBudget-elapsed)
 	defer cancel()
 	type readResult struct {
 		body []byte
@@ -63,10 +65,10 @@ func captureCommand(parent context.Context, args []string, input io.Reader, outp
 		return err
 	}
 	duration := time.Since(start)
-	if duration < 0 || duration >= 750*time.Millisecond || ctx.Err() != nil {
+	if duration < 0 || duration >= captureBudget || ctx.Err() != nil {
 		return errors.New("capture process-start deadline exceeded or clock invalid")
 	}
-	return emit(output, struct {
+	return emitCaptureReceipt(ctx, output, struct {
 		capture.Receipt
 		ProcessStartToReceiptMS float64 `json:"process_start_to_receipt_ms"`
 	}{receipt, float64(duration) / float64(time.Millisecond)})
