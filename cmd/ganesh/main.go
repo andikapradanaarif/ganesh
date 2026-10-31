@@ -15,7 +15,11 @@ import (
 
 func main() {
 	if err := run(context.Background(), os.Args[1:], os.Stdout); err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		// A hook never emits context, decisions or raw diagnostics, including
+		// on failure. Exit status is the only client-facing result.
+		if len(os.Args) < 2 || os.Args[1] != "hook" {
+			fmt.Fprintln(os.Stderr, err)
+		}
 		os.Exit(1)
 	}
 }
@@ -24,11 +28,14 @@ func run(ctx context.Context, args []string, output io.Writer) error {
 	if len(args) > 0 && args[0] == "capture" {
 		return captureFromStdin(ctx, args[1:], output)
 	}
+	if len(args) > 0 && args[0] == "hook" {
+		return hookCommand(ctx, args[1:], os.Stdin)
+	}
 	if len(args) == 1 && args[0] == "doctor" {
 		return emit(output, s0.Discover(ctx))
 	}
 	if len(args) < 2 || args[0] != "s0" {
-		return errors.New("usage: ganesh doctor | capture --spool DIR | s0 prepare|check|freeze-targets|screen [flags]")
+		return errors.New("usage: ganesh doctor | capture --spool DIR | hook crush --spool DIR | s0 prepare|check|freeze-targets|screen [flags]")
 	}
 	f := flag.NewFlagSet(args[1], flag.ContinueOnError)
 	f.SetOutput(io.Discard)
