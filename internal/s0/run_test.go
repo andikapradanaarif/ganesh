@@ -75,6 +75,36 @@ func TestSelectionAndPermissionCannotBeAssumed(t *testing.T) {
 	}
 }
 
+func TestRepeatedMissingReasonsAreUniqueAndStable(t *testing.T) {
+	r := inventoryRun(t)
+	for i := range r.Projects {
+		r.Projects[i].Path = "fixture-relative-duplicate"
+		r.Projects[i].LocalReadPermission = "pending"
+	}
+	result, err := Check(r, "inventory")
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := []string{"distinct absolute project paths", "explicit local-read permission for every selected project"}
+	if !reflect.DeepEqual(result.Missing, want) || result.InputsPresent {
+		t.Fatalf("duplicate diagnostics or changed readiness: %+v", result)
+	}
+	if result.Warnings == nil || len(result.Warnings) != 0 {
+		t.Fatal("presence-only checks invented file permission warnings")
+	}
+	// The first project now has only the permission failure. Later projects
+	// repeat both reasons, so sorting or adjacent-only compaction is wrong.
+	r.Projects[0].Path = filepath.Join(t.TempDir(), "fixture-absolute")
+	result, err = Check(r, "inventory")
+	if err != nil {
+		t.Fatal(err)
+	}
+	want = []string{"explicit local-read permission for every selected project", "distinct absolute project paths"}
+	if !reflect.DeepEqual(result.Missing, want) {
+		t.Fatalf("first-occurrence order changed: %v", result.Missing)
+	}
+}
+
 func TestHeldoutInputsDoNotGrantPermissionsOrA23Funding(t *testing.T) {
 	r := inventoryRun(t)
 	r.Capture.ConfigRevision = text("fixture-config")

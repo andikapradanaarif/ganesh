@@ -67,12 +67,16 @@ func run(ctx context.Context, args []string, output io.Writer) error {
 		}{"prepared", r.ID, false})
 	case "check":
 		var r s0.Run
-		if err := readRecord(input, &r); err != nil {
+		info, err := readRecordInfo(input, &r)
+		if err != nil {
 			return err
 		}
 		readiness, err := s0.Check(r, phase)
 		if err != nil {
 			return err
+		}
+		if info.Mode().Perm()&0044 != 0 {
+			readiness.Warnings = append(readiness.Warnings, "run_record_group_or_other_readable")
 		}
 		if err := emit(output, readiness); err != nil {
 			return err
