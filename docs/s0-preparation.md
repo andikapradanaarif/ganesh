@@ -14,6 +14,8 @@ bin/ganesh s0 prepare --dir .local/s0/day-one
 bin/ganesh s0 check --input .local/s0/day-one/run.json --phase inventory
 ```
 
+Flags are scoped to each command: `prepare` accepts `--dir`; `check` accepts `--input` and `--phase`; `freeze-targets` accepts `--input` and `--output`; `screen` accepts `--input` and `--baseline`. Unrelated flags are rejected before any record is read or written. `doctor` accepts no flags.
+
 `doctor` probes only `go version`, `codex --version`, `claude --version`, `devin --version` and `crush --version`, using binaries found on PATH. Each probe has a two-second timeout and 2 KiB stdout limit. Only an exact recognized version string is recorded; raw output and stderr are discarded. Devin's reported build hash and Crush's fork/prerelease/build suffixes are preserved in the version identity. Missing binaries are `not_on_path`, not proof that the client is absent everywhere. These are discovery candidates, not a supported-client list: no observation selects a client or grants capture eligibility. Other clients and runners remain unknown until inspected.
 
 `prepare` creates a new 0700 workspace containing 0600 `run.json` and `targets.json` files. The parent must already exist; existing workspaces are never reused or overwritten. A failed preparation can leave partial files for inspection and is never reported as successful. This configuration writer makes no capture or remote-durability promise.
@@ -21,6 +23,8 @@ bin/ganesh s0 check --input .local/s0/day-one/run.json --phase inventory
 `run.json` has an actual generated run identity and preparation timestamp. Project selection, capture installation, transcript permission evidence, configuration/measurements, models, budgets, frozen evidence and the optional A2.3 caps remain unknown. `screen_started_at` remains null. `targets.json` starts empty and `not_screened`; preparation does not start the one-hour screen or establish any origin counts.
 
 The workspace is ignored by git. Keep paths, permissions, evidence and later transcript-derived records private; do not copy them into public issues or commits. Local version discovery does not authorize source enrollment or reads.
+
+The next local tools are [need freezing and initial origin accounting](s0-origin-screen.md). They use the same private `targets.json`; real input selection and the actual bounded screen remain separate tasks.
 
 ## Select inputs when their phase needs them
 
