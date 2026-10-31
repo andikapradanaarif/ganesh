@@ -53,3 +53,9 @@ The client host's one-second hook timeout, overall/shared SessionEnd budget and 
 This prototype has no uploader, automated orphan cleanup/expiry, installation control synchronization, device purge acknowledgment or source mapping. Interrupted attempts can leave private metadata temporary files that consume capacity. It is not ready for unattended production capture or real client hook enrollment. Those contracts remain explicit later integration gates; the cap is not an offline-duration guarantee.
 
 Record prototype latency separately from actual per-installation evidence. Fresh-process synthetic measurements do not establish cold-cache startup time, real hook coverage, client honesty, the full P01/P03-D suites or automatic discovery-to-reuse. Keep failures/timeouts and unmeasured paths visible. Project and client selection remain pending; no real project/transcript content is admitted by this implementation task.
+
+### Prototype measurement, 2026-10-31
+
+On macOS amd64 with CGO enabled, the compiled collector from `9c86aaf` completed 50 synthetic captures in fresh processes with zero failures. Nearest-rank process-start-to-durable-receipt latency was p95 **73.201 ms**, p99 **390.825 ms**. Parent-observed elapsed latency over all attempts was p95 **74.567 ms**, p99 **392.075 ms**. The measurement watchdog was two seconds; it did not simulate a client host timeout.
+
+Page-cache state was uncontrolled and cold-start time was not independently measured. No installed hook, SessionEnd budget or competing hook was exercised. Detailed non-content attempt metrics are retained outside git in `.local/local-capture-22-latency.json`. This small prototype sample is not a supported-profile result or performance SLO.
