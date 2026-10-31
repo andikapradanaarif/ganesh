@@ -208,10 +208,11 @@ func InitialScreen(in TargetInventory, baseline *NeedSnapshot) (ScreenReport, er
 	projects := map[string]bool{}
 	assessed := 0
 	for _, target := range in.Targets {
-		if (target.Assessed || target.Mixed || target.Unknown || target.OwnerOnly) && !validRefs(target.ReasonRefs) {
+		hasAssessment := target.Assessed || target.Mixed || target.Unknown || target.OwnerOnly
+		if hasAssessment && !validRefs(target.ReasonRefs) {
 			return r, errors.New("origin assessments need explicit reason references")
 		}
-		if in.State == "not_screened" && (target.Assessed || target.Mixed || target.Unknown || target.OwnerOnly || len(target.LessonIDs) > 0) {
+		if in.State == "not_screened" && (hasAssessment || len(target.LessonIDs) > 0) {
 			return r, errors.New("unscreened inventory cannot contain origin assessments")
 		}
 		a := TargetAssessment{ID: target.ID, Mixed: target.Mixed, Unknown: !target.Assessed || target.Unknown, ReasonRefCount: len(target.ReasonRefs), Reasons: []string{}}
@@ -253,7 +254,7 @@ func InitialScreen(in TargetInventory, baseline *NeedSnapshot) (ScreenReport, er
 				projects[lessons[id].Project] = true
 			}
 		}
-		if target.Assessed || target.Mixed {
+		if hasAssessment {
 			assessed++
 		}
 		r.Assessments = append(r.Assessments, a)

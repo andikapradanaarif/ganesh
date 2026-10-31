@@ -118,6 +118,63 @@ func TestEmptyAndUnassessedAreInconclusive(t *testing.T) {
 	}
 }
 
+func TestExplicitAssessmentFlagsDoNotRequireRedundantAssessed(t *testing.T) {
+	for _, tc := range []struct {
+		name                      string
+		mixed, unknown, ownerOnly bool
+		want                      OriginCounts
+		route                     string
+	}{
+		{"transcripts unavailable", false, true, false, OriginCounts{H: 2, U: 2}, "single_recheck_pending"},
+		{"owner-only needs", false, false, true, OriginCounts{H: 2, U: 2}, "single_recheck_pending"},
+		{"known mixed with incomplete coverage", true, false, false, OriginCounts{H: 2, M: 2}, "a2_3_decision"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			in := screenFixture()
+			in.Targets = in.Targets[4:6]
+			for i := range in.Targets {
+				in.Targets[i].Assessed = false
+				in.Targets[i].Mixed = tc.mixed
+				in.Targets[i].Unknown = tc.unknown
+				in.Targets[i].OwnerOnly = tc.ownerOnly
+				in.Targets[i].ReasonRefs = []string{"fixture-explicit-assessment-evidence"}
+			}
+			// Both needs reference eligible lessons. An assessment declaration
+			// can establish a route without clearing unknown coverage or E.
+			r := screenWithFrozenNeeds(t, in)
+			if r.Counts != tc.want || r.Route != tc.route {
+				t.Fatalf("explicit declarations ignored: %+v", r)
+			}
+			for _, a := range r.Assessments {
+				if !a.Unknown || a.Eligible {
+					t.Fatalf("flag-only assessment upgraded coverage: %+v", a)
+				}
+			}
+			if r.EligibleLessons != 0 || r.EvidenceIndependentlyVerified || r.ProductionNarrativeEnabled || r.ModelRunsAuthorized {
+				t.Fatal("assessment flag granted trust or eligibility")
+			}
+			withoutRefs := in
+			withoutRefs.Targets = append([]ScreenTarget(nil), in.Targets...)
+			withoutRefs.Targets[0].ReasonRefs = nil
+			baseline, err := FreezeNeeds(withoutRefs)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if _, err := InitialScreen(withoutRefs, &baseline); err == nil {
+				t.Fatal("flag-only assessment accepted without evidence references")
+			}
+			in.State = "not_screened"
+			baseline, err = FreezeNeeds(in)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if _, err := InitialScreen(in, &baseline); err == nil {
+				t.Fatal("unscreened inventory accepted explicit assessments")
+			}
+		})
+	}
+}
+
 func TestNeedSnapshotIsCanonicalCaseSensitiveAndNonOverwriting(t *testing.T) {
 	in := TargetInventory{SchemaVersion: 1, Targets: []ScreenTarget{
 		{NeedDefinition: NeedDefinition{"NeedB", "Why Y?"}},

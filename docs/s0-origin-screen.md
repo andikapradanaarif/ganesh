@@ -36,6 +36,8 @@ Each target contains:
 | `reason_refs` | Nonempty references to retained private assessment evidence whenever an origin/owner-only assessment is supplied. Raw evidence content is not copied into the report. |
 | `required_lesson_ids` | Every lesson required to cover this need completely. Partial eligible coverage does not count the whole target as E. |
 
+An explicit `mixed`, `unknown` or `owner_only` declaration with reason references counts as an assessment for initial routing even when `assessed` is false. This includes the legitimate outcome that transcripts were unavailable. It does not clear unknown coverage: `assessed: false` still excludes the target from E. Bare definitions without assessment flags remain inconclusive.
+
 Each lesson has distinct `id`, actual originating `project`, `derivation`, `origin`, `assurance`, `eligibility`, and `eligibility_evidence_refs`. `eligibility` is `eligible`, `ineligible` or `unknown`. A declared eligible automatically derivable lesson must have `derivation: automatic`, `origin: first_party_only`, assurance `server_observed` or `client_attested`, and nonempty evidence references. Inconsistent eligible declarations are rejected. Owner-authored, synthetic, mixed or unknown substitutes cannot count as eligible automatic coverage.
 
 The screener must establish those declarations using the roadmap's actual evidence requirements, including reconciled coverage and file provenance for client-derived lessons. These commands check field consistency and reference presence only; they do not prove that the references exist, establish first-party origin or verify meaning. Labels and an existing anchor cannot substitute for that evidence.
@@ -56,7 +58,7 @@ The report contains H/M/U/E, M/H, U/H, (M+U)/H and E/H together, plus each targe
 
 | Route | Interpretation |
 | --- | --- |
-| `inconclusive` | Empty inventory, or no assessed origin evidence. Empty ratios are null, not zero. The command emits the report and exits with status 1. A wholly unassessed nonempty inventory retains H and U/H = 1. |
+| `inconclusive` | Empty inventory, or no explicit assessment declarations. Empty ratios are null, not zero. The command emits the report and exits with status 1. A nonempty inventory with only bare, unassessed definitions retains H and U/H = 1. |
 | `a2_3_decision` | M/H ≥50%. Move narrative work to the separately scoped/budgeted funding decision; S0 and applicable deterministic work continue. This does not fund or start A2.3. |
 | `single_recheck_pending` | Below the early mixed-origin threshold. The one permitted final first-party eligibility recheck is still required at S0b-2; this is not a first-party go result. |
 

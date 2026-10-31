@@ -60,6 +60,24 @@ func TestFreezeAndScreenCLI(t *testing.T) {
 	if !bytes.Equal(before, after) {
 		t.Fatal("screen modified source inventory")
 	}
+	// Unavailable transcripts can be explicitly unknown without repeating
+	// assessed=true. This remains pending recheck, not inconclusive or eligible.
+	in.Targets[0].Assessed = false
+	in.Targets[0].Mixed = false
+	in.Targets[1].Assessed = false
+	in.Targets[1].OwnerOnly = false
+	in.Targets[1].Unknown = true
+	writeFixture(t, input, in)
+	output.Reset()
+	if err := run(context.Background(), []string{"s0", "screen", "--input", input, "--baseline", baseline}, &output); err != nil {
+		t.Fatal(err)
+	}
+	if err := json.Unmarshal(output.Bytes(), &report); err != nil {
+		t.Fatal(err)
+	}
+	if report.Counts != (s0.OriginCounts{H: 2, U: 2}) || report.Route != "single_recheck_pending" {
+		t.Fatalf("unknown-only declarations were not routed: %+v", report)
+	}
 	output.Reset()
 	in.Targets[1].Need = "changed after freeze"
 	writeFixture(t, input, in)
