@@ -21,11 +21,14 @@ func main() {
 }
 
 func run(ctx context.Context, args []string, output io.Writer) error {
+	if len(args) > 0 && args[0] == "capture" {
+		return captureFromStdin(ctx, args[1:], output)
+	}
 	if len(args) == 1 && args[0] == "doctor" {
 		return emit(output, s0.Discover(ctx))
 	}
 	if len(args) < 2 || args[0] != "s0" {
-		return errors.New("usage: ganesh doctor | s0 prepare|check|freeze-targets|screen [flags]")
+		return errors.New("usage: ganesh doctor | capture --spool DIR | s0 prepare|check|freeze-targets|screen [flags]")
 	}
 	f := flag.NewFlagSet(args[1], flag.ContinueOnError)
 	f.SetOutput(io.Discard)
