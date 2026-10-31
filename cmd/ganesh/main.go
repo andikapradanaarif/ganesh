@@ -27,26 +27,37 @@ func run(ctx context.Context, args []string, output io.Writer) error {
 	if len(args) < 2 || args[0] != "s0" {
 		return errors.New("usage: ganesh doctor | s0 prepare|check|freeze-targets|screen [flags]")
 	}
-	f := flag.NewFlagSet("s0", flag.ContinueOnError)
+	f := flag.NewFlagSet(args[1], flag.ContinueOnError)
 	f.SetOutput(io.Discard)
-	directory := f.String("dir", "", "new private workspace")
-	input := f.String("input", "", "private run.json")
-	outputPath := f.String("output", "", "new private need-definition snapshot")
-	baselinePath := f.String("baseline", "", "frozen need-definition snapshot")
-	phase := f.String("phase", "inventory", "input-check phase")
+	var directory, input, outputPath, baselinePath, phase string
+	switch args[1] {
+	case "prepare":
+		f.StringVar(&directory, "dir", "", "new private workspace")
+	case "check":
+		f.StringVar(&input, "input", "", "private run.json")
+		f.StringVar(&phase, "phase", "inventory", "input-check phase")
+	case "freeze-targets":
+		f.StringVar(&input, "input", "", "private target inventory")
+		f.StringVar(&outputPath, "output", "", "new private need-definition snapshot")
+	case "screen":
+		f.StringVar(&input, "input", "", "private target inventory")
+		f.StringVar(&baselinePath, "baseline", "", "frozen need-definition snapshot")
+	default:
+		return errors.New("unknown S0 command")
+	}
 	if err := f.Parse(args[2:]); err != nil || f.NArg() != 0 {
 		return errors.New("invalid S0 command flags")
 	}
 	switch args[1] {
 	case "prepare":
-		if *directory == "" {
+		if directory == "" {
 			return errors.New("prepare requires --dir")
 		}
 		r, err := s0.NewRun(time.Now(), s0.Discover(ctx))
 		if err != nil {
 			return errors.New("cannot generate run identity")
 		}
-		if err := s0.Prepare(*directory, r); err != nil {
+		if err := s0.Prepare(directory, r); err != nil {
 			return err
 		}
 		return emit(output, struct {
@@ -56,10 +67,10 @@ func run(ctx context.Context, args []string, output io.Writer) error {
 		}{"prepared", r.ID, false})
 	case "check":
 		var r s0.Run
-		if err := readRecord(*input, &r); err != nil {
+		if err := readRecord(input, &r); err != nil {
 			return err
 		}
-		readiness, err := s0.Check(r, *phase)
+		readiness, err := s0.Check(r, phase)
 		if err != nil {
 			return err
 		}
@@ -71,18 +82,18 @@ func run(ctx context.Context, args []string, output io.Writer) error {
 		}
 		return nil
 	case "freeze-targets":
-		if *outputPath == "" {
+		if outputPath == "" {
 			return errors.New("freeze-targets requires --output")
 		}
 		var inventory s0.TargetInventory
-		if err := readRecord(*input, &inventory); err != nil {
+		if err := readRecord(input, &inventory); err != nil {
 			return err
 		}
 		snapshot, err := s0.FreezeNeeds(inventory)
 		if err != nil {
 			return err
 		}
-		if err := s0.SaveNeedSnapshot(*outputPath, snapshot); err != nil {
+		if err := s0.SaveNeedSnapshot(outputPath, snapshot); err != nil {
 			return err
 		}
 		digest, err := snapshot.Digest()
@@ -96,13 +107,13 @@ func run(ctx context.Context, args []string, output io.Writer) error {
 		}{"needs_frozen", digest, len(snapshot.Targets)})
 	case "screen":
 		var inventory s0.TargetInventory
-		if err := readRecord(*input, &inventory); err != nil {
+		if err := readRecord(input, &inventory); err != nil {
 			return err
 		}
 		var baseline *s0.NeedSnapshot
-		if *baselinePath != "" {
+		if baselinePath != "" {
 			baseline = &s0.NeedSnapshot{}
-			if err := readRecord(*baselinePath, baseline); err != nil {
+			if err := readRecord(baselinePath, baseline); err != nil {
 				return err
 			}
 		}

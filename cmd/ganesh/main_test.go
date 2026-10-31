@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -36,6 +37,43 @@ func TestCheckReportsUnknownsWithoutStartingAnything(t *testing.T) {
 	after, _ := os.ReadFile(path)
 	if !bytes.Equal(body, after) {
 		t.Fatal("check modified run record")
+	}
+}
+
+func TestSubcommandsRejectIrrelevantFlagsBeforeIO(t *testing.T) {
+	commands := []struct {
+		name    string
+		allowed map[string]bool
+	}{
+		{"prepare", map[string]bool{"dir": true}},
+		{"check", map[string]bool{"input": true, "phase": true}},
+		{"freeze-targets", map[string]bool{"input": true, "output": true}},
+		{"screen", map[string]bool{"input": true, "baseline": true}},
+	}
+	for _, command := range commands {
+		for _, flag := range []string{"dir", "input", "output", "baseline", "phase"} {
+			if command.allowed[flag] {
+				continue
+			}
+			t.Run(command.name+"/"+flag, func(t *testing.T) {
+				var output bytes.Buffer
+				err := run(context.Background(), []string{"s0", command.name, "--" + flag, "ghp_SYNTHETIC_SECRET"}, &output)
+				if err == nil || err.Error() != "invalid S0 command flags" || output.Len() != 0 {
+					t.Fatalf("irrelevant flag reached command execution: %v %s", err, output.Bytes())
+				}
+				if strings.Contains(err.Error(), "SYNTHETIC_SECRET") {
+					t.Fatal("flag value echoed")
+				}
+			})
+		}
+	}
+	workspace := filepath.Join(t.TempDir(), "must-not-be-created")
+	err := run(context.Background(), []string{"s0", "prepare", "--dir", workspace, "--phase", "heldout"}, &bytes.Buffer{})
+	if err == nil {
+		t.Fatal("prepare accepted phase flag")
+	}
+	if _, err := os.Stat(workspace); !os.IsNotExist(err) {
+		t.Fatalf("invalid command created a workspace: %v", err)
 	}
 }
 
