@@ -22,6 +22,8 @@ bin/ganesh s0 check --input .local/s0/day-one/run.json --phase inventory
 
 The workspace is ignored by git. Keep paths, permissions, evidence and later transcript-derived records private; do not copy them into public issues or commits. Local version discovery does not authorize source enrollment or reads.
 
+The next local tools are [need freezing and initial origin accounting](s0-origin-screen.md). They use the same private `targets.json`; real input selection and the actual bounded screen remain separate tasks.
+
 ## Select inputs when their phase needs them
 
 For the actual one-hour inventory, select 3–5 personal projects with explicit local-read permission and the first capture client/installation. Record their absolute paths in `projects`, each with `local_read_permission` set to `allowed` only after owner selection. Record the observed selected client/build and permitted transcript-access evidence in `capture`. No project content or source path is opened by `check`.

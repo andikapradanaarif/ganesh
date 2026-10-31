@@ -16,3 +16,5 @@ Project selection, the first capture installation, exact model IDs and budgets a
 Work is organized in [roadmap tracker #5](https://github.com/andikapradanaarif/ganesh/issues/5), starting with [S0 issue #6](https://github.com/andikapradanaarif/ganesh/issues/6). Each task uses an issue, milestone, branch and PR. See [AGENTS.md](AGENTS.md).
 
 The first implementation task provides [S0 run preparation](docs/s0-preparation.md): a Go CLI for local client discovery and private run records. Actual transcript screening and capture integration remain pending.
+
+[Initial origin accounting](docs/s0-origin-screen.md) freezes the handoff-need denominator and reports the A1 route from screener declarations. It does not inspect sources or verify provenance.
