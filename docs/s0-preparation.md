@@ -14,7 +14,7 @@ bin/ganesh s0 prepare --dir .local/s0/day-one
 bin/ganesh s0 check --input .local/s0/day-one/run.json --phase inventory
 ```
 
-Flags are scoped to each command: `prepare` accepts `--dir`; `check` accepts `--input` and `--phase`; `freeze-targets` accepts `--input` and `--output`; `screen` accepts `--input` and `--baseline`. Unrelated flags are rejected before any record is read or written. `doctor` accepts no flags.
+Flags are scoped to each command: `prepare` accepts `--dir`; `check` accepts `--input` and `--phase`; `freeze-targets` accepts `--input` and `--output`; `screen` accepts `--input` and `--baseline`. Unrelated flags are rejected before any record is read or written. `doctor` accepts no flags. The separate [local capture primitive](s0-local-capture.md) accepts only `--spool` and normalized stdin metadata.
 
 `doctor` probes only `go version`, `codex --version`, `claude --version`, `devin --version` and `crush --version`, using binaries found on PATH. Each probe has a two-second timeout and 2 KiB stdout limit. Only an exact recognized version string is recorded; raw output and stderr are discarded. Devin's reported build hash and Crush's fork/prerelease/build suffixes are preserved in the version identity. Missing binaries are `not_on_path`, not proof that the client is absent everywhere. These are discovery candidates, not a supported-client list: no observation selects a client or grants capture eligibility. Other clients and runners remain unknown until inspected.
 
@@ -50,6 +50,6 @@ The JSON result also includes `warnings`. If the opened `run.json` mode grants g
 
 ## Remaining day-one work
 
-After selection, inspect the actual permitted transcripts and installed schemas during the bounded screen; freeze high-priority targets before counting origins. Record H/M/U/E and their reasons under A1. Then implement/test only the selected client's bounded metadata capture profile, within the fixed 2–4-hour cap and smoke priority. The collector, its one-second host / 750 ms process-start deadline, receipts, scrubbing and latency/SessionEnd measurements are not implemented by this preparation CLI.
+After selection, inspect the actual permitted transcripts and installed schemas during the bounded screen; freeze high-priority targets before counting origins. Record H/M/U/E and their reasons under A1. Then implement/test only the selected client's bounded metadata capture profile, within the fixed 2–4-hour cap and smoke priority. The [local capture primitive](s0-local-capture.md) provides normalized metadata storage and local receipts; actual client reduction/scrubbing, the one-second host timeout, installed-profile latency/SessionEnd evidence and complete provenance remain unimplemented integration gates.
 
 Count this setup work in S0 effort. Neither an empty target inventory nor successful tooling tests completes P01/P02. No held-out answers, capture installation or release suite is claimed complete.

@@ -18,3 +18,5 @@ Work is organized in [roadmap tracker #5](https://github.com/andikapradanaarif/g
 The first implementation task provides [S0 run preparation](docs/s0-preparation.md): a Go CLI for local client discovery and private run records. Actual transcript screening and capture integration remain pending.
 
 [Initial origin accounting](docs/s0-origin-screen.md) freezes the handoff-need denominator and reports the A1 route from screener declarations. It does not inspect sources or verify provenance.
+
+The [local capture primitive](docs/s0-local-capture.md) accepts bounded normalized metadata on stdin and returns durable local receipts. Actual client adapters, hooks, upload and server intake are not implemented.
