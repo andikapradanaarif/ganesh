@@ -14,7 +14,7 @@ bin/ganesh s0 prepare --dir .local/s0/day-one
 bin/ganesh s0 check --input .local/s0/day-one/run.json --phase inventory
 ```
 
-`doctor` probes only `go version`, `codex --version` and `claude --version`, using binaries found on PATH. Each probe has a two-second timeout and 2 KiB stdout limit. Only an exact recognized version string is recorded; raw output and stderr are discarded. Missing binaries are `not_on_path`, not proof that the client is absent everywhere. These are discovery candidates, not a supported-client list: no observation selects a client or grants capture eligibility. Other clients and runners remain unknown until inspected.
+`doctor` probes only `go version`, `codex --version`, `claude --version`, `devin --version` and `crush --version`, using binaries found on PATH. Each probe has a two-second timeout and 2 KiB stdout limit. Only an exact recognized version string is recorded; raw output and stderr are discarded. Devin's reported build hash and Crush's fork/prerelease/build suffixes are preserved in the version identity. Missing binaries are `not_on_path`, not proof that the client is absent everywhere. These are discovery candidates, not a supported-client list: no observation selects a client or grants capture eligibility. Other clients and runners remain unknown until inspected.
 
 `prepare` creates a new 0700 workspace containing 0600 `run.json` and `targets.json` files. The parent must already exist; existing workspaces are never reused or overwritten. A failed preparation can leave partial files for inspection and is never reported as successful. This configuration writer makes no capture or remote-durability promise.
 

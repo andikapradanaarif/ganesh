@@ -18,11 +18,18 @@ func TestDiscoveryUsesOnlyFixedVersionCommands(t *testing.T) {
 			return []byte("go version go1.27.3 darwin/amd64\n"), nil
 		case "/fixture/codex":
 			return []byte("codex-cli 0.166.0\n"), nil
-		default:
+		case "/fixture/claude":
 			return []byte("2.1.295 (Claude Code)\n"), nil
+		case "/fixture/devin":
+			return []byte("devin 3000.11.234 (92c83011d113)\n"), nil
+		case "/fixture/crush":
+			return []byte("crush version v0.98.3-fork.0.20261027102508-630a3a9dbe00\n"), nil
+		default:
+			t.Fatalf("unexpected version command: %s", path)
+			return nil, nil
 		}
 	})
-	want := [][]string{{"/fixture/go", "version"}, {"/fixture/codex", "--version"}, {"/fixture/claude", "--version"}}
+	want := [][]string{{"/fixture/go", "version"}, {"/fixture/codex", "--version"}, {"/fixture/claude", "--version"}, {"/fixture/devin", "--version"}, {"/fixture/crush", "--version"}}
 	if !reflect.DeepEqual(commands, want) {
 		t.Fatalf("unexpected command: %v", commands)
 	}
@@ -30,6 +37,52 @@ func TestDiscoveryUsesOnlyFixedVersionCommands(t *testing.T) {
 		if result.Status != "observed" || result.Version == nil || result.CaptureProfileSupported {
 			t.Fatalf("wrong discovery status: %+v", result)
 		}
+	}
+}
+
+func TestDevinAndCrushVersionIdentityAndRejection(t *testing.T) {
+	for _, tc := range []struct {
+		name, output, version string
+	}{
+		{"devin", "devin 3000.11.234 (92c83011d113)\n", "3000.11.234 (92c83011d113)"},
+		{"devin", "devin 3000.11.234\n", "3000.11.234"},
+		{"crush", "crush version v0.98.3-fork.0.20261027102508-630a3a9dbe00\n", "v0.98.3-fork.0.20261027102508-630a3a9dbe00"},
+		{"crush", "crush version v0.98.3\n", "v0.98.3"},
+		{"crush", "crush version v0.98.3-rc.1+fixture\n", "v0.98.3-rc.1+fixture"},
+		{"devin", "devin 3000.11.234 (ghp_SYNTHETIC_SECRET)", ""},
+		{"devin", "devin 3000.11.234 (92c83011d113)\nghp_SYNTHETIC_SECRET", ""},
+		{"crush", "crush version v0.98.3\nghp_SYNTHETIC_SECRET", ""},
+		{"crush", "crush version (devel)", ""},
+	} {
+		t.Run(tc.name+"/"+tc.output, func(t *testing.T) {
+			results := discover(context.Background(), func(name string) (string, error) {
+				if name != tc.name {
+					return "", errors.New("not on fixture PATH")
+				}
+				return "/fixture/" + name, nil
+			}, func(context.Context, string, []string) ([]byte, error) {
+				return []byte(tc.output), nil
+			})
+			for _, result := range results {
+				if result.Name != tc.name {
+					continue
+				}
+				if tc.version == "" {
+					if result.Status != "version_unrecognized" || result.Version != nil {
+						t.Fatalf("unexpected content accepted: %+v", result)
+					}
+				} else if result.Status != "observed" || result.Version == nil || *result.Version != tc.version {
+					t.Fatalf("version identity changed: %+v", result)
+				}
+				if result.CaptureProfileSupported {
+					t.Fatal("version observation enabled capture")
+				}
+			}
+			encoded, _ := json.Marshal(results)
+			if strings.Contains(string(encoded), "SYNTHETIC_SECRET") {
+				t.Fatal("unexpected probe content persisted")
+			}
+		})
 	}
 }
 

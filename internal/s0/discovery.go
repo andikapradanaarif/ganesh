@@ -27,6 +27,8 @@ var probes = []probeSpec{
 	{"go", []string{"version"}, regexp.MustCompile(`^go version (go[0-9][0-9A-Za-z.+-]*) [a-z0-9_]+/[a-z0-9_]+$`)},
 	{"codex", []string{"--version"}, regexp.MustCompile(`^codex-cli ([0-9]+\.[0-9]+\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?)$`)},
 	{"claude", []string{"--version"}, regexp.MustCompile(`^([0-9]+\.[0-9]+\.[0-9]+) \(Claude Code\)$`)},
+	{"devin", []string{"--version"}, regexp.MustCompile(`^devin ([0-9]+\.[0-9]+\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?(?: \([0-9a-f]{7,40}\))?)$`)},
+	{"crush", []string{"--version"}, regexp.MustCompile(`^crush version (v?[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?)$`)},
 }
 
 type probeRunner func(context.Context, string, []string) ([]byte, error)
