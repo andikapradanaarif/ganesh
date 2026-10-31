@@ -1,0 +1,83 @@
+package hooks
+
+// Overlay-only synthetic integration fixture. Runs the pinned Crush source
+// serializer, shell runner and output aggregation, never an agent or model.
+import (
+	"context"
+	"encoding/json"
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+)
+
+func TestGaneshToolHookAdapter(t *testing.T) {
+	binary := os.Getenv("GANESH_TEST_BINARY")
+	if binary == "" {
+		t.Fatal("missing test binary")
+	}
+	spool := filepath.Join(t.TempDir(), "spool")
+	quote := func(s string) string { return "'" + strings.ReplaceAll(s, "'", "'\\''") + "'" }
+	command := quote(binary) + " hook crush --spool " + quote(spool)
+	configs := map[string][]HookConfig{}
+	for _, event := range []string{EventPreToolUse, EventPostToolUse, EventPostToolUseFailure} {
+		configs[event] = []HookConfig{{Command: command, Timeout: 1}}
+	}
+	work := t.TempDir()
+	runner := NewRunner(Static(configs), work, work)
+	pre := Event{
+		Name: EventPreToolUse, SessionID: "00000000-0000-4000-8000-000000000002",
+		Tool: &ToolCall{ID: "call-1", Name: "write", Input: `{"file_path":"/synthetic/private","content":"ghp_SYNTHETIC_SECRET"}`},
+	}
+	check := func(ev Event) {
+		t.Helper()
+		a := runner.Run(context.Background(), ev)
+		if a.HookCount != 1 || a.Decision != DecisionNone || a.Halt || a.Reason != "" || a.Context != "" || a.UpdatedInput != "" || a.UpdatedOutput != "" {
+			t.Fatalf("adapter influenced client control/context: %+v", a)
+		}
+	}
+	check(pre)
+	check(pre) // Exact callback retry.
+	post := pre
+	post.Name, post.ToolResponse = EventPostToolUse, new("ghp_SYNTHETIC_SECRET")
+	check(post)
+	failure := pre
+	failure.Name, failure.Error = EventPostToolUseFailure, "ghp_SYNTHETIC_SECRET"
+	check(failure) // Conflicting result rejected, still no control decision.
+	failure.Tool = &ToolCall{ID: "call-2", Name: "write", Input: pre.Tool.Input}
+	check(failure)
+	check(Event{Name: EventPreToolUse, SessionID: "invalid", Tool: pre.Tool})
+	entries, err := os.ReadDir(spool)
+	if err != nil {
+		t.Fatal(err)
+	}
+	count, failed := 0, 0
+	for _, entry := range entries {
+		body, err := os.ReadFile(filepath.Join(spool, entry.Name()))
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, forbidden := range []string{"ghp_", "/synthetic", "call-", "tool_input", "tool_response"} {
+			if strings.Contains(string(body), forbidden) {
+				t.Fatal("raw native content persisted")
+			}
+		}
+		if !strings.HasSuffix(entry.Name(), ".json") {
+			continue
+		}
+		count++
+		var record struct {
+			State, Origin, Coverage string
+			Metadata                struct{ Outcome string }
+		}
+		if json.Unmarshal(body, &record) != nil || record.State != "captured_local" || record.Origin != "unknown" || record.Coverage != "incomplete" {
+			t.Fatal("native runner evidence gained authority")
+		}
+		if record.Metadata.Outcome == "failed" {
+			failed++
+		}
+	}
+	if count != 3 || failed != 1 {
+		t.Fatalf("native runner effects: records=%d failed=%d", count, failed)
+	}
+}

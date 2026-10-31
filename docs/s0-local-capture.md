@@ -2,7 +2,7 @@
 
 Task: [#22](https://github.com/andikapradanaarif/ganesh/issues/22), under [S0 #6](https://github.com/andikapradanaarif/ganesh/issues/6). The [roadmap capture contract](personal-second-memory-roadmap.md#build-41-narrative-origin-file-provenance-and-capture-completeness) and [execution sheet](s0-execution-sheet.md) remain authoritative.
 
-`ganesh capture --spool DIR` accepts a normalized metadata object on stdin and returns a local receipt after storage checks succeed. It is an S0 development primitive, not a working client integration, HTTP/MCP endpoint, full hook adapter or transcript reader. No hooks are installed and discovery still reports every capture profile unsupported.
+`ganesh capture --spool DIR` accepts a normalized metadata object on stdin and returns a local receipt after storage checks succeed. It is an S0 development primitive, not a working client integration, HTTP/MCP endpoint, full hook adapter or transcript reader. A separate prototype [Crush tool-hook command](s0-crush-hooks.md) reduces a narrow native input subset into this core. No hooks are installed and discovery still reports every capture profile unsupported.
 
 ## Input
 

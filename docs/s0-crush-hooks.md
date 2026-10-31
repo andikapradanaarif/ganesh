@@ -34,4 +34,16 @@ The inspected Crush hook configuration has a per-command `timeout` in seconds an
 
 ## Validation
 
-Synthetic unit fixtures cover strict reduction, discarded secret-bearing content, stable case-sensitive identities, durable duplicate recovery and conflicting outcomes. Native source-runner and compiled-command evidence are recorded here when completed. These fixtures are separate from actual installed-client tests, per-installation latency measurements, production secret-scanner admission and S0 product acceptance.
+Synthetic unit fixtures cover strict reduction, discarded secret-bearing content, stable case-sensitive identities, durable duplicate recovery and conflicting outcomes. Compiled-command tests cover silent success/rejection, supported/unsupported clocks, an unchanged record after retry, rejected contradictory results, unsafe storage, malformed/oversized input, irrelevant flags and blocked stdin. The existing normalized-capture output/deadline tests still run.
+
+On 2026-11-01, the source-runner integration fixture passed against the revision above on macOS amd64, Go 1.27.3, CGO enabled. It used the actual Crush `BuildPayload`, hook runner, shell execution and output aggregation with `timeout: 1`, plus synthetic events. Six notifications (attempt, duplicate attempt, success, conflicting failure, distinct failure and invalid session) produced exactly three reduced records and no aggregate decision, halt, context or rewrite. Contradiction and invalid-session callbacks were non-blocking errors with empty adapter stderr. No agent/model/provider, installed binary, real tool effect, user transcript or client configuration was exercised. This is source-runner evidence, not installed-client acceptance or a latency percentile.
+
+To reproduce with that local source checkout and cached Go dependencies:
+
+```sh
+python3 integration/crush/test_runner.py /path/to/crush/source
+```
+
+The optional harness verifies the tracked revision/clean state, builds Ganesh, and adds a synthetic test through Go's temporary overlay mechanism. It does not edit the Crush checkout or fetch modules (`GOPROXY=off`, `GOSUMDB=off`, `GOTOOLCHAIN=local`). Temporary binary/overlay/spool files are removed. A missing dependency, incompatible platform or failing fixture is incomplete evidence, never a substituted pass.
+
+These fixtures are separate from actual installed-client tests, per-installation latency measurements, production secret-scanner admission and S0 product acceptance. SessionEnd/competing-hook measurements remain unknown, and no lifecycle coverage is claimed from tool-only tests.

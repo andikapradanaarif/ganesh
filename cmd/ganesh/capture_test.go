@@ -20,6 +20,7 @@ func TestCompiledCaptureCommand(t *testing.T) {
 	if output, err := exec.Command("go", "build", "-o", binary, ".").CombinedOutput(); err != nil {
 		t.Fatalf("build: %v %s", err, output)
 	}
+	testCompiledCrushHook(t, binary)
 	dir := filepath.Join(t.TempDir(), "spool")
 	input := `{"schema_version":1,"event_id":"00000000-0000-4000-8000-000000000001","session_id":"00000000-0000-4000-8000-000000000002","event":"tool_result","outcome":"failed"}`
 	if _, err := processclock.Start(); err != nil {
