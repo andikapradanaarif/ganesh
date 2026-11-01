@@ -25,6 +25,7 @@ const (
 	sessionField
 	callField
 	decisionField
+	triggerField
 	cwdField
 	nameField
 	inputField
@@ -36,8 +37,8 @@ const (
 var nativeFields = map[string]int{
 	"event": eventField, "hook_event_name": aliasField,
 	"session_id": sessionField, "tool_use_id": callField,
-	"decision": decisionField,
-	"cwd":      cwdField, "tool_name": nameField, "tool_input": inputField,
+	"decision": decisionField, "trigger": triggerField,
+	"cwd": cwdField, "tool_name": nameField, "tool_input": inputField,
 	"tool_response": responseField, "error": errorField,
 	"last_assistant_message": assistantField,
 }
@@ -99,8 +100,8 @@ func (p *nativeParser) expect(want byte) error {
 	return nil
 }
 
-func (p *nativeParser) envelope() ([5]string, uint16, error) {
-	var values [5]string
+func (p *nativeParser) envelope() ([6]string, uint16, error) {
+	var values [6]string
 	var seen uint16
 	if b, err := p.space(); err != nil || b != '{' || p.expect('{') != nil {
 		return values, seen, ErrPayload
@@ -130,11 +131,11 @@ func (p *nativeParser) envelope() ([5]string, uint16, error) {
 			if b != '"' {
 				return values, seen, ErrPayload
 			}
-			value, nonempty, err := p.stringValue(field <= decisionField, maxControl)
+			value, nonempty, err := p.stringValue(field <= triggerField, maxControl)
 			if err != nil || (!nonempty && field != responseField && field != errorField && field != assistantField) {
 				return values, seen, ErrPayload
 			}
-			if field <= decisionField {
+			if field <= triggerField {
 				values[field] = value
 			}
 		}
