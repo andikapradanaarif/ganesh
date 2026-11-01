@@ -51,6 +51,10 @@ func TestPermissionObservationSetAndRetries(t *testing.T) {
 		if err != nil || !again.Duplicate || !again.CapturedAt.Equal(first.CapturedAt) {
 			t.Fatalf("permission retry: %+v %v", again, err)
 		}
+		changed, err := Reduce([]byte(strings.ReplaceAll(permissionBody(tc.outcome), "ghp_SYNTHETIC_SECRET", "different discarded params")))
+		if err != nil || changed != want {
+			t.Fatal("discarded prompt content changed observation identity")
+		}
 		body, err := os.ReadFile(filepath.Join(directory, tc.id+".json"))
 		if err != nil {
 			t.Fatal(err)
@@ -87,6 +91,30 @@ func TestPermissionObservationSetAndRetries(t *testing.T) {
 	if count != 6 {
 		t.Fatalf("permission/tool observation set has %d records", count)
 	}
+}
+
+func FuzzPermissionDecision(f *testing.F) {
+	for _, outcome := range []string{"granted", "denied", "cancelled", "allow", "", "ghp_SYNTHETIC_SECRET"} {
+		f.Add(outcome, byte(0))
+	}
+	f.Fuzz(func(t *testing.T, outcome string, which byte) {
+		if len(outcome) > 8*1024 {
+			t.Skip()
+		}
+		// Use the independent stdlib encoder to keep the envelope valid while
+		// varying the decision data and the event carrying it.
+		event := []string{"PermissionResult", "PermissionRequest", "PreToolUse"}[which%3]
+		encoded, err := json.Marshal(outcome)
+		if err != nil {
+			t.Fatal(err)
+		}
+		body := strings.TrimSuffix(strings.ReplaceAll(attempt, "PreToolUse", event), "}") + `,"decision":` + string(encoded) + "}"
+		got, err := Reduce([]byte(body))
+		allowed := event == "PermissionResult" && (outcome == "granted" || outcome == "denied" || outcome == "cancelled")
+		if (err == nil) != allowed || allowed && (got.Event != "permission_result" || got.Outcome != outcome) || !allowed && got != (capture.Metadata{}) {
+			t.Fatal("permission input disagrees with independent event/enum expectation")
+		}
+	})
 }
 
 func TestPermissionEnvelopeAdmission(t *testing.T) {
