@@ -29,7 +29,7 @@ ENV = dict(os.environ, GOPROXY="off", GOSUMDB="off", GOTOOLCHAIN="local", CGO_EN
 
 
 def write_new(path, value):
-    with path.open("x", opener=lambda p, f: os.open(p, f, 0o600)) as output:
+    with open(path, "x", opener=lambda p, f: os.open(p, f, 0o600)) as output:
         json.dump(value, output, sort_keys=True)
         output.write("\n")
 
@@ -44,7 +44,7 @@ def rows(directory):
 
 
 def save_attempt(directory, result):
-    with (directory / "attempts.jsonl").open("a", opener=lambda p, f: os.open(p, f, 0o600)) as output:
+    with open(directory / "attempts.jsonl", "a", opener=lambda p, f: os.open(p, f, 0o600)) as output:
         output.write(json.dumps(result, sort_keys=True) + "\n")
         output.flush()
         os.fsync(output.fileno())
