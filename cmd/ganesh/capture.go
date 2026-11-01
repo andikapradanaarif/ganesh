@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/andikapradanaarif/ganesh/internal/adapter/crush"
 	"github.com/andikapradanaarif/ganesh/internal/capture"
 	"github.com/andikapradanaarif/ganesh/internal/processclock"
 )
@@ -24,6 +25,26 @@ func captureCommand(parent context.Context, args []string, input io.Reader, outp
 	if *directory == "" {
 		return errors.New("capture requires --spool")
 	}
+	return captureInput(parent, input, output, *directory, capture.Decode, true)
+}
+
+func hookCommand(parent context.Context, args []string, input io.Reader) error {
+	if len(args) == 0 || args[0] != "crush" {
+		return errors.New("unsupported capture hook adapter")
+	}
+	f := flag.NewFlagSet("hook crush", flag.ContinueOnError)
+	f.SetOutput(io.Discard)
+	directory := f.String("spool", "", "dedicated private local spool with an existing parent")
+	if err := f.Parse(args[1:]); err != nil || f.NArg() != 0 {
+		return errors.New("invalid capture hook flags")
+	}
+	if *directory == "" {
+		return errors.New("capture hook requires --spool")
+	}
+	return captureInput(parent, input, io.Discard, *directory, crush.Reduce, false)
+}
+
+func captureInput(parent context.Context, input io.Reader, output io.Writer, directory string, reduce func([]byte) (capture.Metadata, error), emitReceipt bool) error {
 	start, err := processclock.Start()
 	if err != nil {
 		return err
@@ -53,11 +74,11 @@ func captureCommand(parent context.Context, args []string, input io.Reader, outp
 		}
 		body = result.body
 	}
-	metadata, err := capture.Decode(body)
+	metadata, err := reduce(body)
 	if err != nil {
 		return err
 	}
-	receipt, err := (capture.Spool{Directory: *directory}).Append(ctx, metadata)
+	receipt, err := (capture.Spool{Directory: directory}).Append(ctx, metadata)
 	if err != nil {
 		return err
 	}
@@ -67,6 +88,11 @@ func captureCommand(parent context.Context, args []string, input io.Reader, outp
 	duration := time.Since(start)
 	if duration < 0 || duration >= captureBudget || ctx.Err() != nil {
 		return errors.New("capture process-start deadline exceeded or clock invalid")
+	}
+	if !emitReceipt {
+		// The durable record is the local receipt. Hook stdout would enter
+		// the client's control/context parser, so no development JSON is sent.
+		return nil
 	}
 	return emitCaptureReceipt(ctx, output, struct {
 		capture.Receipt
