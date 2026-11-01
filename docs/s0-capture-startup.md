@@ -30,4 +30,8 @@ Run the CLI/core durability and admission checks and both exact-pin native sourc
 
 ## Results
 
-Not run. No startup contributor, improvement or supported-profile result has been established by this plan.
+Diagnosis completed with all 30 planned attempts retained. The initial preparation invocation failed on a Python private-file writer API mismatch before any captures ran; its partial artifacts remain private, and the corrected preparation used a new directory. The writer/accounting regression tests pass.
+
+The unchanged baseline failed all ten new-file first executions and three of ten immediate warm executions under the one-second parent limit. The instrumented artifact failed all five first executions and two of five warm executions. Three first-execution failures returned traces showing 754.594, 821.243 and 845.194 ms before main-package initialization, already beyond 750 ms; two first executions were killed before returning a trace and their phase is unknown. Three successful warm traces show reduction below 0.4 ms and spool completion in 55–71 ms. These separate populations must not be pooled or filtered to successful captures.
+
+Before candidate execution, the analysis helper was corrected to include early-rejection final timestamps when receipt-ready is absent. Its initial ready-only calculation would have selected only successful diagnostic traces, contrary to the frozen requirement to retain failures. The original attempt records and runner digest are retained, and the decision records the correction/new analysis digest. No sample, threshold, counterbalanced order, deadline or attempt cap changes. Eight traces have observed completion; two remain unknown. Startup before the main package is a measured contributor; a specific OS mechanism has not been established. Candidate comparison is pending. No supported-profile result is claimed.

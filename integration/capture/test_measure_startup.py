@@ -11,6 +11,17 @@ import measure_startup as measure
 
 
 class MeasurementAccounting(unittest.TestCase):
+    def test_phase_gate_includes_early_rejections_without_ready(self):
+        results = [
+            {"arm": "trace", "startup_ms": 800, "trace_ns": [800000000, 800100000, 800200000, 0, 0, 0, 801000000]},
+            {"arm": "trace", "startup_ms": 5, "trace_ns": [5000000, 6000000, 7000000, 8000000, 9000000, 10000000, 11000000]},
+            {"arm": "trace", "exit": -9},
+        ]
+        fractions = measure.startup_fractions(results)
+        self.assertEqual(len(fractions), 2)
+        self.assertAlmostEqual(fractions[0], 800 / 801)
+        self.assertEqual(fractions[1], 0.5)
+
     def test_private_creation_never_overwrites(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "plan.json"

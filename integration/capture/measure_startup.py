@@ -254,13 +254,33 @@ def diagnose(directory):
     write_new(directory / "diagnosis.done", {"attempts": 30})
 
 
+def startup_fractions(results):
+    fractions = []
+    for result in results:
+        if result["arm"] != "trace" or result.get("startup_ms") is None:
+            continue
+        marks = result.get("trace_ns", [])
+        if len(marks) != 7:
+            continue
+        # An early rejection has no ready mark. Its measured final mark still
+        # establishes elapsed startup; never condition this gate on success.
+        end = marks[5] or marks[6]
+        span = result["startup_ms"] + (end - marks[0]) / 1e6
+        if end and span > 0:
+            fractions.append(result["startup_ms"] / span)
+    return fractions
+
+
 def compare(directory):
     if len(rows(directory)) != 30 or not (directory / "diagnosis.done").exists():
         raise RuntimeError("diagnosis incomplete or comparison already attempted")
-    traced = [r for r in rows(directory) if r["arm"] == "trace" and r.get("ready_ms") and r.get("startup_ms") is not None]
-    if not traced or statistics.median(r["startup_ms"] / r["ready_ms"] for r in traced) < 0.5:
+    fractions = startup_fractions(rows(directory))
+    if not fractions or statistics.median(fractions) < 0.5:
         raise RuntimeError("startup dominance gate not met; no candidate selected")
-    write_new(directory / "decision.json", {"candidate": "strip_symbols", "basis": "measured startup dominates ready interval"})
+    write_new(directory / "decision.json", {"candidate": "strip_symbols", "basis": "measured startup dominates observed completion interval",
+        "observed_traces": len(fractions), "unknown_traces": 10 - len(fractions),
+        "analysis_correction": "Include early-rejection completion when ready is unavailable; do not select only successful traces",
+        "driver_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest()})
     command(["go", "build", "-ldflags=-s -w", "-o", str(directory / "candidate"), "./cmd/ganesh"], directory / "source")
     write_new(directory / "candidate.json", artifact(directory / "candidate", ["-ldflags=-s -w"]))
     order = [False] * 10 + [True] * 10
