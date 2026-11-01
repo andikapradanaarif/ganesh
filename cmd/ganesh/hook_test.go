@@ -148,3 +148,52 @@ func TestHookCommandAdmission(t *testing.T) {
 		}
 	}
 }
+
+// The child uses the production exit-code dispatcher, with only its handler
+// replaced. No panic-injection flag or environment switch enters the real CLI.
+func TestHookExitProcess(t *testing.T) {
+	if len(os.Args) == 5 && os.Args[2] == "--" && os.Args[3] == "--ganesh-test-hook-exit" {
+		mode := os.Args[4]
+		os.Exit(commandExitCode([]string{"hook", "crush"}, func() error {
+			switch mode {
+			case "success":
+				return nil
+			case "error":
+				return errors.New("ghp_SYNTHETIC_SECRET")
+			case "panic":
+				panic("ghp_SYNTHETIC_SECRET")
+			case "nil-panic":
+				panic(nil)
+			case "runtime-panic":
+				var empty []int
+				_ = empty[len(os.Args)]
+			default:
+				return errors.New("invalid test case")
+			}
+			return nil
+		}, os.Stderr))
+	}
+	for _, mode := range []string{"success", "error", "panic", "nil-panic", "runtime-panic"} {
+		t.Run(mode, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+			defer cancel()
+			cmd := exec.CommandContext(ctx, os.Args[0], "-test.run=^TestHookExitProcess$", "--", "--ganesh-test-hook-exit", mode)
+			output, err := cmd.CombinedOutput()
+			exit := 0
+			if err != nil {
+				var status *exec.ExitError
+				if !errors.As(err, &status) {
+					t.Fatal(err)
+				}
+				exit = status.ExitCode()
+			}
+			want := 1
+			if mode == "success" {
+				want = 0
+			}
+			if exit != want || len(output) != 0 || ctx.Err() != nil {
+				t.Fatalf("hook exit leaked control/diagnostics: status=%d output=%q timeout=%v", exit, output, ctx.Err())
+			}
+		})
+	}
+}
