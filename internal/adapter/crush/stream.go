@@ -24,6 +24,7 @@ const (
 	aliasField
 	sessionField
 	callField
+	decisionField
 	cwdField
 	nameField
 	inputField
@@ -34,7 +35,8 @@ const (
 var nativeFields = map[string]int{
 	"event": eventField, "hook_event_name": aliasField,
 	"session_id": sessionField, "tool_use_id": callField,
-	"cwd": cwdField, "tool_name": nameField, "tool_input": inputField,
+	"decision": decisionField,
+	"cwd":      cwdField, "tool_name": nameField, "tool_input": inputField,
 	"tool_response": responseField, "error": errorField,
 }
 
@@ -95,8 +97,8 @@ func (p *nativeParser) expect(want byte) error {
 	return nil
 }
 
-func (p *nativeParser) envelope() ([4]string, uint16, error) {
-	var values [4]string
+func (p *nativeParser) envelope() ([5]string, uint16, error) {
+	var values [5]string
 	var seen uint16
 	if b, err := p.space(); err != nil || b != '{' || p.expect('{') != nil {
 		return values, seen, ErrPayload
@@ -126,11 +128,11 @@ func (p *nativeParser) envelope() ([4]string, uint16, error) {
 			if b != '"' {
 				return values, seen, ErrPayload
 			}
-			value, nonempty, err := p.stringValue(field <= callField, maxControl)
+			value, nonempty, err := p.stringValue(field <= decisionField, maxControl)
 			if err != nil || (!nonempty && field != responseField && field != errorField) {
 				return values, seen, ErrPayload
 			}
-			if field <= callField {
+			if field <= decisionField {
 				values[field] = value
 			}
 		}

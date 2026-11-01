@@ -88,6 +88,18 @@ func (m Metadata) Validate() error {
 		return ErrMetadata
 	}
 	switch m.Event {
+	case "permission_request":
+		if m.Outcome != "observed" {
+			return ErrMetadata
+		}
+		return nil
+	case "permission_result":
+		switch m.Outcome {
+		case "granted", "denied", "cancelled":
+			return nil
+		default:
+			return ErrMetadata
+		}
 	case "session_start", "session_end", "turn_stop", "tool_attempt", "tool_result", "subagent_start", "subagent_stop", "pre_compact", "post_compact", "instructions_observed":
 	default:
 		return ErrMetadata

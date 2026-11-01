@@ -13,8 +13,10 @@ Only five fields are admitted:
 | `schema_version` | Integer `1`. |
 | `event_id` | Stable lowercase UUID-shaped identity with a UUID version/variant. An adapter must create and preserve this identity before retrying. |
 | `session_id` | Lowercase UUID-shaped local session identity; actual client mapping is a later adapter requirement. |
-| `event` | `session_start`, `session_end`, `turn_stop`, `tool_attempt`, `tool_result`, `subagent_start`, `subagent_stop`, `pre_compact`, `post_compact`, or `instructions_observed`. |
-| `outcome` | `observed`, `succeeded`, `failed`, `denied`, `interrupted`, or `unknown`. |
+| `event` | `session_start`, `session_end`, `turn_stop`, `tool_attempt`, `tool_result`, `subagent_start`, `subagent_stop`, `pre_compact`, `post_compact`, `instructions_observed`, `permission_request`, or `permission_result`. |
+| `outcome` | `observed`, `succeeded`, `failed`, `denied`, `interrupted`, or `unknown` for existing event types; permission pairs as described below. |
+
+Permission events are an additive schema-v1 enum extension: `permission_request` permits only `observed`; `permission_result` permits only `granted`, `denied` or `cancelled`. The new `granted` and `cancelled` values are rejected for old event types. These are client-reported observations with unknown origin and incomplete coverage, never effective grants or execution results. New readers preserve old records; old binaries reject unsupported new enum values.
 
 Unknown/missing/duplicate keys, malformed identities, unsupported values, invalid encoding, extra JSON objects and input over 64 KiB fail with static errors. There is no place for raw text, paths, commands, tool results, credentials, owner declarations or successful-validation claims. Values are preserved exactly rather than normalized into another identity.
 

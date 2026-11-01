@@ -85,12 +85,26 @@ func testCompiledCrushHook(t *testing.T, binary string) {
 	run(largeSuccess, 0)
 	run(largeSuccess, 0)
 	run(largeFailure, 0)
+	permissionRequest := strings.ReplaceAll(nativeAttempt, "PreToolUse", "PermissionRequest")
+	permissionResult := strings.ReplaceAll(nativeAttempt, "PreToolUse", "PermissionResult")
+	run(permissionRequest, 0)
+	run(permissionRequest, 0)
+	for _, outcome := range []string{"granted", "denied", "cancelled"} {
+		body := strings.TrimSuffix(permissionResult, "}") + `,"decision":"` + outcome + `"}`
+		run(body, 0)
+		run(body, 0)
+	}
 	for _, body := range []string{
 		`{"raw":"ghp_SYNTHETIC_SECRET"}`,
 		strings.ReplaceAll(nativeAttempt, "PreToolUse", "SessionEnd"),
 		strings.Repeat(" ", crush.MaxNativeInput) + nativeAttempt,
 		strings.Replace(success, `"tool_response":"ghp_SYNTHETIC_SECRET"`, `"tool_response":"`+strings.Repeat("x", crush.MaxNativeInput)+`"`, 1),
 		strings.Replace(success, `"tool_response":"ghp_SYNTHETIC_SECRET"`, `"tool_response":"`+strings.Repeat("x", 128*1024)+"\xff\"", 1),
+		permissionResult, // An outcome is mandatory on PermissionResult.
+		strings.TrimSuffix(permissionResult, "}") + `,"decision":"allow"}`,
+		strings.TrimSuffix(permissionResult, "}") + `,"decision":"ghp_SYNTHETIC_SECRET"}`,
+		strings.TrimSuffix(permissionRequest, "}") + `,"decision":"granted"}`,
+		strings.TrimSuffix(success, "}") + `,"decision":"granted"}`,
 	} {
 		run(body, 1)
 	}
@@ -99,7 +113,8 @@ func testCompiledCrushHook(t *testing.T, binary string) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	count, failures := 0, 0
+	count, failures, requests := 0, 0, 0
+	permissionOutcomes := map[string]int{}
 	for _, entry := range entries {
 		body, err := os.ReadFile(filepath.Join(dir, entry.Name()))
 		if err != nil {
@@ -121,8 +136,14 @@ func testCompiledCrushHook(t *testing.T, binary string) {
 		if record.Metadata.Outcome == "failed" {
 			failures++
 		}
+		if record.Metadata.Event == "permission_request" {
+			requests++
+		}
+		if record.Metadata.Event == "permission_result" {
+			permissionOutcomes[record.Metadata.Outcome]++
+		}
 	}
-	if count != 6 || failures != 2 {
+	if count != 10 || failures != 2 || requests != 1 || len(permissionOutcomes) != 3 || permissionOutcomes["granted"] != 1 || permissionOutcomes["denied"] != 1 || permissionOutcomes["cancelled"] != 1 {
 		t.Fatalf("native effects: %d records, %d failures", count, failures)
 	}
 	if err := os.Chmod(dir, 0777); err != nil {

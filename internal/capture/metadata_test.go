@@ -36,3 +36,31 @@ func TestReducedMetadataAdmission(t *testing.T) {
 		t.Fatal("invalid UTF-8 accepted")
 	}
 }
+
+func TestPermissionMetadataPairs(t *testing.T) {
+	for _, event := range []string{"permission_request", "permission_result", "tool_attempt", "tool_result"} {
+		for _, outcome := range []string{"observed", "granted", "denied", "cancelled", "failed", "succeeded", "unknown"} {
+			m := fixtureMetadata()
+			m.Event, m.Outcome = event, outcome
+			want := false
+			switch event {
+			case "permission_request":
+				want = outcome == "observed"
+			case "permission_result":
+				want = outcome == "granted" || outcome == "denied" || outcome == "cancelled"
+			default:
+				// Preserve the existing v1 enum grammar for old event types;
+				// granted/cancelled are admitted only as permission results.
+				want = outcome != "granted" && outcome != "cancelled"
+			}
+			body, err := json.Marshal(m)
+			if err != nil {
+				t.Fatal(err)
+			}
+			got, err := Decode(body)
+			if (err == nil) != want || want && got != m {
+				t.Fatalf("metadata pair %s/%s admitted=%v want=%v", event, outcome, err == nil, want)
+			}
+		}
+	}
+}

@@ -20,7 +20,7 @@ func TestGaneshToolHookAdapter(t *testing.T) {
 	quote := func(s string) string { return "'" + strings.ReplaceAll(s, "'", "'\\''") + "'" }
 	command := quote(binary) + " hook crush --spool " + quote(spool)
 	configs := map[string][]HookConfig{}
-	for _, event := range []string{EventPreToolUse, EventPostToolUse, EventPostToolUseFailure} {
+	for _, event := range []string{EventPreToolUse, EventPostToolUse, EventPostToolUseFailure, EventPermissionRequest, EventPermissionResult} {
 		configs[event] = []HookConfig{{Command: command, Timeout: 1}}
 	}
 	work := t.TempDir()
@@ -63,11 +63,28 @@ func TestGaneshToolHookAdapter(t *testing.T) {
 	largeFailure.Tool = &ToolCall{ID: "call-4", Name: "write", Input: pre.Tool.Input}
 	largeFailure.Error = large
 	check(largeFailure)
+	request := pre
+	request.Name = EventPermissionRequest
+	check(request)
+	check(request)
+	for _, outcome := range []string{"granted", "denied", "cancelled"} {
+		result := pre
+		result.Name, result.Decision = EventPermissionResult, outcome
+		check(result)
+		check(result)
+	}
+	missing := pre
+	missing.Name = EventPermissionResult
+	check(missing)
+	invalid := missing
+	invalid.Decision = "allow"
+	check(invalid)
 	entries, err := os.ReadDir(spool)
 	if err != nil {
 		t.Fatal(err)
 	}
-	count, failed := 0, 0
+	count, failed, requests := 0, 0, 0
+	permissionOutcomes := map[string]int{}
 	for _, entry := range entries {
 		body, err := os.ReadFile(filepath.Join(spool, entry.Name()))
 		if err != nil {
@@ -84,7 +101,7 @@ func TestGaneshToolHookAdapter(t *testing.T) {
 		count++
 		var record struct {
 			State, Origin, Coverage string
-			Metadata                struct{ Outcome string }
+			Metadata                struct{ Event, Outcome string }
 		}
 		if json.Unmarshal(body, &record) != nil || record.State != "captured_local" || record.Origin != "unknown" || record.Coverage != "incomplete" {
 			t.Fatal("native runner evidence gained authority")
@@ -92,8 +109,14 @@ func TestGaneshToolHookAdapter(t *testing.T) {
 		if record.Metadata.Outcome == "failed" {
 			failed++
 		}
+		if record.Metadata.Event == "permission_request" {
+			requests++
+		}
+		if record.Metadata.Event == "permission_result" {
+			permissionOutcomes[record.Metadata.Outcome]++
+		}
 	}
-	if count != 6 || failed != 2 {
+	if count != 10 || failed != 2 || requests != 1 || len(permissionOutcomes) != 3 || permissionOutcomes["granted"] != 1 || permissionOutcomes["denied"] != 1 || permissionOutcomes["cancelled"] != 1 {
 		t.Fatalf("native runner effects: records=%d failed=%d", count, failed)
 	}
 }
