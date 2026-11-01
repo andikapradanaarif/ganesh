@@ -24,16 +24,19 @@ func Reduce(body []byte) (capture.Metadata, error) {
 	return ReduceStream(context.Background(), bytes.NewReader(body))
 }
 
-func nativeMetadata(values [4]string, seen uint16) (capture.Metadata, error) {
+func nativeMetadata(values [5]string, seen uint16) (capture.Metadata, error) {
 	var empty capture.Metadata
-	const required = (1 << (inputField + 1)) - 1
+	const required = ((1 << (inputField + 1)) - 1) &^ (1 << decisionField)
 	if seen&required != required || values[eventField] != values[aliasField] || !callID(values[callField]) {
 		return empty, ErrPayload
 	}
-	phase, outcome := "result", ""
+	if values[eventField] != "PermissionResult" && seen&(1<<decisionField) != 0 {
+		return empty, ErrPayload
+	}
+	phase, outcome, event := "result", "", "tool_result"
 	switch values[eventField] {
 	case "PreToolUse":
-		phase, outcome = "attempt", "unknown"
+		phase, outcome, event = "attempt", "unknown", "tool_attempt"
 		if seen&((1<<responseField)|(1<<errorField)) != 0 {
 			return empty, ErrPayload
 		}
@@ -47,13 +50,30 @@ func nativeMetadata(values [4]string, seen uint16) (capture.Metadata, error) {
 		if seen&(1<<responseField) != 0 {
 			return empty, ErrPayload
 		}
+	case "PermissionRequest":
+		phase, outcome, event = "permission_request", "observed", "permission_request"
+		if seen&((1<<responseField)|(1<<errorField)) != 0 {
+			return empty, ErrPayload
+		}
+	case "PermissionResult":
+		if seen&(1<<decisionField) == 0 || seen&((1<<responseField)|(1<<errorField)) != 0 {
+			return empty, ErrPayload
+		}
+		switch values[decisionField] {
+		case "granted", "denied", "cancelled":
+			outcome = values[decisionField]
+		default:
+			return empty, ErrPayload
+		}
+		event = "permission_result"
+		// The native payload omits the prompt ID. Distinct outcomes may be
+		// from different prompts for one call. Preserve the observed set;
+		// never claim a prompt count, order or resolved contradiction.
+		phase = "permission_result/" + outcome
 	default:
 		return empty, ErrPayload
 	}
-	m := capture.Metadata{SchemaVersion: 1, EventID: eventID(values[sessionField], values[callField], phase), SessionID: values[sessionField], Event: "tool_result", Outcome: outcome}
-	if phase == "attempt" {
-		m.Event = "tool_attempt"
-	}
+	m := capture.Metadata{SchemaVersion: 1, EventID: eventID(values[sessionField], values[callField], phase), SessionID: values[sessionField], Event: event, Outcome: outcome}
 	if m.Validate() != nil {
 		return empty, ErrPayload
 	}
