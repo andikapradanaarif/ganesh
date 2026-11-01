@@ -25,8 +25,9 @@ func TestGaneshTurnEndingCancellation(t *testing.T) {
 		// Separate stores prevent delivery in one context case from masking
 		// missing callbacks in the other via per-session deduplication.
 		spool := filepath.Join(t.TempDir(), "spool")
+		invoked := filepath.Join(t.TempDir(), "hook-invoked")
 		quote := func(s string) string { return "'" + strings.ReplaceAll(s, "'", "'\\''") + "'" }
-		command := quote(binary) + " hook crush --spool " + quote(spool)
+		command := "printf invoked > " + quote(invoked) + " && " + quote(binary) + " hook crush --spool " + quote(spool)
 		work := t.TempDir()
 		config := map[string][]hooks.HookConfig{}
 		for _, event := range []string{hooks.EventTurnEnd, hooks.EventStopFailure, hooks.EventInterrupt} {
@@ -56,11 +57,17 @@ func TestGaneshTurnEndingCancellation(t *testing.T) {
 			sa.fireTurnHook(ctx, call, hooks.Event{Name: hooks.EventInterrupt})
 		}
 		if !fixed {
+			if _, err := os.Stat(invoked); !os.IsNotExist(err) {
+				t.Fatal("baseline hook command ran; absence of a Ganesh record alone cannot prove producer loss")
+			}
 			if _, err := os.Stat(spool); !os.IsNotExist(err) {
 				t.Fatal("baseline no longer reproduces its pinned cancellation gap")
 			}
 			t.Log("Known baseline defect reproduced: no TurnEnd callback reached Ganesh")
 			continue
+		}
+		if _, err := os.Stat(invoked); err != nil {
+			t.Fatal("corrected producer did not invoke the hook command")
 		}
 		for _, tc := range []struct{ id, outcome string }{
 			{"4d7e68aa-4614-8ceb-b3f4-26f68b4b6b63", "observed"},

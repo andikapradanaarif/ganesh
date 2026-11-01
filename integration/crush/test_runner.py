@@ -62,8 +62,10 @@ def main():
         env["GANESH_TEST_BINARY"] = binary
         started = time.monotonic()
         print("Compiling/running pinned Crush fixture (60 s cap; test runtime 20 s)", flush=True)
+        # Serialize packages so timed capture checks do not compete with other
+        # package compilation/tests. Per-hook and process deadlines stay fixed.
         subprocess.run(
-            ["go", "test", "-count=1", "-overlay", str(overlay),
+            ["go", "test", "-p=1", "-count=1", "-overlay", str(overlay),
              "./internal/hooks", "./internal/agent", "-run", "^TestGanesh(ToolHookAdapter|TurnEndingCancellation)$", "-timeout=20s", "-v"],
             cwd=source, env=env, check=True, timeout=60,
         )
