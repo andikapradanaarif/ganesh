@@ -25,7 +25,13 @@ func captureCommand(parent context.Context, args []string, input io.Reader, outp
 	if *directory == "" {
 		return errors.New("capture requires --spool")
 	}
-	return captureInput(parent, input, output, *directory, capture.Decode, true)
+	return captureInput(parent, input, output, *directory, func(_ context.Context, r io.Reader) (capture.Metadata, error) {
+		body, err := io.ReadAll(io.LimitReader(r, capture.MaxInput+1))
+		if err != nil {
+			return capture.Metadata{}, errors.New("capture input read failed")
+		}
+		return capture.Decode(body)
+	}, true)
 }
 
 func hookCommand(parent context.Context, args []string, input io.Reader) error {
@@ -41,10 +47,25 @@ func hookCommand(parent context.Context, args []string, input io.Reader) error {
 	if *directory == "" {
 		return errors.New("capture hook requires --spool")
 	}
-	return captureInput(parent, input, io.Discard, *directory, crush.Reduce, false)
+	return captureInput(parent, input, io.Discard, *directory, crush.ReduceStream, false)
 }
 
-func captureInput(parent context.Context, input io.Reader, output io.Writer, directory string, reduce func([]byte) (capture.Metadata, error), emitReceipt bool) error {
+type metadataResult struct {
+	metadata capture.Metadata
+	err      error
+}
+
+// Reduction runs on the input worker so an unclosed stdin cannot hold the
+// process past its deadline. Recover here as well as at the CLI boundary;
+// panics cannot be recovered across goroutines or printed as Crush exit 2.
+func reduceCaptureInput(ctx context.Context, input io.Reader, reduce func(context.Context, io.Reader) (capture.Metadata, error)) (result metadataResult) {
+	result.err = errors.New("capture input reduction failed")
+	defer func() { _ = recover() }()
+	result.metadata, result.err = reduce(ctx, input)
+	return result
+}
+
+func captureInput(parent context.Context, input io.Reader, output io.Writer, directory string, reduce func(context.Context, io.Reader) (capture.Metadata, error), emitReceipt bool) error {
 	start, err := processclock.Start()
 	if err != nil {
 		return err
@@ -55,28 +76,19 @@ func captureInput(parent context.Context, input io.Reader, output io.Writer, dir
 	}
 	ctx, cancel := context.WithTimeout(parent, captureBudget-elapsed)
 	defer cancel()
-	type readResult struct {
-		body []byte
-		err  error
-	}
-	ready := make(chan readResult, 1)
+	ready := make(chan metadataResult, 1)
 	go func() {
-		body, err := io.ReadAll(io.LimitReader(input, capture.MaxInput+1))
-		ready <- readResult{body, err}
+		ready <- reduceCaptureInput(ctx, input, reduce)
 	}()
-	var body []byte
+	var metadata capture.Metadata
 	select {
 	case <-ctx.Done():
 		return errors.New("capture input deadline exceeded")
 	case result := <-ready:
 		if result.err != nil {
-			return errors.New("capture input read failed")
+			return result.err
 		}
-		body = result.body
-	}
-	metadata, err := reduce(body)
-	if err != nil {
-		return err
+		metadata = result.metadata
 	}
 	receipt, err := (capture.Spool{Directory: directory}).Append(ctx, metadata)
 	if err != nil {

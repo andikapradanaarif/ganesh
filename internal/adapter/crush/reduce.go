@@ -4,13 +4,11 @@ package crush
 
 import (
 	"bytes"
+	"context"
 	"crypto/sha256"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"strings"
-	"unicode/utf8"
 
 	"github.com/andikapradanaarif/ganesh/internal/capture"
 )
@@ -20,81 +18,39 @@ const Profile = "crush-tool-hooks-v1-aed2bae"
 
 var ErrPayload = errors.New("invalid or unsupported Crush tool-hook input")
 
-// Reduce drops every content-bearing field before calling the capture core.
-// Only the native session UUID and a derived call/phase UUID survive. Repeated
-// bodies with the same reduced metadata are duplicates, not proof of equal raw
-// input. Neither a reported success nor an ID proves a file mutation occurred.
+// Reduce is the byte-slice convenience entry point for synthetic fixtures.
+// The hook CLI calls ReduceStream directly and never buffers the native body.
 func Reduce(body []byte) (capture.Metadata, error) {
+	return ReduceStream(context.Background(), bytes.NewReader(body))
+}
+
+func nativeMetadata(values [4]string, seen uint16) (capture.Metadata, error) {
 	var empty capture.Metadata
-	if len(body) > capture.MaxInput || !utf8.Valid(body) {
-		return empty, ErrPayload
-	}
-	d := json.NewDecoder(bytes.NewReader(body))
-	first, err := d.Token()
-	if err != nil || first != json.Delim('{') {
-		return empty, ErrPayload
-	}
-	fields := make(map[string]json.RawMessage)
-	for d.More() {
-		token, err := d.Token()
-		if err != nil {
-			return empty, ErrPayload
-		}
-		key, ok := token.(string)
-		if !ok || fields[key] != nil {
-			return empty, ErrPayload
-		}
-		switch key {
-		case "event", "hook_event_name", "session_id", "cwd", "tool_name", "tool_input", "tool_use_id", "tool_response", "error":
-		default:
-			return empty, ErrPayload
-		}
-		var value json.RawMessage
-		if d.Decode(&value) != nil {
-			return empty, ErrPayload
-		}
-		fields[key] = value
-	}
-	last, err := d.Token()
-	if err != nil || last != json.Delim('}') || d.Decode(new(any)) != io.EOF {
-		return empty, ErrPayload
-	}
-	var event, alias, session, call, cwd, name string
-	for key, target := range map[string]*string{
-		"event": &event, "hook_event_name": &alias, "session_id": &session,
-		"tool_use_id": &call, "cwd": &cwd, "tool_name": &name,
-	} {
-		if !readString(fields[key], target) || *target == "" {
-			return empty, ErrPayload
-		}
-	}
-	input := bytes.TrimSpace(fields["tool_input"])
-	if len(input) == 0 || input[0] != '{' || event != alias || !callID(call) {
+	const required = (1 << (inputField + 1)) - 1
+	if seen&required != required || values[eventField] != values[aliasField] || !callID(values[callField]) {
 		return empty, ErrPayload
 	}
 	phase, outcome := "result", ""
-	switch event {
+	switch values[eventField] {
 	case "PreToolUse":
 		phase, outcome = "attempt", "unknown"
-		if fields["tool_response"] != nil || fields["error"] != nil {
+		if seen&((1<<responseField)|(1<<errorField)) != 0 {
 			return empty, ErrPayload
 		}
 	case "PostToolUse":
 		outcome = "succeeded"
-		var ignored string
-		if !readString(fields["tool_response"], &ignored) || fields["error"] != nil {
+		if seen&(1<<responseField) == 0 || seen&(1<<errorField) != 0 {
 			return empty, ErrPayload
 		}
 	case "PostToolUseFailure":
 		outcome = "failed"
-		var ignored string
-		if fields["tool_response"] != nil || (fields["error"] != nil && !readString(fields["error"], &ignored)) {
+		if seen&(1<<responseField) != 0 {
 			return empty, ErrPayload
 		}
 	default:
 		return empty, ErrPayload
 	}
-	m := capture.Metadata{SchemaVersion: 1, EventID: eventID(session, call, phase), SessionID: session, Event: "tool_result", Outcome: outcome}
+	m := capture.Metadata{SchemaVersion: 1, EventID: eventID(values[sessionField], values[callField], phase), SessionID: values[sessionField], Event: "tool_result", Outcome: outcome}
 	if phase == "attempt" {
 		m.Event = "tool_attempt"
 	}
@@ -102,10 +58,6 @@ func Reduce(body []byte) (capture.Metadata, error) {
 		return empty, ErrPayload
 	}
 	return m, nil
-}
-
-func readString(raw json.RawMessage, target *string) bool {
-	return len(raw) > 0 && raw[0] == '"' && json.Unmarshal(raw, target) == nil
 }
 
 func callID(value string) bool {

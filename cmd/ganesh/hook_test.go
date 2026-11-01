@@ -12,6 +12,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/andikapradanaarif/ganesh/internal/adapter/crush"
 	"github.com/andikapradanaarif/ganesh/internal/capture"
 	"github.com/andikapradanaarif/ganesh/internal/processclock"
 )
@@ -78,7 +79,7 @@ func testCompiledCrushHook(t *testing.T, binary string) {
 	for _, body := range []string{
 		`{"raw":"ghp_SYNTHETIC_SECRET"}`,
 		strings.ReplaceAll(nativeAttempt, "PreToolUse", "SessionEnd"),
-		strings.Repeat(" ", capture.MaxInput) + nativeAttempt,
+		strings.Repeat(" ", crush.MaxNativeInput) + nativeAttempt,
 	} {
 		run(body, 1)
 	}
