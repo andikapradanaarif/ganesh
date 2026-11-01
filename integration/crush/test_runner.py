@@ -14,7 +14,7 @@ import tempfile
 import time
 
 BASELINE_REVISION = "aed2bae006adc2f17c9ea2c693e2ca9cb4eca84f"
-ENDING_FIX_REVISION = "d05cce5db2b09f3b4a89f3359b1953c96207e9b1"
+ENDING_FIX_REVISION = "3378f47a8398c79a10e35cc61c994160cc0ae3ea"
 
 
 def main():

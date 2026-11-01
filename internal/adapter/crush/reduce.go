@@ -24,20 +24,22 @@ func Reduce(body []byte) (capture.Metadata, error) {
 	return ReduceStream(context.Background(), bytes.NewReader(body))
 }
 
-func nativeMetadata(values [5]string, seen uint16) (capture.Metadata, error) {
+func nativeMetadata(values [6]string, seen uint16) (capture.Metadata, error) {
 	var empty capture.Metadata
 	const base = (1 << eventField) | (1 << aliasField) | (1 << sessionField) | (1 << cwdField)
 	if seen&base != base || values[eventField] != values[aliasField] {
 		return empty, ErrPayload
 	}
 	switch values[eventField] {
+	case "PreCompact", "PostCompact":
+		return compactMetadata(values, seen, base)
 	case "TurnEnd", "StopFailure", "Interrupt":
 		return turnMetadata(values, seen, base)
 	}
-	if seen&(1<<assistantField) != 0 {
+	if seen&((1<<assistantField)|(1<<triggerField)) != 0 {
 		return empty, ErrPayload
 	}
-	const required = ((1 << (inputField + 1)) - 1) &^ (1 << decisionField)
+	const required = base | (1 << callField) | (1 << nameField) | (1 << inputField)
 	if seen&required != required || !callID(values[callField]) {
 		return empty, ErrPayload
 	}
@@ -91,7 +93,26 @@ func nativeMetadata(values [5]string, seen uint16) (capture.Metadata, error) {
 	return m, nil
 }
 
-func turnMetadata(values [5]string, seen, allowed uint16) (capture.Metadata, error) {
+func compactMetadata(values [6]string, seen, base uint16) (capture.Metadata, error) {
+	var empty capture.Metadata
+	const trigger = 1 << triggerField
+	if seen != base|trigger || (values[triggerField] != "auto" && values[triggerField] != "manual") {
+		return empty, ErrPayload
+	}
+	event := "pre_compact"
+	if values[eventField] == "PostCompact" {
+		event = "post_compact"
+	}
+	// No compaction ID is supplied. Trigger is validated then discarded;
+	// both triggers and repeated invocations collapse to one phase marker.
+	m := capture.Metadata{SchemaVersion: 1, EventID: eventID(values[sessionField], "", "compact/"+values[eventField]), SessionID: values[sessionField], Event: event, Outcome: "observed"}
+	if m.Validate() != nil {
+		return empty, ErrPayload
+	}
+	return m, nil
+}
+
+func turnMetadata(values [6]string, seen, allowed uint16) (capture.Metadata, error) {
 	var empty capture.Metadata
 	outcome := ""
 	switch values[eventField] {

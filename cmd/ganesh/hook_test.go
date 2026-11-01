@@ -24,12 +24,15 @@ const nativeTurnEnd = `{"event":"TurnEnd","hook_event_name":"TurnEnd","session_i
 func testCompiledCrushHook(t *testing.T, binary string) {
 	t.Helper()
 	dir := filepath.Join(t.TempDir(), "crush-spool")
+	invocation := 0
 	run := func(body string, exit int, args ...string) {
 		t.Helper()
+		invocation++
 		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 		defer cancel()
 		cmd := exec.CommandContext(ctx, binary, append([]string{"hook", "crush", "--spool", dir}, args...)...)
 		cmd.Stdin = strings.NewReader(body)
+		started := time.Now()
 		output, err := cmd.CombinedOutput()
 		got := 0
 		if err != nil {
@@ -40,7 +43,7 @@ func testCompiledCrushHook(t *testing.T, binary string) {
 			got = status.ExitCode()
 		}
 		if len(output) != 0 || got != exit || ctx.Err() != nil {
-			t.Fatalf("hook output/exit/deadline: %q %v %v", output, err, ctx.Err())
+			t.Fatalf("native hook invocation %d expected exit %d after %s: output=%q error=%v context=%v", invocation, exit, time.Since(started), output, err, ctx.Err())
 		}
 	}
 	if _, err := processclock.Start(); err != nil {
@@ -105,6 +108,15 @@ func testCompiledCrushHook(t *testing.T, binary string) {
 	run(strings.TrimSuffix(stopFailure, "}")+`,"error":"`+large+`"}`, 0)
 	run(interrupt, 0)
 	run(interrupt, 0)
+	for _, event := range []string{"PreCompact", "PostCompact"} {
+		base := strings.ReplaceAll(nativeTurnEnd, "TurnEnd", event)
+		for _, trigger := range []string{"auto", "manual", "auto"} {
+			run(strings.TrimSuffix(base, "}")+`,"trigger":"`+trigger+`"}`, 0)
+		}
+		for _, suffix := range []string{"", `,"trigger":null`, `,"trigger":""`, `,"trigger":"AUTO"`, `,"trigger":"ghp_SYNTHETIC_SECRET"`, `,"trigger":"auto","tri\u0067ger":"manual"`, `,"trigger":"auto","tool_input":{}`} {
+			run(strings.TrimSuffix(base, "}")+suffix+"}", 1)
+		}
+	}
 	for _, body := range []string{
 		`{"raw":"ghp_SYNTHETIC_SECRET"}`,
 		strings.ReplaceAll(nativeAttempt, "PreToolUse", "SessionEnd"),
@@ -119,6 +131,8 @@ func testCompiledCrushHook(t *testing.T, binary string) {
 		strings.ReplaceAll(nativeAttempt, "PreToolUse", "Interrupt"),
 		strings.TrimSuffix(stopFailure, "}") + `,"last_assistant_message":"ghp_SYNTHETIC_SECRET"}`,
 		strings.TrimSuffix(nativeAttempt, "}") + `,"last_assistant_message":"ghp_SYNTHETIC_SECRET"}`,
+		strings.TrimSuffix(nativeAttempt, "}") + `,"trigger":"auto"}`,
+		strings.TrimSuffix(nativeTurnEnd, "}") + `,"trigger":"manual"}`,
 	} {
 		run(body, 1)
 	}
@@ -130,12 +144,13 @@ func testCompiledCrushHook(t *testing.T, binary string) {
 	count, failures, requests := 0, 0, 0
 	permissionOutcomes := map[string]int{}
 	turnOutcomes := map[string]int{}
+	compactPhases := map[string]int{}
 	for _, entry := range entries {
 		body, err := os.ReadFile(filepath.Join(dir, entry.Name()))
 		if err != nil {
 			t.Fatal(err)
 		}
-		for _, forbidden := range []string{"SYNTHETIC_SECRET", "/synthetic", "call-", "tool_input", "tool_response", "last_assistant_message"} {
+		for _, forbidden := range []string{"SYNTHETIC_SECRET", "/synthetic", "call-", "tool_input", "tool_response", "last_assistant_message", `"trigger"`, `"auto"`, `"manual"`} {
 			if bytes.Contains(body, []byte(forbidden)) {
 				t.Fatal("raw native content reached the spool")
 			}
@@ -160,12 +175,21 @@ func testCompiledCrushHook(t *testing.T, binary string) {
 		if record.Metadata.Event == "turn_stop" {
 			turnOutcomes[record.Metadata.Outcome]++
 		}
+		if record.Metadata.Event == "pre_compact" || record.Metadata.Event == "post_compact" {
+			if record.Metadata.Outcome != "observed" {
+				t.Fatal("compaction notification gained completion authority")
+			}
+			compactPhases[record.Metadata.Event]++
+		}
 	}
-	if count != 13 || failures != 2 || requests != 1 || len(permissionOutcomes) != 3 || permissionOutcomes["granted"] != 1 || permissionOutcomes["denied"] != 1 || permissionOutcomes["cancelled"] != 1 {
+	if count != 15 || failures != 2 || requests != 1 || len(permissionOutcomes) != 3 || permissionOutcomes["granted"] != 1 || permissionOutcomes["denied"] != 1 || permissionOutcomes["cancelled"] != 1 {
 		t.Fatalf("native effects: %d records, %d failures", count, failures)
 	}
 	if len(turnOutcomes) != 3 || turnOutcomes["observed"] != 1 || turnOutcomes["failed"] != 1 || turnOutcomes["interrupted"] != 1 {
 		t.Fatal("turn endings were lost, duplicated or promoted to success")
+	}
+	if len(compactPhases) != 2 || compactPhases["pre_compact"] != 1 || compactPhases["post_compact"] != 1 {
+		t.Fatal("compaction phases were lost, counted or collided with other events")
 	}
 	if err := os.Chmod(dir, 0777); err != nil {
 		t.Fatal(err)

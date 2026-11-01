@@ -20,7 +20,7 @@ func TestGaneshToolHookAdapter(t *testing.T) {
 	quote := func(s string) string { return "'" + strings.ReplaceAll(s, "'", "'\\''") + "'" }
 	command := quote(binary) + " hook crush --spool " + quote(spool)
 	configs := map[string][]HookConfig{}
-	for _, event := range []string{EventPreToolUse, EventPostToolUse, EventPostToolUseFailure, EventPermissionRequest, EventPermissionResult, EventTurnEnd, EventStopFailure, EventInterrupt} {
+	for _, event := range []string{EventPreToolUse, EventPostToolUse, EventPostToolUseFailure, EventPermissionRequest, EventPermissionResult, EventTurnEnd, EventStopFailure, EventInterrupt, EventPreCompact, EventPostCompact} {
 		configs[event] = []HookConfig{{Command: command, Timeout: 1}}
 	}
 	work := t.TempDir()
@@ -29,8 +29,10 @@ func TestGaneshToolHookAdapter(t *testing.T) {
 		Name: EventPreToolUse, SessionID: "00000000-0000-4000-8000-000000000002",
 		Tool: &ToolCall{ID: "call-1", Name: "write", Input: `{"file_path":"/synthetic/private","content":"ghp_SYNTHETIC_SECRET"}`},
 	}
+	notifications := 0
 	check := func(ev Event) {
 		t.Helper()
+		notifications++
 		a := runner.Run(context.Background(), ev)
 		if a.HookCount != 1 || a.Decision != DecisionNone || a.Halt || a.Reason != "" || a.Context != "" || a.UpdatedInput != "" || a.UpdatedOutput != "" {
 			t.Fatalf("adapter influenced client control/context: %+v", a)
@@ -89,6 +91,13 @@ func TestGaneshToolHookAdapter(t *testing.T) {
 	invalidTurn.Name = EventInterrupt
 	check(invalidTurn)
 	check(Event{Name: EventStopFailure, SessionID: pre.SessionID, LastAssistantMessage: &large})
+	for _, name := range []string{EventPreCompact, EventPostCompact} {
+		for _, trigger := range []string{"auto", "manual", "auto", "", "ghp_SYNTHETIC_SECRET"} {
+			check(Event{Name: name, SessionID: pre.SessionID, Trigger: trigger})
+		}
+		check(Event{Name: name, SessionID: pre.SessionID, Trigger: "auto", Tool: pre.Tool})
+	}
+	check(Event{Name: EventTurnEnd, SessionID: pre.SessionID, Trigger: "auto"})
 	entries, err := os.ReadDir(spool)
 	if err != nil {
 		t.Fatal(err)
@@ -96,12 +105,13 @@ func TestGaneshToolHookAdapter(t *testing.T) {
 	count, failed, requests := 0, 0, 0
 	permissionOutcomes := map[string]int{}
 	turnOutcomes := map[string]int{}
+	compactPhases := map[string]int{}
 	for _, entry := range entries {
 		body, err := os.ReadFile(filepath.Join(spool, entry.Name()))
 		if err != nil {
 			t.Fatal(err)
 		}
-		for _, forbidden := range []string{"ghp_", "/synthetic", "call-", "tool_input", "tool_response", "last_assistant_message"} {
+		for _, forbidden := range []string{"ghp_", "/synthetic", "call-", "tool_input", "tool_response", "last_assistant_message", `"trigger"`, `"auto"`, `"manual"`} {
 			if strings.Contains(string(body), forbidden) {
 				t.Fatal("raw native content persisted")
 			}
@@ -129,11 +139,21 @@ func TestGaneshToolHookAdapter(t *testing.T) {
 		if record.Metadata.Event == "turn_stop" {
 			turnOutcomes[record.Metadata.Outcome]++
 		}
+		if record.Metadata.Event == "pre_compact" || record.Metadata.Event == "post_compact" {
+			if record.Metadata.Outcome != "observed" {
+				t.Fatal("compaction phase gained completion authority")
+			}
+			compactPhases[record.Metadata.Event]++
+		}
 	}
-	if count != 13 || failed != 2 || requests != 1 || len(permissionOutcomes) != 3 || permissionOutcomes["granted"] != 1 || permissionOutcomes["denied"] != 1 || permissionOutcomes["cancelled"] != 1 {
+	if count != 15 || failed != 2 || requests != 1 || len(permissionOutcomes) != 3 || permissionOutcomes["granted"] != 1 || permissionOutcomes["denied"] != 1 || permissionOutcomes["cancelled"] != 1 {
 		t.Fatalf("native runner effects: records=%d failed=%d", count, failed)
 	}
 	if len(turnOutcomes) != 3 || turnOutcomes["observed"] != 1 || turnOutcomes["failed"] != 1 || turnOutcomes["interrupted"] != 1 {
 		t.Fatal("turn endings were lost, duplicated or promoted to success")
 	}
+	if len(compactPhases) != 2 || compactPhases["pre_compact"] != 1 || compactPhases["post_compact"] != 1 {
+		t.Fatal("compaction phases were lost, counted or collided")
+	}
+	t.Logf("%d synthetic notifications produced %d reduced records", notifications, count)
 }
