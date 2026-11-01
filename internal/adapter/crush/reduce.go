@@ -26,8 +26,19 @@ func Reduce(body []byte) (capture.Metadata, error) {
 
 func nativeMetadata(values [5]string, seen uint16) (capture.Metadata, error) {
 	var empty capture.Metadata
+	const base = (1 << eventField) | (1 << aliasField) | (1 << sessionField) | (1 << cwdField)
+	if seen&base != base || values[eventField] != values[aliasField] {
+		return empty, ErrPayload
+	}
+	switch values[eventField] {
+	case "TurnEnd", "StopFailure", "Interrupt":
+		return turnMetadata(values, seen, base)
+	}
+	if seen&(1<<assistantField) != 0 {
+		return empty, ErrPayload
+	}
 	const required = ((1 << (inputField + 1)) - 1) &^ (1 << decisionField)
-	if seen&required != required || values[eventField] != values[aliasField] || !callID(values[callField]) {
+	if seen&required != required || !callID(values[callField]) {
 		return empty, ErrPayload
 	}
 	if values[eventField] != "PermissionResult" && seen&(1<<decisionField) != 0 {
@@ -74,6 +85,34 @@ func nativeMetadata(values [5]string, seen uint16) (capture.Metadata, error) {
 		return empty, ErrPayload
 	}
 	m := capture.Metadata{SchemaVersion: 1, EventID: eventID(values[sessionField], values[callField], phase), SessionID: values[sessionField], Event: event, Outcome: outcome}
+	if m.Validate() != nil {
+		return empty, ErrPayload
+	}
+	return m, nil
+}
+
+func turnMetadata(values [5]string, seen, allowed uint16) (capture.Metadata, error) {
+	var empty capture.Metadata
+	outcome := ""
+	switch values[eventField] {
+	case "TurnEnd":
+		allowed |= 1 << assistantField
+		outcome = "observed" // A normal ending is not proof of task success.
+	case "StopFailure":
+		allowed |= 1 << errorField
+		outcome = "failed"
+	case "Interrupt":
+		outcome = "interrupted"
+	default:
+		return empty, ErrPayload
+	}
+	if seen & ^allowed != 0 {
+		return empty, ErrPayload
+	}
+	// The native notification has no turn/call ID. An empty call component
+	// plus a distinct phase identifies only a per-session ending-type marker.
+	// Repeated turns collapse; neither count nor order can be reconstructed.
+	m := capture.Metadata{SchemaVersion: 1, EventID: eventID(values[sessionField], "", "turn/"+values[eventField]), SessionID: values[sessionField], Event: "turn_stop", Outcome: outcome}
 	if m.Validate() != nil {
 		return empty, ErrPayload
 	}
