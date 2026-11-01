@@ -8,6 +8,7 @@ import unittest
 from unittest import mock
 
 import measure_startup as measure
+from analyze_startup import evaluate
 
 
 class MeasurementAccounting(unittest.TestCase):
@@ -70,6 +71,42 @@ class MeasurementAccounting(unittest.TestCase):
                     measure.attempt(Path(directory), None, Path(directory) / "unused", "diagnosis", "baseline", "warm", 0)
                 launch.assert_not_called()
             self.assertEqual(measure.rows(Path(directory)), [])
+
+    def test_decision_rejects_a_new_failure_despite_faster_median(self):
+        results = self.comparison_fixture()
+        target = next(r for r in results if (r["stage"], r["arm"], r["category"], r["block"]) == ("comparison", "candidate", "warm", 0))
+        target["success"], target["exit"], target["record"] = False, 1, "absent"
+        decision = evaluate(results)
+        self.assertTrue(decision["speed_signal"])
+        self.assertFalse(decision["build_recommendation"])
+        self.assertEqual(decision["added_failure_pairs"], [{"category": "warm", "block": 0}])
+
+    def test_decision_uses_full_sample_and_checks_the_slow_tail(self):
+        results = self.comparison_fixture()
+        self.assertTrue(evaluate(results)["build_recommendation"])
+        self.assertFalse(evaluate(results[:-1])["build_recommendation"])
+        for r in results:
+            if r["arm"] == "candidate" and r["category"] == "new_file_first" and r["block"] >= 18:
+                r["parent_ms"] = 200
+        decision = evaluate(results)
+        self.assertGreater(decision["paired_median_improvement"], .20)
+        self.assertFalse(decision["build_recommendation"])
+
+    @staticmethod
+    def comparison_fixture():
+        results = []
+        for stage, arm, categories in [
+            ("diagnosis", "baseline", [("new_file_first", 10), ("warm", 10)]),
+            ("diagnosis", "trace", [("new_file_first", 5), ("warm", 5)]),
+            ("comparison", "baseline", [("new_file_first", 20), ("warm", 20), ("idle_30s", 2)]),
+            ("comparison", "candidate", [("new_file_first", 20), ("warm", 20), ("idle_30s", 2)]),
+        ]:
+            for category, count in categories:
+                for block in range(count):
+                    results.append({"stage": stage, "arm": arm, "category": category, "block": block,
+                        "parent_ms": 50 if arm == "candidate" else 100, "success": True, "exit": 0,
+                        "record": "present_unknown_incomplete", "output_bytes": {"stdout": 0, "stderr": 0}})
+        return results
 
     def test_attempt_cap_prevents_another_launch(self):
         with tempfile.TemporaryDirectory() as directory:
