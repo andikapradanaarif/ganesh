@@ -101,7 +101,7 @@ func TestNativeByteBoundAndEOF(t *testing.T) {
 func TestDiscardedJSONGrammar(t *testing.T) {
 	const input = `{"file_path":"/synthetic/private","content":"ghp_SYNTHETIC_SECRET"}`
 	for _, value := range []string{
-		`{}`, `{"x":null}`, `{"x":true,"y":false}`, `{"x":-0.1e+12}`, `{"x":1E-2}`,
+		`{}`, `{"x":null}`, `{"x":true,"y":false}`, `{"x":-0.1e+12}`, `{"x":1E-2}`, `{"x":1e99999}`,
 		`{"x":[]}`, `{"x":{"y":[1,"ok",{},[]]}}`, `{"x":"😺é\u263a\n\t\\\"\/"}`,
 		`{"x":"\ud800"}`, `{"duplicate":1,"duplicate":2}`,
 	} {
@@ -142,6 +142,11 @@ func TestStreamCancellationAndControls(t *testing.T) {
 	if m, err := ReduceStream(ctx, strings.NewReader(attempt)); !errors.Is(err, ErrPayload) || m != (capture.Metadata{}) {
 		t.Fatal("cancelled stream admitted")
 	}
+	ctx, cancel = context.WithCancel(context.Background())
+	input := &cancelReader{input: largeResult(128 * 1024), cancel: cancel}
+	if m, err := ReduceStream(ctx, input); !errors.Is(err, ErrPayload) || m != (capture.Metadata{}) || input.reads != 2 {
+		t.Fatalf("mid-stream cancellation: %+v %v reads=%d", m, err, input.reads)
+	}
 	for _, body := range []string{
 		strings.Replace(attempt, `"event":`, `"\u0065vent":`, 1),
 		strings.Replace(attempt, `"call-1"`, `"\u0063all-1"`, 1),
@@ -163,10 +168,25 @@ func TestStreamCancellationAndControls(t *testing.T) {
 	}
 }
 
+type cancelReader struct {
+	input  io.Reader
+	cancel context.CancelFunc
+	reads  int
+}
+
+func (r *cancelReader) Read(b []byte) (int, error) {
+	r.reads++
+	n, err := r.input.Read(b)
+	if r.reads == 2 {
+		r.cancel()
+	}
+	return n, err
+}
+
 // Independent standard-library syntax/UTF-8 oracle for the custom skipper.
 // Mutations affect only the discarded tool_input object, not protected fields.
 func FuzzDiscardedToolInput(f *testing.F) {
-	for _, value := range []string{`{}`, `{"x":1}`, `{"x":"a\\\"b"}`, `{"x":[true,null,-1e2]}`, `{"x":01}`, `{"x":"😺"}`} {
+	for _, value := range []string{`{}`, `{"x":1}`, `{"x":"a\\\"b"}`, `{"x":[true,null,-1e2]}`, `{"x":01}`, `{"x":"😺"}`, `{"x":1e99999}`} {
 		f.Add(value)
 	}
 	f.Fuzz(func(t *testing.T, value string) {
@@ -183,6 +203,7 @@ func FuzzDiscardedToolInput(f *testing.F) {
 			// A standalone valid object cannot escape into the parent envelope.
 			// Count its containers with the independent stdlib token decoder.
 			d := json.NewDecoder(strings.NewReader(value))
+			d.UseNumber()           // syntax oracle must not impose float64 range semantics
 			depth, maxDepth := 1, 1 // surrounding envelope already contributes one
 			for {
 				token, tokenErr := d.Token()

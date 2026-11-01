@@ -48,7 +48,7 @@ If another pre-tool hook denies or halts a call, the inspected `hookedTool` retu
 
 Synthetic unit fixtures cover strict reduction, discarded secret-bearing content, stable case-sensitive identities, durable duplicate recovery and conflicting outcomes. Compiled-command tests cover silent success/rejection, supported/unsupported clocks, an unchanged record after retry, rejected contradictory results, unsafe storage, malformed/oversized input, irrelevant flags and blocked stdin. The existing normalized-capture output/deadline tests still run.
 
-Subprocess fixtures exercise the production exit-code dispatcher with success, an error, a secret-bearing panic, `panic(nil)` and a recoverable bounds panic. They require empty combined stdout/stderr, exit 0 for success and exit 1 otherwise. Panic injection exists only in test code; the production CLI has no panic trigger. Runtime fatal failures and other-goroutine panic containment are not tested or claimed.
+Subprocess fixtures exercise the production exit-code dispatcher with success, an error, a secret-bearing panic, `panic(nil)`, a recoverable bounds panic and a reader panic on the input worker. They require empty combined stdout/stderr, exit 0 for success and exit 1 otherwise. Panic injection exists only in test code; the production CLI has no panic trigger. Runtime fatal failures and containment of unguarded goroutines are not tested or claimed.
 
 On 2026-11-01, the source-runner integration fixture passed against the revision above on macOS amd64, Go 1.27.3, CGO enabled. It used the actual Crush `BuildPayload`, hook runner, shell execution and output aggregation with `timeout: 1`, plus synthetic events. Six notifications (attempt, duplicate attempt, success, conflicting failure, distinct failure and invalid session) produced exactly three reduced records and no aggregate decision, halt, context or rewrite. Contradiction and invalid-session callbacks were non-blocking errors with empty adapter stderr. No agent/model/provider, installed binary, real tool effect, user transcript or client configuration was exercised. This is source-runner evidence, not installed-client acceptance or a latency percentile.
 
@@ -62,6 +62,28 @@ The optional harness verifies the tracked revision/clean state, builds Ganesh, a
 
 These fixtures are separate from actual installed-client tests, per-installation latency measurements, production secret-scanner admission and S0 product acceptance. SessionEnd/competing-hook measurements remain unknown, and no lifecycle coverage is claimed from tool-only tests.
 
-### Streaming follow-up
+### Streaming follow-up, 2026-11-01
 
-The streaming implementation is exercised with synthetic large results/arguments, JSON grammar/UTF-8 and depth boundaries, exact raw-byte limits, chunked readers and independent standard-library syntax checks. Its event-ID profile is unchanged, so previously accepted callbacks retain their retry/conflict identity. Compiled/native-runner and allocation evidence for the follow-up will be recorded when completed. No installed capture profile or product gate is enabled.
+The native source-runner fixture now sends ten synthetic notifications and checks six retained records, including one large attempt, one large success, its duplicate and one large failure. The added argument/output/error values each contain at least 128 KiB of discarded text. All aggregate decisions remain `none`, with no context/halt/rewrite. The compiled CLI separately tests large values, valid over-cap envelopes, invalid UTF-8 after a large prefix, and a complete JSON object whose stdin never closes; none of the rejected cases can create a successful record. An input-worker panic also produces silent exit 1. The event-ID profile is unchanged, so previously accepted callbacks retain their retry/conflict identity.
+
+One native harness attempt exceeded its 60-second compile/run cap without a test-start message; its cause was not established. That attempt is recorded as a timeout. The harness now prints stage durations and adds a 20-second Go test-runtime limit while keeping the 60-second stage caps and one-second per-hook timeout. The subsequent run passed: Ganesh build 1.257 s, Crush compile/run stage 23.808 s, actual fixture test 0.81 s. These times include test/build machinery as labelled and are not per-hook latency percentiles.
+
+The latest 15-second fuzz session completed 384,598 executions with two workers and no observed mismatch. Its independent `encoding/json` syntax/token oracle uses `UseNumber` so that float64 range does not impose meaning on discarded JSON numbers; raw UTF-8 and container depth are checked separately. Fuzzing is bounded evidence, not exhaustive parser assurance.
+
+A ten-iteration-per-case benchmark on macOS amd64, Go 1.27.3 measured:
+
+| Generated discarded output | Allocated bytes/op | Allocations/op | Reduction time/op |
+| --- | --- | --- | --- |
+| 1 KiB | 6,764 | 42 | 39,843 ns |
+| 128 KiB | 6,764 | 42 | 1,182,919 ns |
+| 1 MiB | 7,338 | 44 | 8,879,618 ns |
+
+The reader generates repeated bytes rather than constructing the large value. Allocation includes that reader setup, bounded control fields and metadata/ID construction. It excludes process startup, storage and client envelope construction, and measures allocation volume rather than maximum RSS. No whole-payload allocation growth was observed in these cases. The skipper uses a 4 KiB read buffer, bounded retained control strings, fixed string-validation scratch space and at most 64 container levels. It does not build discarded scalar strings or objects. The selected Go build's standard JSON skip path still buffers scalar string tokens, so this bounded grammar skipper is checked against independent standard-library parsing rather than claiming `SkipValue` alone provides that memory behavior.
+
+Reproduce the allocation sample with:
+
+```sh
+go test ./internal/adapter/crush -run '^$' -bench '^BenchmarkReduceStream$' -benchmem -benchtime=10x
+```
+
+Build, vet, normal/race/CGO-disabled suites and the native fixture pass. Limits and withheld context remain visible: no installed capture profile or product gate is enabled, no real workload loss rate is known, and over-cap or late input still fails closed.
