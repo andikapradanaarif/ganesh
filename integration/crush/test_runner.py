@@ -11,6 +11,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+import time
 
 REVISION = "aed2bae006adc2f17c9ea2c693e2ca9cb4eca84f"
 
@@ -40,21 +41,27 @@ def main():
     env = dict(os.environ, GOPROXY="off", GOSUMDB="off", GOTOOLCHAIN="local")
     with tempfile.TemporaryDirectory(prefix="ganesh-crush-runner-") as temp:
         binary = str(Path(temp) / "ganesh")
+        started = time.monotonic()
+        print("Building Ganesh fixture binary (60 s cap)", flush=True)
         subprocess.run(
             ["go", "build", "-o", binary, "./cmd/ganesh"],
             cwd=root, env=env, check=True, timeout=60,
         )
+        print(f"Ganesh build completed in {time.monotonic() - started:.3f} s", flush=True)
         overlay = Path(temp) / "overlay.json"
         overlay.write_text(json.dumps({"Replace": {
             str(source / "internal/hooks/ganesh_adapter_test.go"):
                 str(root / "integration/crush/runner_test.go.fixture")
         }}))
         env["GANESH_TEST_BINARY"] = binary
+        started = time.monotonic()
+        print("Compiling/running pinned Crush fixture (60 s cap; test runtime 20 s)", flush=True)
         subprocess.run(
             ["go", "test", "-count=1", "-overlay", str(overlay),
-             "./internal/hooks", "-run", "^TestGaneshToolHookAdapter$", "-v"],
+             "./internal/hooks", "-run", "^TestGaneshToolHookAdapter$", "-timeout=20s", "-v"],
             cwd=source, env=env, check=True, timeout=60,
         )
+        print(f"Crush fixture stage completed in {time.monotonic() - started:.3f} s", flush=True)
 
 
 if __name__ == "__main__":

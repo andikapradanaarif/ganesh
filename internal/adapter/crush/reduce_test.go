@@ -91,7 +91,7 @@ func TestRejectedNativeShapes(t *testing.T) {
 		strings.Replace(resultBody(false), `,"tool_response":"ghp_SYNTHETIC_SECRET"`, ``, 1),
 		strings.Replace(resultBody(true), `"error":"ghp_SYNTHETIC_SECRET"`, `"error":42`, 1),
 		string([]byte{'{', '"', 0xff, '"', ':', '1', '}'}),
-		strings.Repeat(" ", capture.MaxInput) + attempt,
+		strings.Repeat(" ", MaxNativeInput) + attempt,
 	} {
 		if m, err := Reduce([]byte(body)); !errors.Is(err, ErrPayload) || m != (capture.Metadata{}) || strings.Contains(err.Error(), "SYNTHETIC_SECRET") {
 			t.Fatalf("unsafe admission/rejection: %+v %v", m, err)

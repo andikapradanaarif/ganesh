@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -12,6 +13,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/andikapradanaarif/ganesh/internal/adapter/crush"
 	"github.com/andikapradanaarif/ganesh/internal/capture"
 	"github.com/andikapradanaarif/ganesh/internal/processclock"
 )
@@ -75,10 +77,20 @@ func testCompiledCrushHook(t *testing.T, binary string) {
 	run(success, 0)
 	run(failure, 1) // Same call/result identity, contradictory outcome.
 	run(strings.Replace(failure, "call-1", "call-2", 1), 0)
+	large := strings.Repeat("x", 128*1024) + "ghp_SYNTHETIC_SECRET"
+	largeAttempt := strings.ReplaceAll(strings.Replace(nativeAttempt, "call-1", "call-3", 1), "ghp_SYNTHETIC_SECRET", large)
+	largeSuccess := strings.ReplaceAll(strings.Replace(success, "call-1", "call-3", 1), "ghp_SYNTHETIC_SECRET", large)
+	largeFailure := strings.ReplaceAll(strings.Replace(failure, "call-1", "call-4", 1), "ghp_SYNTHETIC_SECRET", large)
+	run(largeAttempt, 0)
+	run(largeSuccess, 0)
+	run(largeSuccess, 0)
+	run(largeFailure, 0)
 	for _, body := range []string{
 		`{"raw":"ghp_SYNTHETIC_SECRET"}`,
 		strings.ReplaceAll(nativeAttempt, "PreToolUse", "SessionEnd"),
-		strings.Repeat(" ", capture.MaxInput) + nativeAttempt,
+		strings.Repeat(" ", crush.MaxNativeInput) + nativeAttempt,
+		strings.Replace(success, `"tool_response":"ghp_SYNTHETIC_SECRET"`, `"tool_response":"`+strings.Repeat("x", crush.MaxNativeInput)+`"`, 1),
+		strings.Replace(success, `"tool_response":"ghp_SYNTHETIC_SECRET"`, `"tool_response":"`+strings.Repeat("x", 128*1024)+"\xff\"", 1),
 	} {
 		run(body, 1)
 	}
@@ -110,7 +122,7 @@ func testCompiledCrushHook(t *testing.T, binary string) {
 			failures++
 		}
 	}
-	if count != 3 || failures != 1 {
+	if count != 6 || failures != 2 {
 		t.Fatalf("native effects: %d records, %d failures", count, failures)
 	}
 	if err := os.Chmod(dir, 0777); err != nil {
@@ -127,6 +139,10 @@ func testCompiledCrushHook(t *testing.T, binary string) {
 	}
 	defer r.Close()
 	defer w.Close()
+	unclosed := strings.Replace(nativeAttempt, "call-1", "call-unclosed", 1)
+	if _, err := io.WriteString(w, unclosed); err != nil {
+		t.Fatal(err)
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, binary, "hook", "crush", "--spool", dir)
@@ -136,6 +152,10 @@ func testCompiledCrushHook(t *testing.T, binary string) {
 	var status *exec.ExitError
 	if !errors.As(err, &status) || status.ExitCode() != 1 || len(output) != 0 || ctx.Err() != nil || time.Since(started) > 2*time.Second {
 		t.Fatalf("blocked hook stdin: %q %v %v", output, err, ctx.Err())
+	}
+	afterUnclosed, err := os.ReadDir(dir)
+	if err != nil || len(afterUnclosed) != len(entries) {
+		t.Fatal("complete JSON without EOF created storage")
 	}
 }
 
@@ -167,13 +187,17 @@ func TestHookExitProcess(t *testing.T) {
 			case "runtime-panic":
 				var empty []int
 				_ = empty[len(os.Args)]
+			case "reader-panic":
+				ready := make(chan metadataResult, 1)
+				go func() { ready <- reduceCaptureInput(context.Background(), panicReader{}, crush.ReduceStream) }()
+				return (<-ready).err
 			default:
 				return errors.New("invalid test case")
 			}
 			return nil
 		}, os.Stderr))
 	}
-	for _, mode := range []string{"success", "error", "panic", "nil-panic", "runtime-panic"} {
+	for _, mode := range []string{"success", "error", "panic", "nil-panic", "runtime-panic", "reader-panic"} {
 		t.Run(mode, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 			defer cancel()
@@ -197,3 +221,7 @@ func TestHookExitProcess(t *testing.T) {
 		})
 	}
 }
+
+type panicReader struct{}
+
+func (panicReader) Read([]byte) (int, error) { panic("ghp_SYNTHETIC_SECRET") }
