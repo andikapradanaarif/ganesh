@@ -19,4 +19,4 @@ The first implementation task provides [S0 run preparation](docs/s0-preparation.
 
 [Initial origin accounting](docs/s0-origin-screen.md) freezes the handoff-need denominator and reports the A1 route from screener declarations. It does not inspect sources or verify provenance.
 
-The [local capture primitive](docs/s0-local-capture.md) accepts bounded normalized metadata on stdin and returns durable local receipts. A prototype [Crush tool-hook adapter](docs/s0-crush-hooks.md) reduces native tool and permission notifications without emitting agent context. Installed-client coverage, hook enrollment, upload and server intake remain pending.
+The [local capture primitive](docs/s0-local-capture.md) accepts bounded normalized metadata on stdin and returns durable local receipts. A prototype [Crush tool-hook adapter](docs/s0-crush-hooks.md) reduces native tool, permission and turn-ending notifications without emitting agent context. Installed-client coverage, hook enrollment, upload and server intake remain pending.

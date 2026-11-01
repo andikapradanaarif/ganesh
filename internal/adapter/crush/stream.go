@@ -30,6 +30,7 @@ const (
 	inputField
 	responseField
 	errorField
+	assistantField
 )
 
 var nativeFields = map[string]int{
@@ -38,6 +39,7 @@ var nativeFields = map[string]int{
 	"decision": decisionField,
 	"cwd":      cwdField, "tool_name": nameField, "tool_input": inputField,
 	"tool_response": responseField, "error": errorField,
+	"last_assistant_message": assistantField,
 }
 
 // ReduceStream validates a complete native JSON envelope and discards content
@@ -129,7 +131,7 @@ func (p *nativeParser) envelope() ([5]string, uint16, error) {
 				return values, seen, ErrPayload
 			}
 			value, nonempty, err := p.stringValue(field <= decisionField, maxControl)
-			if err != nil || (!nonempty && field != responseField && field != errorField) {
+			if err != nil || (!nonempty && field != responseField && field != errorField && field != assistantField) {
 				return values, seen, ErrPayload
 			}
 			if field <= decisionField {

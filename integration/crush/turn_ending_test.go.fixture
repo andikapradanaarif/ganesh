@@ -1,0 +1,109 @@
+package agent
+
+// Overlay-only producer-to-consumer regression. It calls the real Crush
+// ending dispatcher with canceled/expired contexts and invokes Ganesh as the
+// hook command. No model, real session or transcript is used.
+import (
+	"context"
+	"encoding/json"
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+	"time"
+
+	"github.com/charmbracelet/crush/internal/hooks"
+)
+
+func TestGaneshTurnEndingCancellation(t *testing.T) {
+	binary := os.Getenv("GANESH_TEST_BINARY")
+	if binary == "" {
+		t.Fatal("missing test binary")
+	}
+	fixed := os.Getenv("GANESH_TEST_FIXED_ENDINGS") == "1"
+	for _, expired := range []bool{false, true} {
+		// Separate stores prevent delivery in one context case from masking
+		// missing callbacks in the other via per-session deduplication.
+		spool := filepath.Join(t.TempDir(), "spool")
+		invoked := filepath.Join(t.TempDir(), "hook-invoked")
+		quote := func(s string) string { return "'" + strings.ReplaceAll(s, "'", "'\\''") + "'" }
+		command := "printf invoked > " + quote(invoked) + " && " + quote(binary) + " hook crush --spool " + quote(spool)
+		work := t.TempDir()
+		config := map[string][]hooks.HookConfig{}
+		for _, event := range []string{hooks.EventTurnEnd, hooks.EventStopFailure, hooks.EventInterrupt} {
+			config[event] = []hooks.HookConfig{{Command: command, Timeout: 1}}
+		}
+		sa := &sessionAgent{hooks: hooks.NewRunner(hooks.Static(config), work, work)}
+		call := SessionAgentCall{SessionID: "00000000-0000-4000-8000-000000000002"}
+		secret := "ghp_SYNTHETIC_SECRET"
+		ctx, cancel := context.WithCancel(context.Background())
+		if expired {
+			cancel()
+			ctx, cancel = context.WithDeadline(context.Background(), time.Unix(1, 0))
+		}
+		cancel()
+		wantError := context.Canceled
+		if expired {
+			wantError = context.DeadlineExceeded
+		}
+		if ctx.Err() != wantError {
+			t.Fatal("caller must already have the expected cancellation cause")
+		}
+		// The baseline producer already detaches its error-path call site;
+		// only the success-path TurnEnd is a known real delivery gap there.
+		sa.fireTurnHook(ctx, call, hooks.Event{Name: hooks.EventTurnEnd, LastAssistantMessage: &secret})
+		if fixed {
+			sa.fireTurnHook(ctx, call, hooks.Event{Name: hooks.EventStopFailure, Error: secret})
+			sa.fireTurnHook(ctx, call, hooks.Event{Name: hooks.EventInterrupt})
+		}
+		if !fixed {
+			if _, err := os.Stat(invoked); !os.IsNotExist(err) {
+				t.Fatal("baseline hook command ran; absence of a Ganesh record alone cannot prove producer loss")
+			}
+			if _, err := os.Stat(spool); !os.IsNotExist(err) {
+				t.Fatal("baseline no longer reproduces its pinned cancellation gap")
+			}
+			t.Log("Known baseline defect reproduced: no TurnEnd callback reached Ganesh")
+			continue
+		}
+		if _, err := os.Stat(invoked); err != nil {
+			t.Fatal("corrected producer did not invoke the hook command")
+		}
+		for _, tc := range []struct{ id, outcome string }{
+			{"4d7e68aa-4614-8ceb-b3f4-26f68b4b6b63", "observed"},
+			{"725d8d56-4170-8d9e-9643-f94069d2ee2d", "failed"},
+			{"ad0dc494-a284-8783-90b3-5079d0e25c79", "interrupted"},
+		} {
+			body, err := os.ReadFile(filepath.Join(spool, tc.id+".json"))
+			if err != nil {
+				t.Fatal(err)
+			}
+			var record struct {
+				State, Origin, Coverage string
+				Metadata                struct {
+					Event, Outcome string
+					SessionID      string `json:"session_id"`
+				}
+			}
+			if json.Unmarshal(body, &record) != nil || record.State != "captured_local" || record.Origin != "unknown" || record.Coverage != "incomplete" || record.Metadata.Event != "turn_stop" || record.Metadata.Outcome != tc.outcome || record.Metadata.SessionID != call.SessionID {
+				t.Fatal("corrected producer did not yield the expected reduced marker")
+			}
+			if strings.Contains(string(body), "SYNTHETIC_SECRET") {
+				t.Fatal("producer text reached durable storage")
+			}
+		}
+		entries, err := os.ReadDir(spool)
+		if err != nil {
+			t.Fatal(err)
+		}
+		count := 0
+		for _, entry := range entries {
+			if strings.HasSuffix(entry.Name(), ".json") {
+				count++
+			}
+		}
+		if count != 3 {
+			t.Fatalf("expected three ending markers for this context case, got %d", count)
+		}
+	}
+}
