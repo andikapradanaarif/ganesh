@@ -19,6 +19,7 @@ import (
 )
 
 const nativeAttempt = `{"event":"PreToolUse","hook_event_name":"PreToolUse","session_id":"00000000-0000-4000-8000-000000000002","cwd":"/synthetic/ghp_SYNTHETIC_SECRET","tool_name":"write","tool_input":{"content":"ghp_SYNTHETIC_SECRET"},"tool_use_id":"call-1"}`
+const nativeTurnEnd = `{"event":"TurnEnd","hook_event_name":"TurnEnd","session_id":"00000000-0000-4000-8000-000000000002","cwd":"/synthetic/ghp_SYNTHETIC_SECRET"}`
 
 func testCompiledCrushHook(t *testing.T, binary string) {
 	t.Helper()
@@ -94,6 +95,16 @@ func testCompiledCrushHook(t *testing.T, binary string) {
 		run(body, 0)
 		run(body, 0)
 	}
+	stopFailure := strings.ReplaceAll(nativeTurnEnd, "TurnEnd", "StopFailure")
+	interrupt := strings.ReplaceAll(nativeTurnEnd, "TurnEnd", "Interrupt")
+	run(nativeTurnEnd, 0)
+	run(strings.TrimSuffix(nativeTurnEnd, "}")+`,"last_assistant_message":""}`, 0)
+	run(strings.TrimSuffix(nativeTurnEnd, "}")+`,"last_assistant_message":"`+large+`"}`, 0)
+	run(stopFailure, 0)
+	run(strings.TrimSuffix(stopFailure, "}")+`,"error":""}`, 0)
+	run(strings.TrimSuffix(stopFailure, "}")+`,"error":"`+large+`"}`, 0)
+	run(interrupt, 0)
+	run(interrupt, 0)
 	for _, body := range []string{
 		`{"raw":"ghp_SYNTHETIC_SECRET"}`,
 		strings.ReplaceAll(nativeAttempt, "PreToolUse", "SessionEnd"),
@@ -105,6 +116,9 @@ func testCompiledCrushHook(t *testing.T, binary string) {
 		strings.TrimSuffix(permissionResult, "}") + `,"decision":"ghp_SYNTHETIC_SECRET"}`,
 		strings.TrimSuffix(permissionRequest, "}") + `,"decision":"granted"}`,
 		strings.TrimSuffix(success, "}") + `,"decision":"granted"}`,
+		strings.ReplaceAll(nativeAttempt, "PreToolUse", "Interrupt"),
+		strings.TrimSuffix(stopFailure, "}") + `,"last_assistant_message":"ghp_SYNTHETIC_SECRET"}`,
+		strings.TrimSuffix(nativeAttempt, "}") + `,"last_assistant_message":"ghp_SYNTHETIC_SECRET"}`,
 	} {
 		run(body, 1)
 	}
@@ -115,12 +129,13 @@ func testCompiledCrushHook(t *testing.T, binary string) {
 	}
 	count, failures, requests := 0, 0, 0
 	permissionOutcomes := map[string]int{}
+	turnOutcomes := map[string]int{}
 	for _, entry := range entries {
 		body, err := os.ReadFile(filepath.Join(dir, entry.Name()))
 		if err != nil {
 			t.Fatal(err)
 		}
-		for _, forbidden := range []string{"SYNTHETIC_SECRET", "/synthetic", "call-", "tool_input", "tool_response"} {
+		for _, forbidden := range []string{"SYNTHETIC_SECRET", "/synthetic", "call-", "tool_input", "tool_response", "last_assistant_message"} {
 			if bytes.Contains(body, []byte(forbidden)) {
 				t.Fatal("raw native content reached the spool")
 			}
@@ -133,7 +148,7 @@ func testCompiledCrushHook(t *testing.T, binary string) {
 		if json.Unmarshal(body, &record) != nil || record.State != "captured_local" || record.Origin != "unknown" || record.Coverage != "incomplete" {
 			t.Fatal("native capture acquired authority")
 		}
-		if record.Metadata.Outcome == "failed" {
+		if record.Metadata.Event == "tool_result" && record.Metadata.Outcome == "failed" {
 			failures++
 		}
 		if record.Metadata.Event == "permission_request" {
@@ -142,9 +157,15 @@ func testCompiledCrushHook(t *testing.T, binary string) {
 		if record.Metadata.Event == "permission_result" {
 			permissionOutcomes[record.Metadata.Outcome]++
 		}
+		if record.Metadata.Event == "turn_stop" {
+			turnOutcomes[record.Metadata.Outcome]++
+		}
 	}
-	if count != 10 || failures != 2 || requests != 1 || len(permissionOutcomes) != 3 || permissionOutcomes["granted"] != 1 || permissionOutcomes["denied"] != 1 || permissionOutcomes["cancelled"] != 1 {
+	if count != 13 || failures != 2 || requests != 1 || len(permissionOutcomes) != 3 || permissionOutcomes["granted"] != 1 || permissionOutcomes["denied"] != 1 || permissionOutcomes["cancelled"] != 1 {
 		t.Fatalf("native effects: %d records, %d failures", count, failures)
+	}
+	if len(turnOutcomes) != 3 || turnOutcomes["observed"] != 1 || turnOutcomes["failed"] != 1 || turnOutcomes["interrupted"] != 1 {
+		t.Fatal("turn endings were lost, duplicated or promoted to success")
 	}
 	if err := os.Chmod(dir, 0777); err != nil {
 		t.Fatal(err)

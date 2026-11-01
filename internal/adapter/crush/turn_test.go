@@ -109,6 +109,8 @@ func TestTurnFieldIsolation(t *testing.T) {
 		turnBody("TurnEnd", "tool_response", ""),
 		turnBody("Interrupt", "decision", "cancelled"),
 		turnBody("TurnStart", "", nil), turnBody("SessionEnd", "", nil),
+		turnBody("PreToolUse", "", nil), turnBody("PermissionRequest", "", nil),
+		turnBody("PermissionResult", "decision", "denied"),
 		strings.Replace(turnEnd, `"event":"TurnEnd"`, `"event":"Interrupt"`, 1),
 		strings.Replace(turnEnd, `"cwd":"/synthetic/ghp_SYNTHETIC_SECRET"`, `"cwd":""`, 1),
 		strings.Replace(turnEnd, `,"cwd":"/synthetic/ghp_SYNTHETIC_SECRET"`, "", 1),
