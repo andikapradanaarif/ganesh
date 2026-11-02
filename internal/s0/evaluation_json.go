@@ -9,6 +9,8 @@ import (
 	"strings"
 	"syscall"
 	"unicode/utf8"
+
+	"github.com/andikapradanaarif/ganesh/internal/jsonrecord"
 )
 
 // Evaluation input is metadata only. Reject duplicate/aliased/missing keys
@@ -21,7 +23,7 @@ func decodeEvaluation(body []byte, target any) error {
 	d.UseNumber()
 	var unique func(int) error
 	unique = func(depth int) error {
-		if depth > 32 {
+		if depth > jsonrecord.MaxDepth {
 			return ErrEvaluation
 		}
 		token, err := d.Token()

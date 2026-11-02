@@ -76,14 +76,10 @@ func run(ctx context.Context, args []string, output io.Writer) error {
 		if err != nil {
 			return err
 		}
-		if err := s0.SaveEvaluationSnapshot(outputPath, snapshot); err != nil {
-			return err
-		}
-		report, err := s0.CheckEvaluation(snapshot)
+		report, err := s0.SaveEvaluationSnapshot(outputPath, snapshot)
 		if err != nil {
 			return err
 		}
-		report.State = "evaluation_frozen"
 		return emit(output, report)
 	case "check-evaluation":
 		if expectedDigest == "" {

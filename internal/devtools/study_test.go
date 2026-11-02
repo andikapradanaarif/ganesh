@@ -306,3 +306,13 @@ func TestJSONDuplicatesAndMissingAttempts(t *testing.T) {
 		t.Fatal("unstarted study must stay incomplete")
 	}
 }
+
+func TestStudyJSONDepthBoundary(t *testing.T) {
+	for _, depth := range []int{64, 65} {
+		body := []byte(strings.Repeat("[", depth) + "0" + strings.Repeat("]", depth))
+		err := uniqueJSON(body)
+		if (depth == 64 && err != nil) || (depth == 65 && err != ErrStudy) {
+			t.Fatal("JSON nesting boundary changed")
+		}
+	}
+}

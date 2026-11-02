@@ -124,7 +124,7 @@ func TestEvaluationScheduleFixedCountsAndCounterbalance(t *testing.T) {
 	if len(filtered) != 12 || firstD != 6 {
 		t.Fatal("conditional D/F counterbalance failed")
 	}
-	r, err := CheckEvaluation(s)
+	r, err := CheckEvaluationAgainst(s, s.Digest)
 	if err != nil || r.Tasks != 30 || r.Within != 20 || r.Cross != 10 || r.Diagnostics != 12 || r.BaseAnswers != 108 || r.ConditionalAnswers != 24 || r.MaximumAnswers != 132 || r.Trigger != "not_evaluated" || r.ModelRunsAuthorized || r.EvidenceIndependentlyVerified || r.ProductionNarrativeEnabled {
 		t.Fatal("planning report invented authorization or changed counts")
 	}
@@ -177,7 +177,7 @@ func TestEvaluationRankAndCanonicalIdentity(t *testing.T) {
 	*d.Tasks[0].BaselineCanAccess = false
 	d.Tasks[0].Tags[0] = "irrelevant_memory"
 	d.CalibrationIDs[0] = "changed"
-	if _, err := CheckEvaluation(frozen); err != nil {
+	if _, err := CheckEvaluationAgainst(frozen, frozen.Digest); err != nil {
 		t.Fatal("snapshot aliases mutable caller input")
 	}
 }
@@ -291,17 +291,17 @@ func TestEvaluationSnapshotTamperingAndPrivateNonOverwrite(t *testing.T) {
 			case "definition_order":
 				slices.Reverse(changed.Definition.Tasks)
 			}
-			if _, err := CheckEvaluation(changed); err != ErrEvaluation {
+			if _, err := CheckEvaluationAgainst(changed, s.Digest); err != ErrEvaluation {
 				t.Fatal("tampering accepted")
 			}
 		})
 	}
 	path := filepath.Join(t.TempDir(), "snapshot.json")
-	if err := SaveEvaluationSnapshot(path, s); err != nil {
+	if report, err := SaveEvaluationSnapshot(path, s); err != nil || report.State != "evaluation_frozen" || report.Digest != s.Digest {
 		t.Fatal(err)
 	}
 	before, _ := os.ReadFile(path)
-	if SaveEvaluationSnapshot(path, s) == nil {
+	if report, err := SaveEvaluationSnapshot(path, s); err == nil || report != (EvaluationReport{}) {
 		t.Fatal("existing snapshot overwritten")
 	}
 	after, _ := os.ReadFile(path)
@@ -312,7 +312,7 @@ func TestEvaluationSnapshotTamperingAndPrivateNonOverwrite(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := CheckEvaluation(loaded); err != nil {
+	if _, err := CheckEvaluationAgainst(loaded, s.Digest); err != nil {
 		t.Fatal(err)
 	}
 	info, err := os.Stat(path)
@@ -355,7 +355,7 @@ func TestEvaluationInputBoundaries(t *testing.T) {
 			case "oversize":
 				text = strings.Repeat(" ", (1<<20)+1)
 			case "deep":
-				text = strings.Repeat("[", 34) + "0" + strings.Repeat("]", 34)
+				text = strings.Repeat("[", 65) + "0" + strings.Repeat("]", 65)
 			}
 			if os.WriteFile(path, []byte(text), 0o600) != nil {
 				t.Fatal("cannot write fixture")
@@ -376,5 +376,22 @@ func TestEvaluationInputBoundaries(t *testing.T) {
 				t.Fatal("unsafe record admitted or error leaked content")
 			}
 		})
+	}
+}
+
+func TestEvaluationJSONDepthBoundary(t *testing.T) {
+	// Probe the syntax layer separately from the deliberately shallow record
+	// schema. This must not admit arbitrary nesting into a real definition.
+	for _, depth := range []int{64, 65} {
+		body := []byte(strings.Repeat("[", depth) + "0" + strings.Repeat("]", depth))
+		var value any
+		err := decodeEvaluation(body, &value)
+		if (depth == 64 && err != nil) || (depth == 65 && err != ErrEvaluation) {
+			t.Fatal("JSON nesting boundary changed")
+		}
+		var definition EvaluationDefinition
+		if decodeEvaluation(body, &definition) != ErrEvaluation {
+			t.Fatal("array syntax was admitted as an evaluation definition")
+		}
 	}
 }

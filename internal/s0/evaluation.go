@@ -258,7 +258,9 @@ func FreezeEvaluation(in EvaluationDefinition) (EvaluationSnapshot, error) {
 	return s, nil
 }
 
-func CheckEvaluation(s EvaluationSnapshot) (EvaluationReport, error) {
+// checkEvaluationStructure checks canonical shape and internal consistency.
+// Only CheckEvaluationAgainst validates a previously retained baseline pin.
+func checkEvaluationStructure(s EvaluationSnapshot) (EvaluationReport, error) {
 	expected, err := FreezeEvaluation(s.Definition)
 	if err != nil {
 		return EvaluationReport{}, err
@@ -281,12 +283,19 @@ func CheckEvaluationAgainst(s EvaluationSnapshot, expectedDigest string) (Evalua
 	if !evaluationHash.MatchString(expectedDigest) || s.Digest != expectedDigest {
 		return EvaluationReport{}, ErrEvaluation
 	}
-	return CheckEvaluation(s)
+	return checkEvaluationStructure(s)
 }
 
-func SaveEvaluationSnapshot(path string, s EvaluationSnapshot) error {
-	if _, err := CheckEvaluation(s); err != nil {
-		return err
+// SaveEvaluationSnapshot returns the new freeze report only after writing it.
+// It creates a new baseline; it does not validate an earlier baseline's pin.
+func SaveEvaluationSnapshot(path string, s EvaluationSnapshot) (EvaluationReport, error) {
+	report, err := checkEvaluationStructure(s)
+	if err != nil {
+		return EvaluationReport{}, err
 	}
-	return writePrivate(path, s)
+	if err := writePrivate(path, s); err != nil {
+		return EvaluationReport{}, err
+	}
+	report.State = "evaluation_frozen"
+	return report, nil
 }

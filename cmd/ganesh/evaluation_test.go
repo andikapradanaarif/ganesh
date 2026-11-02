@@ -111,6 +111,9 @@ func TestEvaluationCLIRoundTrip(t *testing.T) {
 	if err != nil || info.Mode().Perm() != 0o600 {
 		t.Fatal("snapshot is not private")
 	}
+	if _, err := os.Stat(filepath.Join(dir, "run.json")); !os.IsNotExist(err) {
+		t.Fatal("standalone declaration unexpectedly required or created a workspace run record")
+	}
 	// A changed arm must be rejected before a report is emitted.
 	var altered s0.EvaluationSnapshot
 	if json.Unmarshal(prior, &altered) != nil {
