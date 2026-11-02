@@ -16,8 +16,25 @@ import (
 )
 
 func TestCompiledCaptureCommand(t *testing.T) {
+	for _, profile := range []struct {
+		name  string
+		flags []string
+	}{
+		{"development", nil},
+		{"stripped", []string{"-ldflags=-s -w"}},
+	} {
+		t.Run(profile.name, func(t *testing.T) {
+			testCompiledCaptureProfile(t, profile.flags)
+		})
+	}
+}
+
+func testCompiledCaptureProfile(t *testing.T, flags []string) {
+	t.Helper()
 	binary := filepath.Join(t.TempDir(), "ganesh")
-	if output, err := exec.Command("go", "build", "-o", binary, ".").CombinedOutput(); err != nil {
+	args := append([]string{"build"}, flags...)
+	args = append(args, "-o", binary, ".")
+	if output, err := exec.Command("go", args...).CombinedOutput(); err != nil {
 		t.Fatalf("build: %v %s", err, output)
 	}
 	testCompiledCrushHook(t, binary)

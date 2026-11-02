@@ -1,0 +1,12 @@
+// Observer-only use of the same OS clock as the collector. No process contents.
+#include <libproc.h>
+#include <sys/proc_info.h>
+
+int ganesh_observe_start(int pid, long long *seconds, long long *micros) {
+    struct proc_bsdinfo info;
+    int count = proc_pidinfo(pid, PROC_PIDTBSDINFO, 0, &info, sizeof(info));
+    if (count != sizeof(info)) return -1;
+    *seconds = info.pbi_start_tvsec;
+    *micros = info.pbi_start_tvusec;
+    return 0;
+}

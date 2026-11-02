@@ -1,0 +1,27 @@
+package main
+
+// Overlay-only instrumentation. Never compiled into the production CLI.
+import (
+	"encoding/json"
+	"os"
+	"strconv"
+	"time"
+)
+
+var startupTrace = [7]int64{time.Now().UnixNano()}
+
+func startupMark(stage int) { startupTrace[stage] = time.Now().UnixNano() }
+
+func startupFlush() {
+	startupMark(6)
+	fd, err := strconv.Atoi(os.Getenv("GANESH_TEST_STARTUP_FD"))
+	if err != nil || fd < 3 {
+		return
+	}
+	f := os.NewFile(uintptr(fd), "startup-trace")
+	if f == nil {
+		return
+	}
+	defer f.Close()
+	_ = json.NewEncoder(f).Encode(startupTrace)
+}

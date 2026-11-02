@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Test a pinned local Crush source runner with synthetic events, offline.
 
-Usage: python3 integration/crush/test_runner.py /path/to/crush/source
+Usage: python3 integration/crush/test_runner.py /path/to/crush/source [--build-profile stripped]
 No source files, client settings, transcripts or installed binaries are changed.
 """
 
@@ -18,8 +18,9 @@ ENDING_FIX_REVISION = "3378f47a8398c79a10e35cc61c994160cc0ae3ea"
 
 
 def main():
-    if len(sys.argv) != 2:
+    if len(sys.argv) not in (2, 4) or len(sys.argv) == 4 and sys.argv[2:] != ["--build-profile", "stripped"]:
         raise SystemExit("provide the pinned local Crush source directory")
+    build_flags = ["-ldflags=-s -w"] if len(sys.argv) == 4 else []
     source = Path(sys.argv[1]).resolve(strict=True)
     root = Path(__file__).resolve().parents[2]
     revision = subprocess.check_output(
@@ -53,10 +54,10 @@ def main():
         started = time.monotonic()
         print("Building Ganesh fixture binary (60 s cap)", flush=True)
         subprocess.run(
-            ["go", "build", "-o", binary, "./cmd/ganesh"],
+            ["go", "build", *build_flags, "-o", binary, "./cmd/ganesh"],
             cwd=root, env=env, check=True, timeout=60,
         )
-        print(f"Ganesh build completed in {time.monotonic() - started:.3f} s", flush=True)
+        print(f"Ganesh build completed in {time.monotonic() - started:.3f} s; stripped: {bool(build_flags)}", flush=True)
         overlay = Path(temp) / "overlay.json"
         overlay.write_text(json.dumps({"Replace": replacements}))
         env["GANESH_TEST_BINARY"] = binary
