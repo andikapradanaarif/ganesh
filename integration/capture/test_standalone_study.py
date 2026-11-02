@@ -5,11 +5,11 @@ import unittest
 from unittest import mock
 
 from observe_standalone import Budget, observe
-from standalone_study import evaluate
+from standalone_study import END, LIMIT, evaluate, evaluate_bound
 
 
 def fixture():
-    return [{"arm": arm, "category": category, "block": block,
+    return [{"stage": "standalone36", "arm": arm, "category": category, "block": block,
         "parent_ms": 100 if arm == "baseline" else 50, "os_to_exit_ms": 90 if arm == "baseline" else 40,
         "success": True, "exit": 0, "record": "present_unknown_incomplete",
         "output_bytes": {"stdout": 0, "stderr": 0}}
@@ -60,6 +60,32 @@ class StandaloneRules(unittest.TestCase):
         self.assertEqual(evaluate(data[:-1])["status"], "incomplete")
         data[-1] = data[0]
         self.assertEqual(evaluate(data)["status"], "incomplete")
+
+    def test_foreign_or_missing_stage_cannot_fill_a_cell(self):
+        for stage in ["comparison", "diagnosis", None]:
+            data = fixture()
+            if stage is None:
+                del data[0]["stage"]
+            else:
+                data[0]["stage"] = stage
+            result = evaluate(data)
+            self.assertEqual(result["status"], "incomplete")
+            self.assertFalse(result["local_signal"])
+            self.assertFalse(result["headroom_probe"])
+        data = fixture()
+        for row in data:
+            row["stage"] = "comparison"
+        self.assertEqual(evaluate(data)["status"], "incomplete")
+
+    def test_summary_requires_the_frozen_study_manifest(self):
+        plan = {"study": 36, "attempt_cap": LIMIT, "deadline_utc": END}
+        self.assertEqual(evaluate_bound(plan, fixture()), evaluate(fixture()))
+        for key, value in [("study", 34), ("attempt_cap", 114), ("deadline_utc", END + 60)]:
+            invalid = dict(plan, **{key: value})
+            result = evaluate_bound(invalid, fixture())
+            self.assertEqual(result["status"], "invalid_study_binding")
+            self.assertFalse(result["local_signal"])
+            self.assertFalse(result["headroom_probe"])
 
     def test_launch_failure_is_retained_without_contents(self):
         with tempfile.TemporaryDirectory() as temp:

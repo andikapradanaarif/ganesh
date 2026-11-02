@@ -89,9 +89,9 @@ def run(directory):
 
 
 def evaluate(results):
-    expected = {(arm, category, block) for arm in ["baseline", "candidate"]
+    expected = {("standalone36", arm, category, block) for arm in ["baseline", "candidate"]
         for category, count in [("new_file_first", 20), ("warm", 20), ("idle_30s", 2)] for block in range(count)}
-    keys = [(r["arm"], r["category"], r["block"]) for r in results]
+    keys = [(r.get("stage"), r["arm"], r["category"], r["block"]) for r in results]
     if len(keys) != LIMIT or set(keys) != expected or any(not math.isfinite(r["parent_ms"]) or r["parent_ms"] <= 0 for r in results):
         return {"status": "incomplete", "attempts": len(results), "local_signal": False,
                 "headroom_probe": False, "capture_profile_enabled": False}
@@ -127,6 +127,15 @@ def evaluate(results):
         "capture_profile_enabled": False}
 
 
+def evaluate_bound(plan, results):
+    # Summary accepts the same manifest identity required before collection.
+    # This validates input identity without changing the frozen score rule.
+    if plan.get("study") != 36 or plan.get("attempt_cap") != LIMIT or plan.get("deadline_utc") != END:
+        return {"status": "invalid_study_binding", "attempts": len(results),
+                "local_signal": False, "headroom_probe": False, "capture_profile_enabled": False}
+    return evaluate(results)
+
+
 def main():
     if len(sys.argv) != 3 or sys.argv[1] not in ("prepare", "run", "summary"):
         raise RuntimeError("invalid study command")
@@ -140,7 +149,7 @@ def main():
     elif mode == "run":
         run(directory)
     else:
-        print(json.dumps(evaluate(rows(directory)), indent=2))
+        print(json.dumps(evaluate_bound(load(directory / "plan.json"), rows(directory)), indent=2))
 
 
 if __name__ == "__main__":

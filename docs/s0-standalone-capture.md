@@ -79,3 +79,11 @@ python3 -B -m unittest discover -s integration/capture -p 'test_*.py'
 ```
 
 The historical source/metrics are distinct from later builds carrying different VCS metadata. The timing result does not justify switching a client to the dedicated command. It also does not demonstrate that putting a receiver behind the same per-event Go wrapper would remove startup cost. An alternative invocation/capture architecture needs a separately reviewed scope and end-to-end evidence.
+
+## PR #37 review follow-up
+
+Post-review summary hardening now binds every scored cell to `stage=standalone36` and checks the summary manifest's study, cap and deadline against the same identity enforced before collection. Missing, foreign or mixed-stage cells cannot fill this study's expected sample, and a foreign manifest cannot be summarized as study 36. This is input-identity validation; no timing threshold, failure veto, original record or scoring calculation was changed. The retained 84-attempt summary is exactly equal before and after this change, with both gates still false. No capture was rerun. Seventeen Python tests now pass, including the added stage and manifest cases.
+
+The owner-provided review reports one failed package on an initial race run under load around 44, followed by a passing rerun. This is reviewer-reported validation evidence, separate from the assistant's earlier passing runs and the frozen performance sample; its precise rejection cause is not established here.
+
+The reviewer also traced initial smoke rejections to a 0755 spool directory. **Silent exit 1 is an outcome, not a diagnosis:** strict input admission, private-store checks, clock/deadline failure, capacity and other guarded failures share that signal. Do not infer a deadline miss solely from silence and exit status; use separately observed evidence, and preserve ambiguity when it is unavailable. Hook stdout/stderr remain empty. The disclosed warm-median change is unresolved and must not be attributed to load alone.
