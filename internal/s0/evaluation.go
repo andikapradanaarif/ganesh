@@ -114,6 +114,7 @@ func canonicalEvaluation(in EvaluationDefinition) (EvaluationDefinition, error) 
 	}
 	allowedTags := map[string]bool{"changed_state": true, "workflow": true, "gotcha": true, "mistaken_premise": true, "abstention": true, "local_exception": true, "irrelevant_memory": true}
 	tasks := make([]EvaluationTask, 0, 30)
+	seenInputs := make(map[[3]string]bool)
 	for _, task := range in.Tasks {
 		c, validRole := got[task.Role]
 		if !evaluationID.MatchString(task.ID) || seen[task.ID] || !validRole || task.BaselineCanAccess == nil || len(task.Tags) == 0 || len(task.Tags) > len(allowedTags) {
@@ -125,6 +126,11 @@ func canonicalEvaluation(in EvaluationDefinition) (EvaluationDefinition, error) 
 				return EvaluationDefinition{}, ErrEvaluation
 			}
 		}
+		inputKey := [3]string{task.Role, task.Prompt, task.Sources}
+		if seenInputs[inputKey] {
+			return EvaluationDefinition{}, ErrEvaluation
+		}
+		seenInputs[inputKey] = true
 		switch task.Stratum {
 		case "within":
 			c.within++
@@ -267,6 +273,15 @@ func CheckEvaluation(s EvaluationSnapshot) (EvaluationReport, error) {
 	}
 	return EvaluationReport{State: "evaluation_snapshot_valid", Digest: expected.Digest, Tasks: 30, Within: 20, Cross: 10, Diagnostics: 12,
 		BaseAnswers: len(expected.Base), ConditionalAnswers: len(expected.Conditional), MaximumAnswers: len(expected.Base) + len(expected.Conditional), Trigger: "not_evaluated"}, nil
+}
+
+// CheckEvaluationAgainst also compares the separately retained freeze output.
+// A self-consistent replacement is a different plan, not the original baseline.
+func CheckEvaluationAgainst(s EvaluationSnapshot, expectedDigest string) (EvaluationReport, error) {
+	if !evaluationHash.MatchString(expectedDigest) || s.Digest != expectedDigest {
+		return EvaluationReport{}, ErrEvaluation
+	}
+	return CheckEvaluation(s)
 }
 
 func SaveEvaluationSnapshot(path string, s EvaluationSnapshot) error {

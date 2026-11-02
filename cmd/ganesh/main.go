@@ -38,7 +38,7 @@ func run(ctx context.Context, args []string, output io.Writer) error {
 	}
 	f := flag.NewFlagSet(args[1], flag.ContinueOnError)
 	f.SetOutput(io.Discard)
-	var directory, input, outputPath, baselinePath, phase string
+	var directory, input, outputPath, baselinePath, phase, expectedDigest string
 	switch args[1] {
 	case "prepare":
 		f.StringVar(&directory, "dir", "", "new private workspace")
@@ -56,6 +56,7 @@ func run(ctx context.Context, args []string, output io.Writer) error {
 		f.StringVar(&outputPath, "output", "", "new private evaluation snapshot")
 	case "check-evaluation":
 		f.StringVar(&input, "input", "", "private evaluation snapshot")
+		f.StringVar(&expectedDigest, "expected-digest", "", "previously retained freeze digest")
 	default:
 		return errors.New("unknown S0 command")
 	}
@@ -85,11 +86,14 @@ func run(ctx context.Context, args []string, output io.Writer) error {
 		report.State = "evaluation_frozen"
 		return emit(output, report)
 	case "check-evaluation":
+		if expectedDigest == "" {
+			return s0.ErrEvaluation
+		}
 		snapshot, err := s0.ReadEvaluationSnapshot(input)
 		if err != nil {
 			return err
 		}
-		report, err := s0.CheckEvaluation(snapshot)
+		report, err := s0.CheckEvaluationAgainst(snapshot, expectedDigest)
 		if err != nil {
 			return err
 		}

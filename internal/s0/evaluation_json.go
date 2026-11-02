@@ -125,7 +125,7 @@ func readEvaluation(path string, target any) error {
 	}
 	defer f.Close()
 	info, err := f.Stat()
-	if err != nil || !info.Mode().IsRegular() || info.Mode().Perm() != 0o600 || info.Size() > 1<<20 {
+	if err != nil || !info.Mode().IsRegular() || (info.Mode().Perm() != 0o600 && info.Mode().Perm() != 0o400) || info.Size() > 1<<20 {
 		return ErrEvaluation
 	}
 	body, err := io.ReadAll(io.LimitReader(f, (1<<20)+1))

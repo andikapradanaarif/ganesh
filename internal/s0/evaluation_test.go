@@ -141,6 +141,10 @@ func TestEvaluationRankAndCanonicalIdentity(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	// Serialized synthetic snapshot independently rehashed with jq/shasum.
+	if a.Digest != "ec0a141b713efd83fe47a249e29d0184cbd02fd5dc7bd4cea45f7f6d751d3154" {
+		t.Fatal("snapshot byte contract changed")
+	}
 	slices.Reverse(d.Tasks)
 	slices.Reverse(d.CalibrationIDs)
 	for i := range d.Tasks {
@@ -155,6 +159,17 @@ func TestEvaluationRankAndCanonicalIdentity(t *testing.T) {
 	if err != nil || c.Digest == a.Digest || reflect.DeepEqual(c.Base, a.Base) {
 		t.Fatal("seed does not bind order and identity")
 	}
+	if _, err := CheckEvaluationAgainst(c, a.Digest); err != ErrEvaluation {
+		t.Fatal("valid replacement silently changed frozen baseline")
+	}
+	if _, err := CheckEvaluationAgainst(a, a.Digest); err != nil {
+		t.Fatal("retained baseline rejected")
+	}
+	for _, expected := range []string{"", strings.Repeat("A", 64), "ghp_SYNTHETIC_SECRET"} {
+		if _, err := CheckEvaluationAgainst(a, expected); err != ErrEvaluation {
+			t.Fatal("invalid expected digest admitted")
+		}
+	}
 	// Later caller mutation must not rewrite the already returned snapshot.
 	d = evaluationFixture()
 	frozen, _ := FreezeEvaluation(d)
@@ -168,7 +183,7 @@ func TestEvaluationRankAndCanonicalIdentity(t *testing.T) {
 }
 
 func TestEvaluationRejectsIncompleteAndWrongStrata(t *testing.T) {
-	for _, scenario := range []string{"empty", "schema", "run", "seed", "binding", "calibration_empty", "calibration_duplicate", "calibration_overlap", "role", "stratum", "role_mix", "diagnostic", "duplicate", "added", "removed", "prompt", "rubric", "oracle", "source", "access", "tag", "duplicate_tag"} {
+	for _, scenario := range []string{"empty", "schema", "run", "seed", "binding", "calibration_empty", "calibration_duplicate", "calibration_overlap", "role", "stratum", "role_mix", "diagnostic", "duplicate", "duplicate_inputs", "added", "removed", "prompt", "rubric", "oracle", "source", "access", "tag", "duplicate_tag"} {
 		t.Run(scenario, func(t *testing.T) {
 			d := evaluationFixture()
 			switch scenario {
@@ -198,6 +213,8 @@ func TestEvaluationRejectsIncompleteAndWrongStrata(t *testing.T) {
 				d.Tasks[0].Diagnostic = false
 			case "duplicate":
 				d.Tasks[1].ID = d.Tasks[0].ID
+			case "duplicate_inputs":
+				d.Tasks[1].Prompt = d.Tasks[0].Prompt
 			case "added":
 				d.Tasks = append(d.Tasks, d.Tasks[0])
 			case "removed":
@@ -301,6 +318,12 @@ func TestEvaluationSnapshotTamperingAndPrivateNonOverwrite(t *testing.T) {
 	info, err := os.Stat(path)
 	if err != nil || info.Mode().Perm() != 0o600 {
 		t.Fatal("snapshot is not private")
+	}
+	if err := os.Chmod(path, 0o400); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := ReadEvaluationSnapshot(path); err != nil {
+		t.Fatal("private read-only snapshot rejected")
 	}
 }
 
