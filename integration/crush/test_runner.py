@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Test a pinned local Crush source runner with synthetic events, offline.
 
-Usage: python3 integration/crush/test_runner.py /path/to/crush/source [--build-profile stripped]
+Usage: python3 integration/crush/test_runner.py /path/to/crush/source [--build-profile stripped|collector]
 No source files, client settings, transcripts or installed binaries are changed.
 """
 
@@ -18,9 +18,15 @@ ENDING_FIX_REVISION = "3378f47a8398c79a10e35cc61c994160cc0ae3ea"
 
 
 def main():
-    if len(sys.argv) not in (2, 4) or len(sys.argv) == 4 and sys.argv[2:] != ["--build-profile", "stripped"]:
+    profiles = {
+        "development": ([], "./cmd/ganesh"),
+        "stripped": (["-ldflags=-s -w"], "./cmd/ganesh"),
+        "collector": (["-ldflags=-s -w"], "./cmd/ganesh-capture"),
+    }
+    if len(sys.argv) not in (2, 4) or len(sys.argv) == 4 and (sys.argv[2] != "--build-profile" or sys.argv[3] not in ("stripped", "collector")):
         raise SystemExit("provide the pinned local Crush source directory")
-    build_flags = ["-ldflags=-s -w"] if len(sys.argv) == 4 else []
+    profile = sys.argv[3] if len(sys.argv) == 4 else "development"
+    build_flags, target = profiles[profile]
     source = Path(sys.argv[1]).resolve(strict=True)
     root = Path(__file__).resolve().parents[2]
     revision = subprocess.check_output(
@@ -54,10 +60,10 @@ def main():
         started = time.monotonic()
         print("Building Ganesh fixture binary (60 s cap)", flush=True)
         subprocess.run(
-            ["go", "build", *build_flags, "-o", binary, "./cmd/ganesh"],
+            ["go", "build", *build_flags, "-o", binary, target],
             cwd=root, env=env, check=True, timeout=60,
         )
-        print(f"Ganesh build completed in {time.monotonic() - started:.3f} s; stripped: {bool(build_flags)}", flush=True)
+        print(f"Ganesh build completed in {time.monotonic() - started:.3f} s; profile: {profile}", flush=True)
         overlay = Path(temp) / "overlay.json"
         overlay.write_text(json.dumps({"Replace": replacements}))
         env["GANESH_TEST_BINARY"] = binary

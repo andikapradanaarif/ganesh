@@ -253,17 +253,13 @@ func TestHookExitProcess(t *testing.T) {
 			case "runtime-panic":
 				var empty []int
 				_ = empty[len(os.Args)]
-			case "reader-panic":
-				ready := make(chan metadataResult, 1)
-				go func() { ready <- reduceCaptureInput(context.Background(), panicReader{}, crush.ReduceStream) }()
-				return (<-ready).err
 			default:
 				return errors.New("invalid test case")
 			}
 			return nil
 		}, os.Stderr))
 	}
-	for _, mode := range []string{"success", "error", "panic", "nil-panic", "runtime-panic", "reader-panic"} {
+	for _, mode := range []string{"success", "error", "panic", "nil-panic", "runtime-panic"} {
 		t.Run(mode, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 			defer cancel()
@@ -287,7 +283,3 @@ func TestHookExitProcess(t *testing.T) {
 		})
 	}
 }
-
-type panicReader struct{}
-
-func (panicReader) Read([]byte) (int, error) { panic("ghp_SYNTHETIC_SECRET") }

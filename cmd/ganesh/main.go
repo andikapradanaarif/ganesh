@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 	"flag"
-	"fmt"
 	"io"
 	"os"
 	"time"
 
+	"github.com/andikapradanaarif/ganesh/internal/capturecli"
 	"github.com/andikapradanaarif/ganesh/internal/s0"
 )
 
@@ -20,26 +20,7 @@ func main() {
 }
 
 func commandExitCode(args []string, execute func() error, diagnostic io.Writer) int {
-	if len(args) > 0 && args[0] == "hook" {
-		return hookExitCode(execute)
-	}
-	if err := execute(); err != nil {
-		fmt.Fprintln(diagnostic, err)
-		return 1
-	}
-	return 0
-}
-
-// A recoverable panic in the hook handler must not escape as Go's exit 2,
-// which Crush interprets as a tool denial. Never format the panic value.
-// Recovery is limited to this goroutine; runtime fatal errors are not caught.
-func hookExitCode(execute func() error) (status int) {
-	status = 1
-	defer func() { _ = recover() }()
-	if execute() == nil {
-		return 0
-	}
-	return status
+	return capturecli.ExitCode(args, execute, diagnostic)
 }
 
 func run(ctx context.Context, args []string, output io.Writer) error {

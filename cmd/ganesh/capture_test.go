@@ -17,23 +17,25 @@ import (
 
 func TestCompiledCaptureCommand(t *testing.T) {
 	for _, profile := range []struct {
-		name  string
-		flags []string
+		name   string
+		target string
+		flags  []string
 	}{
-		{"development", nil},
-		{"stripped", []string{"-ldflags=-s -w"}},
+		{"development", ".", nil},
+		{"stripped", ".", []string{"-ldflags=-s -w"}},
+		{"standalone", "../ganesh-capture", []string{"-ldflags=-s -w"}},
 	} {
 		t.Run(profile.name, func(t *testing.T) {
-			testCompiledCaptureProfile(t, profile.flags)
+			testCompiledCaptureProfile(t, profile.target, profile.flags)
 		})
 	}
 }
 
-func testCompiledCaptureProfile(t *testing.T, flags []string) {
+func testCompiledCaptureProfile(t *testing.T, target string, flags []string) {
 	t.Helper()
 	binary := filepath.Join(t.TempDir(), "ganesh")
 	args := append([]string{"build"}, flags...)
-	args = append(args, "-o", binary, ".")
+	args = append(args, "-o", binary, target)
 	if output, err := exec.Command("go", args...).CombinedOutput(); err != nil {
 		t.Fatalf("build: %v %s", err, output)
 	}
@@ -147,7 +149,7 @@ func testBlockedCaptureReceipt(t *testing.T, binary, dir, input string) {
 	started := time.Now()
 	err = cmd.Run()
 	var exit *exec.ExitError
-	if !errors.As(err, &exit) || exit.ExitCode() != captureOutputTimeoutExitCode || ctx.Err() != nil || time.Since(started) > 2*time.Second {
+	if !errors.As(err, &exit) || exit.ExitCode() != 124 || ctx.Err() != nil || time.Since(started) > 2*time.Second {
 		t.Fatalf("receipt backpressure escaped deadline: %v stderr=%s", err, stderr.Bytes())
 	}
 	// The output watchdog fires after commit. It must not erase the event, and
