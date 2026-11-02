@@ -20,6 +20,9 @@ func Prepare(directory string, r Run) error {
 	if err := writePrivate(filepath.Join(directory, "run.json"), r); err != nil {
 		return err
 	}
+	if err := writePrivate(filepath.Join(directory, "evaluation.json"), NewEvaluationDefinition(r.ID)); err != nil {
+		return err
+	}
 	return nil
 }
 

@@ -34,7 +34,7 @@ func run(ctx context.Context, args []string, output io.Writer) error {
 		return emit(output, s0.Discover(ctx))
 	}
 	if len(args) < 2 || args[0] != "s0" {
-		return errors.New("usage: ganesh doctor | capture --spool DIR | hook crush --spool DIR | s0 prepare|check|freeze-targets|screen [flags]")
+		return errors.New("usage: ganesh doctor | capture --spool DIR | hook crush --spool DIR | s0 prepare|check|freeze-targets|screen|freeze-evaluation|check-evaluation [flags]")
 	}
 	f := flag.NewFlagSet(args[1], flag.ContinueOnError)
 	f.SetOutput(io.Discard)
@@ -51,6 +51,11 @@ func run(ctx context.Context, args []string, output io.Writer) error {
 	case "screen":
 		f.StringVar(&input, "input", "", "private target inventory")
 		f.StringVar(&baselinePath, "baseline", "", "frozen need-definition snapshot")
+	case "freeze-evaluation":
+		f.StringVar(&input, "input", "", "private evaluation definition")
+		f.StringVar(&outputPath, "output", "", "new private evaluation snapshot")
+	case "check-evaluation":
+		f.StringVar(&input, "input", "", "private evaluation snapshot")
 	default:
 		return errors.New("unknown S0 command")
 	}
@@ -58,6 +63,37 @@ func run(ctx context.Context, args []string, output io.Writer) error {
 		return errors.New("invalid S0 command flags")
 	}
 	switch args[1] {
+	case "freeze-evaluation":
+		if outputPath == "" {
+			return errors.New("freeze-evaluation requires --output")
+		}
+		definition, err := s0.ReadEvaluationDefinition(input)
+		if err != nil {
+			return err
+		}
+		snapshot, err := s0.FreezeEvaluation(definition)
+		if err != nil {
+			return err
+		}
+		if err := s0.SaveEvaluationSnapshot(outputPath, snapshot); err != nil {
+			return err
+		}
+		report, err := s0.CheckEvaluation(snapshot)
+		if err != nil {
+			return err
+		}
+		report.State = "evaluation_frozen"
+		return emit(output, report)
+	case "check-evaluation":
+		snapshot, err := s0.ReadEvaluationSnapshot(input)
+		if err != nil {
+			return err
+		}
+		report, err := s0.CheckEvaluation(snapshot)
+		if err != nil {
+			return err
+		}
+		return emit(output, report)
 	case "prepare":
 		if directory == "" {
 			return errors.New("prepare requires --dir")
