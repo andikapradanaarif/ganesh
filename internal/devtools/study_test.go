@@ -185,7 +185,11 @@ func TestFewerFailuresAndBinding(t *testing.T) {
 				cases[0].ParentMS = 0
 			}
 			got := summarize(study, p, cases)
-			if got.Decision["status"] == "complete_local_comparison" || got.Decision[key] != false || got.Metrics != nil {
+			wantStatus := "invalid_study_binding"
+			if scenario == "stage" || scenario == "duplicate" || scenario == "missing" || scenario == "parent" {
+				wantStatus = "incomplete"
+			}
+			if got.Decision["status"] != wantStatus || got.Decision[key] != false || got.Metrics != nil {
 				t.Fatalf("study %d accepted contaminated %s", study, scenario)
 			}
 		}

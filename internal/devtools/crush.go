@@ -30,7 +30,8 @@ type invocation struct {
 	dir, name string
 	args, env []string
 	timeout   time.Duration
-	output    io.Writer // nil means bounded, private metadata capture
+	stdout    io.Writer // both nil means bounded, private stdout capture
+	stderr    io.Writer // metadata stderr is discarded; streamed stages keep it separate
 }
 
 type execute func(context.Context, invocation) ([]byte, error)
@@ -45,15 +46,18 @@ func (b *limitedOutput) Write(p []byte) (int, error) {
 }
 
 func executeCommand(ctx context.Context, call invocation) ([]byte, error) {
+	if (call.stdout == nil) != (call.stderr == nil) {
+		return nil, ErrFixture
+	}
 	ctx, cancel := context.WithTimeout(ctx, call.timeout)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, call.name, call.args...)
 	cmd.Dir, cmd.Env, cmd.WaitDelay = call.dir, call.env, time.Second
 	var output limitedOutput
-	if call.output == nil {
+	if call.stdout == nil {
 		cmd.Stdout = &output
 	} else {
-		cmd.Stdout, cmd.Stderr = call.output, call.output
+		cmd.Stdout, cmd.Stderr = call.stdout, call.stderr
 	}
 	if err := cmd.Run(); err != nil || ctx.Err() != nil {
 		return nil, ErrFixture // never format paths, environments or child errors
@@ -92,11 +96,14 @@ func offlineEnvironment(env []string) ([]string, error) {
 
 // RunCrush exercises synthetic fixtures through one of two exact source pins.
 // It changes neither the source checkout nor installed client configuration.
-func RunCrush(ctx context.Context, root, source, profile string, output io.Writer) error {
-	return runCrush(ctx, root, source, profile, output, os.Environ(), executeCommand)
+func RunCrush(ctx context.Context, root, source, profile string, stdout, stderr io.Writer) error {
+	return runCrush(ctx, root, source, profile, stdout, stderr, os.Environ(), executeCommand)
 }
 
-func runCrush(ctx context.Context, root, source, profile string, output io.Writer, environment []string, run execute) error {
+func runCrush(ctx context.Context, root, source, profile string, stdout, stderr io.Writer, environment []string, run execute) error {
+	if stdout == nil || stderr == nil {
+		return ErrFixture
+	}
 	flags, target, err := buildProfile(profile)
 	if err != nil {
 		return err
@@ -114,7 +121,7 @@ func runCrush(ctx context.Context, root, source, profile string, output io.Write
 		return ErrSource
 	}
 	git := func(args ...string) ([]byte, error) {
-		return run(ctx, invocation{source, "git", args, env, 5 * time.Second, nil})
+		return run(ctx, invocation{dir: source, name: "git", args: args, env: env, timeout: 5 * time.Second})
 	}
 	revisionBytes, err := git("rev-parse", "HEAD")
 	revision := strings.TrimSpace(string(revisionBytes))
@@ -145,7 +152,7 @@ func runCrush(ctx context.Context, root, source, profile string, output io.Write
 		fixed = "1"
 	}
 	env = append(env, "GANESH_TEST_FIXED_ENDINGS="+fixed)
-	if _, err := fmt.Fprintf(output, "Source revision: %s; corrected ending dispatch: %s\n", revision, fixed); err != nil {
+	if _, err := fmt.Fprintf(stdout, "Source revision: %s; corrected ending dispatch: %s\n", revision, fixed); err != nil {
 		return ErrFixture
 	}
 	temp, err := os.MkdirTemp("", "ganesh-crush-runner-")
@@ -157,10 +164,10 @@ func runCrush(ctx context.Context, root, source, profile string, output io.Write
 	buildArgs := append([]string{"build"}, flags...)
 	buildArgs = append(buildArgs, "-o", binary, target)
 	started := time.Now()
-	if _, err := run(ctx, invocation{root, "go", buildArgs, env, 60 * time.Second, output}); err != nil {
+	if _, err := run(ctx, invocation{dir: root, name: "go", args: buildArgs, env: env, timeout: 60 * time.Second, stdout: stdout, stderr: stderr}); err != nil {
 		return ErrFixture
 	}
-	if _, err := fmt.Fprintf(output, "Ganesh build completed in %.3f s; profile: %s\n", time.Since(started).Seconds(), profile); err != nil {
+	if _, err := fmt.Fprintf(stdout, "Ganesh build completed in %.3f s; profile: %s\n", time.Since(started).Seconds(), profile); err != nil {
 		return ErrFixture
 	}
 	body, err := json.Marshal(struct{ Replace map[string]string }{replacements})
@@ -174,10 +181,10 @@ func runCrush(ctx context.Context, root, source, profile string, output io.Write
 	env = append(env, "GANESH_TEST_BINARY="+binary)
 	started = time.Now()
 	args := []string{"test", "-p=1", "-count=1", "-overlay", overlay, "./internal/hooks", "./internal/agent", "-run", "^TestGanesh(ToolHookAdapter|TurnEndingCancellation)$", "-timeout=20s", "-v"}
-	if _, err := run(ctx, invocation{source, "go", args, env, 60 * time.Second, output}); err != nil {
+	if _, err := run(ctx, invocation{dir: source, name: "go", args: args, env: env, timeout: 60 * time.Second, stdout: stdout, stderr: stderr}); err != nil {
 		return ErrFixture
 	}
-	if _, err := fmt.Fprintf(output, "Crush fixture stage completed in %.3f s\n", time.Since(started).Seconds()); err != nil {
+	if _, err := fmt.Fprintf(stdout, "Crush fixture stage completed in %.3f s\n", time.Since(started).Seconds()); err != nil {
 		return ErrFixture
 	}
 	return nil

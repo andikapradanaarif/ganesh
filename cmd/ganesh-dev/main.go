@@ -68,7 +68,7 @@ func repositoryRoot() (string, error) {
 	}
 }
 
-func run(args []string, output io.Writer) error {
+func run(args []string, stdout, stderr io.Writer) error {
 	opts, err := parse(args)
 	if err != nil {
 		return err
@@ -82,7 +82,7 @@ func run(args []string, output io.Writer) error {
 		if err != nil {
 			return err
 		}
-		encoder := json.NewEncoder(output)
+		encoder := json.NewEncoder(stdout)
 		encoder.SetIndent("", "  ")
 		if err := encoder.Encode(report); err != nil {
 			return devtools.ErrStudy
@@ -93,11 +93,11 @@ func run(args []string, output io.Writer) error {
 	if err != nil {
 		return err
 	}
-	return devtools.RunCrush(context.Background(), root, opts.source, opts.profile, output)
+	return devtools.RunCrush(context.Background(), root, opts.source, opts.profile, stdout, stderr)
 }
 
 func main() {
-	if err := run(os.Args[1:], os.Stdout); err != nil {
+	if err := run(os.Args[1:], os.Stdout, os.Stderr); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}

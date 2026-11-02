@@ -1,9 +1,11 @@
 package devtools
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -42,6 +44,7 @@ func TestCrushPlan(t *testing.T) {
 		for _, profile := range []string{"development", "stripped", "collector"} {
 			t.Run(pin[:7]+"/"+profile, func(t *testing.T) {
 				root, source := fixtureTree(t)
+				var stdout, stderr bytes.Buffer
 				var calls []invocation
 				var temp string
 				run := func(_ context.Context, call invocation) ([]byte, error) {
@@ -62,14 +65,14 @@ func TestCrushPlan(t *testing.T) {
 					}
 					return nil, nil
 				}
-				if err := runCrush(context.Background(), root, source, profile, io.Discard, []string{"PATH=/synthetic", "GOPROXY=network", "GANESH_TEST_FIXED_ENDINGS=bad"}, run); err != nil {
+				if err := runCrush(context.Background(), root, source, profile, &stdout, &stderr, []string{"PATH=/synthetic", "GOPROXY=network", "GANESH_TEST_FIXED_ENDINGS=bad"}, run); err != nil {
 					t.Fatal(err)
 				}
 				if len(calls) != 5 {
 					t.Fatal("command count changed")
 				}
 				for i, want := range [][]string{{"rev-parse", "HEAD"}, {"diff", "--quiet", "HEAD", "--"}, {"ls-files", "--others", "--exclude-standard", "--", "*.go"}} {
-					if !reflect.DeepEqual(calls[i].args, want) || calls[i].timeout != 5*time.Second || calls[i].dir != source || calls[i].output != nil {
+					if !reflect.DeepEqual(calls[i].args, want) || calls[i].timeout != 5*time.Second || calls[i].dir != source || calls[i].stdout != nil || calls[i].stderr != nil {
 						t.Fatal("source gate changed")
 					}
 				}
@@ -87,7 +90,7 @@ func TestCrushPlan(t *testing.T) {
 					t.Fatal("fixture command changed")
 				}
 				for _, call := range calls[3:] {
-					if call.timeout != 60*time.Second || call.name != "go" || call.output == nil {
+					if call.timeout != 60*time.Second || call.name != "go" || call.stdout != &stdout || call.stderr != &stderr {
 						t.Fatal("stage boundary changed")
 					}
 					fixed := "GANESH_TEST_FIXED_ENDINGS=0"
@@ -99,6 +102,9 @@ func TestCrushPlan(t *testing.T) {
 							t.Fatal("offline environment changed")
 						}
 					}
+				}
+				if stderr.Len() != 0 || !strings.Contains(stdout.String(), "Source revision:") || !strings.Contains(stdout.String(), "Ganesh build completed") || !strings.Contains(stdout.String(), "Crush fixture stage completed") {
+					t.Fatal("progress output left stdout")
 				}
 				if !slices.Contains(calls[4].env, "GANESH_TEST_BINARY="+filepath.Join(temp, "ganesh")) {
 					t.Fatal("binary binding missing")
@@ -125,7 +131,7 @@ func TestCrushFailuresStopWithoutFallback(t *testing.T) {
 			}
 			return nil, nil
 		}
-		err := runCrush(context.Background(), root, source, "stripped", io.Discard, nil, run)
+		err := runCrush(context.Background(), root, source, "stripped", io.Discard, io.Discard, nil, run)
 		if err == nil || strings.Contains(err.Error(), "ghp_") || calls != step+1 {
 			t.Fatal("failed stage escaped or fell back")
 		}
@@ -169,10 +175,64 @@ func TestCrushFailuresStopWithoutFallback(t *testing.T) {
 				}
 				return nil, nil
 			}
-			if err := runCrush(context.Background(), root, source, profile, io.Discard, env, run); err == nil || strings.Contains(err.Error(), "ghp_") {
+			if err := runCrush(context.Background(), root, source, profile, io.Discard, io.Discard, env, run); err == nil || strings.Contains(err.Error(), "ghp_") {
 				t.Fatal("unsafe gate accepted or echoed")
 			}
 		})
+	}
+}
+
+func TestCommandStreamHelper(t *testing.T) {
+	mode := os.Getenv("GANESH_DEVTOOLS_STREAM_HELPER")
+	if mode == "" {
+		return
+	}
+	fmt.Fprint(os.Stdout, "synthetic child stdout\n")
+	fmt.Fprint(os.Stderr, "synthetic child stderr\n")
+	if mode == "failure" {
+		os.Exit(7)
+	}
+	os.Exit(0)
+}
+
+func TestExecuteCommandPreservesStreams(t *testing.T) {
+	executable, err := os.Executable()
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, mode := range []string{"success", "failure"} {
+		for _, streamed := range []bool{false, true} {
+			t.Run(fmt.Sprintf("%s/streamed=%t", mode, streamed), func(t *testing.T) {
+				var stdout, stderr bytes.Buffer
+				call := invocation{
+					name: executable, args: []string{"-test.run=^TestCommandStreamHelper$"},
+					env: append(os.Environ(), "GANESH_DEVTOOLS_STREAM_HELPER="+mode), timeout: 10 * time.Second,
+				}
+				if streamed {
+					call.stdout, call.stderr = &stdout, &stderr
+				}
+				body, err := executeCommand(context.Background(), call)
+				if mode == "failure" {
+					if err != ErrFixture || body != nil {
+						t.Fatal("child failure must return only static error")
+					}
+				} else if err != nil {
+					t.Fatal("child success rejected")
+				}
+				if streamed {
+					if stdout.String() != "synthetic child stdout\n" || stderr.String() != "synthetic child stderr\n" || len(body) != 0 {
+						t.Fatal("child output crossed channels or was captured")
+					}
+				} else if mode == "success" && string(body) != "synthetic child stdout\n" {
+					t.Fatal("private metadata capture included stderr or lost stdout")
+				}
+			})
+		}
+	}
+	for _, call := range []invocation{{stdout: io.Discard}, {stderr: io.Discard}} {
+		if _, err := executeCommand(context.Background(), call); err != ErrFixture {
+			t.Fatal("incomplete stream binding must fail before launch")
+		}
 	}
 }
 
