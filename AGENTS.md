@@ -16,6 +16,8 @@ Go and a server-hosted service with REST and MCP over one core are agreed. Follo
 4. Complete the issue's authorized scope and report milestone evidence. Apply the roadmap's next-stage gates; issue creation is not evidence that those gates passed.
 5. Do not merge without the owner's instruction or existing explicit authorization.
 
+Triage every review finding before merge. Address actionable findings, including minor ones, in the current issue/PR when they fit its scope. Record the reason for retaining deliberate behavior or deferring work.
+
 The roadmap tracker is issue #5; S0 is issue #6. Earlier closed review and tooling attempts are historical artifacts, not active prerequisites or acceptance evidence.
 
 ## Stage and evidence boundaries
@@ -30,5 +32,7 @@ The roadmap tracker is issue #5; S0 is issue #6. Earlier closed review and tooli
 ## Engineering
 
 Prefer a small Go core with explicit transaction boundaries and thin adapters. Keep domain/application code independent of transport framework and ORM types. Distinguish local capture, durable service acceptance, narrative eligibility and publication.
+
+Use Go for active developer tooling and new test harnesses too. Retain completed Python experiment sources at their original paths as historical evidence; do not change their recorded producers, hashes or frozen rules. Current Go tools must not invoke Python.
 
 Run checks appropriate to the change. Document imports require source-fidelity and link checks; runtime guarantees require executable evidence.
