@@ -20,6 +20,8 @@ The snapshot is checked against the separately retained freeze digest before res
 
 The evidence record must identify its task, arm, corpus and fresh execution/session evidence. Evidence hashes cannot be reused across slots; a shared batch artifact needs separately addressed per-slot records. This rejects obvious replay but does not authenticate records or prove fresh sessions. The analyzer reads none of those artifacts. Missing evidence, unknown critical errors or an indeterminate outcome makes the grade unresolved. Usage can remain unknown independently of grading. Missing rows and unknown values never become failed tasks or zero usage.
 
+Use pass/fail only for final externally adjudicated verdicts. Unresolved critical/unsupported flags, oracle–model disagreements and unknown outcomes remain indeterminate. The retained evidence must preserve the required oracle, model and owner decisions; model agreement alone is not adjudication, and a hash does not establish that these checks occurred.
+
 All values are declarations. The independent source-keyed oracle, calibrated alternate-family grader, owner samples, full-context fit, permissions, budgets and actual run identity still need the execution-sheet checks. Calibration, preparation, extraction, grading and other overhead costs must be reconciled separately; the reported answering/tool aggregates are not a claim of complete experiment cost or budget compliance.
 
 Primary counts compare 0/A on the same frozen tasks, separately for 20 within-project and 10 cross-project cases. Partial paired counts use only fully resolved pairs and retain the fixed expected denominator; percentages, introduced-error totals and regression flags stay unknown until all pairs in that comparison resolve. A critical error is introduced when its ID appears for a task in the candidate but not in that same task's baseline. Equal aggregate counts cannot hide a different error or a move to another task.
@@ -37,3 +39,20 @@ States are `incomplete_base_metadata`, `conditional_metadata_required`, `unexpec
 Inputs use the private, exact-shape evaluation reader: regular 0600/0400 files, no final-component symlinks, 1 MiB per file and the shared depth-64 bound. Reject unplanned/duplicate slots, invalid IDs, duplicate critical IDs, reused evidence hashes, negative numbers and overflow. Numeric totals must fit signed 64-bit integers; this is a representation limit, not a run budget. Row and critical-ID ordering is canonicalized for `results_digest`. Task-ID/critical-ID case and all values remain significant. Errors are static and never echo invalid content. Reports include bounded IDs only from the pinned plan; actual answers, rubrics and source bodies are absent.
 
 This is metadata accounting for the standard S0 plan. It supplies no actual project/model/budget/result identifiers, enables no capture or narrative lane, and establishes neither P01/P02 acceptance nor the mandatory automatic-memory product case. Startup reliability remains tracked in [#34](https://github.com/andikapradanaarif/ganesh/issues/34); no closed timing study is extended.
+
+## Validation, 2026-11-03 (Asia/Jakarta)
+
+The result-analysis/domain and CLI contract fixtures pass, including the exact floor/net/token boundaries, per-stratum regression/access accounting, per-task critical identities, unknowns, matched diagnostics, trigger OR rule, conditional completeness/policy loss, canonical identity, malformed metadata and overflow. Build, vet and the CGO-disabled full suite pass on Go 1.27.3, macOS amd64. The dedicated collector dependency graph still excludes S0/developer/local-record packages and `os/exec`; capture code and deadlines are unchanged.
+
+Full normal and race validation remains incomplete under #34. Each suite was attempted once and retried once unchanged, serially. The following first-callback rejections returned silent exit 1 while their outer contexts remained active; exact causes and record/receipt outcomes are unconfirmed. No race-detector warning appeared.
+
+| Suite attempt | Observed rejected profiles and parent-observed callback duration |
+| --- | --- |
+| Normal initial | Stripped 928.638 ms; standalone 785.974 ms |
+| Race initial | Development 778.295 ms |
+| Normal retry | Stripped 764.709 ms; standalone 774.426 ms |
+| Race retry | Development 768.591 ms; stripped 762.563 ms |
+
+No further repeat-until-pass attempts, clock changes or relaxed deadlines were used. These are correctness-validation observations, not a new timing study or profile qualification. PR #43 remains draft; its full-suite acceptance criterion is not met.
+
+The compiled CLI was separately checked with explicitly synthetic metadata: 108 rows declaring A=21/0=18 produce `metadata_complete` and a met numeric filter, while all acceptance/authorization flags remain false. An empty ledger produces 108 missing slots, an incomplete criterion, JSON output and exit 1. No answer was graded and no model was called. Actual S0 inputs/results and cumulative stage effort remain unknown; the approved documents and historical experiments are unchanged.
