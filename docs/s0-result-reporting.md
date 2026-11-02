@@ -44,7 +44,7 @@ This is metadata accounting for the standard S0 plan. It supplies no actual proj
 
 The result-analysis/domain and CLI contract fixtures pass, including the exact floor/net/token boundaries, per-stratum regression/access accounting, per-task critical identities, unknowns, matched diagnostics, trigger OR rule, conditional completeness/policy loss, canonical identity, malformed metadata and overflow. Build, vet and the CGO-disabled full suite pass on Go 1.27.3, macOS amd64. The dedicated collector dependency graph still excludes S0/developer/local-record packages and `os/exec`; capture code and deadlines are unchanged.
 
-Full normal and race validation remains incomplete under #34. Each suite was attempted once and retried once unchanged, serially. The following first-callback rejections returned silent exit 1 while their outer contexts remained active; exact causes and record/receipt outcomes are unconfirmed. No race-detector warning appeared.
+Initial full normal and race validation was incomplete under #34. Each suite was attempted once and retried once unchanged, serially. The following first-callback rejections returned silent exit 1 while their outer contexts remained active; exact causes and record/receipt outcomes are unconfirmed. No race-detector warning appeared.
 
 | Suite attempt | Observed rejected profiles and parent-observed callback duration |
 | --- | --- |
@@ -53,6 +53,10 @@ Full normal and race validation remains incomplete under #34. Each suite was att
 | Normal retry | Stripped 764.709 ms; standalone 774.426 ms |
 | Race retry | Development 768.591 ms; stripped 762.563 ms |
 
-No further repeat-until-pass attempts, clock changes or relaxed deadlines were used. These are correctness-validation observations, not a new timing study or profile qualification. PR #43 remains draft; its full-suite acceptance criterion is not met.
+These are correctness-validation observations, not a timing study or profile qualification. The initial failures kept PR #43 in draft.
+
+Follow-up under [#44](https://github.com/andikapradanaarif/ganesh/issues/44), at runtime head `932c449`: after a separately frozen 18-launch diagnosis/artifact comparison, one new serial pass each of build, vet, full normal (`go test -p=1 -count=1 ./...`), full race (`go test -race -p=1 -count=1 ./...`) and CGO-disabled full tests passed. Both exact-pin native runner fixtures also passed: baseline `aed2bae` reproduced TurnEnd suppression; repaired `3378f47` delivered endings; each produced 15 reduced records from 41 synthetic notifications. Collector dependency isolation and documentation/diff checks pass.
+
+No runtime code, test assertion, build preparation, clock or deadline changed between the failed and passing validations, and no repeat-until-pass loop was used. The follow-up measurement had zero failures in both unsigned and ad hoc signed arms; it established no signing benefit and selected no build change. Its producers/results are recorded in [PR #45](https://github.com/andikapradanaarif/ganesh/pull/45), separately from these correctness checks. PR #43's validation criterion is now met for this run and it is ready for review. #34 remains open: these passes neither explain the earlier failures nor qualify an installed capture profile.
 
 The compiled CLI was separately checked with explicitly synthetic metadata: 108 rows declaring A=21/0=18 produce `metadata_complete` and a met numeric filter, while all acceptance/authorization flags remain false. An empty ledger produces 108 missing slots, an incomplete criterion, JSON output and exit 1. No answer was graded and no model was called. Actual S0 inputs/results and cumulative stage effort remain unknown; the approved documents and historical experiments are unchanged.
