@@ -105,6 +105,9 @@ func TestResultPrimaryBoundaries(t *testing.T) {
 			if r.ExperimentAccepted || r.EvidenceIndependentlyVerified || r.ModelRunsAuthorized || r.ProductionNarrativeEnabled {
 				t.Fatal("numeric criteria authorized a run or quality claim")
 			}
+			if *r.Primary.Within.Pairs.BaselineElapsedMS != 200 || *r.Primary.Cross.Pairs.CandidateCostMicroUSD != 10 || r.Base.KnownElapsedMS != 1080 || r.Base.KnownCostMicroUSD != 108 {
+				t.Fatal("paired stratum usage was pooled or omitted")
+			}
 		})
 	}
 	for _, extra := range []int64{0, 1} {
@@ -159,6 +162,16 @@ func TestResultStratumRegressionCannotBePooledAway(t *testing.T) {
 		}
 		if r.Primary.Within.Pairs.Expected != 20 || r.Primary.Cross.Pairs.Expected != 10 || r.Primary.Within.Pairs.BaselineOnly != loss || len(r.Primary.AccessWins) != loss+3 {
 			t.Fatal("stratum/access accounting wrong")
+		}
+		before := r.Primary
+		addConditional(s, &in)
+		for i := range in.Results {
+			if in.Results[i].Answer.Corpus == "eligible_origin" {
+				in.Results[i].Outcome = "pass"
+			}
+		}
+		if after := resultReport(t, s, in); !reflect.DeepEqual(before, after.Primary) {
+			t.Fatal("filtered diagnostics cleared or changed the primary regression")
 		}
 	}
 }
@@ -317,6 +330,13 @@ func TestResultUnknownsNeverBecomeFailuresOrZero(t *testing.T) {
 		if field == "tokens" && (r.Primary.Overall.CandidateTokens != nil || r.Primary.Overall.BaselineTokens == nil || r.Primary.NumericCriteria != "incomplete") {
 			t.Fatal("unknown tokens became zero or hid known baseline")
 		}
+	}
+	changeResult(&in, id, "A", "none", func(r *EvaluationResult) {
+		r.Outcome = "indeterminate"
+		r.CriticalErrors = resultErrors("known-unsafe")
+	})
+	if r := resultReport(t, s, in); r.Base.KnownCriticalErrors != 1 || r.Primary.Overall.IntroducedCritical != nil {
+		t.Fatal("known critical warning vanished inside unresolved grading")
 	}
 	empty := EvaluationResults{1, s.Digest, []EvaluationResult{}}
 	r := resultReport(t, s, empty)

@@ -32,16 +32,18 @@ type EvaluationResults struct {
 }
 
 type EvaluationCoverage struct {
-	Expected          int   `json:"expected"`
-	Present           int   `json:"present"`
-	Missing           int   `json:"missing"`
-	Unresolved        int   `json:"unresolved"`
-	KnownTokens       int64 `json:"known_answering_tokens"`
-	UnknownTokens     int   `json:"unknown_token_slots"`
-	KnownElapsedMS    int64 `json:"known_elapsed_ms"`
-	UnknownElapsed    int   `json:"unknown_elapsed_slots"`
-	KnownCostMicroUSD int64 `json:"known_cost_micro_usd"`
-	UnknownCost       int   `json:"unknown_cost_slots"`
+	Expected            int   `json:"expected"`
+	Present             int   `json:"present"`
+	Missing             int   `json:"missing"`
+	Unresolved          int   `json:"unresolved"`
+	KnownCriticalErrors int   `json:"known_critical_errors"`
+	UnknownCriticalSets int   `json:"unknown_critical_error_slots"`
+	KnownTokens         int64 `json:"known_answering_tokens"`
+	UnknownTokens       int   `json:"unknown_token_slots"`
+	KnownElapsedMS      int64 `json:"known_elapsed_ms"`
+	UnknownElapsed      int   `json:"unknown_elapsed_slots"`
+	KnownCostMicroUSD   int64 `json:"known_cost_micro_usd"`
+	UnknownCost         int   `json:"unknown_cost_slots"`
 }
 
 func (c EvaluationCoverage) complete() bool {
@@ -49,21 +51,25 @@ func (c EvaluationCoverage) complete() bool {
 }
 
 type EvaluationPairs struct {
-	Expected           int      `json:"expected_pairs"`
-	Resolved           int      `json:"resolved_pairs"`
-	BothPass           int      `json:"both_pass"`
-	BothFail           int      `json:"both_fail"`
-	BaselineOnly       int      `json:"baseline_only"`
-	CandidateOnly      int      `json:"candidate_only"`
-	BaselineCompleted  int      `json:"baseline_completed_resolved_pairs"`
-	CandidateCompleted int      `json:"candidate_completed_resolved_pairs"`
-	Net                int      `json:"net_resolved_pairs"`
-	DeltaPoints        *float64 `json:"completion_delta_percentage_points"`
-	BaselineCritical   int      `json:"baseline_critical_errors_resolved_pairs"`
-	CandidateCritical  int      `json:"candidate_critical_errors_resolved_pairs"`
-	IntroducedCritical *int     `json:"introduced_critical_errors"`
-	BaselineTokens     *int64   `json:"baseline_answering_tokens"`
-	CandidateTokens    *int64   `json:"candidate_answering_tokens"`
+	Expected              int      `json:"expected_pairs"`
+	Resolved              int      `json:"resolved_pairs"`
+	BothPass              int      `json:"both_pass"`
+	BothFail              int      `json:"both_fail"`
+	BaselineOnly          int      `json:"baseline_only"`
+	CandidateOnly         int      `json:"candidate_only"`
+	BaselineCompleted     int      `json:"baseline_completed_resolved_pairs"`
+	CandidateCompleted    int      `json:"candidate_completed_resolved_pairs"`
+	Net                   int      `json:"net_resolved_pairs"`
+	DeltaPoints           *float64 `json:"completion_delta_percentage_points"`
+	BaselineCritical      int      `json:"baseline_critical_errors_resolved_pairs"`
+	CandidateCritical     int      `json:"candidate_critical_errors_resolved_pairs"`
+	IntroducedCritical    *int     `json:"introduced_critical_errors"`
+	BaselineTokens        *int64   `json:"baseline_answering_tokens"`
+	CandidateTokens       *int64   `json:"candidate_answering_tokens"`
+	BaselineElapsedMS     *int64   `json:"baseline_elapsed_ms"`
+	CandidateElapsedMS    *int64   `json:"candidate_elapsed_ms"`
+	BaselineCostMicroUSD  *int64   `json:"baseline_cost_micro_usd"`
+	CandidateCostMicroUSD *int64   `json:"candidate_cost_micro_usd"`
 }
 
 type EvaluationStratum struct {
@@ -188,6 +194,11 @@ func resultCoverage(slots []EvaluationAnswer, rows map[EvaluationAnswer]Evaluati
 				c.Unresolved++
 			}
 		}
+		if r.CriticalErrors == nil {
+			c.UnknownCriticalSets++
+		} else {
+			c.KnownCriticalErrors += len(*r.CriticalErrors)
+		}
 		if r.AnsweringTokens == nil {
 			c.UnknownTokens++
 		} else {
@@ -209,22 +220,10 @@ func resultCoverage(slots []EvaluationAnswer, rows map[EvaluationAnswer]Evaluati
 
 func compareResultPairs(tasks []EvaluationTask, baselineArm, baselineCorpus, candidateArm, candidateCorpus string, rows map[EvaluationAnswer]EvaluationResult) EvaluationPairs {
 	p := EvaluationPairs{Expected: len(tasks)}
-	var bTokens, cTokens int64
-	baselineTokensKnown, candidateTokensKnown := true, true
 	introduced := 0
 	for _, task := range tasks {
 		b, bok := rows[EvaluationAnswer{task.ID, baselineArm, baselineCorpus}]
 		c, cok := rows[EvaluationAnswer{task.ID, candidateArm, candidateCorpus}]
-		if !bok || b.AnsweringTokens == nil {
-			baselineTokensKnown = false
-		} else {
-			bTokens += *b.AnsweringTokens
-		}
-		if !cok || c.AnsweringTokens == nil {
-			candidateTokensKnown = false
-		} else {
-			cTokens += *c.AnsweringTokens
-		}
 		if !resultResolved(b, bok) || !resultResolved(c, cok) {
 			continue
 		}
@@ -264,13 +263,34 @@ func compareResultPairs(tasks []EvaluationTask, baselineArm, baselineCorpus, can
 		delta := 100 * float64(p.Net) / float64(p.Expected)
 		p.DeltaPoints = &delta
 	}
-	if baselineTokensKnown {
-		p.BaselineTokens = &bTokens
-	}
-	if candidateTokensKnown {
-		p.CandidateTokens = &cTokens
-	}
+	p.BaselineTokens, p.BaselineElapsedMS, p.BaselineCostMicroUSD = pairUsage(tasks, baselineArm, baselineCorpus, rows)
+	p.CandidateTokens, p.CandidateElapsedMS, p.CandidateCostMicroUSD = pairUsage(tasks, candidateArm, candidateCorpus, rows)
 	return p
+}
+
+func pairUsage(tasks []EvaluationTask, arm, corpus string, rows map[EvaluationAnswer]EvaluationResult) (tokens, elapsed, cost *int64) {
+	var sums [3]int64
+	known := [3]bool{true, true, true}
+	for _, task := range tasks {
+		r := rows[EvaluationAnswer{task.ID, arm, corpus}]
+		for i, v := range []*int64{r.AnsweringTokens, r.ElapsedMS, r.CostMicroUSD} {
+			if v == nil {
+				known[i] = false
+			} else {
+				sums[i] += *v
+			}
+		}
+	}
+	if known[0] {
+		tokens = &sums[0]
+	}
+	if known[1] {
+		elapsed = &sums[1]
+	}
+	if known[2] {
+		cost = &sums[2]
+	}
+	return
 }
 
 // scaledLE compares full 128-bit products; no ratio rounding or int64 overflow.
