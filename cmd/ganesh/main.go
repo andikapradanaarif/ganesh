@@ -34,11 +34,11 @@ func run(ctx context.Context, args []string, output io.Writer) error {
 		return emit(output, s0.Discover(ctx))
 	}
 	if len(args) < 2 || args[0] != "s0" {
-		return errors.New("usage: ganesh doctor | capture --spool DIR | hook crush --spool DIR | s0 prepare|check|freeze-targets|screen|freeze-evaluation|check-evaluation [flags]")
+		return errors.New("usage: ganesh doctor | capture --spool DIR | hook crush --spool DIR | s0 prepare|check|freeze-targets|screen|freeze-evaluation|check-evaluation|report-evaluation [flags]")
 	}
 	f := flag.NewFlagSet(args[1], flag.ContinueOnError)
 	f.SetOutput(io.Discard)
-	var directory, input, outputPath, baselinePath, phase, expectedDigest string
+	var directory, input, outputPath, baselinePath, phase, expectedDigest, planPath string
 	switch args[1] {
 	case "prepare":
 		f.StringVar(&directory, "dir", "", "new private workspace")
@@ -57,6 +57,10 @@ func run(ctx context.Context, args []string, output io.Writer) error {
 	case "check-evaluation":
 		f.StringVar(&input, "input", "", "private evaluation snapshot")
 		f.StringVar(&expectedDigest, "expected-digest", "", "previously retained freeze digest")
+	case "report-evaluation":
+		f.StringVar(&input, "input", "", "private result metadata")
+		f.StringVar(&planPath, "plan", "", "private frozen evaluation snapshot")
+		f.StringVar(&expectedDigest, "expected-digest", "", "previously retained freeze digest")
 	default:
 		return errors.New("unknown S0 command")
 	}
@@ -64,6 +68,32 @@ func run(ctx context.Context, args []string, output io.Writer) error {
 		return errors.New("invalid S0 command flags")
 	}
 	switch args[1] {
+	case "report-evaluation":
+		if expectedDigest == "" {
+			return s0.ErrEvaluation
+		}
+		snapshot, err := s0.ReadEvaluationSnapshot(planPath)
+		if err != nil {
+			return err
+		}
+		if _, err := s0.CheckEvaluationAgainst(snapshot, expectedDigest); err != nil {
+			return err
+		}
+		results, err := s0.ReadEvaluationResults(input)
+		if err != nil {
+			return err
+		}
+		report, err := s0.ReportEvaluation(snapshot, expectedDigest, results)
+		if err != nil {
+			return err
+		}
+		if err := emit(output, report); err != nil {
+			return s0.ErrResults
+		}
+		if report.State != "metadata_complete" {
+			return s0.ErrIncompleteResults
+		}
+		return nil
 	case "freeze-evaluation":
 		if outputPath == "" {
 			return errors.New("freeze-evaluation requires --output")

@@ -53,9 +53,10 @@ func TestSubcommandsRejectIrrelevantFlagsBeforeIO(t *testing.T) {
 		{"screen", map[string]bool{"input": true, "baseline": true}},
 		{"freeze-evaluation", map[string]bool{"input": true, "output": true}},
 		{"check-evaluation", map[string]bool{"input": true, "expected-digest": true}},
+		{"report-evaluation", map[string]bool{"input": true, "plan": true, "expected-digest": true}},
 	}
 	for _, command := range commands {
-		for _, flag := range []string{"dir", "input", "output", "baseline", "phase", "expected-digest"} {
+		for _, flag := range []string{"dir", "input", "output", "baseline", "phase", "expected-digest", "plan"} {
 			if command.allowed[flag] {
 				continue
 			}
