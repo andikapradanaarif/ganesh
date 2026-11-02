@@ -144,7 +144,7 @@ func TestWorkspaceIsPrivateAndNeverOverwritten(t *testing.T) {
 	if !reflect.DeepEqual(before, after) {
 		t.Fatal("changed existing run")
 	}
-	for _, name := range []string{dir, filepath.Join(dir, "run.json"), filepath.Join(dir, "targets.json")} {
+	for _, name := range []string{dir, filepath.Join(dir, "run.json"), filepath.Join(dir, "targets.json"), filepath.Join(dir, "evaluation.json")} {
 		info, err := os.Stat(name)
 		if err != nil || info.Mode().Perm()&0077 != 0 {
 			t.Fatalf("private permissions: %s %v", name, err)
@@ -152,5 +152,12 @@ func TestWorkspaceIsPrivateAndNeverOverwritten(t *testing.T) {
 	}
 	if !strings.Contains(string(before), `"screen_started_at": null`) {
 		t.Fatal("preparation started a screen")
+	}
+	definition, err := ReadEvaluationDefinition(filepath.Join(dir, "evaluation.json"))
+	if err != nil || definition.RunID != r.ID || definition.Seed != nil || len(definition.Tasks) != 0 || len(definition.CalibrationIDs) != 0 || definition.Bindings != (EvaluationBindings{}) {
+		t.Fatal("preparation invented evaluation inputs")
+	}
+	if _, err := FreezeEvaluation(definition); err != ErrEvaluation {
+		t.Fatal("empty prepared evaluation passed")
 	}
 }

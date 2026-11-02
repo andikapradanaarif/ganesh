@@ -1,0 +1,67 @@
+# S0 evaluation planning
+
+[Issue #40](https://github.com/andikapradanaarif/ganesh/issues/40) adds local preparation tools for [roadmap A1](personal-second-memory-roadmap.md#appendix-a-experiments-before-s1a) and the [execution sheet](s0-execution-sheet.md). This freezes a declared plan and its schedule. Actual screening, corpus preparation, independent grading, model execution and product acceptance remain pending.
+
+`s0 prepare --dir DIR` now adds `evaluation.json` alongside `run.json` and `targets.json`. It binds the generated run ID and leaves the seed unselected, artifact hashes empty, and calibration/held-out task lists empty. It invents no projects, clients, models, budgets or task content. Existing prepared workspaces remain untouched; the new command accepts a separately prepared definition for an existing run too.
+
+At freeze/check time, `run_id` is a declared namespace: the tool checks its format and includes it in snapshot identity. It does not load a workspace's `run.json`, compare that file's ID or verify workspace membership. The operator must confirm the selected run and its actual settings before held-out answers. Standalone definitions remain supported with the same false assurance flags.
+
+After filling permitted, real inputs, freeze and inspect the standard plan:
+
+```sh
+go run ./cmd/ganesh s0 freeze-evaluation --input /path/to/private/run/evaluation.json --output /path/to/private/run/evaluation.frozen.json
+go run ./cmd/ganesh s0 check-evaluation --input /path/to/private/run/evaluation.frozen.json --expected-digest SAVED_FREEZE_DIGEST
+```
+
+The input schema is the generated template. Each task supplies `id`, `role`, `stratum`, `diagnostic`, `tags`, `prompt_sha256`, `rubric_sha256`, `source_keyed_oracle_sha256`, `permitted_sources_sha256` and an explicit `baseline_can_access_required_information` boolean. IDs are case-sensitive ASCII letters/digits/underscore/hyphen, starting with a letter/digit, up to 80 characters. Role and stratum use the exact values below. Tags are unique members of `changed_state`, `workflow`, `gotcha`, `mistaken_premise`, `abstention`, `local_exception` and `irrelevant_memory`; they may overlap across tasks.
+
+| Role | Within / cross tasks | Diagnostic within / cross |
+| --- | --- | --- |
+| `coder` | 7 / 3 | 2 / 2 |
+| `planner` | 7 / 3 | 2 / 2 |
+| `reviewer` | 6 / 4 | 2 / 2 |
+| Total | 20 / 10 | 6 / 6 |
+
+Provide an explicit unsigned 32-bit `schedule_seed` (zero is valid), and 1–30 distinct calibration task IDs that do not overlap held-out IDs. `bindings` holds lowercase 64-character SHA-256 declarations for the corpus, preselected eligible corpus/filter, unchanged native instructions/notes, typed cards, variants/renderer, permission/access map, model/limit record, calibration, grading/spot-check protocol, clean-session setup and full-context preflight. The grading artifact must retain the source-keyed oracle, calibrated alternate-family grader and the required preselected owner samples. Hash already permitted scrubbed artifacts locally; the planner reads neither their contents nor named projects and cannot establish their validity.
+
+The tool supports the standard 30-task plan only. Repeated role/prompt/source tuples are rejected even under different IDs. An empty, reduced or incorrectly stratified definition fails rather than receiving standard-plan counts. A reduced pilot still needs the roadmap's separate, pre-answer declaration and recalculated protocol.
+
+The schedule contains 60 primary `0`/`A` slots and 48 `B`/`C`/`D`/`F` slots on exactly the frozen diagnostics: **108 base answers**. It also freezes **24 conditional D/F slots** on those same 12 tasks using the eligible corpus: **132 answers only if the later history-win trigger fires**. Conditional slots are planning data; this command never evaluates the trigger or executes them. An empty eligible corpus remains an operator-recorded case with no-summary counterparts, not permission to omit the conditional comparison.
+
+`summary_corpus` identifies only the summary/prose input. `A` and `B` still receive their frozen typed cards; `C` uses the reference prose; `D` and `F` use the identical full authorized corpus, then the identical eligible subset if triggered. `F` is always present. Preparing a digest does not establish context fit or authorize truncation, disclosure or a model call. Existing held-out run checks and every execution-sheet requirement remain in force.
+
+The `sha256-order-v1` algorithm ranks tasks using SHA-256 of its versioned prefix, big-endian seed and length-prefixed purpose/task ID. Primary pairs alternate which arm goes first within each stratum (10/10 within, 5/5 cross). Diagnostic order rotates B/C/D/F so every arm occupies each position three times overall; conditional D/F order is balanced 6/6. Rank ties use exact task ID. Task IDs, tags and calibration IDs are canonically sorted for snapshot identity, making input array order irrelevant. Counterbalance covers these arm orders; project/role-stratified grading samples remain in the separate grading artifact.
+
+The snapshot records the full definition, versioned algorithm and both schedules. Its digest hashes compact JSON in the declared struct field order with the digest field empty. Retain the digest printed at freeze time separately from the snapshot, then supply it to `check-evaluation --expected-digest`. The checker compares that pin and reconstructs the entire canonical snapshot, rejecting changed digests, definitions, algorithms, seed, schedules or counts. A self-consistent regenerated plan fails against the original digest. JSON whitespace, escape spellings and object key order are not identity; decoded string case and values are. Snapshots themselves must retain canonical array order. Schema version and algorithm changes require a new contract.
+
+The Go API exposes `CheckEvaluationAgainst` for validating a retained baseline. Structural consistency checking is private to the package; `SaveEvaluationSnapshot` creates a new baseline and returns its freeze report only after the private write succeeds. Adding even an optional field requires a new schema and an explicit decoder/migration contract for older records; missing or additional fields are never silently accepted.
+
+Inputs are bounded to 1 MiB, regular 0600 or private read-only 0400 files, 64 JSON nesting levels and exact schema keys. The nesting guard uses `internal/jsonrecord.MaxDepth`, shared with active developer record readers; the root is depth zero and values beyond depth 64 fail. This aligns resource limits while the valid evaluation record shape remains shallow and unchanged. Missing/unknown/duplicate/case-aliased keys, wrong types, unselected fields and invalid bounds fail with static errors. Final-component file symlinks are rejected; ancestor paths and the same-user host remain trusted. A new snapshot is created exclusively with mode 0600 (subject to a stricter umask) and file synchronization. The destination's parent must already exist. An existing file is never overwritten, and failed writes can leave an inspectable partial file. This is preparation storage, not the capture spool's crash-recovery/durable-receipt contract.
+
+Freeze/check output contains only state, digest, counts and explicit `evidence_independently_verified: false`, `model_runs_authorized: false`, `production_narrative_enabled: false`, with the trigger `not_evaluated`. Actual definitions/snapshots remain private and outside git. The planner checks declared identities and shape; it cannot prove permission, semantic task distinctness, oracle independence, eligibility, model availability, unchanged artifacts or that freezing preceded answers. Re-freezing to another path remains an operator-controlled action, never evidence that the original baseline was preserved.
+
+Capture reliability remains open in [#34](https://github.com/andikapradanaarif/ganesh/issues/34). This tooling consumes no performance-study attempts and grants no installed capture profile, narrative lane, service build or next-stage acceptance.
+
+## Validation, 2026-11-02
+
+On macOS amd64 with Go 1.27.3, build/vet, normal, race and CGO-disabled suites pass. The first full race attempt killed the standalone collector's first native callback at the unchanged three-second outer test limit (3.0009 seconds, no output); the exact cause is unconfirmed. The unchanged serialized full rerun passed. This observed failure remains part of the capture-reliability record, not an excluded warm-up or evidence of qualified startup.
+
+Fixed synthetic fixtures verify the six role/stratum cells, 12 diagnostic identities, required arms, 108/24/132 accounting, primary/diagnostic counterbalance, explicit false assurance flags, private non-overwrite storage, empty preparation, malformed records and old-pin rejection of a valid regenerated plan. A literal rank byte sequence and the serialized synthetic snapshot were separately rehashed with `shasum`; the snapshot digest is `ec0a141b713efd83fe47a249e29d0184cbd02fd5dc7bd4cea45f7f6d751d3154`. The compiled CLI accepted that pin, rejected a different pin and refused to overwrite its snapshot. These are synthetic contract checks, not real handoffs or semantic grading.
+
+The Go native runner passed on both inspected Crush pins with profile `stripped`: each main fixture received 41 synthetic notifications, retained 15 reduced records, and logged exactly 13 intended non-blocking rejections with no additional rejection/retry. Baseline ending suppression was reproduced; repaired-pin ending delivery passed. Compile/test stage durations were 22.495 seconds (baseline) and 13.856 seconds (repaired), with empty stderr files. These validation durations are separate from closed timing studies. No hooks were installed. The capture-only dependency graph still excludes `internal/s0`, `internal/devtools` and `os/exec`.
+
+The approved roadmap/execution sheet, historical producers and data remain unchanged. Actual projects, corpus, models, budgets and held-out runs remain unselected/not run; no overall S0 effort-cap compliance or P01/P02 acceptance is claimed.
+
+## Review follow-up
+
+| Finding | Disposition |
+| --- | --- |
+| Initial race timeout | Retain the original failure and unchanged passing rerun under #34. Capture startup qualification remains outside this planning slice; no deadline is relaxed. |
+| No workspace/run binding | Name `run_id` as a declared, digest-bound namespace. CLI tests explicitly cover a standalone definition with no workspace `run.json`; actual run selection stays an operator check. |
+| Generic checker could accept replacements | Make structural checking private. The exported baseline checker requires the retained pin; saving a new baseline returns its freeze report only after successful persistence. |
+| Exact shape breaks implicit future additions | Keep fail-closed decoding and require an explicit new schema/decoder contract for additions. Current field layout, algorithm and snapshot digest are unchanged. |
+| Different JSON depth limits | Share the 64-level local-record constant across evaluation and developer readers, with independent depth-64/depth-65 boundary tests. Valid evaluation shapes and the separate capture-hook parser contract are unchanged. |
+
+Follow-up build/vet, normal, race and CGO-disabled suites pass. The first follow-up race attempt returned silent exit 1 on the first callback in development, stripped and standalone profiles after parent-observed durations of 1006.0, 865.6 and 774.1 ms respectively; each outer context remained active. No race-detector warning appeared. Exact causes and record/receipt outcomes are unconfirmed. The unchanged serialized full rerun passed; no runtime/test deadlines changed, and these observations remain under #34 rather than entering a timing study.
+
+The structural-only checker is absent from the exported API, failed snapshot saves return no success report, both depth boundaries pass, and standalone declarations remain covered. The compiled CLI still freezes/checks the original `ec0a141b…` fixture digest; all 198 retained study decisions/metrics are byte-identical to the approved outputs. Capture-only dependencies still exclude S0, developer tools and the shared local-record package. No actual S0 answers, source enrollment or production activation occurred.

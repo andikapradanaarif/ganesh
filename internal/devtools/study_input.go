@@ -12,6 +12,8 @@ import (
 	"strings"
 	"syscall"
 	"unicode/utf8"
+
+	"github.com/andikapradanaarif/ganesh/internal/jsonrecord"
 )
 
 var ErrStudy = errors.New("private bounded study input required")
@@ -77,7 +79,7 @@ func uniqueJSON(body []byte) error {
 	decoder.UseNumber()
 	var value func(int) error
 	value = func(depth int) error {
-		if depth > 64 {
+		if depth > jsonrecord.MaxDepth {
 			return ErrStudy
 		}
 		token, err := decoder.Token()
