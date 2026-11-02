@@ -1,7 +1,8 @@
-package main
+package capturecli
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"io"
 	"os"
@@ -28,7 +29,9 @@ func emitCaptureReceipt(ctx context.Context, output io.Writer, value any) error 
 		os.Exit(captureOutputTimeoutExitCode)
 	})
 	defer stop()
-	if err := emit(output, value); err != nil {
+	encoder := json.NewEncoder(output)
+	encoder.SetIndent("", "  ")
+	if err := encoder.Encode(value); err != nil {
 		return errors.New("capture receipt output failed")
 	}
 	if ctx.Err() != nil || !time.Now().Before(deadline) {
