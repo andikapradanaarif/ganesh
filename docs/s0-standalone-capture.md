@@ -29,4 +29,53 @@ Before presenting a build recommendation, run existing CLI/core safety and durab
 
 ## Results
 
-Not run. No performance signal or headroom has been established for the standalone collector.
+The 84-attempt comparison is complete. **No local performance signal and no acceptable prototype headroom were established.** The candidate remains experimental; the default build/capture path is unchanged and #34 stays open. This outcome does not authorize a daemon, uploader, clock change or installation.
+
+Both artifacts use source `5eb607f1fc9271ca18dfae161a7769e8f398c3f3`, Go 1.27.3 and `-ldflags='-s -w'`:
+
+| Artifact | Bytes | SHA-256 |
+| --- | ---: | --- |
+| General CLI | 3,450,192 | `1512cd98f3bb48d3a6783490b0816f9c27092cf31e28884ce06b5a3793843f5a` |
+| Dedicated collector | 3,281,368 | `c00231d7e5c9d60e8a289fbc32871f5cc30fa29cc07b12a2e88181d6bdb032a0` |
+
+The candidate is 4.9% smaller. Its recorded dependency graph excludes `internal/s0` and `os/exec`; it shares `internal/capturecli`, the original reducer/spool and the OS process clock. The source move preserves the 750 ms constant, kernel creation-time lookup, output watchdog and receipt format. The shared package is CLI-specific: its process deadline/watchdog must not be reused as an in-process or server callback contract.
+
+Parent launch-to-observed-exit times include failures and kills:
+
+| Arm / stratum | n | Failed | Median ms | p95 ms | p99 ms |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| General / first new file | 20 | 20 | 1,003.125 | 1,006.029 | 1,006.036 |
+| Dedicated / first new file | 20 | 20 | 1,003.895 | 1,005.976 | 1,008.559 |
+| General / warm | 20 | 7 | 176.534 | 1,006.157 | 1,006.214 |
+| Dedicated / warm | 20 | 7 | 410.781 | 1,004.070 | 1,006.120 |
+| General / short idle | 2 | 0 | 158.070 | 203.288 | 203.288 |
+| Dedicated / short idle | 2 | 0 | 118.994 | 138.462 | 138.462 |
+
+There were no added candidate failure pairs, unexpected output or record-classification violations in either arm. The paired first-execution median improvement was **0.017%**. Both first-execution distributions are largely censored by the one-second watchdog: small differences at termination are not uncapped execution-time improvements. The first/warm p95 comparisons technically satisfy the tail condition, but equal first-failure counts and the failed 20% improvement threshold make `local_signal=false`. Warm median latency worsened and remains visible.
+
+Observed OS-start-to-termination first-execution p99 was 1,005.066 ms general and 1,007.122 ms dedicated. Every first execution failed; `headroom_probe=false` independently of the relative comparison. All 84 attempts have OS-clock observations. Across both arms, thirty returns succeeded with unknown/incomplete records, seventeen returned exit 1 and thirty-seven were killed. One failed general attempt left partial artifacts; no failed return had a confirmed expected record. Those failures were not replayed or replaced.
+
+Each arm has 42 attempts. Actual short-idle gaps were 30.003–31.224 seconds. One-minute host-load samples ranged from 33.32 to 76.90; cache state remained uncontrolled. These results are specific to the declared conditions, not a population rate or proof that every host behaves this way. Do not pool this study with #34, use idle successes to clear first-launch failures, or infer a particular OS mechanism from the result.
+
+## Implementation and validation record
+
+The general CLI now delegates capture parsing/deadlines, hook exits and receipt output to `internal/capturecli`. `cmd/ganesh-capture` imports that adapter without preparation/discovery. `make build` retains the general binary; `make build-collector` exposes the explicitly experimental candidate. No client configuration is changed and no capture profile is enabled.
+
+Correctness checks run all native/normalized CLI cases against development general, stripped general and dedicated artifacts. Handler-panic subprocess checks call the shared exit guard; the input-worker panic test moved into the shared package and still asserts a static error and zero metadata. Receipt-output timeout expectations use the declared exit code 124 rather than importing the implementation constant.
+
+An initial compile check found that old test-only constant reference after the move; it was corrected before measurements. The first compiled CLI validation then failed its first native callback on all three artifacts (silent exit 1 after 1.144, 1.194 and 1.072 seconds). A later complete normal suite passed without changing collector runtime code or deadlines. The failed validations remain recorded here and do not disappear into the timing study or become hidden warm-up.
+
+The repaired-pin native fixture passes with `--build-profile collector`: 41 synthetic notifications yield fifteen reduced records and all six ending-dispatch records. It logged fourteen non-blocking rejections, one more than the thirteen intentionally rejected cases: the initial `PreToolUse` callback returned exit 1 with empty adapter stderr, and the fixture's explicit duplicate recovered the record. That is an observed capture failure, not automatic retry or installed-profile acceptance. Its compile/run stage took 40.523 seconds.
+
+The original-pin fixture also passes its expectations: the same 41 notifications yield fifteen records with thirteen expected rejections, while the invocation probe still demonstrates the original ending-dispatch suppression for cancelled/expired callers. Its compile/run stage took 47.717 seconds. Neither run installs a hook, executes an actual agent turn or establishes complete delivery.
+
+Final checks pass: `go build ./...`, `go vet ./...`, `go test -p=1 ./...`, `go test -race -p=1 ./...`, and `CGO_ENABLED=0 go test -p=1 ./...`. The compiled CLI suite covers all three build profiles; core crash/durability checks remain green. Fifteen Python tests pass (eight historical accounting tests and seven new study-rule tests), including symmetric output/record vetoes, warm-tail rejection, missing clocks, sample completeness and budget enforcement. Formatting, Python syntax, local links and diff checks pass. Historical study files and the approved roadmap/execution sheet are unchanged.
+
+The producer and all raw numeric/enum observations are retained privately in `.local/standalone-capture-36-20261102` (0700 directory, 0600 manifests/metrics). The artifact source revision, hashes, producer digests, dependency graph, order, load samples, clock gaps and all 84 outcomes remain available. No real project/transcript data or raw child output was stored. The earlier study's files and frozen rule were not changed. Further measurements require another frozen scope; this study's 84-attempt ceiling is exhausted.
+
+```sh
+python3 -B integration/capture/standalone_study.py summary .local/standalone-capture-36-20261102
+python3 -B -m unittest discover -s integration/capture -p 'test_*.py'
+```
+
+The historical source/metrics are distinct from later builds carrying different VCS metadata. The timing result does not justify switching a client to the dedicated command. It also does not demonstrate that putting a receiver behind the same per-event Go wrapper would remove startup cost. An alternative invocation/capture architecture needs a separately reviewed scope and end-to-end evidence.

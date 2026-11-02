@@ -22,3 +22,5 @@ The first implementation task provides [S0 run preparation](docs/s0-preparation.
 The [local capture primitive](docs/s0-local-capture.md) accepts bounded normalized metadata on stdin and returns durable local receipts. A prototype [Crush hook adapter](docs/s0-crush-hooks.md) reduces native tool, permission, turn-ending and compaction notifications without emitting agent context. Installed-client coverage, hook enrollment, upload and server intake remain pending.
 
 `make build` produces a smaller `bin/ganesh` artifact with Go's `-s -w` linker flags. The [startup investigation](docs/s0-capture-startup.md) records a bounded reduction in observed failures and the remaining cold-launch loss. This build does not qualify an installed capture profile or extend the 750 ms collector budget.
+
+The [standalone collector experiment](docs/s0-standalone-capture.md) extracts shared capture CLI code and provides `make build-collector`. Its dedicated Go binary excludes preparation/discovery, but it did not pass the frozen timing or headroom gates. It remains experimental; `make build` continues to produce the general CLI and no client configuration changes automatically.

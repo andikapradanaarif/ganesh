@@ -27,10 +27,15 @@ class StandaloneRules(unittest.TestCase):
 
     def test_controls_are_symmetric(self):
         for arm in ["baseline", "candidate"]:
-            data = fixture()
-            next(r for r in data if r["arm"] == arm)["output_bytes"]["stderr"] = 1
-            self.assertFalse(evaluate(data)["local_signal"])
-            self.assertFalse(evaluate(data)["headroom_probe"])
+            for violation in ["output", "record"]:
+                data = fixture()
+                target = next(r for r in data if r["arm"] == arm)
+                if violation == "output":
+                    target["output_bytes"]["stderr"] = 1
+                else:
+                    target["record"] = "invalid"
+                self.assertFalse(evaluate(data)["local_signal"])
+                self.assertFalse(evaluate(data)["headroom_probe"])
 
     def test_warm_tail_vetoes_an_improved_first_stratum(self):
         data = fixture()
@@ -70,3 +75,5 @@ class StandaloneRules(unittest.TestCase):
             with self.assertRaises(RuntimeError):
                 observe(Path(temp), None, Path(temp) / "unused", "baseline", "warm", 0, Budget(0, 84))
             launch.assert_not_called()
+        with self.assertRaises(RuntimeError):
+            Budget(time.time() + 60, 84).check(84)
