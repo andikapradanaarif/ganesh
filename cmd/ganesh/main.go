@@ -76,6 +76,8 @@ func run(ctx context.Context, args []string, output io.Writer) error {
 		if err != nil {
 			return err
 		}
+		// Check before opening metadata. ReportEvaluation checks again so its
+		// non-CLI callers receive the same snapshot-binding guarantee.
 		if _, err := s0.CheckEvaluationAgainst(snapshot, expectedDigest); err != nil {
 			return err
 		}

@@ -327,7 +327,7 @@ func primaryResult(tasks []EvaluationTask, rows map[EvaluationAnswer]EvaluationR
 			p.AccessWins = append(p.AccessWins, task.ID)
 		}
 	}
-	if o.Resolved != 30 {
+	if o.Resolved != o.Expected {
 		return p
 	}
 	p.AFloor, p.ZeroFloor = "not_met", "not_met"
@@ -431,9 +431,9 @@ func ReportEvaluation(s EvaluationSnapshot, expectedDigest string, in Evaluation
 	if r.HistoryTrigger != "triggered" {
 		r.UnexpectedConditional = r.Conditional.Present
 	}
+	// Complete base coverage also resolves both history comparisons and usage.
 	if r.Base.complete() {
 		switch {
-		case r.HistoryTrigger == "incomplete": // missing usage cannot count as zero
 		case r.HistoryTrigger == "triggered" && !r.Conditional.complete():
 			r.State = "conditional_metadata_required"
 		case r.UnexpectedConditional > 0:
