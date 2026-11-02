@@ -125,3 +125,19 @@ The collector dependency graph still excludes S0/developer packages and
 `os/exec`. Documentation links/diff and archived producer hashes were checked.
 Only this report and the completed producers are added by PR #45; no runtime,
 test assertion, build defaults or approved baseline document changes.
+
+## Review follow-up
+
+The owner-supplied review of heads `3ddd51d` / `c64f265` reports additional silent
+capture rejections during full tests at load 73–90 and native-fixture rejection
+recovery through explicit duplicates. These are reviewer-reported observations,
+outside the closed 18-launch sample. They support keeping startup reliability
+unresolved; they do not establish load as the cause of any particular rejection.
+
+Six comparisons per arm are insufficient to determine whether signing fixes
+the earlier failure regime, which this pass did not reproduce. The conclusion
+remains “no benefit demonstrated in this pass,” not “signing has no effect.”
+No load-dependence conclusion or diagnosis is established. Neither the frozen
+rules, original measurements nor archived producer bytes change after review.
+Producer hashes and documentation/diff checks pass again; no new measurements
+were run for this documentation follow-up.
