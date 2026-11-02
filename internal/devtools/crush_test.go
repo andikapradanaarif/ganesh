@@ -17,6 +17,15 @@ import (
 func fixtureTree(t *testing.T) (string, string) {
 	t.Helper()
 	root, source := t.TempDir(), t.TempDir()
+	var err error
+	root, err = filepath.EvalSymlinks(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	source, err = filepath.EvalSymlinks(source)
+	if err != nil {
+		t.Fatal(err)
+	}
 	if err := os.MkdirAll(filepath.Join(root, "integration/crush"), 0o700); err != nil {
 		t.Fatal(err)
 	}

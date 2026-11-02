@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
@@ -20,7 +22,10 @@ func TestParse(t *testing.T) {
 
 func TestRepositoryRoot(t *testing.T) {
 	root, err := repositoryRoot()
-	if err != nil || !strings.HasSuffix(root, "/ganesh") {
+	if err != nil {
 		t.Fatal("repository root unavailable")
+	}
+	if _, err := os.Stat(filepath.Join(root, "go.mod")); err != nil {
+		t.Fatal("repository root missing module")
 	}
 }
