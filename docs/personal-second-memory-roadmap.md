@@ -12,7 +12,7 @@ Sections 0–7 define the product direction, delivery stages and decision gates.
 
 **The problem:** knowledge accumulates in individual conversations, repositories and tools. A new agent or session often needs the owner to reconstruct the context: what was decided, what was tried, what changed and what another project already learned. Repeated explanation becomes part of every handoff, while useful discoveries remain difficult to reuse.
 
-**The intended experience:** the owner starts work and the agent receives a short, relevant brief. As work progresses, the service captures permitted reports and source changes, updates project memory and makes eligible knowledge available to other authorized agents. When evidence changes, memory can change with it. The owner can inspect where a statement came from and correct, pin, undo or delete it.
+**The intended experience:** the owner starts work and the agent receives a short, relevant brief. As work progresses, the service captures permitted reports and source changes, updates project memory and makes eligible knowledge available to other authorized agents — a coding agent in one client, a terminal assistant or a chat assistant in another — rather than leaving it trapped in the conversation that produced it. When evidence changes, memory can change with it. The owner can inspect where a statement came from and correct, pin, undo or delete it.
 
 **Owner responsibilities:** configure access and retain control. Routine operation must require no manual note-taking, session summaries, per-item approvals or recurring semantic review. The owner may optionally supply preferences, decisions or corrections. Setup, credential renewal and exceptional incident handling remain explicit administrative costs. Neither missing owner feedback nor elapsed time since a review disables otherwise eligible memory. Automated checks, expiry and scoped incident pauses remain mandatory; they do not establish semantic truth.
 
@@ -51,6 +51,8 @@ The initial scope is one owner working with multiple agents across multiple proj
 | Yesterday's remembered state becomes wrong | New evidence refreshes it, or the service marks the uncertainty instead of quietly presenting it as current. |
 | An automatic update looks suspicious | The owner can trace its inputs, checks and effects, then correct or undo it. |
 | Keeping memory organized becomes another job | Routine capture and upkeep run automatically; blocked items do not become an approval backlog. |
+
+One failure mode deserves its own statement: the property that makes cross-session and cross-agent memory valuable — surfacing knowledge the current context could not have contained — is also what hides its losses. A fresh agent cannot tell which memory it never received, so coverage must report what capture attempted, not only what it delivered.
 
 The strongest product hypothesis is that continuity and reuse reduce both repeated explanation and repeated work. We will measure those outcomes. Token savings, source coverage and audit completeness help assess the system, but each answers a different question.
 
