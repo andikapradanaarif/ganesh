@@ -1,0 +1,262 @@
+package main
+
+import (
+	"bytes"
+	"context"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
+	"fmt"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"strings"
+	"time"
+)
+
+const end = "2026-11-02T19:50:00Z"
+const maximum = 18
+const payload = `{"event":"PreToolUse","hook_event_name":"PreToolUse","session_id":"00000000-0000-4000-8000-000000000002","cwd":"/synthetic","tool_name":"write","tool_input":{"content":"ghp_SYNTHETIC_SECRET"},"tool_use_id":"call-1"}`
+
+type row struct {
+	Stage          string          `json:"stage"`
+	Profile        string          `json:"profile"`
+	Arm            string          `json:"arm"`
+	Block          int             `json:"block"`
+	Artifact       string          `json:"artifact_sha256"`
+	PreparationMS  float64         `json:"preparation_ms"`
+	ParentMS       float64         `json:"parent_ms"`
+	Exit           int             `json:"exit"`
+	Killed         bool            `json:"killed"`
+	OutputBytes    int             `json:"output_bytes"`
+	Records        int             `json:"records"`
+	InvalidRecords int             `json:"invalid_records"`
+	Success        bool            `json:"success"`
+	Trace          json.RawMessage `json:"trace"`
+}
+
+var directory, root string
+var count int
+
+func must(err error) {
+	if err != nil {
+		panic("investigation failed")
+	}
+}
+func write(path string, body []byte) {
+	f, e := os.OpenFile(path, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+	must(e)
+	_, e = f.Write(body)
+	must(e)
+	must(f.Close())
+}
+func digest(body []byte) string { sum := sha256.Sum256(body); return hex.EncodeToString(sum[:]) }
+func check() {
+	deadline, e := time.Parse(time.RFC3339, end)
+	must(e)
+	if !time.Now().Before(deadline) {
+		panic("investigation deadline")
+	}
+}
+func tool(name string, args ...string) {
+	check()
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, name, args...)
+	cmd.Dir = root
+	body, e := cmd.CombinedOutput()
+	if e != nil {
+		fmt.Printf("build/preparation rejected: %s (%d output bytes)\n", name, len(body))
+		panic("tool failed")
+	}
+}
+func replace(body, old, new string) string {
+	if strings.Count(body, old) != 1 {
+		panic("overlay binding failed")
+	}
+	return strings.Replace(body, old, new, 1)
+}
+
+func overlay() string {
+	body, e := os.ReadFile(filepath.Join(root, "internal/capturecli/capture.go"))
+	must(e)
+	source := string(body)
+	source = replace(source, "emitReceipt bool) error {", "emitReceipt bool) error {\n artifactMark(1, \"entry\")\n defer artifactFlush()")
+	source = replace(source, "elapsed := time.Since(start)", "artifactBirth = start.UnixNano()\n artifactMark(2, \"clock\")\n elapsed := time.Since(start)")
+	source = replace(source, "if elapsed < 0 || elapsed >= captureBudget {", "if elapsed < 0 || elapsed >= captureBudget {\n artifactMark(3, \"startup_budget\")")
+	source = replace(source, "metadata = result.metadata", "metadata = result.metadata\n artifactMark(4, \"reduced\")")
+	source = replace(source, "receipt, err := (capture.Spool", "artifactMark(5, \"spool\")\n receipt, err := (capture.Spool")
+	source = replace(source, "if err := ctx.Err(); err != nil {", "artifactMark(6, \"spooled\")\n if err := ctx.Err(); err != nil {")
+	source = replace(source, "if !emitReceipt {", "artifactMark(7, \"ready\")\n if !emitReceipt {")
+	modified := filepath.Join(directory, "capture.go.overlay")
+	write(modified, []byte(source))
+	helper := `package capturecli
+import("encoding/json";"os";"time")
+var artifactMarks = [9]int64{time.Now().UnixNano()}
+var artifactBirth int64
+var artifactPhase = "init"
+func artifactMark(stage int, phase string){ artifactMarks[stage]=time.Now().UnixNano();artifactPhase=phase }
+func artifactFlush(){ artifactMarks[8]=time.Now().UnixNano();f:=os.NewFile(3,"phase");if f==nil{return};defer f.Close();_ = json.NewEncoder(f).Encode(struct{Marks [9]int64;Birth int64;Phase string}{artifactMarks,artifactBirth,artifactPhase}) }
+`
+	h := filepath.Join(directory, "phase.go.overlay")
+	write(h, []byte(helper))
+	virtual := filepath.Join(root, "internal/capturecli/ganesh_artifact_phase.go")
+	if _, err := os.Lstat(virtual); !os.IsNotExist(err) {
+		panic("overlay target exists")
+	}
+	data, e := json.Marshal(struct{ Replace map[string]string }{map[string]string{filepath.Join(root, "internal/capturecli/capture.go"): modified, virtual: h}})
+	must(e)
+	out := filepath.Join(directory, "overlay.json")
+	write(out, data)
+	return out
+}
+
+func build(profile, tag, overlay string) (string, float64) {
+	started := time.Now()
+	path := filepath.Join(directory, "binary-"+profile+"-"+tag)
+	flags := "-buildid=ganesh-44-" + profile + "-" + tag
+	if profile != "development" {
+		flags += " -s -w"
+	}
+	args := []string{"build", "-ldflags=" + flags}
+	if overlay != "" {
+		args = append(args, "-overlay", overlay)
+	}
+	target := "./cmd/ganesh"
+	if profile == "standalone" {
+		target = "./cmd/ganesh-capture"
+	}
+	args = append(args, "-o", path, target)
+	tool("go", args...)
+	return path, float64(time.Since(started)) / 1e6
+}
+func launch(stage, profile, arm string, block int, binary string, prep float64, trace bool) row {
+	check()
+	if count >= maximum {
+		panic("launch cap")
+	}
+	count++
+	body, e := os.ReadFile(binary)
+	must(e)
+	entry := row{Stage: stage, Profile: profile, Arm: arm, Block: block, Artifact: digest(body), PreparationMS: prep, Trace: json.RawMessage("null")}
+	spool := filepath.Join(directory, fmt.Sprintf("spool-%02d", count))
+	// Persist attempt intent before Start; a killed driver cannot silently omit it.
+	intent, _ := json.Marshal(entry)
+	write(filepath.Join(directory, fmt.Sprintf("intent-%02d.json", count)), intent)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, binary, "hook", "crush", "--spool", spool)
+	cmd.Stdin = strings.NewReader(payload)
+	cmd.WaitDelay = 100 * time.Millisecond
+	var output bytes.Buffer
+	cmd.Stdout = &output
+	cmd.Stderr = &output
+	var tfile *os.File
+	if trace {
+		tfile, e = os.OpenFile(filepath.Join(directory, fmt.Sprintf("trace-%02d.json", count)), os.O_CREATE|os.O_EXCL|os.O_RDWR, 0600)
+		must(e)
+		cmd.ExtraFiles = []*os.File{tfile}
+	}
+	started := time.Now()
+	err := cmd.Run()
+	entry.ParentMS = float64(time.Since(started)) / 1e6
+	entry.Killed = ctx.Err() != nil
+	entry.OutputBytes = output.Len()
+	if err != nil {
+		entry.Exit = -1
+		if x, ok := err.(*exec.ExitError); ok {
+			entry.Exit = x.ExitCode()
+		}
+	}
+	if trace {
+		must(tfile.Close())
+		tb, e := os.ReadFile(filepath.Join(directory, fmt.Sprintf("trace-%02d.json", count)))
+		must(e)
+		if json.Valid(tb) {
+			entry.Trace = tb
+		}
+	}
+	entries, _ := os.ReadDir(spool)
+	for _, item := range entries {
+		if strings.HasSuffix(item.Name(), ".json") {
+			entry.Records++
+			b, e := os.ReadFile(filepath.Join(spool, item.Name()))
+			must(e)
+			var record struct{ State, Origin, Coverage string }
+			if json.Unmarshal(b, &record) != nil || record.State != "captured_local" || record.Origin != "unknown" || record.Coverage != "incomplete" || bytes.Contains(b, []byte("SYNTHETIC_SECRET")) {
+				entry.InvalidRecords++
+			}
+		}
+	}
+	entry.Success = entry.Exit == 0 && !entry.Killed && entry.ParentMS <= 1000 && entry.OutputBytes == 0 && entry.Records == 1 && entry.InvalidRecords == 0
+	data, e := json.Marshal(entry)
+	must(e)
+	write(filepath.Join(directory, fmt.Sprintf("result-%02d.json", count)), data)
+	fmt.Println(string(data))
+	return entry
+}
+
+func main() {
+	root, e := os.Getwd()
+	must(e)
+	directory = filepath.Join(root, ".local/capture-artifact-44")
+	check()
+	if _, e := os.Stat(filepath.Join(directory, "plan.json")); !os.IsNotExist(e) {
+		panic("closed run")
+	}
+	script, e := os.ReadFile(filepath.Join(directory, "run.go"))
+	must(e)
+	protocol, e := os.ReadFile(filepath.Join(root, "docs/s0-capture-artifact-preparation.md"))
+	must(e)
+	plan, _ := json.Marshal(map[string]any{"cap": maximum, "deadline": end, "driver_sha256": digest(script), "protocol_sha256": digest(protocol), "started_at": time.Now().UTC(), "profiles": []string{"development", "stripped", "standalone"}})
+	write(filepath.Join(directory, "plan.json"), plan)
+	ov := overlay()
+	profiles := []string{"development", "stripped", "standalone"}
+	startup := false
+	for _, profile := range profiles {
+		for _, trace := range []bool{false, true} {
+			tag := "production"
+			o := ""
+			if trace {
+				tag = "diagnostic"
+				o = ov
+			}
+			b, p := build(profile, tag, o)
+			r := launch("diagnose", profile, tag, 0, b, p, trace)
+			if trace && strings.Contains(string(r.Trace), "startup_budget") {
+				startup = true
+			}
+		}
+	}
+	if !startup {
+		fmt.Println("startup contributor not reproduced; comparison not selected")
+		return
+	}
+	for block := range 2 {
+		for i, profile := range profiles {
+			b, p := build(profile, fmt.Sprintf("pair-%d", block), "")
+			unsigned, e := os.ReadFile(b)
+			must(e)
+			signed := b + "-signed"
+			write(signed, unsigned)
+			must(os.Chmod(signed, 0700))
+			start := time.Now()
+			tool("/usr/bin/codesign", "--force", "--sign", "-", "--timestamp=none", signed)
+			tool("/usr/bin/codesign", "--verify", "--strict", signed)
+			cost := float64(time.Since(start)) / 1e6
+			arms := []string{"unsigned", "signed"}
+			if (i+block)%2 == 1 {
+				arms = []string{"signed", "unsigned"}
+			}
+			for _, arm := range arms {
+				binary := b
+				prep := p
+				if arm == "signed" {
+					binary = signed
+					prep += cost
+				}
+				launch("compare", profile, arm, block, binary, prep, false)
+			}
+		}
+	}
+}

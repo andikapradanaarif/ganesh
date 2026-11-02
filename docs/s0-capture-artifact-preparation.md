@@ -60,4 +60,68 @@ The 18-launch cap, deadline, comparison order and candidate gate are unchanged.
 This is a disclosed procedural correction, not a reproduced diagnosis of the
 specific previous failures or a change to their classification.
 
-Comparison pending. No profile or production narrative is enabled.
+All twelve comparison launches also completed with one valid reduced record,
+zero output and no retained planted token. The two blocks used different build
+IDs. In each block, each profile's signed artifact started from its unsigned
+artifact's bytes. Ad hoc signing plus strict verification occurred before
+either arm's execution, with no certificate, keychain identity or timestamp
+service. No capture launch was replayed.
+
+| First-execution arm | n | Median parent elapsed | Nearest-rank p95 / p99 | Failures |
+| --- | --- | --- | --- | --- |
+| Unsigned | 6 | 412.607 ms | 511.166 / 511.166 ms | 0 |
+| Ad hoc signed | 6 | 411.737 ms | 496.657 / 496.657 ms | 0 |
+
+Mean paired signed-minus-unsigned elapsed was -2.605 ms, with mixed pair
+directions. The local ≤600 ms candidate gate passes; the unsigned arm passes
+the same numerical bounds. These observations do not establish a signing
+benefit or diagnose the previous failed callbacks. **Select no build/runtime
+change.** The observed startup sensitivity in #34 remains unresolved, and no
+installed profile or production narrative is enabled.
+
+Reported build time ranged from 752.5 to 1,390.1 ms for comparison artifacts;
+signing plus verification added 66.3–101.6 ms. Those preparation fields include
+build/sign/verify commands, not all driver work such as copying, hashing and
+record inspection. No preparation execution warms a capture callback, but
+file access can affect caches. Host load around the end was 3.23 / 3.34 / 7.41
+(1/5/15-minute averages); earlier higher-load failures are not matched controls.
+Do not attribute their difference to load or signing.
+
+The 18-launch measurement cap is exhausted. Both original private producers
+are retained byte-for-byte as completed experiment sources:
+
+- [Diagnosis producer](../integration/capture/artifact44/diagnose.go.fixture),
+  SHA-256 `94469439f26cb85985676eb0ed5d589c43951c0cc36c914c057183335bb816e7`.
+- [Comparison producer](../integration/capture/artifact44/compare.go.fixture),
+  SHA-256 `bbd9213c1cf87bb485c71d689f31363cb379da0868cf2a4a06e6cffea377a3a0`.
+
+These are historical sources, not active developer commands or permission to
+repeat the closed study. Their `.local/capture-artifact-44` records/spools stay
+outside version control. The initial plan hash is
+`b3847970e51e2f82fbb50c2b22b82df331e3748fe510f40bc020a5534c3d9290`;
+the corrected comparison-plan hash is
+`433c31caf133fad57ee121c991b7a21cef6bba1477322fd44c1ff06a3118a813`.
+Each plan binds its producer and then-current protocol digest. They do not
+authenticate the host, source or measurements. The runtime source was unchanged
+from `22e8514`; only this protocol changed before measurement.
+
+## Correctness validation
+
+On PR #43 runtime head `932c449`, one new serial pass each of build, vet, full
+normal, full race and CGO-disabled full tests passed. Both exact-pin native
+fixtures are checked separately below. These validation executions are outside
+the 18-launch measurement sample. They do not erase the earlier failed normal/
+race validations documented in [PR #43's result-reporting record](https://github.com/andikapradanaarif/ganesh/pull/43)
+or qualify the profile. No clock, test assertion, runtime deadline or build
+preparation changed to obtain those passes. No repeat-until-pass loop was used.
+
+Both exact source pins passed using the Go native runner and the experimental
+collector profile: baseline `aed2bae` reproduced suppressed TurnEnd dispatch;
+repaired `3378f47` delivered the endings. Each processed 41 synthetic
+notifications into 15 reduced records. Expected malformed/conflicting fixtures
+returned non-blocking errors; every runner decision remained `none`.
+
+The collector dependency graph still excludes S0/developer packages and
+`os/exec`. Documentation links/diff and archived producer hashes were checked.
+Only this report and the completed producers are added by PR #45; no runtime,
+test assertion, build defaults or approved baseline document changes.
