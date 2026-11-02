@@ -42,4 +42,22 @@ not establish the cause of the delay.
 
 ## Results
 
-Pending. No profile or production narrative is enabled.
+The first six launches all completed: production parent elapsed was 435.2,
+414.5 and 400.1 ms; instrumented elapsed was 464.5, 427.9 and 427.2 ms. The
+instrumented OS-birth-to-package-init intervals were 411.7, 377.6 and 378.0 ms,
+roughly 88% of their completion intervals. No startup rejection was reproduced
+in these six launches. Every launch produced one unknown/incomplete record,
+with no hook output or retained planted token.
+
+Preparation correction before the remaining twelve launches: the private
+driver initially required a new `startup_budget` rejection to select comparison,
+which was narrower than the frozen protocol's “startup remains the contributor.”
+It stopped after six launches without running a candidate. Preserve that driver
+and all six results. A separate comparison-only driver uses the measured dominant
+startup interval and the existing rejection evidence as the selection basis;
+it verifies those six records and consumes only the remaining twelve slots.
+The 18-launch cap, deadline, comparison order and candidate gate are unchanged.
+This is a disclosed procedural correction, not a reproduced diagnosis of the
+specific previous failures or a change to their classification.
+
+Comparison pending. No profile or production narrative is enabled.
