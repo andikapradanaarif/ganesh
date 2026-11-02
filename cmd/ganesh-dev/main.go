@@ -3,6 +3,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -27,13 +28,19 @@ func parse(args []string) (options, error) {
 	case "crush-test":
 		flags.StringVar(&opts.source, "source", "", "pinned source checkout")
 		flags.StringVar(&opts.profile, "build-profile", "development", "fixed build profile")
+	case "study-summary":
+		flags.StringVar(&opts.directory, "dir", "", "private completed study directory")
+		flags.StringVar(&opts.study, "study", "", "completed study: 34 or 36")
 	default:
 		return options{}, devtools.ErrCommand
 	}
-	if flags.Parse(args[1:]) != nil || flags.NArg() != 0 || strings.TrimSpace(opts.source) == "" {
+	if flags.Parse(args[1:]) != nil || flags.NArg() != 0 {
 		return options{}, devtools.ErrCommand
 	}
-	if opts.profile != "development" && opts.profile != "stripped" && opts.profile != "collector" {
+	if opts.command == "crush-test" && (strings.TrimSpace(opts.source) == "" || (opts.profile != "development" && opts.profile != "stripped" && opts.profile != "collector")) {
+		return options{}, devtools.ErrCommand
+	}
+	if opts.command == "study-summary" && (strings.TrimSpace(opts.directory) == "" || (opts.study != "34" && opts.study != "36")) {
 		return options{}, devtools.ErrCommand
 	}
 	return opts, nil
@@ -65,6 +72,22 @@ func run(args []string, output io.Writer) error {
 	opts, err := parse(args)
 	if err != nil {
 		return err
+	}
+	if opts.command == "study-summary" {
+		study := 34
+		if opts.study == "36" {
+			study = 36
+		}
+		report, err := devtools.SummarizeStudy(study, opts.directory)
+		if err != nil {
+			return err
+		}
+		encoder := json.NewEncoder(output)
+		encoder.SetIndent("", "  ")
+		if err := encoder.Encode(report); err != nil {
+			return devtools.ErrStudy
+		}
+		return nil
 	}
 	root, err := repositoryRoot()
 	if err != nil {

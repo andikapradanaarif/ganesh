@@ -64,10 +64,12 @@ On 2026-11-01, the source-runner integration fixture passed against the revision
 To reproduce with that local source checkout and cached Go dependencies:
 
 ```sh
-python3 integration/crush/test_runner.py /path/to/crush/source
+go run ./cmd/ganesh-dev crush-test --source /path/to/crush/source
 ```
 
 The optional harness verifies an exact allowlisted revision and clean tracked state, builds Ganesh, and adds synthetic tests through Go's temporary overlay mechanism. It does not edit the Crush checkout or fetch modules (`GOPROXY=off`, `GOSUMDB=off`, `GOTOOLCHAIN=local`). Temporary binary/overlay/spool files are removed. A missing dependency, incompatible platform or failing fixture is incomplete evidence, never a substituted pass.
+
+The active harness is Go; see [current developer commands and migration evidence](go-developer-tools.md). The original Python runner is retained unchanged as a historical record.
 
 These fixtures are separate from actual installed-client tests, per-installation latency measurements, production secret-scanner admission and S0 product acceptance. SessionEnd/competing-hook measurements remain unknown, and the earlier tool-only tests establish no turn or session-closure coverage.
 
