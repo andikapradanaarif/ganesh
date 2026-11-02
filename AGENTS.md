@@ -31,4 +31,6 @@ The roadmap tracker is issue #5; S0 is issue #6. Earlier closed review and tooli
 
 Prefer a small Go core with explicit transaction boundaries and thin adapters. Keep domain/application code independent of transport framework and ORM types. Distinguish local capture, durable service acceptance, narrative eligibility and publication.
 
+Use Go for active developer tooling and new test harnesses too. Retain completed Python experiment sources at their original paths as historical evidence; do not change their recorded producers, hashes or frozen rules. Current Go tools must not invoke Python.
+
 Run checks appropriate to the change. Document imports require source-fidelity and link checks; runtime guarantees require executable evidence.

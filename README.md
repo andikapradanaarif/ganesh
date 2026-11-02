@@ -24,3 +24,5 @@ The [local capture primitive](docs/s0-local-capture.md) accepts bounded normaliz
 `make build` produces a smaller `bin/ganesh` artifact with Go's `-s -w` linker flags. The [startup investigation](docs/s0-capture-startup.md) records a bounded reduction in observed failures and the remaining cold-launch loss. This build does not qualify an installed capture profile or extend the 750 ms collector budget.
 
 The [standalone collector experiment](docs/s0-standalone-capture.md) extracts shared capture CLI code and provides `make build-collector`. Its dedicated Go binary excludes preparation/discovery, but it did not pass the frozen timing or headroom gates. It remains experimental; `make build` continues to produce the general CLI and no client configuration changes automatically.
+
+Current validation tooling uses Go; see [Go developer tools](docs/go-developer-tools.md). Completed Python experiments remain historical evidence at their original paths.
