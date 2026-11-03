@@ -133,5 +133,32 @@ Snapshot output is also capped at 1 MiB. Errors never echo input. The external
 snapshot pin is checked before opening final metadata; the reporting API checks
 it independently for callers outside the CLI. Inputs are never modified.
 
-Synthetic fixture validation is reported after the checks complete. Actual
-projects, run settings, corpus permission and recheck results remain unknown.
+## Validation
+
+On Go 1.27.3, Darwin/AMD64: build, vet, full normal (`go test -p=1 -count=1
+./...`), full race (`go test -race -p=1 -count=1 ./...`) and CGO-disabled full
+tests pass. Each full suite was run once for this change. Synthetic fixtures
+pin the exact 6/2/50%/3+3 boundaries, disjoint M/U and distinct need/lesson
+counts, partial/owner/mixed/unknown exclusions, early-route locking,
+inconclusive inputs, task support and replacement rejection. A separate check
+hashes the serialized snapshot bytes with the digest blanked, independently of
+the freeze implementation. CLI tests cover pin-before-read, private parsing,
+non-overwrite, emit-before-exit, no content echo and input non-mutation.
+
+A separately compiled CLI with synthetic private metadata returns
+`declared_criteria_met` for six eligible needs/lessons across two projects and
+three supported tasks per stratum. Removing task declarations preserves those
+need/lesson counts but returns `declared_gate_not_met`, A2.3 routing and exit 1.
+Both reports keep all four authority flags false and omit the planted prose.
+These are contract checks, not real S0/S0b-2 results.
+
+Collector dependencies still exclude S0/developer packages and `os/exec`.
+Formatting, local documentation links and diff checks pass. Approved source
+documents, capture code/deadlines and historical producers are unchanged.
+No new timing-study sample or native-runner rerun was needed for reporting-only
+changes. [#34](https://github.com/andikapradanaarif/ganesh/issues/34) stays open;
+passing these checks does not qualify an installed capture profile.
+
+Actual projects, run settings, corpus permission and recheck results remain
+unknown. The single real collection window and all relevant safety/product
+gates remain pending.
