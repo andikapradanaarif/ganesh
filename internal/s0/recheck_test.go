@@ -106,6 +106,69 @@ func TestRecheckExactGateAndPrivacy(t *testing.T) {
 	}
 }
 
+func TestRecheckClassificationsByID(t *testing.T) {
+	targets := []RecheckTarget{
+		{ID: "need-b", Assessed: true, OwnerOnly: true, LessonIDs: []string{"lesson-b"}},
+		{ID: "need-a", Assessed: true, LessonIDs: []string{"lesson-a"}},
+	}
+	assessments := []TargetAssessment{
+		{ID: "need-a", Eligible: true},
+		{ID: "need-b", Mixed: true, Unknown: true},
+	}
+	want := map[string]RecheckClassification{
+		"need-a": {Assessed: true, Eligible: true, Lessons: []string{"lesson-a"}},
+		"need-b": {Assessed: true, Mixed: true, Unknown: true, OwnerOnly: true, Lessons: []string{"lesson-b"}},
+	}
+	for range 2 {
+		got, err := recheckClassifications(targets, assessments)
+		if err != nil || !reflect.DeepEqual(got, want) {
+			t.Fatalf("assessment attributed to wrong need: %+v, %v", got, err)
+		}
+		slices.Reverse(assessments)
+	}
+	for _, name := range []string{"missing", "extra", "foreign", "case_changed", "duplicate_assessment", "duplicate_target"} {
+		t.Run(name, func(t *testing.T) {
+			targets, assessments := slices.Clone(targets), slices.Clone(assessments)
+			switch name {
+			case "missing":
+				assessments = assessments[:1]
+			case "extra":
+				assessments = append(assessments, TargetAssessment{ID: "extra"})
+			case "foreign":
+				assessments[0].ID = "foreign"
+			case "case_changed":
+				assessments[0].ID = "Need-a"
+			case "duplicate_assessment":
+				assessments[1].ID = assessments[0].ID
+			case "duplicate_target":
+				targets[1].ID = targets[0].ID
+			}
+			if got, err := recheckClassifications(targets, assessments); err != ErrRecheck || got != nil {
+				t.Fatal("mismatched identities produced classifications")
+			}
+		})
+	}
+}
+
+func TestRecheckReferenceOnlyChangesRemainDigestBound(t *testing.T) {
+	d, in := recheckFixture()
+	d.Initial = in.Final
+	before := reportRecheckFixture(t, d, in)
+	if len(before.Changes) != 0 || before.State != "declared_criteria_met" {
+		t.Fatal("fixture must start with identical eligible inventories")
+	}
+	// The fixture inventories share slices; replace them before changing final
+	// references so the frozen initial declarations remain intact.
+	in.Final.Targets = slices.Clone(in.Final.Targets)
+	in.Final.Lessons = slices.Clone(in.Final.Lessons)
+	in.Final.Targets[0].ReasonRefs = []string{"synthetic-new-reason"}
+	in.Final.Lessons[0].EvidenceRefs = []string{"synthetic-new-evidence"}
+	after := reportRecheckFixture(t, d, in)
+	if len(after.Changes) != 0 || after.SnapshotDigest != before.SnapshotDigest || after.InputDigest == before.InputDigest || !reflect.DeepEqual(after.Final, before.Final) || after.State != "declared_criteria_met" {
+		t.Fatal("reference-only edit changed classification or escaped digest binding")
+	}
+}
+
 func TestRecheckDistinctGateFailures(t *testing.T) {
 	for _, name := range []string{"five_lessons", "one_project", "below_half", "one_missing_task", "unknown_applicability", "unsupported_applicability", "one_lesson_six_needs", "six_lessons_one_need", "partial_need", "mixed", "unknown", "owner_only", "unassessed", "owner_lesson", "synthetic_lesson"} {
 		t.Run(name, func(t *testing.T) {

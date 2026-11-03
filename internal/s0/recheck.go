@@ -321,6 +321,33 @@ func ReadRecheckInput(path string) (RecheckInput, error) {
 	return in, nil
 }
 
+// Join by identity: screen assessment order is independent of inventory order.
+// Missing, foreign or duplicate identities cannot produce a classification.
+func recheckClassifications(targets []RecheckTarget, assessments []TargetAssessment) (map[string]RecheckClassification, error) {
+	if len(targets) != len(assessments) {
+		return nil, ErrRecheck
+	}
+	byID := make(map[string]TargetAssessment, len(assessments))
+	for _, a := range assessments {
+		if _, exists := byID[a.ID]; exists {
+			return nil, ErrRecheck
+		}
+		byID[a.ID] = a
+	}
+	classes := make(map[string]RecheckClassification, len(targets))
+	for _, t := range targets {
+		a, exists := byID[t.ID]
+		if !exists {
+			return nil, ErrRecheck
+		}
+		if _, duplicate := classes[t.ID]; duplicate {
+			return nil, ErrRecheck
+		}
+		classes[t.ID] = RecheckClassification{t.Assessed, a.Mixed, a.Unknown, t.OwnerOnly, a.Eligible, append([]string{}, t.LessonIDs...)}
+	}
+	return classes, nil
+}
+
 // ReportRecheck computes declared eligibility only. The caller still needs the
 // actual collection window, independent evidence and relevant safety gates.
 func ReportRecheck(s RecheckSnapshot, expectedDigest string, in RecheckInput) (RecheckReport, error) {
@@ -343,6 +370,14 @@ func ReportRecheck(s RecheckSnapshot, expectedDigest string, in RecheckInput) (R
 	after, err := InitialScreen(in.Final.screenInventory(), &needs)
 	if err != nil {
 		return RecheckReport{}, ErrRecheck
+	}
+	beforeClasses, err := recheckClassifications(s.Definition.Initial.Targets, before.Assessments)
+	if err != nil {
+		return RecheckReport{}, err
+	}
+	afterClasses, err := recheckClassifications(in.Final.Targets, after.Assessments)
+	if err != nil {
+		return RecheckReport{}, err
 	}
 	known := map[string]bool{}
 	for _, task := range s.Definition.Tasks {
@@ -385,12 +420,9 @@ func ReportRecheck(s RecheckSnapshot, expectedDigest string, in RecheckInput) (R
 	}
 	r := RecheckReport{SchemaVersion: 1, State: "inconclusive", Route: "inconclusive", SnapshotDigest: s.Digest, InputDigest: hex.EncodeToString(hash[:]), InitialRoute: before.Route, Initial: origin(before), Final: origin(after), Changes: []RecheckChange{}, Tasks: []RecheckTaskResult{}, Reasons: []string{}}
 	eligible := map[string]bool{}
-	class := func(t RecheckTarget, a TargetAssessment) RecheckClassification {
-		return RecheckClassification{t.Assessed, a.Mixed, a.Unknown, t.OwnerOnly, a.Eligible, append([]string{}, t.LessonIDs...)}
-	}
-	for i, t := range in.Final.Targets {
-		eligible[t.ID] = after.Assessments[i].Eligible
-		b, a := class(s.Definition.Initial.Targets[i], before.Assessments[i]), class(t, after.Assessments[i])
+	for _, t := range in.Final.Targets {
+		b, a := beforeClasses[t.ID], afterClasses[t.ID]
+		eligible[t.ID] = a.Eligible
 		if !reflect.DeepEqual(b, a) {
 			r.Changes = append(r.Changes, RecheckChange{t.ID, b, a})
 		}

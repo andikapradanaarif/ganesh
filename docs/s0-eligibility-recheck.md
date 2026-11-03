@@ -51,6 +51,11 @@ be present, including `lessons: []` and empty reference arrays. Each target has
 `derivation`, `origin`, `assurance`, `eligibility`, and
 `eligibility_evidence_refs`. This does not change the older screen input format.
 
+Each reference array must contain distinct entries and satisfy the limits below.
+An inventory accepted by `s0 screen` can therefore fail `freeze-recheck`; screen
+acceptance is not recheck-format validation. Preserve the original evidence
+privately when preparing the stricter declaration format.
+
 Each of the exactly six task definitions has:
 
 | Field | Declaration |
@@ -62,7 +67,8 @@ Each of the exactly six task definitions has:
 | `source_keyed_rubric_sha256` | Predeclared source-keyed expected outcome/rubric digest. |
 | `permitted_sources_sha256` | Digest of this task's permitted evidence/source map. |
 
-Duplicate prompt/source pairs under renamed task IDs are rejected. Actual
+Duplicate prompt/source pairs under renamed task IDs are rejected even if their
+rubrics differ: changing a grading rubric does not create a distinct task. Actual
 task distinctness, source permission and semantic dependence are not verified.
 The tasks must be genuine applicable follow-ons under A1/A2.2; synthetic clean
 lessons or hand-authored memory cannot satisfy the real gate.
@@ -117,10 +123,15 @@ separate A2.3 decision rather than an empty first-party experiment.
 
 Reports include canonical snapshot/input digests and bounded stable IDs, counts,
 flags and generated reasons. They omit need prose, project names and evidence
-reference contents. Initial/current origins are screener declarations; the
-calculator does not inspect manifests, closure, provenance, anchors, lifetimes
-or applicability evidence. No optional owner contribution fills an automatic
-coverage gap. The mandatory discovery-to-reuse/product gates remain separate.
+reference contents. `classification_changes` covers the declared classification
+and required-lesson membership; it does not list changes only to reason or lesson
+evidence references. The snapshot/input digests bind those references, so a
+reference-only edit changes the corresponding digest. Retain both private records
+to inspect evidence-reference changes. Initial/current origins are screener
+declarations; the calculator does not inspect manifests, closure, provenance,
+anchors, lifetimes or applicability evidence. No optional owner contribution
+fills an automatic coverage gap. The mandatory discovery-to-reuse/product gates
+remain separate.
 
 Inputs use regular private 0600/0400 files, no final-component symlinks, 1 MiB
 per file and depth 64. Duplicate, aliased, unknown or missing JSON keys and null
@@ -162,3 +173,33 @@ passing these checks does not qualify an installed capture profile.
 Actual projects, run settings, corpus permission and recheck results remain
 unknown. The single real collection window and all relevant safety/product
 gates remain pending.
+
+## PR #47 review follow-up
+
+| Finding | Disposition |
+| --- | --- |
+| Positional assessment coupling | Fixed: join both inventories to their screen assessments by exact target ID. Missing, foreign or duplicate identities fail before reporting. Independent fixtures permute assessment order and pin attribution to distinct target flags and lesson IDs. |
+| Stricter reference rules than `s0 screen` | Retained: bounded distinct references are part of the private recheck contract. Screen acceptance does not imply compatibility; the preparation guidance above now states this explicitly. No reference is silently truncated or deduplicated. |
+| Reference-only edits absent from `classification_changes` | Retained: the list describes classification and required-lesson changes, not evidence history. Snapshot/input digests still bind references; a fixture confirms a final reference-only edit changes input identity without changing classifications or counts. Inspect the retained private records for the reference differences. |
+| Task identity excludes rubric | Retained: prompt/source identity prevents counting the same task twice with different grading rubrics. The existing renamed-task fixture already uses distinct rubric hashes and requires rejection. |
+| Intermittent capture-test failure | Retained as unresolved evidence under [#34](https://github.com/andikapradanaarif/ganesh/issues/34). No capture code, deadline, assertion or build preparation was changed. |
+
+The owner-supplied review reports one full race-suite failure on the first
+development hook callback at approximately 966 ms, followed by a passing rerun.
+The preceding project scan also observed a full normal-suite failure on the
+first standalone hook callback: silent exit 1 after 1.064 seconds, with the
+three-second outer context still active. Other packages passed that scan.
+These observations are separate from the original PR validation above and from
+all closed timing-study samples. Exact rejection causes and record/receipt
+outcomes remain unconfirmed; silence does not diagnose a deadline miss.
+
+Follow-up validation on Go 1.27.3, Darwin/AMD64 passes: build, vet, focused
+recheck domain/CLI tests, and one serial run each of full normal, full race and
+CGO-disabled full tests (`-p=1 -count=1`). No full-suite retry was used for this
+follow-up. The dedicated collector has zero forbidden S0/developer/local-record
+or `os/exec` dependencies. Formatting, local documentation targets, diff checks
+and unchanged approved-document/capture/historical-producer checks pass.
+
+These passes do not explain or erase the earlier failed attempts or qualify an
+installed profile. No new timing study, native-runner rerun, source enrollment
+or production activation occurred; #34 remains open.
