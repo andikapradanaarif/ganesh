@@ -34,11 +34,11 @@ func run(ctx context.Context, args []string, output io.Writer) error {
 		return emit(output, s0.Discover(ctx))
 	}
 	if len(args) < 2 || args[0] != "s0" {
-		return errors.New("usage: ganesh doctor | capture --spool DIR | hook crush --spool DIR | s0 prepare|check|freeze-targets|screen|freeze-evaluation|check-evaluation|report-evaluation [flags]")
+		return errors.New("usage: ganesh doctor | capture --spool DIR | hook crush --spool DIR | s0 prepare|check|freeze-targets|screen|freeze-evaluation|check-evaluation|report-evaluation|freeze-recheck|recheck-eligibility [flags]")
 	}
 	f := flag.NewFlagSet(args[1], flag.ContinueOnError)
 	f.SetOutput(io.Discard)
-	var directory, input, outputPath, baselinePath, phase, expectedDigest, planPath string
+	var directory, input, outputPath, baselinePath, phase, expectedDigest, planPath, expectedNeedDigest string
 	switch args[1] {
 	case "prepare":
 		f.StringVar(&directory, "dir", "", "new private workspace")
@@ -61,6 +61,14 @@ func run(ctx context.Context, args []string, output io.Writer) error {
 		f.StringVar(&input, "input", "", "private result metadata")
 		f.StringVar(&planPath, "plan", "", "private frozen evaluation snapshot")
 		f.StringVar(&expectedDigest, "expected-digest", "", "previously retained freeze digest")
+	case "freeze-recheck":
+		f.StringVar(&input, "input", "", "private initial inventory and applicability definitions")
+		f.StringVar(&outputPath, "output", "", "new private recheck snapshot")
+		f.StringVar(&expectedNeedDigest, "expected-need-digest", "", "previously retained need-definition digest")
+	case "recheck-eligibility":
+		f.StringVar(&input, "input", "", "private final inventory and applicability declarations")
+		f.StringVar(&planPath, "plan", "", "private frozen recheck snapshot")
+		f.StringVar(&expectedDigest, "expected-digest", "", "previously retained recheck freeze digest")
 	default:
 		return errors.New("unknown S0 command")
 	}
@@ -68,6 +76,10 @@ func run(ctx context.Context, args []string, output io.Writer) error {
 		return errors.New("invalid S0 command flags")
 	}
 	switch args[1] {
+	case "freeze-recheck":
+		return freezeRecheckCommand(input, expectedNeedDigest, outputPath, output)
+	case "recheck-eligibility":
+		return recheckCommand(planPath, expectedDigest, input, output)
 	case "report-evaluation":
 		if expectedDigest == "" {
 			return s0.ErrEvaluation
