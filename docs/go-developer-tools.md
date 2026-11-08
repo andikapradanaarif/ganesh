@@ -41,6 +41,8 @@ go run ./cmd/ganesh-dev devin-audit --dir .local/s0/issue-50-20261108 --transcri
 
 The evidence directory must contain private 0600 `devin-sessions.json` and `devin-manifest.jsonl`; the grant-map directory must contain private 0600 `project-roots.json`, derived from the recorded owner grants and excluding Nexus. Both directories must be 0700. The explicit transcript root must be a real directory, working directories must be absolute clean paths, and the reader accepts only regular, stable files with names derived from validated session IDs. Input limits are 4 MiB per evidence file, 1 MiB for the grant map, 1,000 rows, 128 KiB per manifest line, 32 MiB per transcript and 128 MiB across all transcripts. The audit emits only aggregate counts, file bytes, drift categories and digests. Changed or newly available files are reported as drift; unsafe file types, path escapes and malformed inputs fail with a static error. It does not output transcript text or authorize model use. See the [source-link audit](s0-devin-source-audit.md) for the observed result and limitations.
 
+Each transcript read stops at its checked size plus one sentinel byte. A file that grows or shrinks during the read fails the audit; the sentinel cannot start another accepted source read or appear in a partial report.
+
 Build and run the active Go checks:
 
 ```sh
