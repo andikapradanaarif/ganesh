@@ -1,11 +1,18 @@
 package main
 
 import (
+	"bytes"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/andikapradanaarif/ganesh/internal/devtools"
 )
 
 func TestParse(t *testing.T) {
@@ -43,6 +50,66 @@ func TestParse(t *testing.T) {
 	if err != nil || got.expectedManifest != strings.Repeat("a", 64) || got.outputDirectory != "/private/output" {
 		t.Fatal("valid candidate command rejected")
 	}
+}
+
+func TestCalibrationCommand(t *testing.T) {
+	for _, args := range [][]string{
+		{"calibration-summary"},
+		{"calibration-summary", "--dir", "x"},
+		{"calibration-summary", "--dir", "x", "--frame-sha256", strings.Repeat("G", 64)},
+		{"calibration-summary", "--dir", "x", "--frame-sha256", strings.Repeat("a", 64), "extra"},
+		{"calibration-summary", "--dir", "x", "--frame-sha256", strings.Repeat("a", 64), "--run"},
+	} {
+		if _, err := parse(args); err == nil {
+			t.Fatal("invalid calibration command accepted")
+		}
+	}
+	dir := t.TempDir()
+	if err := os.Chmod(dir, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	var cases []map[string]any
+	for i := range 6 {
+		for j := range 3 {
+			cases = append(cases, map[string]any{
+				"task_id": fmt.Sprintf("synthetic-%d", i), "case_id": fmt.Sprintf("synthetic-%d-%c", i, 'a'+j),
+				"completion": nil, "introduced_critical_error": nil, "unsupported_claim": nil, "notes": "",
+			})
+		}
+	}
+	body, err := json.Marshal(map[string]any{"cases": cases, "status": "unlabelled", "reviewer_identity": nil, "labelled_at_utc": nil})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "owner-labels.blank.json"), body, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	// A known independent digest is supplied by the caller, not auto-discovered
+	// from whatever packet happens to be on disk.
+	sum := sha256.Sum256(body)
+	args := []string{"calibration-summary", "--dir", dir, "--frame-sha256", hex.EncodeToString(sum[:])}
+	var stdout, stderr bytes.Buffer
+	if err := run(args, &stdout, &stderr); err != nil {
+		t.Fatal(err)
+	}
+	var report devtools.CalibrationReport
+	if json.Unmarshal(stdout.Bytes(), &report) != nil || report.Status != "incomplete" || report.Cases != 18 || report.CalibrationAccepted || stderr.Len() != 0 {
+		t.Fatal("invalid command output")
+	}
+	if err := run(args, failingCalibrationWriter{}, &stderr); err != devtools.ErrCalibration {
+		t.Fatal("output failure not normalized")
+	}
+	stdout.Reset()
+	args[len(args)-1] = strings.Repeat("0", 64)
+	if err := run(args, &stdout, &stderr); err != devtools.ErrCalibration || stdout.Len() != 0 || stderr.Len() != 0 {
+		t.Fatal("invalid frame emitted a report or private diagnostics")
+	}
+}
+
+type failingCalibrationWriter struct{}
+
+func (failingCalibrationWriter) Write([]byte) (int, error) {
+	return 0, fmt.Errorf("ghp_SYNTHETIC_CANARY")
 }
 
 func TestRepositoryRoot(t *testing.T) {

@@ -63,6 +63,14 @@ The two-row `codex-kiosk-manifest.txt` and `project-roots.json` must be regular 
 
 The first metadata line must end with a newline. Each read stops at the checked file size plus one growth-detection byte, including buffered prefetch; growth or shrinkage fails without a partial result.
 
+Compare saved owner and grader calibration judgments without model calls:
+
+```sh
+go run ./cmd/ganesh-dev calibration-summary --dir .local/s0/issue-60-20261108/grader-fixtures --frame-sha256 "$S0_CALIBRATION_FRAME_SHA256"
+```
+
+The digest pins the preserved `owner-labels.blank.json` frame. Optional `owner-labels.json` and `grader-labels.json` use the same packet format; missing files and null judgments remain incomplete. The reader requires exact joins for six tasks / 18 cases, private 0700/0600 storage and at most 128 KiB per file. It reports aggregate comparison counts and input hashes, never notes, identities or answer text. It does not run a model or accept calibration. See [the comparison workflow](s0-calibration-comparison.md) for status/metadata fields, denominators, validation and provenance limits.
+
 Build and run the active Go checks:
 
 ```sh

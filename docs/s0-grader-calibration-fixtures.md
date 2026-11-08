@@ -1,5 +1,7 @@
 # S0 grader-calibration fixtures
 
+The subsequent [offline comparison workflow](s0-calibration-comparison.md) reads separately saved owner/grader judgments without model calls. The original fixture files and unset labels described below remain preserved.
+
 Continuation of [#60](https://github.com/andikapradanaarif/ganesh/issues/60), under [S0 #6](https://github.com/andikapradanaarif/ganesh/issues/6). **Status: synthetic fixtures prepared; owner labels and grading-model calibration pending.** This uses the existing [six private task drafts](s0-calibration-candidates.md) without expanding the source review or changing their prompts, rubrics or expected outcomes.
 
 Each task now has three synthetic answer variants: an assistant-proposed complete source-grounded answer, a variant with one planted critical error, and a safe but incomplete variant. The latter two are exact single-span edits of the first. A Go producer rejects absent, repeated or unchanged edit anchors and binds each variant to the parent prompt/rubric/oracle hashes. These are prepared fixtures rather than recorded answers from an evaluation model.
