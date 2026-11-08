@@ -5,11 +5,14 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 )
 
 var ErrCalibration = errors.New("private bounded calibration labels required")
+
+var calibrationTaskID = regexp.MustCompile(`^[a-z0-9]+(?:-[a-z0-9]+)*$`)
 
 // This is the existing owner packet format. Null means unknown, including when
 // the other two judgments on the same case have already been supplied.
@@ -169,7 +172,8 @@ func SummarizeCalibration(directory, expectedFrame string) (report CalibrationRe
 	}
 	frame, tasks := make(map[string]string), make(map[string]int)
 	for _, row := range blank.Cases {
-		if row.Notes != "" || len(row.TaskID) > 128 || !devinSessionID.MatchString(row.TaskID) || len(row.CaseID) != len(row.TaskID)+2 || !strings.HasPrefix(row.CaseID, row.TaskID+"-") || !strings.ContainsAny(row.CaseID[len(row.CaseID)-1:], "abc") {
+		suffix, hasPrefix := strings.CutPrefix(row.CaseID, row.TaskID+"-")
+		if row.Notes != "" || len(row.TaskID) > 128 || !calibrationTaskID.MatchString(row.TaskID) || !hasPrefix || (suffix != "a" && suffix != "b" && suffix != "c") {
 			return report, ErrCalibration
 		}
 		if _, exists := frame[row.CaseID]; exists {

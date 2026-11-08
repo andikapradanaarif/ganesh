@@ -28,6 +28,8 @@ Absent owner/grader files are an unstarted comparison. Existing malformed or uns
 
 Fully compared cases require all three judgments on both sides. Only all 18 fully compared cases produce `status: compared_declarations`. No percentage is computed from a partial denominator, and `calibration_accepted` is always false, including for perfect agreement. Output contains aggregate counts and exact input digests, without case IDs, notes, reviewer identities, timestamps or paths. Keep even this metadata private unless intentionally publishing aggregates.
 
+`owner_present` and `grader_present` indicate file presence, independently of labeling progress. An absent file has an empty digest string. A present all-null packet has its actual digest and zero known judgments; it remains incomplete. These explicit presence fields preserve a stable output shape without interpreting an empty digest or zero count as a completed review.
+
 The frame pins case membership, not answer content, rubric fidelity or reviewer provenance. Saved label files contain no per-answer hashes. The operator must preserve their relationship to the original answers and record the corresponding fixture/run metadata separately; the reader does not verify model identity, different-family grading, independence, provider disclosure or budget compliance. It never reads answers, source excerpts or proposed labels. Actual independent labels, rubric/source checks and the execution-sheet review remain necessary for acceptance.
 
 ## Local evidence
