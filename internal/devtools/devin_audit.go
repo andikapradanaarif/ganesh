@@ -160,7 +160,7 @@ func AuditDevin(directory, transcriptRoot, grantMapDirectory string) (report Dev
 	}
 	index := make(map[string]devinIndexRow)
 	for _, row := range indexRows {
-		if !devinSessionID.MatchString(row.ID) || row.WorkingDirectory == "" || index[row.ID].ID != "" {
+		if !devinSessionID.MatchString(row.ID) || !filepath.IsAbs(row.WorkingDirectory) || filepath.Clean(row.WorkingDirectory) != row.WorkingDirectory || index[row.ID].ID != "" {
 			return report, ErrDevinAudit
 		}
 		index[row.ID] = row

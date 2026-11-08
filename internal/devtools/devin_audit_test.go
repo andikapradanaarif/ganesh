@@ -30,6 +30,7 @@ func TestAuditDevinSourceLinksAndDrift(t *testing.T) {
 	restore := func() {
 		_ = os.Remove(filepath.Join(transcripts, "a1.json"))
 		_ = os.Remove(filepath.Join(transcripts, "b2.json"))
+		writeCorpusFixture(t, grantMapDirectory, "project-roots.json", projectRoots)
 		if err := os.WriteFile(filepath.Join(transcripts, "a1.json"), content, 0o600); err != nil {
 			t.Fatal(err)
 		}
@@ -80,7 +81,7 @@ func TestAuditDevinSourceLinksAndDrift(t *testing.T) {
 		change func()
 	}{
 		{"duplicate index", func() { writeCorpusFixture(t, evidence, "devin-sessions.json", []devinIndexRow{first, first}) }},
-		{"missing manifest row", func() { writeCorpusLines(t, evidence, "devin-manifest.jsonl", firstManifest) }},
+		{"index row missing from manifest", func() { writeCorpusLines(t, evidence, "devin-manifest.jsonl", firstManifest) }},
 		{"duplicate manifest row", func() { writeCorpusLines(t, evidence, "devin-manifest.jsonl", firstManifest, firstManifest) }},
 		{"path escape", func() {
 			altered := firstManifest
@@ -97,6 +98,20 @@ func TestAuditDevinSourceLinksAndDrift(t *testing.T) {
 			altered.WorkingDirectory = "/synthetic/other"
 			writeCorpusFixture(t, evidence, "devin-sessions.json", []devinIndexRow{{ID: first.ID, WorkingDirectory: altered.WorkingDirectory}, second})
 			writeCorpusLines(t, evidence, "devin-manifest.jsonl", altered, secondManifest)
+		}},
+		{"unclean working directory", func() {
+			altered := firstManifest
+			altered.WorkingDirectory = "/synthetic/project-a/../elsewhere"
+			writeCorpusFixture(t, evidence, "devin-sessions.json", []devinIndexRow{{ID: first.ID, WorkingDirectory: altered.WorkingDirectory}, second})
+			writeCorpusLines(t, evidence, "devin-manifest.jsonl", altered, secondManifest)
+		}},
+		{"extra grant-map project", func() {
+			altered := make(map[string]string, len(projectRoots)+1)
+			for key, value := range projectRoots {
+				altered[key] = value
+			}
+			altered["nexus"] = "/synthetic/nexus"
+			writeCorpusFixture(t, grantMapDirectory, "project-roots.json", altered)
 		}},
 		{"source symlink", func() {
 			if err := os.Remove(filepath.Join(transcripts, "a1.json")); err != nil {
@@ -116,6 +131,11 @@ func TestAuditDevinSourceLinksAndDrift(t *testing.T) {
 		})
 	}
 	restore()
+	for _, invalidRoot := range []string{"relative/transcripts", filepath.Join(transcripts, "..", "transcripts") + "/../transcripts"} {
+		if got, err := AuditDevin(evidence, invalidRoot, grantMapDirectory); err != ErrDevinAudit || !reflect.DeepEqual(got, DevinAuditReport{}) {
+			t.Fatal("non-absolute or unclean transcript root accepted")
+		}
+	}
 	if err := os.Chmod(filepath.Join(evidence, "devin-sessions.json"), 0o644); err != nil {
 		t.Fatal(err)
 	}
