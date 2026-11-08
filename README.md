@@ -17,6 +17,8 @@ Work is organized in [roadmap tracker #5](https://github.com/andikapradanaarif/g
 
 The first implementation task provides [S0 run preparation](docs/s0-preparation.md): a Go CLI for local client discovery and private run records. The [permitted day-one inventory and origin screen](docs/s0-day-one-inventory.md) now records bounded aggregate results. Capture integration remains pending.
 
+[S0 corpus and calibration preparation](docs/s0-corpus-calibration-preflight.md) records the source-permission boundaries and a private source-availability pass. Prior focused effort remains unknown; no scrubbed corpus or model run is claimed.
+
 [Initial origin accounting](docs/s0-origin-screen.md) freezes the handoff-need denominator and reports the A1 route from screener declarations. It does not inspect sources or verify provenance.
 
 [Evaluation planning](docs/s0-evaluation-plan.md) freezes the standard S0 task/diagnostic split and counterbalanced 108-answer schedule, with 24 conditional eligible-origin slots. Real inputs and execution/acceptance remain pending.
