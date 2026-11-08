@@ -14,7 +14,7 @@ import (
 	"github.com/andikapradanaarif/ganesh/internal/devtools"
 )
 
-type options struct{ command, source, profile, directory, study, raw, transcriptRoot, sessionsRoot, grantMapDirectory string }
+type options struct{ command, source, profile, directory, study, raw, transcriptRoot, sessionsRoot, grantMapDirectory, expectedManifest, outputDirectory string }
 
 func parse(args []string) (options, error) {
 	var opts options
@@ -34,10 +34,14 @@ func parse(args []string) (options, error) {
 	case "corpus-audit":
 		flags.StringVar(&opts.directory, "dir", "", "private corpus directory")
 		flags.StringVar(&opts.raw, "raw", "", "comma-separated private raw snapshot basenames")
-	case "devin-audit":
+	case "devin-audit", "devin-candidates":
 		flags.StringVar(&opts.directory, "dir", "", "private Devin evidence directory")
 		flags.StringVar(&opts.transcriptRoot, "transcript-root", "", "explicit Devin transcript directory")
 		flags.StringVar(&opts.grantMapDirectory, "grant-map-dir", "", "private owner-grant project-root map directory")
+		if opts.command == "devin-candidates" {
+			flags.StringVar(&opts.expectedManifest, "manifest-sha256", "", "pinned source manifest SHA-256")
+			flags.StringVar(&opts.outputDirectory, "output-dir", "", "existing private candidate output directory")
+		}
 	case "codex-audit":
 		flags.StringVar(&opts.directory, "manifest-dir", "", "private Codex manifest directory")
 		flags.StringVar(&opts.sessionsRoot, "sessions-root", "", "explicit Codex sessions directory")
@@ -57,7 +61,10 @@ func parse(args []string) (options, error) {
 	if opts.command == "corpus-audit" && (strings.TrimSpace(opts.directory) == "" || strings.TrimSpace(opts.raw) == "") {
 		return options{}, devtools.ErrCommand
 	}
-	if opts.command == "devin-audit" && (strings.TrimSpace(opts.directory) == "" || strings.TrimSpace(opts.transcriptRoot) == "" || strings.TrimSpace(opts.grantMapDirectory) == "") {
+	if (opts.command == "devin-audit" || opts.command == "devin-candidates") && (strings.TrimSpace(opts.directory) == "" || strings.TrimSpace(opts.transcriptRoot) == "" || strings.TrimSpace(opts.grantMapDirectory) == "") {
+		return options{}, devtools.ErrCommand
+	}
+	if opts.command == "devin-candidates" && (len(opts.expectedManifest) != 64 || strings.TrimSpace(opts.outputDirectory) == "") {
 		return options{}, devtools.ErrCommand
 	}
 	if opts.command == "codex-audit" && (strings.TrimSpace(opts.directory) == "" || strings.TrimSpace(opts.sessionsRoot) == "" || strings.TrimSpace(opts.grantMapDirectory) == "") {
@@ -130,6 +137,18 @@ func run(args []string, stdout, stderr io.Writer) error {
 		encoder.SetIndent("", "  ")
 		if err := encoder.Encode(report); err != nil {
 			return devtools.ErrDevinAudit
+		}
+		return nil
+	}
+	if opts.command == "devin-candidates" {
+		report, err := devtools.PrepareDevinCandidates(opts.directory, opts.transcriptRoot, opts.grantMapDirectory, opts.expectedManifest, opts.outputDirectory)
+		if err != nil {
+			return err
+		}
+		encoder := json.NewEncoder(stdout)
+		encoder.SetIndent("", "  ")
+		if err := encoder.Encode(report); err != nil {
+			return devtools.ErrDevinCandidates
 		}
 		return nil
 	}
