@@ -25,6 +25,14 @@ Reads require a 0700 directory and regular 0600 `plan.json`/`attempts.jsonl` fil
 
 The manifest must match the completed study's source revision, seed, cap and deadline; study 36 also requires its explicit study ID. Matching declared constants is a consistency check, not authentication. The sample must contain every expected stage/arm/category/block exactly once and valid positive parent timings. These input checks supplement the original summaries without changing their numeric rules. Percentiles use nearest rank and include failed/censored attempts. Missing OS clocks stay visible. Study 34 preserves its candidate-only control veto and first-execution tail gate; study 36 preserves its symmetric controls, first/warm tail gates and separate headroom probe. Neither rule enables a capture profile. The reader does not revalidate source artifacts, producer digests or the collector's reported outcomes.
 
+Audit the private local-only Crush digest reduction for [issue #50](https://github.com/andikapradanaarif/ganesh/issues/50):
+
+```sh
+go run ./cmd/ganesh-dev corpus-audit --dir .local/s0/issue-50-20261108 --raw crush-digests-valo.raw.json,crush-digests-kiosk.raw.json
+```
+
+The command reads the listed raw snapshot basenames plus `crush-digest-manifest.jsonl` and `crush-digest-candidates.jsonl` in the same private 0700 directory. Every file must be regular and 0600; final-component symlinks are rejected. It verifies exact raw-field hashes, a one-to-one raw/manifest/candidate join, the declared reduction, redaction counts and local-only flags. It emits aggregate JSON without source text and returns a static error on invalid input. Each file is capped at 2 MiB; rows have separate 64 KiB text and 128 KiB JSON-line bounds. The file cap is intentionally tighter than the theoretical sum of row limits for this small pilot and must be changed deliberately if a later corpus grows. This audit checks reproducibility of the declared patterns only. It does not establish safe model disclosure, first-party origin, semantic quality, full-context fit or permission to run models. See the [preflight](s0-corpus-calibration-preflight.md) for the observed result and remaining gaps.
+
 Build and run the active Go checks:
 
 ```sh

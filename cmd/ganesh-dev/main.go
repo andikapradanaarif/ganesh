@@ -14,7 +14,7 @@ import (
 	"github.com/andikapradanaarif/ganesh/internal/devtools"
 )
 
-type options struct{ command, source, profile, directory, study string }
+type options struct{ command, source, profile, directory, study, raw string }
 
 func parse(args []string) (options, error) {
 	var opts options
@@ -31,6 +31,9 @@ func parse(args []string) (options, error) {
 	case "study-summary":
 		flags.StringVar(&opts.directory, "dir", "", "private completed study directory")
 		flags.StringVar(&opts.study, "study", "", "completed study: 34 or 36")
+	case "corpus-audit":
+		flags.StringVar(&opts.directory, "dir", "", "private corpus directory")
+		flags.StringVar(&opts.raw, "raw", "", "comma-separated private raw snapshot basenames")
 	default:
 		return options{}, devtools.ErrCommand
 	}
@@ -41,6 +44,9 @@ func parse(args []string) (options, error) {
 		return options{}, devtools.ErrCommand
 	}
 	if opts.command == "study-summary" && (strings.TrimSpace(opts.directory) == "" || (opts.study != "34" && opts.study != "36")) {
+		return options{}, devtools.ErrCommand
+	}
+	if opts.command == "corpus-audit" && (strings.TrimSpace(opts.directory) == "" || strings.TrimSpace(opts.raw) == "") {
 		return options{}, devtools.ErrCommand
 	}
 	return opts, nil
@@ -86,6 +92,18 @@ func run(args []string, stdout, stderr io.Writer) error {
 		encoder.SetIndent("", "  ")
 		if err := encoder.Encode(report); err != nil {
 			return devtools.ErrStudy
+		}
+		return nil
+	}
+	if opts.command == "corpus-audit" {
+		report, err := devtools.AuditCorpus(opts.directory, strings.Split(opts.raw, ","))
+		if err != nil {
+			return err
+		}
+		encoder := json.NewEncoder(stdout)
+		encoder.SetIndent("", "  ")
+		if err := encoder.Encode(report); err != nil {
+			return devtools.ErrCorpus
 		}
 		return nil
 	}
