@@ -15,6 +15,8 @@ Anthropic documents Opus 5.5 for coding/knowledge work with adaptive thinking an
 
 This is a proposed Claude-answering/OpenAI-grading arrangement consistent with the execution sheet's family separation. It has no empirical calibration result yet. Before freezing, verify account access, supported request settings, exact requested and returned model identifiers, and version stability. Record any absence of an immutable provider version; do not invent a dated snapshot ID or silently substitute a model.
 
+The model identity freeze record must retain the provider/endpoint and API version, literal requested model ID, literal returned model ID (or an explicit absence), any returned version/fingerprint (or `unavailable`), observation time and request-configuration digest. If the returned ID merely repeats the requested name, record that result without treating it as proof of an immutable version. Any unavailable version binding remains a reproducibility limitation.
+
 ## Limits and cost
 
 | Input | Proposal or unresolved decision |
