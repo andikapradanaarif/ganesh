@@ -4,8 +4,40 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 )
+
+func TestDevinHashInputBoundsSizeDrift(t *testing.T) {
+	for _, tc := range []struct {
+		name                string
+		body                string
+		expected, remaining int64
+		consumed            int
+		valid               bool
+	}{
+		{"unchanged", "abc", 3, 3, 3, true},
+		{"grew after stat", strings.Repeat("x", 4096), 1, 1, 2, false},
+		{"shrank after stat", "a", 3, 3, 1, false},
+		{"exceeds remaining total", "abc", 3, 2, 0, false},
+		{"exceeds file cap", "abc", 32<<20 + 1, 64 << 20, 0, false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			input := strings.NewReader(tc.body)
+			n, digest, err := devinHashInput(input, tc.expected, tc.remaining)
+			if len(tc.body)-input.Len() != tc.consumed {
+				t.Fatal("read exceeded the size check and sentinel allowance")
+			}
+			if tc.valid {
+				if err != nil || n != tc.expected || digest != devinDigest([]byte(tc.body)) {
+					t.Fatal("valid bounded content rejected")
+				}
+			} else if err != ErrDevinAudit || n != 0 || digest != "" {
+				t.Fatal("invalid size accepted or partial digest returned")
+			}
+		})
+	}
+}
 
 func TestAuditDevinSourceLinksAndDrift(t *testing.T) {
 	evidence := t.TempDir()

@@ -55,6 +55,20 @@ func devinDigest(body []byte) string {
 	return hex.EncodeToString(sum[:])
 }
 
+func devinHashInput(input io.Reader, expectedSize, remaining int64) (int64, string, error) {
+	if expectedSize < 0 || expectedSize > 32<<20 || expectedSize > remaining {
+		return 0, "", ErrDevinAudit
+	}
+	hash := sha256.New()
+	// One sentinel byte detects growth without scanning beyond the size that
+	// passed the per-file and remaining-total checks.
+	n, err := io.Copy(hash, io.LimitReader(input, expectedSize+1))
+	if err != nil || n != expectedSize {
+		return 0, "", ErrDevinAudit
+	}
+	return n, hex.EncodeToString(hash.Sum(nil)), nil
+}
+
 func devinHashFile(root *os.Root, name string, remaining int64) (state string, bytesRead int64, digest string, err error) {
 	info, err := root.Lstat(name)
 	if errors.Is(err, os.ErrNotExist) {
@@ -72,9 +86,8 @@ func devinHashFile(root *os.Root, name string, remaining int64) (state string, b
 	if err != nil || !os.SameFile(info, opened) || !opened.Mode().IsRegular() {
 		return "", 0, "", ErrDevinAudit
 	}
-	hash := sha256.New()
-	n, err := io.Copy(hash, io.LimitReader(f, 32<<20+1))
-	if err != nil || n != info.Size() || n > 32<<20 {
+	n, digest, err := devinHashInput(f, info.Size(), remaining)
+	if err != nil {
 		return "", 0, "", ErrDevinAudit
 	}
 	if err := f.Close(); err != nil {
@@ -84,7 +97,7 @@ func devinHashFile(root *os.Root, name string, remaining int64) (state string, b
 	if err != nil || !after.Mode().IsRegular() || !os.SameFile(info, after) || after.Size() != info.Size() || !after.ModTime().Equal(info.ModTime()) {
 		return "", 0, "", ErrDevinAudit
 	}
-	return "present_hashed", n, hex.EncodeToString(hash.Sum(nil)), nil
+	return "present_hashed", n, digest, nil
 }
 
 // AuditDevin compares a saved index/manifest with a current transcript store.
