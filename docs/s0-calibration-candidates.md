@@ -22,3 +22,5 @@ The pass began at **11:46:56 UTC on 2026-11-08**. The next clock observation aft
 No evaluation API calls, grader calibration, held-out answers or S0 stage pass occurred. Exact evaluation model IDs, spend/time/output/retry limits, baseline/card permissions, a complete D/F corpus and context fit, final task/rubric freeze and ordering remain unresolved. Installed capture remains blocked by [#34](https://github.com/andikapradanaarif/ganesh/issues/34).
 
 The subsequent [run-input proposal](s0-run-input-proposal.md) provides documented model candidates, proposed output limits and cost arithmetic while keeping owner decisions and execution disabled.
+
+[Grader-calibration fixtures](s0-grader-calibration-fixtures.md) add 18 private synthetic answer variants and a separate owner-labeling packet. Proposed labels remain unadjudicated; no grading model has run.
