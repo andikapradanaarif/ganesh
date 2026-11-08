@@ -121,6 +121,30 @@ func codexMetaCWD(line []byte) (string, error) {
 	return cwd, nil
 }
 
+func codexHashInput(input io.Reader, expectedCWD string, expectedSize, remaining int64) (int64, string, error) {
+	if expectedSize < 0 || expectedSize > codexMaxRolloutBytes || expectedSize > remaining {
+		return 0, "", ErrCodexAudit
+	}
+	hash := sha256.New()
+	// Match the size that passed the resource checks, with one sentinel byte
+	// to detect growth even when the buffered metadata reader prefetches.
+	reader := bufio.NewReaderSize(io.TeeReader(io.LimitReader(input, expectedSize+1), hash), codexMaxMetaLine)
+	first, err := reader.ReadSlice('\n')
+	if err != nil || len(first) > codexMaxMetaLine {
+		return 0, "", ErrCodexAudit
+	}
+	cwd, err := codexMetaCWD(bytes.TrimSuffix(first, []byte{'\n'}))
+	if err != nil || cwd != expectedCWD {
+		return 0, "", ErrCodexAudit
+	}
+	rest, err := io.Copy(io.Discard, reader)
+	n := int64(len(first)) + rest
+	if err != nil || n != expectedSize {
+		return 0, "", ErrCodexAudit
+	}
+	return n, hex.EncodeToString(hash.Sum(nil)), nil
+}
+
 func codexHashFile(root *os.Root, name, expectedCWD string, remaining int64) (state string, size int64, digest string, err error) {
 	info, err := root.Lstat(name)
 	if errors.Is(err, os.ErrNotExist) {
@@ -138,19 +162,8 @@ func codexHashFile(root *os.Root, name, expectedCWD string, remaining int64) (st
 	if err != nil || !os.SameFile(info, opened) || !opened.Mode().IsRegular() {
 		return "", 0, "", ErrCodexAudit
 	}
-	hash := sha256.New()
-	reader := bufio.NewReaderSize(io.TeeReader(io.LimitReader(f, codexMaxRolloutBytes+1), hash), codexMaxMetaLine)
-	first, err := reader.ReadSlice('\n')
-	if err != nil || len(first) > codexMaxMetaLine {
-		return "", 0, "", ErrCodexAudit
-	}
-	cwd, err := codexMetaCWD(bytes.TrimSuffix(first, []byte{'\n'}))
-	if err != nil || cwd != expectedCWD {
-		return "", 0, "", ErrCodexAudit
-	}
-	rest, err := io.Copy(io.Discard, reader)
-	n := int64(len(first)) + rest
-	if err != nil || n != info.Size() || n > codexMaxRolloutBytes {
+	n, digest, err := codexHashInput(f, expectedCWD, info.Size(), remaining)
+	if err != nil {
 		return "", 0, "", ErrCodexAudit
 	}
 	if err := f.Close(); err != nil {
@@ -160,7 +173,7 @@ func codexHashFile(root *os.Root, name, expectedCWD string, remaining int64) (st
 	if err != nil || !after.Mode().IsRegular() || !os.SameFile(info, after) || after.Size() != info.Size() || !after.ModTime().Equal(info.ModTime()) {
 		return "", 0, "", ErrCodexAudit
 	}
-	return "present_hashed", n, hex.EncodeToString(hash.Sum(nil)), nil
+	return "present_hashed", n, digest, nil
 }
 
 // AuditCodex rechecks only the two previously selected Kiosk rollouts.

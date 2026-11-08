@@ -5,8 +5,41 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 )
+
+func TestCodexHashInputBoundsSizeDrift(t *testing.T) {
+	content := "{\"type\":\"session_meta\",\"payload\":{\"cwd\":\"/synthetic/kiosk\"}}\nbody\n"
+	size := int64(len(content))
+	for _, tc := range []struct {
+		name, body          string
+		expected, remaining int64
+		consumed            int
+		valid               bool
+	}{
+		{"unchanged", content, size, size, len(content), true},
+		{"grew after stat", content + strings.Repeat("x", 4096), size, size, len(content) + 1, false},
+		{"shrank after stat", content[:len(content)-1], size, size, len(content) - 1, false},
+		{"exceeds remaining total", content, size, size - 1, 0, false},
+		{"exceeds file cap", content, codexMaxRolloutBytes + 1, codexMaxTotalBytes, 0, false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			input := strings.NewReader(tc.body)
+			n, digest, err := codexHashInput(input, "/synthetic/kiosk", tc.expected, tc.remaining)
+			if len(tc.body)-input.Len() != tc.consumed {
+				t.Fatal("read exceeded the checked size and sentinel allowance")
+			}
+			if tc.valid {
+				if err != nil || n != tc.expected || digest != devinDigest([]byte(tc.body)) {
+					t.Fatal("valid bounded rollout rejected")
+				}
+			} else if err != ErrCodexAudit || n != 0 || digest != "" {
+				t.Fatal("invalid size accepted or partial digest returned")
+			}
+		})
+	}
+}
 
 func TestAuditCodexLinksAndDrift(t *testing.T) {
 	manifestDir := t.TempDir()
@@ -83,6 +116,16 @@ func TestAuditCodexLinksAndDrift(t *testing.T) {
 		name   string
 		change func()
 	}{
+		{"missing manifest file", func() {
+			if err := os.Remove(filepath.Join(manifestDir, "codex-kiosk-manifest.txt")); err != nil {
+				t.Fatal(err)
+			}
+		}},
+		{"manifest over file cap", func() {
+			if err := os.WriteFile(filepath.Join(manifestDir, "codex-kiosk-manifest.txt"), []byte(strings.Repeat("x", 1<<20+1)), 0o600); err != nil {
+				t.Fatal(err)
+			}
+		}},
 		{"duplicate path", func() {
 			body := manifest(firstPath, firstPath, devinDigest(first), devinDigest(first))
 			if err := os.WriteFile(filepath.Join(manifestDir, "codex-kiosk-manifest.txt"), body, 0o600); err != nil {
@@ -115,6 +158,16 @@ func TestAuditCodexLinksAndDrift(t *testing.T) {
 		}},
 		{"missing session metadata", func() {
 			if err := os.WriteFile(firstPath, []byte("{\"type\":\"event_msg\"}\n"), 0o600); err != nil {
+				t.Fatal(err)
+			}
+		}},
+		{"metadata without trailing newline", func() {
+			if err := os.WriteFile(firstPath, []byte(strings.TrimSuffix(string(second), "\n")), 0o600); err != nil {
+				t.Fatal(err)
+			}
+		}},
+		{"session metadata after first line", func() {
+			if err := os.WriteFile(firstPath, []byte("{}\n"+string(second)), 0o600); err != nil {
 				t.Fatal(err)
 			}
 		}},

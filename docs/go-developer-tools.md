@@ -51,6 +51,8 @@ go run ./cmd/ganesh-dev codex-audit --manifest-dir .local/s0/issue-50-20261108 -
 
 The two-row `codex-kiosk-manifest.txt` and `project-roots.json` must be regular 0600 files in 0700 directories. The reader checks each manifest path under the explicit sessions root, rejects symlinked components, hashes at most 32 MiB per rollout and 64 MiB total, and requires a first-line `session_meta` record within 64 KiB whose `cwd` equals the granted Kiosk root. Changed or missing files are reported as drift; malformed metadata, unsafe paths and unsupported files fail with a static error. It emits aggregate counts, file bytes and digests without rollout text or private paths. It does not authorize model use; see the [Codex source-link audit](s0-codex-source-audit.md) for results and limits.
 
+The first metadata line must end with a newline. Each read stops at the checked file size plus one growth-detection byte, including buffered prefetch; growth or shrinkage fails without a partial result.
+
 Build and run the active Go checks:
 
 ```sh
