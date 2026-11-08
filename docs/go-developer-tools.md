@@ -33,6 +33,14 @@ go run ./cmd/ganesh-dev corpus-audit --dir .local/s0/issue-50-20261108 --raw cru
 
 The command reads the listed raw snapshot basenames plus `crush-digest-manifest.jsonl` and `crush-digest-candidates.jsonl` in the same private 0700 directory. Every file must be regular and 0600; final-component symlinks are rejected. It verifies exact raw-field hashes, a one-to-one raw/manifest/candidate join, the declared reduction, redaction counts and local-only flags. It emits aggregate JSON without source text and returns a static error on invalid input. Each file is capped at 2 MiB; rows have separate 64 KiB text and 128 KiB JSON-line bounds. The file cap is intentionally tighter than the theoretical sum of row limits for this small pilot and must be changed deliberately if a later corpus grows. This audit checks reproducibility of the declared patterns only. It does not establish safe model disclosure, first-party origin, semantic quality, full-context fit or permission to run models. See the [preflight](s0-corpus-calibration-preflight.md) for the observed result and remaining gaps.
 
+Recheck the private Devin source links for [issue #53](https://github.com/andikapradanaarif/ganesh/issues/53):
+
+```sh
+go run ./cmd/ganesh-dev devin-audit --dir .local/s0/issue-50-20261108 --transcript-root /path/to/Devin/transcripts --grant-map-dir .local/s0/issue-53-20261108
+```
+
+The evidence directory must contain private 0600 `devin-sessions.json` and `devin-manifest.jsonl`; the grant-map directory must contain private 0600 `project-roots.json`, derived from the recorded owner grants and excluding Nexus. Both directories must be 0700. The explicit transcript root must be a real directory, and the reader accepts only regular, stable files with names derived from validated session IDs. Input limits are 4 MiB per evidence file, 1 MiB for the grant map, 1,000 rows, 128 KiB per manifest line, 32 MiB per transcript and 128 MiB across all transcripts. The audit emits only aggregate counts, file bytes, drift categories and digests. Changed or newly available files are reported as drift; unsafe file types, path escapes and malformed inputs fail with a static error. It does not output transcript text or authorize model use. See the [source-link audit](s0-devin-source-audit.md) for the observed result and limitations.
+
 Build and run the active Go checks:
 
 ```sh
