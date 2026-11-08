@@ -41,6 +41,14 @@ go run ./cmd/ganesh-dev devin-audit --dir .local/s0/issue-50-20261108 --transcri
 
 The evidence directory must contain private 0600 `devin-sessions.json` and `devin-manifest.jsonl`; the grant-map directory must contain private 0600 `project-roots.json`, derived from the recorded owner grants and excluding Nexus. Both directories must be 0700. The explicit transcript root must be a real directory, working directories must be absolute clean paths, and the reader accepts only regular, stable files with names derived from validated session IDs. Input limits are 4 MiB per evidence file, 1 MiB for the grant map, 1,000 rows, 128 KiB per manifest line, 32 MiB per transcript and 128 MiB across all transcripts. The audit emits only aggregate counts, file bytes, drift categories and digests. Changed or newly available files are reported as drift; unsafe file types, path escapes and malformed inputs fail with a static error. It does not output transcript text or authorize model use. See the [source-link audit](s0-devin-source-audit.md) for the observed result and limitations.
 
+Recheck the two selected Kiosk Codex rollouts for [issue #55](https://github.com/andikapradanaarif/ganesh/issues/55):
+
+```sh
+go run ./cmd/ganesh-dev codex-audit --manifest-dir .local/s0/issue-50-20261108 --sessions-root /path/to/Codex/sessions --grant-map-dir .local/s0/issue-53-20261108
+```
+
+The two-row `codex-kiosk-manifest.txt` and `project-roots.json` must be regular 0600 files in 0700 directories. The reader checks each manifest path under the explicit sessions root, rejects symlinked components, hashes at most 32 MiB per rollout and 64 MiB total, and requires a first-line `session_meta` record within 64 KiB whose `cwd` equals the granted Kiosk root. Changed or missing files are reported as drift; malformed metadata, unsafe paths and unsupported files fail with a static error. It emits aggregate counts, file bytes and digests without rollout text or private paths. It does not authorize model use; see the [Codex source-link audit](s0-codex-source-audit.md) for results and limits.
+
 Build and run the active Go checks:
 
 ```sh

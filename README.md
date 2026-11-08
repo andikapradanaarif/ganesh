@@ -21,6 +21,8 @@ The first implementation task provides [S0 run preparation](docs/s0-preparation.
 
 The [Devin source-link audit](docs/s0-devin-source-audit.md) rechecks the saved availability manifest against the current local files without disclosing transcript text.
 
+The [Codex source-link audit](docs/s0-codex-source-audit.md) similarly rechecks the two permitted Kiosk rollouts and summarizes the still-incomplete source-class coverage.
+
 [Initial origin accounting](docs/s0-origin-screen.md) freezes the handoff-need denominator and reports the A1 route from screener declarations. It does not inspect sources or verify provenance.
 
 [Evaluation planning](docs/s0-evaluation-plan.md) freezes the standard S0 task/diagnostic split and counterbalanced 108-answer schedule, with 24 conditional eligible-origin slots. Real inputs and execution/acceptance remain pending.
