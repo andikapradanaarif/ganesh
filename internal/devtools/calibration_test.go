@@ -100,6 +100,28 @@ func TestCalibrationComparison(t *testing.T) {
 	}
 }
 
+func TestCalibrationBlankAndPerfectAgreement(t *testing.T) {
+	dir, pin, packet := calibrationFixture(t)
+	saveCalibration(t, dir, "owner-labels.json", packet)
+	saveCalibration(t, dir, "grader-labels.json", packet)
+	report, err := SummarizeCalibration(dir, pin)
+	if err != nil || !report.OwnerPresent || !report.GraderPresent || report.Status != "incomplete" || report.ComparedCases != 0 {
+		t.Fatal("blank copies became completed labels")
+	}
+	for _, field := range report.Fields {
+		if field != (CalibrationField{}) {
+			t.Fatal("null labels became negative judgments")
+		}
+	}
+	labelCalibration(&packet)
+	saveCalibration(t, dir, "owner-labels.json", packet)
+	saveCalibration(t, dir, "grader-labels.json", packet)
+	report, err = SummarizeCalibration(dir, pin)
+	if err != nil || report.Status != "compared_declarations" || report.AgreedCases != 18 || report.CalibrationAccepted {
+		t.Fatal("perfect declarations accepted calibration or lost a case")
+	}
+}
+
 func TestCalibrationRejectsInvalidPackets(t *testing.T) {
 	for _, name := range []string{"duplicate", "missing row", "extra row", "wrong task", "unknown case", "missing field", "null notes", "duplicate key", "aliased key", "unknown key", "trailing", "wrong type", "invalid status", "missing identity", "invalid time", "critical completion", "oversize", "permissions", "symlink", "frame hash", "frame duplicate", "frame labelled", "directory permissions", "directory symlink"} {
 		t.Run(name, func(t *testing.T) {

@@ -77,7 +77,7 @@ func decodeCalibration(body []byte) (calibrationPacket, error) {
 	}
 	known := 0
 	for i, row := range packet.Cases {
-		if len(rows[i]) != 6 || string(rows[i]["notes"]) == "null" || len(row.Notes) > 4096 {
+		if len(rows[i]) != 6 || strings.TrimSpace(string(rows[i]["notes"])) == "null" || len(row.Notes) > 4096 {
 			return packet, ErrCalibration
 		}
 		if row.Completion != nil && *row.Completion && row.Critical != nil && *row.Critical {
