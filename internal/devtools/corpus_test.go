@@ -1,9 +1,11 @@
 package devtools
 
 import (
+	"bytes"
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -15,6 +17,19 @@ func writeCorpusFixture(t *testing.T, dir, name string, value any) {
 		t.Fatal(err)
 	}
 	if err := os.WriteFile(filepath.Join(dir, name), append(body, '\n'), 0o600); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func writeCorpusLines(t *testing.T, dir, name string, values ...any) {
+	t.Helper()
+	var body bytes.Buffer
+	for _, value := range values {
+		if err := json.NewEncoder(&body).Encode(value); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err := os.WriteFile(filepath.Join(dir, name), body.Bytes(), 0o600); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -57,6 +72,11 @@ func TestAuditCorpusLinksAndLocalOnlyBoundary(t *testing.T) {
 		t.Fatalf("valid fixture: %+v, %v", report, err)
 	}
 
+	restore := func() {
+		writeCorpusFixture(t, dir, "raw.json", []corpusRawJSON{raw})
+		writeCorpusFixture(t, dir, "crush-digest-manifest.jsonl", manifest)
+		writeCorpusFixture(t, dir, "crush-digest-candidates.jsonl", candidate)
+	}
 	for _, tc := range []struct {
 		name   string
 		change func()
@@ -78,15 +98,41 @@ func TestAuditCorpusLinksAndLocalOnlyBoundary(t *testing.T) {
 			altered.ModelDispatch = false
 			writeCorpusFixture(t, dir, "crush-digest-candidates.jsonl", altered)
 		}},
+		{"duplicate raw session", func() {
+			writeCorpusFixture(t, dir, "raw.json", []corpusRawJSON{raw, raw})
+		}},
+		{"duplicate manifest session", func() {
+			writeCorpusLines(t, dir, "crush-digest-manifest.jsonl", manifest, manifest)
+		}},
+		{"missing manifest row", func() {
+			writeCorpusLines(t, dir, "crush-digest-manifest.jsonl")
+		}},
+		{"duplicate candidate session", func() {
+			writeCorpusLines(t, dir, "crush-digest-candidates.jsonl", candidate, candidate)
+		}},
+		{"missing candidate row", func() {
+			writeCorpusLines(t, dir, "crush-digest-candidates.jsonl")
+		}},
+		{"redaction count mismatch", func() {
+			altered := candidate
+			altered.Redactions = map[string]int{"email": 0}
+			writeCorpusFixture(t, dir, "crush-digest-candidates.jsonl", altered)
+		}},
+		{"undeclared redaction key", func() {
+			altered := candidate
+			altered.Redactions = map[string]int{"email": 1, "unlisted": 1}
+			writeCorpusFixture(t, dir, "crush-digest-candidates.jsonl", altered)
+		}},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
+			restore()
 			tc.change()
-			if _, err := AuditCorpus(dir, []string{"raw.json"}); err == nil {
-				t.Fatal("invalid corpus accepted")
+			if report, err := AuditCorpus(dir, []string{"raw.json"}); err != ErrCorpus || !reflect.DeepEqual(report, CorpusAudit{}) {
+				t.Fatal("invalid corpus accepted or partial result returned")
 			}
 		})
 	}
-	writeCorpusFixture(t, dir, "crush-digest-candidates.jsonl", candidate)
+	restore()
 	if err := os.Chmod(filepath.Join(dir, "raw.json"), 0o644); err != nil {
 		t.Fatal(err)
 	}

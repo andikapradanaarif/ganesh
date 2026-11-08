@@ -121,6 +121,7 @@ func corpusRead(root *os.Root, name string) ([]byte, error) {
 	if name == "" || filepath.Base(name) != name || name == "." {
 		return nil, ErrCorpus
 	}
+	// The 2 MiB per-file cap bounds this pilot reader independently of row caps.
 	body, err := privateFile(root, name, 2<<20)
 	if err != nil {
 		return nil, ErrCorpus
@@ -144,8 +145,13 @@ func corpusRequired(body []byte, keys ...string) bool {
 
 // AuditCorpus verifies the existing local-only reduction against private raw
 // snapshots. It does not establish safe disclosure or semantic correctness.
-func AuditCorpus(directory string, rawNames []string) (CorpusAudit, error) {
-	var report CorpusAudit
+func AuditCorpus(directory string, rawNames []string) (report CorpusAudit, auditErr error) {
+	// A rejected corpus must not expose counts from the rows scanned before failure.
+	defer func() {
+		if auditErr != nil {
+			report = CorpusAudit{}
+		}
+	}()
 	if len(rawNames) == 0 || len(rawNames) > 10 {
 		return report, ErrCorpus
 	}
@@ -264,7 +270,7 @@ func AuditCorpus(directory string, rawNames []string) (CorpusAudit, error) {
 		report.CandidateTextBytes += len(c.Title) + len(c.Checkpoint) + len(c.Files)
 		return nil
 	}) != nil || len(seen) != len(manifest) {
-		return CorpusAudit{}, ErrCorpus
+		return report, ErrCorpus
 	}
 	report.CandidateRows = len(seen)
 	report.SourceLinksValid = true

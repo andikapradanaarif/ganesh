@@ -102,7 +102,10 @@ func run(args []string, stdout, stderr io.Writer) error {
 		}
 		encoder := json.NewEncoder(stdout)
 		encoder.SetIndent("", "  ")
-		return encoder.Encode(report)
+		if err := encoder.Encode(report); err != nil {
+			return devtools.ErrCorpus
+		}
+		return nil
 	}
 	root, err := repositoryRoot()
 	if err != nil {
