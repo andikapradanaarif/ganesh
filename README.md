@@ -25,6 +25,8 @@ The [Codex source-link audit](docs/s0-codex-source-audit.md) similarly rechecks 
 
 [Local Devin excerpt preparation](docs/s0-devin-excerpt-candidates.md) now produces private source-linked candidates for later calibration review; they remain unverified and local only.
 
+[Calibration candidate preparation](docs/s0-calibration-candidates.md) records six private draft tasks and the incomplete outcome after the planned preparation pass was exceeded.
+
 [Initial origin accounting](docs/s0-origin-screen.md) freezes the handoff-need denominator and reports the A1 route from screener declarations. It does not inspect sources or verify provenance.
 
 [Evaluation planning](docs/s0-evaluation-plan.md) freezes the standard S0 task/diagnostic split and counterbalanced 108-answer schedule, with 24 conditional eligible-origin slots. Real inputs and execution/acceptance remain pending.
