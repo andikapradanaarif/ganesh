@@ -9,7 +9,7 @@ import (
 )
 
 func TestParse(t *testing.T) {
-	for _, args := range [][]string{nil, {"capture"}, {"crush-test"}, {"crush-test", "--source", "x", "extra"}, {"crush-test", "--source", "x", "--build-profile", "ghp_SYNTHETIC_SECRET"}, {"crush-test", "--source", "x", "--study", "34"}, {"crush-test", "--unknown", "ghp_SYNTHETIC_SECRET"}, {"study-summary"}, {"study-summary", "--dir", "x", "--study", "37"}, {"study-summary", "--dir", "x", "--study", "34", "--source", "ghp_SYNTHETIC_SECRET"}, {"study-summary", "run", "--dir", "x", "--study", "36"}} {
+	for _, args := range [][]string{nil, {"capture"}, {"crush-test"}, {"crush-test", "--source", "x", "extra"}, {"crush-test", "--source", "x", "--build-profile", "ghp_SYNTHETIC_SECRET"}, {"crush-test", "--source", "x", "--study", "34"}, {"crush-test", "--unknown", "ghp_SYNTHETIC_SECRET"}, {"study-summary"}, {"study-summary", "--dir", "x", "--study", "37"}, {"study-summary", "--dir", "x", "--study", "34", "--source", "ghp_SYNTHETIC_SECRET"}, {"study-summary", "run", "--dir", "x", "--study", "36"}, {"corpus-audit"}, {"corpus-audit", "--dir", "x"}, {"corpus-audit", "--raw", "raw.json"}, {"corpus-audit", "--dir", "x", "--raw", "raw.json", "extra"}} {
 		if _, err := parse(args); err == nil || strings.Contains(err.Error(), "ghp_") {
 			t.Fatal("invalid command accepted or echoed")
 		}
@@ -21,6 +21,10 @@ func TestParse(t *testing.T) {
 	got, err = parse([]string{"study-summary", "--study", "36", "--dir", "/synthetic"})
 	if err != nil || got.study != "36" || got.directory != "/synthetic" {
 		t.Fatal("valid summary command rejected")
+	}
+	got, err = parse([]string{"corpus-audit", "--dir", "/synthetic", "--raw", "raw.json"})
+	if err != nil || got.directory != "/synthetic" || got.raw != "raw.json" {
+		t.Fatal("valid corpus audit command rejected")
 	}
 }
 
