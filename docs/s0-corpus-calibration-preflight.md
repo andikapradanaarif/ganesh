@@ -32,7 +32,9 @@ The private Devin session index returned **86** sessions mapped to the exact Aur
 | Valo-backend | 71 | 13 | 58 |
 | Kiosk | 13 | 13 | 0 |
 
-Read-only Crush metadata queries found **19** Valo-backend and **5** Kiosk sessions, with **16** and **5** existing session-digest rows. Those digest rows were exported only to private raw snapshots; their text is **not scrubbed**. Two Codex rollout files matched Kiosk's exact working directory and were hashed privately. The client stores are mutable; these are point-in-time availability observations, not an installed capture profile, a complete source corpus or a full-context fit check.
+Read-only Crush metadata queries found **19** Valo-backend and **5** Kiosk sessions, with **16** and **5** existing session-digest rows. Those digest rows were exported only to private raw snapshots. A private Go manifest records per-field sizes and hashes for all 21 rows, with independent hash checks on one checkpoint from each store. Two Codex rollout files matched Kiosk's exact working directory and were hashed privately. The client stores are mutable; these are point-in-time availability observations, not an installed capture profile, a complete source corpus or a full-context fit check.
+
+A conservative private Go reduction pass produced **21 local-only candidate records** from the Crush digest rows. Synthetic fixtures for planted sensitive forms passed, and a local scan found no remaining matches within the reducer's declared URL, email, path, known-token and long-token patterns. The pass made **155 generic long-token replacements**; that rule can remove valid commit IDs and useful source references. Every candidate remains `unknown_unreconciled`, `candidate_unverified_local_only` and `model_dispatch_authorized=false`. Pattern checks do not establish general secret-scrubbing coverage, safe disclosure, semantic usefulness or a model-ready corpus. No candidate text was sent to a model.
 
 ## Next evidence
 
