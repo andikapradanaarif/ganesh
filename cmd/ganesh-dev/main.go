@@ -14,7 +14,7 @@ import (
 	"github.com/andikapradanaarif/ganesh/internal/devtools"
 )
 
-type options struct{ command, source, profile, directory, study, raw, transcriptRoot, grantMapDirectory string }
+type options struct{ command, source, profile, directory, study, raw, transcriptRoot, sessionsRoot, grantMapDirectory string }
 
 func parse(args []string) (options, error) {
 	var opts options
@@ -38,6 +38,10 @@ func parse(args []string) (options, error) {
 		flags.StringVar(&opts.directory, "dir", "", "private Devin evidence directory")
 		flags.StringVar(&opts.transcriptRoot, "transcript-root", "", "explicit Devin transcript directory")
 		flags.StringVar(&opts.grantMapDirectory, "grant-map-dir", "", "private owner-grant project-root map directory")
+	case "codex-audit":
+		flags.StringVar(&opts.directory, "manifest-dir", "", "private Codex manifest directory")
+		flags.StringVar(&opts.sessionsRoot, "sessions-root", "", "explicit Codex sessions directory")
+		flags.StringVar(&opts.grantMapDirectory, "grant-map-dir", "", "private owner-grant project-root map directory")
 	default:
 		return options{}, devtools.ErrCommand
 	}
@@ -54,6 +58,9 @@ func parse(args []string) (options, error) {
 		return options{}, devtools.ErrCommand
 	}
 	if opts.command == "devin-audit" && (strings.TrimSpace(opts.directory) == "" || strings.TrimSpace(opts.transcriptRoot) == "" || strings.TrimSpace(opts.grantMapDirectory) == "") {
+		return options{}, devtools.ErrCommand
+	}
+	if opts.command == "codex-audit" && (strings.TrimSpace(opts.directory) == "" || strings.TrimSpace(opts.sessionsRoot) == "" || strings.TrimSpace(opts.grantMapDirectory) == "") {
 		return options{}, devtools.ErrCommand
 	}
 	return opts, nil
@@ -123,6 +130,18 @@ func run(args []string, stdout, stderr io.Writer) error {
 		encoder.SetIndent("", "  ")
 		if err := encoder.Encode(report); err != nil {
 			return devtools.ErrDevinAudit
+		}
+		return nil
+	}
+	if opts.command == "codex-audit" {
+		report, err := devtools.AuditCodex(opts.directory, opts.sessionsRoot, opts.grantMapDirectory)
+		if err != nil {
+			return err
+		}
+		encoder := json.NewEncoder(stdout)
+		encoder.SetIndent("", "  ")
+		if err := encoder.Encode(report); err != nil {
+			return devtools.ErrCodexAudit
 		}
 		return nil
 	}
