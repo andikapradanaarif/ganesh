@@ -9,7 +9,7 @@ The two private owner grants from the [day-one inventory](s0-day-one-inventory.m
 | Source | Current #50 disposition |
 | --- | --- |
 | Nexus | Architectural reference; excluded from corpus enrollment under [AGENTS.md](../AGENTS.md). Its day-one screening grant does not change that boundary. |
-| Aurum, Borneo, Valo-backend, Kiosk agent history | Candidate classes under the recorded transcript grants. Source-specific processing and the remaining S0 effort allowance must be checked before corpus work. The day-one screen observed no Aurum transcripts in the proposed clients. |
+| Aurum, Borneo, Valo-backend, Kiosk agent history | Candidate classes under the recorded transcript grants. The owner directed continuation with prior S0 effort unknown; local source availability was checked, but no scrubbed corpus is ready. |
 | Repository files and notes | Local-read grants do not by themselves enroll their content as a processed or disclosed corpus. |
 | Generated typed cards, scrubbed summaries and eligible-origin subset | No artifacts prepared. They remain distinct inputs under the execution sheet; unknown or mixed origin cannot be promoted to first-party. |
 
@@ -17,13 +17,26 @@ Any candidate processing is limited to a private local workspace until its sourc
 
 ## Effort gate
 
-The execution sheet allocates **30–56 focused hours to S0**, including **8–12 hours for sources and calibration**. Completed capture studies record their own ceilings, and the day-one screen records completion within one hour. Those records do not establish cumulative focused hours or the remaining allowance. The existing evidence reports this total as unknown. Issue #50 requires the remaining allowance to be established before further source preparation; no hours or budget are inferred from commit timestamps or experiment ceilings.
+The execution sheet allocates **30–56 focused hours to S0**, including **8–12 hours for sources and calibration**. Completed capture studies record their own ceilings, and the day-one screen records completion within one hour. Those records do not establish cumulative focused hours or the remaining allowance. The existing evidence reports this total as unknown. On 2026-11-08 the owner directed continuation with prior effort unknown. Issue #50 now permits bounded local preparation with prospective effort tracking; overall S0 cap compliance remains **incomplete**, and no hours or budget are inferred from commit timestamps or experiment ceilings.
 
-The private #50 preflight is stored with 0700/0600 modes under git-ignored `.local/`. It records the grant references, source-class decisions and the unknown effort total. No corpus source content was read for #50, no summary/card/calibration artifact was generated, and no model call was made.
+The private #50 preflight and source records are stored with 0700/0600 modes under git-ignored `.local/`. The initial preflight read no corpus source content. The later availability pass hashed selected transcript files and exported selected client digest rows into private raw snapshots. No scrubbed summary/card/calibration artifact was generated, and no model call was made.
+
+## Local source availability pass
+
+The private Devin session index returned **86** sessions mapped to the exact Aurum, Borneo, Valo-backend and Kiosk roots or their subdirectories. Three sessions under Valo's parent directory were excluded because that parent is not the selected Valo-backend project. All selected session IDs were distinct. The private Go producer found **28** matching regular transcript files and recorded their size and SHA-256; **58** Valo-backend index entries had no matching transcript file. Every manifest row remains `unknown_unreconciled` for origin. Missing files are coverage loss, not empty or clean sessions.
+
+| Project | Devin index rows | Present transcript files | Missing files |
+| --- | ---: | ---: | ---: |
+| Aurum | 0 | 0 | 0 |
+| Borneo | 2 | 2 | 0 |
+| Valo-backend | 71 | 13 | 58 |
+| Kiosk | 13 | 13 | 0 |
+
+Read-only Crush metadata queries found **19** Valo-backend and **5** Kiosk sessions, with **16** and **5** existing session-digest rows. Those digest rows were exported only to private raw snapshots; their text is **not scrubbed**. Two Codex rollout files matched Kiosk's exact working directory and were hashed privately. The client stores are mutable; these are point-in-time availability observations, not an installed capture profile, a complete source corpus or a full-context fit check.
 
 ## Next evidence
 
-1. Record actual focused S0 hours spent or an approved remaining allowance. Stop affected source processing if the issue's effort gate cannot be met.
-2. Confirm each proposed source class and disclosure destination, preserving the Nexus exclusion unless the owner explicitly changes its enrollment status.
-3. Prepare private source manifests, scrubbed candidate material, source-keyed oracle references and separate calibration candidates under the confirmed scope. Record digests, exclusions, coverage loss, effort and full-context diagnostic fit.
-4. Freeze held-out corpus/tasks/rubrics, permissions, models, limits and order before answers. This preflight grants no P01/P02 pass, first-party eligibility, A2.3 funding, production narrative or later-stage build.
+1. Track effort prospectively and retain prior S0 effort as unknown. Any overall cap claim remains incomplete until the earlier work is reconciled.
+2. Establish and test a bounded secret-scrubbing path before using digest or transcript text as model input. Preserve private raw snapshots, source links and unknown/mixed origin; do not treat file presence as provenance.
+3. Prepare private scrubbed candidate summaries, source-keyed oracle references and separate calibration candidates under confirmed permissions. Record digests, exclusions, coverage loss and full-context diagnostic fit.
+4. Freeze held-out corpus/tasks/rubrics, permissions, models, limits and order before answers. This preparation grants no P01/P02 pass, first-party eligibility, A2.3 funding, production narrative or later-stage build.
