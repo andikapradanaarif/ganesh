@@ -19,6 +19,8 @@ The first implementation task provides [S0 run preparation](docs/s0-preparation.
 
 [S0 corpus and calibration preparation](docs/s0-corpus-calibration-preflight.md) records the source-permission boundaries and a private source-availability pass. Prior focused effort remains unknown; no scrubbed corpus or model run is claimed.
 
+The [Devin source-link audit](docs/s0-devin-source-audit.md) rechecks the saved availability manifest against the current local files without disclosing transcript text.
+
 [Initial origin accounting](docs/s0-origin-screen.md) freezes the handoff-need denominator and reports the A1 route from screener declarations. It does not inspect sources or verify provenance.
 
 [Evaluation planning](docs/s0-evaluation-plan.md) freezes the standard S0 task/diagnostic split and counterbalanced 108-answer schedule, with 24 conditional eligible-origin slots. Real inputs and execution/acceptance remain pending.

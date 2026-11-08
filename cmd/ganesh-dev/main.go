@@ -14,7 +14,7 @@ import (
 	"github.com/andikapradanaarif/ganesh/internal/devtools"
 )
 
-type options struct{ command, source, profile, directory, study, raw string }
+type options struct{ command, source, profile, directory, study, raw, transcriptRoot, grantMapDirectory string }
 
 func parse(args []string) (options, error) {
 	var opts options
@@ -34,6 +34,10 @@ func parse(args []string) (options, error) {
 	case "corpus-audit":
 		flags.StringVar(&opts.directory, "dir", "", "private corpus directory")
 		flags.StringVar(&opts.raw, "raw", "", "comma-separated private raw snapshot basenames")
+	case "devin-audit":
+		flags.StringVar(&opts.directory, "dir", "", "private Devin evidence directory")
+		flags.StringVar(&opts.transcriptRoot, "transcript-root", "", "explicit Devin transcript directory")
+		flags.StringVar(&opts.grantMapDirectory, "grant-map-dir", "", "private owner-grant project-root map directory")
 	default:
 		return options{}, devtools.ErrCommand
 	}
@@ -47,6 +51,9 @@ func parse(args []string) (options, error) {
 		return options{}, devtools.ErrCommand
 	}
 	if opts.command == "corpus-audit" && (strings.TrimSpace(opts.directory) == "" || strings.TrimSpace(opts.raw) == "") {
+		return options{}, devtools.ErrCommand
+	}
+	if opts.command == "devin-audit" && (strings.TrimSpace(opts.directory) == "" || strings.TrimSpace(opts.transcriptRoot) == "" || strings.TrimSpace(opts.grantMapDirectory) == "") {
 		return options{}, devtools.ErrCommand
 	}
 	return opts, nil
@@ -104,6 +111,18 @@ func run(args []string, stdout, stderr io.Writer) error {
 		encoder.SetIndent("", "  ")
 		if err := encoder.Encode(report); err != nil {
 			return devtools.ErrCorpus
+		}
+		return nil
+	}
+	if opts.command == "devin-audit" {
+		report, err := devtools.AuditDevin(opts.directory, opts.transcriptRoot, opts.grantMapDirectory)
+		if err != nil {
+			return err
+		}
+		encoder := json.NewEncoder(stdout)
+		encoder.SetIndent("", "  ")
+		if err := encoder.Encode(report); err != nil {
+			return devtools.ErrDevinAudit
 		}
 		return nil
 	}
