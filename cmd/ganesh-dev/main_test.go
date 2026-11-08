@@ -14,6 +14,11 @@ func TestParse(t *testing.T) {
 			t.Fatal("invalid command accepted or echoed")
 		}
 	}
+	for _, args := range [][]string{{"devin-candidates"}, {"devin-candidates", "--dir", "x", "--transcript-root", "/synthetic", "--grant-map-dir", "x"}, {"devin-candidates", "--output-dir", "x", "--manifest-sha256", strings.Repeat("a", 64)}} {
+		if _, err := parse(args); err == nil {
+			t.Fatal("incomplete candidate command accepted")
+		}
+	}
 	got, err := parse([]string{"crush-test", "--build-profile", "stripped", "--source", "/synthetic"})
 	if err != nil || !reflect.DeepEqual(got, options{command: "crush-test", source: "/synthetic", profile: "stripped"}) {
 		t.Fatal("valid command rejected")
@@ -33,6 +38,10 @@ func TestParse(t *testing.T) {
 	got, err = parse([]string{"codex-audit", "--manifest-dir", "/private/evidence", "--sessions-root", "/synthetic/sessions", "--grant-map-dir", "/private/grants"})
 	if err != nil || got.directory != "/private/evidence" || got.sessionsRoot != "/synthetic/sessions" || got.grantMapDirectory != "/private/grants" {
 		t.Fatal("valid Codex audit command rejected")
+	}
+	got, err = parse([]string{"devin-candidates", "--dir", "/private/evidence", "--transcript-root", "/synthetic/transcripts", "--grant-map-dir", "/private/grants", "--manifest-sha256", strings.Repeat("a", 64), "--output-dir", "/private/output"})
+	if err != nil || got.expectedManifest != strings.Repeat("a", 64) || got.outputDirectory != "/private/output" {
+		t.Fatal("valid candidate command rejected")
 	}
 }
 

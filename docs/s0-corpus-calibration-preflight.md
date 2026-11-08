@@ -46,6 +46,8 @@ No calibration task or source-keyed oracle has been finalized from these candida
 
 ## Next evidence
 
+The follow-up [#58 excerpt preparation](s0-devin-excerpt-candidates.md) produced 27 private, unverified Devin handoff excerpt candidates and accounted for all 86 source rows. This advances local preparation; semantic review, source-keyed calibration oracles and model disclosure remain pending.
+
 1. Track effort prospectively and retain prior S0 effort as unknown. Any overall cap claim remains incomplete until the earlier work is reconciled.
 2. Review the bounded reduction's residual leakage and source-link loss before using digest or transcript text as model input. Preserve private raw snapshots, source links and unknown/mixed origin; do not treat file presence as provenance.
 3. Prepare private scrubbed candidate summaries, source-keyed oracle references and separate calibration candidates under confirmed permissions. Record digests, exclusions, coverage loss and full-context diagnostic fit.

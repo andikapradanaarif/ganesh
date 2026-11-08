@@ -43,6 +43,16 @@ The evidence directory must contain private 0600 `devin-sessions.json` and `devi
 
 Each transcript read stops at its checked size plus one sentinel byte. A file that grows or shrinks during the read fails the audit; the sentinel cannot start another accepted source read or appear in a partial report.
 
+Prepare local-only Devin handoff excerpt candidates for [issue #58](https://github.com/andikapradanaarif/ganesh/issues/58):
+
+```sh
+go run ./cmd/ganesh-dev devin-candidates --dir .local/s0/issue-50-20261108 --transcript-root /path/to/Devin/transcripts --grant-map-dir .local/s0/issue-53-20261108 --manifest-sha256 "$S0_DEVIN_MANIFEST_SHA256" --output-dir .local/s0/issue-58-20261108
+```
+
+Set the manifest digest from the saved private source record. The command requires an unchanged source audit, rechecks the exact bytes selected for parsing, and extracts only the last nonempty recorded agent message without tool calls. It omits user/system messages, reasoning and tool fields. Existing source limits apply independently to the audit pass and extraction pass. Parsing accepts at most 20,000 steps per transcript; selected messages are limited to 16 KiB before pattern reduction and 64 KiB after it. Oversized or unsupported messages are excluded without fallback or truncation. See the [candidate report](s0-devin-excerpt-candidates.md) for the exact reduction policy and real counts.
+
+The output directory must already be 0700 and excluded from git. `devin-excerpts.json` is created exclusively as 0600, capped at 2 MiB, and synchronized before success. Existing output is never overwritten. A failed write can leave an incomplete private file; no aggregate success is returned for it. Stdout contains only counts, byte totals, redaction totals and the artifact digest; errors are static. Candidates retain source links, unknown origin/closure and local-only status. This command grants no source-content disclosure or model-run permission.
+
 Recheck the two selected Kiosk Codex rollouts for [issue #55](https://github.com/andikapradanaarif/ganesh/issues/55):
 
 ```sh
