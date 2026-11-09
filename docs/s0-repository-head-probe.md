@@ -34,4 +34,14 @@ Permissions, real API parsing/authentication, coequal conflicts, chronological s
 
 ## Execution status
 
-The expected records are frozen before implementation. Candidate execution and validation results will be recorded after running the separate comparison scorer; this initial freeze claims no passing result.
+The expectations were committed at `29d6fe4` before candidate implementation. Run the fixed embedded set with:
+
+```sh
+go run ./cmd/ganesh-dev repository-head-probe
+```
+
+The no-input command reports **43 matches / zero mismatches**, with four supported-head outcomes and 39 withheld. The scorer compares the whole outcome with manually recorded expectations; the verifier receives neither expected outcomes nor case names. An always-positive verifier returning the first commit ID matches only three cases and yields **40 mismatches**. Modified fixture bytes fail the pinned digest check.
+
+Output contains schema/status, counts, the fixture digest and fixed `synthetic: true`, `publication_authorized: false`, `stage_gate_passed: false` fields. No fixture IDs, commit values, source prose or paths appear in the aggregate. A valid mismatch report uses `status: fixture_mismatch` and exits 1; invalid embedded input and output-write errors use a static error. Matching expectations is bounded synthetic regression evidence, not authenticated source verification or held-out accuracy.
+
+Full Go tests, affected normal/race/vet checks, CLI argument/output tests, document targets and diff checks pass. The original issue-state command still reports 24/24 with its original digest, and its separate 12-case edge set remains unchanged. The approved source documents and private calibration artifacts are preserved. No source/model/service call or stage pass occurred.

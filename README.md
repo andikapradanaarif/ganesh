@@ -31,6 +31,8 @@ The [Codex source-link audit](docs/s0-codex-source-audit.md) similarly rechecks 
 
 [Issue-state verifier probe](docs/s0-issue-state-probe.md) tests exact enum support against frozen synthetic expectations without inferring resolution or deployment readiness.
 
+[Repository-head verifier probe](docs/s0-repository-head-probe.md) separates protected-branch resolution from commit existence, tags and deployment claims using fixed synthetic inputs.
+
 [Initial origin accounting](docs/s0-origin-screen.md) freezes the handoff-need denominator and reports the A1 route from screener declarations. It does not inspect sources or verify provenance.
 
 [Evaluation planning](docs/s0-evaluation-plan.md) freezes the standard S0 task/diagnostic split and counterbalanced 108-answer schedule, with 24 conditional eligible-origin slots. Real inputs and execution/acceptance remain pending.
