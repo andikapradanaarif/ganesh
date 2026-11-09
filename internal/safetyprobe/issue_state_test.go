@@ -1,11 +1,48 @@
 package safetyprobe
 
 import (
+	"crypto/sha256"
+	_ "embed"
+	"encoding/hex"
 	"encoding/json"
 	"reflect"
 	"strings"
 	"testing"
 )
+
+//go:embed testdata/issue_state_edges_v1.json
+var issueEdgeFixtures []byte
+
+func TestFrozenIssueStateEdges(t *testing.T) {
+	sum := sha256.Sum256(issueEdgeFixtures)
+	if hex.EncodeToString(sum[:]) != "d56676b2aeec62977bc64fee948ab07d77b7ac6c4b9341347ba3b20829b0b76b" {
+		t.Fatal("supplementary expectations changed")
+	}
+	var fixtures struct {
+		Schema string `json:"schema"`
+		Cases  []struct {
+			issueCase
+			Policy issuePolicy `json:"policy"`
+			Now    int64       `json:"now_unix"`
+		} `json:"cases"`
+	}
+	if json.Unmarshal(issueEdgeFixtures, &fixtures) != nil || fixtures.Schema != "synthetic-issue-state-edges-v1" || len(fixtures.Cases) != 12 {
+		t.Fatal("invalid supplementary fixtures")
+	}
+	seen := make(map[string]bool)
+	for _, row := range fixtures.Cases {
+		if row.Name == "" || seen[row.Name] {
+			t.Fatal("duplicate or unnamed edge fixture")
+		}
+		seen[row.Name] = true
+		t.Run(row.Name, func(t *testing.T) {
+			got := verifyIssueState(row.Claim, row.Evidence, row.Policy, row.Now)
+			if got != row.Expected || got.Kind != "withheld" {
+				t.Fatalf("got %+v; frozen edge expectation %+v", got, row.Expected)
+			}
+		})
+	}
+}
 
 func TestFrozenIssueStateCases(t *testing.T) {
 	var fixtures issueFixtureSet
