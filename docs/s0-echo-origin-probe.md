@@ -58,3 +58,5 @@ Full Go tests, affected normal/race/vet, CLI argument/output checks, document ta
 A separate [four-case depth fixture](../internal/safetyprobe/testdata/echo_depth_v1.json), schema `synthetic-echo-depth-v1`, freezes SHA-256 `f8cabe0c7e074f18ea0a6a855cf61635cc871ea3ae8751e0757deb8bddaa433e`. Each graph lists its joining target first and gives it both a short route through a shared ancestor and a longer route through that same ancestor. The 17-node path must return `depth_limit` without partial counts; the 16-node control must remain reported-only. Both parent orders are recorded, including short-path-first traversal that could otherwise populate a misleading visited-node cache.
 
 The supplemental expectations are frozen before their test execution with the existing tracer visible and unchanged. They are regression coverage, not held-out evidence. The original 50-case fixture, CLI and declared-origin/independence limitations remain unchanged.
+
+All four supplementary cases pass. Full Go tests, affected race/vet, links/diff checks and a byte-identical original CLI report pass after the addition; no tracer behavior changed.

@@ -1,11 +1,41 @@
 package safetyprobe
 
 import (
+	"crypto/sha256"
+	_ "embed"
+	"encoding/hex"
 	"encoding/json"
 	"reflect"
 	"strings"
 	"testing"
 )
+
+//go:embed testdata/echo_depth_v1.json
+var echoDepthFixtures []byte
+
+func TestFrozenSharedAncestorDepth(t *testing.T) {
+	sum := sha256.Sum256(echoDepthFixtures)
+	if hex.EncodeToString(sum[:]) != "f8cabe0c7e074f18ea0a6a855cf61635cc871ea3ae8751e0757deb8bddaa433e" {
+		t.Fatal("shared-ancestor depth expectations changed")
+	}
+	var fixtures echoFixtureSet
+	if json.Unmarshal(echoDepthFixtures, &fixtures) != nil || fixtures.Schema != "synthetic-echo-depth-v1" || len(fixtures.Cases) != 4 {
+		t.Fatal("invalid supplementary depth fixtures")
+	}
+	seen := make(map[string]bool)
+	for _, row := range fixtures.Cases {
+		if row.Name == "" || seen[row.Name] {
+			t.Fatal("duplicate or unnamed depth fixture")
+		}
+		seen[row.Name] = true
+		t.Run(row.Name, func(t *testing.T) {
+			got := traceEchoOrigins(row.Graph)
+			if got != row.Expected {
+				t.Fatalf("got %+v; frozen shared-ancestor expectation %+v", got, row.Expected)
+			}
+		})
+	}
+}
 
 func TestFrozenEchoOriginCases(t *testing.T) {
 	var fixtures echoFixtureSet
