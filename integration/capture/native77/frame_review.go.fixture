@@ -1,0 +1,46 @@
+package main
+
+// Post-review, offline validation only. The completed driver is unchanged.
+import (
+	"errors"
+	"fmt"
+)
+
+var errFrame77 = errors.New("invalid native77 frame")
+
+func checkFrame77(p protocol) error {
+	if p.Study != 77 || len(p.Cells) != 32 || p.HostLimit != 8 || p.CallbackLimit != 32 || p.CollectorLimit != 12 {
+		return errFrame77
+	}
+	arms := [...]string{"control", "candidate", "candidate", "control", "control", "candidate", "candidate", "control"}
+	strata := [...]string{"first", "warm", "idle"}
+	faults := [...]string{"disabled", "unsafe", "cancelled", "write_failure", "lost_ack", "replay", "conflict", "crash"}
+	for i, got := range p.Cells {
+		id := i + 1
+		want := cell{ID: id, Store: id, Call: fmt.Sprintf("call-%d", id), Event: "PostToolUse"}
+		if i < 24 {
+			want.Host, want.Arm, want.Stratum = i/3+1, arms[i/3], strata[i%3]
+			want.ExpectedAck, want.ExpectedFinal, want.ExpectedOutcome = true, 1, "success"
+		} else {
+			fault := faults[i-24]
+			want.Host, want.Arm, want.Stratum, want.Fault = 2, "candidate", "fault", fault
+			want.ExpectedOutcome = fault
+			switch fault {
+			case "lost_ack", "replay", "conflict":
+				want.Store, want.Call, want.ExpectedFinal = 29, "call-29", 1
+			case "crash":
+				want.Host, want.ExpectedPending = 7, 1
+			}
+			if fault == "replay" {
+				want.ExpectedAck, want.ExpectedDuplicate, want.ExpectedOutcome = true, true, "success"
+			}
+			if fault == "conflict" {
+				want.Event = "PostToolUseFailure"
+			}
+		}
+		if got != want {
+			return errFrame77
+		}
+	}
+	return nil
+}
