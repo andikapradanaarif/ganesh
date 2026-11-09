@@ -1,0 +1,27 @@
+# Native capture experiment
+
+[Issue #77](https://github.com/andikapradanaarif/ganesh/issues/77) implements the separately approved experiment from the [capture path proposal](s0-capture-path-proposal.md). This is synthetic local capture research, not an installed client profile or service.
+
+## Authorization and frozen protocol
+
+After PR #76 merged, the owner explicitly selected “Approve the bounded experiment” for both the candidate's timing anchor and limits. Recorded start: **2026-11-09 18:06:35 UTC**; deadline: **20:06:35 UTC**. The two-hour ceiling includes preparation, implementation, builds, validation and reporting. Prior cumulative S0 effort remains unknown. No model/provider calls, paid API spend, real transcripts, installed hooks, worker or uploader are included.
+
+The existing collector retains 750 ms from OS process start. The candidate gets 750 ms from producer capture dispatch before serialization, with an independent one-second callback watchdog. These are different contracts. Host launch-to-ready and launch-to-first-receipt are reported separately; client startup is not hidden in a warm callback.
+
+Before implementation, the private `protocol.json` froze 32 callback cells, eight hosts, at most twelve control collector invocations, a five-second host readiness watchdog and 31-second idle gaps. SHA-256: `b39eafca3f437fb33ddd9ae9f76e03a119de8a3f4c0a0063bfe4daa5f551ba00`. Cells 1–24 are three sequential callbacks per host (first/warm/idle); host arm order is control, candidate, candidate, control, control, candidate, candidate, control. The four matched pairs alternate arm order. Each ordinary callback has a distinct synthetic tool-call identity and private store.
+
+Cells 25–32 are candidate-only: disabled adapter, unsafe spool, cancelled dispatch, injected failure before file sync, acknowledgment lost after publication and directory syncs, exact replay, conflicting metadata, then a process crash immediately before publication. Lost acknowledgment/replay/conflict share one identity and store. The crash uses the seventh host after its ordinary callbacks. Faults otherwise use the second host. No replacement hosts or callbacks; a dead/unready host leaves its reserved cells failed/unavailable. Each deliberate replay consumes one cell.
+
+The expected ordinary/replay result is one private final metadata record and acknowledgment; replay must be duplicate. Disabled/unsafe/cancelled/write failure must not acknowledge or publish. Lost acknowledgment and conflict retain one final record without acknowledgment. Crash must leave no final record and one metadata-only temporary file. No fault may alter client decision/context. Expectations were declared by the same assistant before candidate implementation; they are not independent human adjudication or held-out natural events.
+
+Runtime baseline: Ganesh `4aae27e3f9b1d032ff09b396883cf4606aeddbca`; client source: Crush `3378f47a8398c79a10e35cc61c994160cc0ae3ea`. A private pre-run binding must hash all copied files, import rewrites, source overlays, producers, protocol and compiled artifacts before the first host launch. Baseline uses the stripped standalone collector. Candidate uses the same reducer/spool source, with a test-only fault-injection bridge, directly from the client's hook runner. No CLI process watchdog or `os.Exit` enters the candidate adapter.
+
+The parent starts timing before sending a cell command, waits at most one second for a callback response, then inspects the expected spool directly without another collector invocation. Both arms use this external observation upper bound. Only a successful callback plus a valid private expected record establishes external acknowledgment. Visible records after failed returns remain ambiguous; candidate internal receipt-ready timing is separate. Host readiness has a distinct five-second watchdog. A one-second callback timeout kills the experimental host and records that loss; it does not prove cooperative cancellation or safe continuation of a real client.
+
+All callback and diagnostic output is checked transiently for the synthetic secret/path canaries; raw bodies are discarded. Private numeric/enum records stay in ignored 0700 directories and 0600 files. Check capture-created files and pending files too. Fixture source/binaries intentionally containing canaries are not capture output. Client runner logs are inspected through a transient sink. Preserve file/dir modes, strict native reduction, identities, idempotency and unknown/incomplete labels. Ordinary source events use the pinned producer serializer; no model or real tool executes.
+
+Report every cell, including readiness failures, kills and missing observations. Report per-arm/stratum counts and nearest-rank p95/p99, with four ordinary cells per arm/stratum. No population SLO or cold-cache claim follows. Positive prototype recommendation requires every candidate ordinary callback acknowledged within 600 ms externally, return within one second, no missing timing data, all eight fault outcomes and no privacy/control/receipt regression. All ceilings remain hard stops; incomplete work is reported rather than extending the run.
+
+## Execution status
+
+Protocol frozen; implementation and results pending. No capture or stage gate has passed. The approved [execution sheet](s0-execution-sheet.md) and [roadmap](personal-second-memory-roadmap.md) remain unchanged; #34 is unresolved.
