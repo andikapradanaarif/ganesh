@@ -18,7 +18,7 @@ func TestFrameReviewRejectsMisroutedOrReorderedSlots(t *testing.T) {
 	}{
 		{"warm wrong host", func(p *protocol) { p.Cells[1].Host = 2 }},
 		{"idle wrong host", func(p *protocol) { p.Cells[2].Host = 2 }},
-		{"warm idle swapped", func(p *protocol) { p.Cells[1], p.Cells[2] = p.Cells[2], p.Cells[1] }},
+		{"warm idle swapped", func(p *protocol) { p.Cells[1].Stratum, p.Cells[2].Stratum = p.Cells[2].Stratum, p.Cells[1].Stratum }},
 		{"wrong arm", func(p *protocol) { p.Cells[4].Arm = "control" }},
 		{"duplicate cell", func(p *protocol) { p.Cells[5] = p.Cells[4] }},
 		{"replay wrong store", func(p *protocol) { p.Cells[29].Store = 30 }},
