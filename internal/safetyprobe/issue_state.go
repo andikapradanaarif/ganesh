@@ -48,7 +48,7 @@ type issueObservation struct {
 	Revision   string `json:"revision"`
 	Updated    int64  `json:"updated_unix"`
 	Checked    int64  `json:"checked_unix"`
-	Prose      string `json:"prose"`
+	Prose      string `json:"prose"` // Deliberately carried but never read by the verifier or copied into its result.
 }
 
 type issueOutcome struct {

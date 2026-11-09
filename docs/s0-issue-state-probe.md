@@ -6,7 +6,7 @@
 
 Before implementing or running the candidate verifier, freeze [24 synthetic cases](../internal/safetyprobe/issue_state_v1.json), schema `synthetic-issue-state-v1`, SHA-256 `dfef7a7c5c0df95f57ec09a8e14b51fe2e1342d8c0cc57ea7eb426ecb4244298`. Every case contains a complete candidate, optional complete observation and manually specified expected outcome. A local Go producer materialized these inputs; it does not run the candidate or derive expected answers from it. These expectations are separate from the implementation, authored by the same assistant and open to review; they are not independent human adjudication or held-out evidence.
 
-All objects, revisions, timestamps and prose are synthetic. The configured fake source is `fixture.issue-api`, repository `synthetic/project`, and the current-check bound is 900 seconds (the roadmap's 15-minute default). Fixture time is a simulated integer clock, not a measurement of a real API. A configured fake channel/source establishes no authenticated real-world provenance.
+All objects, revisions, timestamps and prose are synthetic. The configured fake source is `fixture.issue-api`, repository `synthetic/project`, and the current-check bound is 900 seconds. Roadmap [Build §6, initial freshness defaults](personal-second-memory-roadmap.md#build-6-verified-typed-publication-and-injection-boundary) explicitly requires volatile CI/issue/head observations to be rechecked within 15 minutes before publication. This probe borrows that recheck interval; it does not implement publication or the separate 24-hour display expiry. Fixture time is a simulated integer clock, not a measurement of a real API. A configured fake channel/source establishes no authenticated real-world provenance.
 
 ## Exact predicate
 
@@ -45,3 +45,9 @@ The command accepts no source directory, endpoint, credential or external input.
 Output contains only fixed status/schema values, counts, the fixture digest, `synthetic: true`, `publication_authorized: false` and `stage_gate_passed: false`. It omits object IDs, source prose and per-case content. A valid mismatch report uses `status: fixture_mismatch` and exits 1; invalid embedded input or output errors return a static error. A matched set uses `status: fixture_expectations_matched`, which establishes only agreement on this synthetic subset.
 
 Affected normal/race/vet checks, the full Go suite, CLI argument/output checks and source/document checks pass. No live model/API call or stage outcome is inferred. These are previously inspected regression cases, not held-out results. The original private calibration packet, expected outcomes and source hashes are unchanged.
+
+## Review follow-up: supplementary edge expectations
+
+The original 24-case fixture and CLI remain unchanged. A separate [12-case edge set](../internal/safetyprobe/testdata/issue_state_edges_v1.json), schema `synthetic-issue-state-edges-v1`, pins the additional rejection reasons identified during review: empty policy source/repository, zero/negative check-age limits, zero/negative source-change and simulated-now timestamps, negative candidate/observation issue IDs, and one-sided empty revisions. Its SHA-256 is `d56676b2aeec62977bc64fee948ab07d77b7ac6c4b9341347ba3b20829b0b76b`.
+
+These manually specified expectations were frozen before their supplementary test execution, with the existing candidate visible and unchanged. They are regression coverage, not fresh held-out evidence or independent adjudication. The follow-up also documents the intentionally unused prose field and links the exact initial-freshness paragraph in Build §6.
