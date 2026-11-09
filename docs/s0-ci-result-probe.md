@@ -37,4 +37,14 @@ Real API parsing/authentication, atomic cross-source snapshots and publication-t
 
 ## Execution status
 
-Expectations are frozen before implementation. Candidate results and validation will be recorded after execution; this initial freeze claims no passing result.
+The expected set was committed at `dcf3fed` before candidate implementation. Run the fixed embedded set with:
+
+```sh
+go run ./cmd/ganesh-dev ci-result-probe
+```
+
+The no-input command reports **75 matches / zero mismatches**, comprising eight supported commit-qualified results, four supported current-head-qualified results and 63 withheld outcomes. An intentionally always-current-head-green candidate matches only three cases and yields **72 mismatches** under the separate scorer. That mutation also mismatches valid old-commit successes because their qualification is narrower. Appending even one newline to fixture bytes fails the pinned digest.
+
+Output contains fixed schema/status, aggregate counts, the fixture digest and `synthetic: true`, `publication_authorized: false`, `stage_gate_passed: false`. It omits fixture identities, commit/run/workflow values, source prose and paths. Valid mismatch output uses `status: fixture_mismatch` and exits 1; invalid embedded input or failed output writes return a static error. Matching this inspected set is synthetic regression evidence only.
+
+Full Go tests, affected normal/race/vet, CLI argument/output checks, documentation targets and diff checks pass. The previous issue-state/head fixtures and CLI outputs remain unchanged (24/24 and 43/43 respectively), as do the approved baseline documents and original private calibration artifacts. No model/service call or stage pass occurred.
