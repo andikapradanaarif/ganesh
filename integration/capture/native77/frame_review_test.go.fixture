@@ -1,0 +1,74 @@
+package main
+
+import (
+	"fmt"
+	"os"
+	"testing"
+)
+
+// Explicit examples isolate the warm/idle slots the original preflight omitted.
+func TestFrameReviewRejectsMisroutedOrReorderedSlots(t *testing.T) {
+	p := frameReviewExample77()
+	if checkFrame77(p) != nil {
+		t.Fatal("valid declared frame rejected")
+	}
+	for _, tc := range []struct {
+		name   string
+		mutate func(*protocol)
+	}{
+		{"warm wrong host", func(p *protocol) { p.Cells[1].Host = 2 }},
+		{"idle wrong host", func(p *protocol) { p.Cells[2].Host = 2 }},
+		{"warm idle swapped", func(p *protocol) { p.Cells[1].Stratum, p.Cells[2].Stratum = p.Cells[2].Stratum, p.Cells[1].Stratum }},
+		{"wrong arm", func(p *protocol) { p.Cells[4].Arm = "control" }},
+		{"duplicate cell", func(p *protocol) { p.Cells[5] = p.Cells[4] }},
+		{"replay wrong store", func(p *protocol) { p.Cells[29].Store = 30 }},
+		{"crash wrong host", func(p *protocol) { p.Cells[31].Host = 2 }},
+		{"missing cell", func(p *protocol) { p.Cells = p.Cells[:31] }},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			changed := p
+			changed.Cells = append([]cell(nil), p.Cells...)
+			tc.mutate(&changed)
+			if checkFrame77(changed) == nil {
+				t.Fatal("malformed frame accepted")
+			}
+		})
+	}
+}
+
+func frameReviewExample77() protocol {
+	p := protocol{Study: 77, HostLimit: 8, CallbackLimit: 32, CollectorLimit: 12}
+	for h, arm := range []string{"control", "candidate", "candidate", "control", "control", "candidate", "candidate", "control"} {
+		for _, stratum := range []string{"first", "warm", "idle"} {
+			id := len(p.Cells) + 1
+			p.Cells = append(p.Cells, cell{ID: id, Host: h + 1, Arm: arm, Stratum: stratum, Store: id, Call: fmt.Sprintf("call-%d", id), Event: "PostToolUse", ExpectedAck: true, ExpectedFinal: 1, ExpectedOutcome: "success"})
+		}
+	}
+	p.Cells = append(p.Cells,
+		cell{ID: 25, Host: 2, Arm: "candidate", Stratum: "fault", Fault: "disabled", Store: 25, Call: "call-25", Event: "PostToolUse", ExpectedOutcome: "disabled"},
+		cell{ID: 26, Host: 2, Arm: "candidate", Stratum: "fault", Fault: "unsafe", Store: 26, Call: "call-26", Event: "PostToolUse", ExpectedOutcome: "unsafe"},
+		cell{ID: 27, Host: 2, Arm: "candidate", Stratum: "fault", Fault: "cancelled", Store: 27, Call: "call-27", Event: "PostToolUse", ExpectedOutcome: "cancelled"},
+		cell{ID: 28, Host: 2, Arm: "candidate", Stratum: "fault", Fault: "write_failure", Store: 28, Call: "call-28", Event: "PostToolUse", ExpectedOutcome: "write_failure"},
+		cell{ID: 29, Host: 2, Arm: "candidate", Stratum: "fault", Fault: "lost_ack", Store: 29, Call: "call-29", Event: "PostToolUse", ExpectedFinal: 1, ExpectedOutcome: "lost_ack"},
+		cell{ID: 30, Host: 2, Arm: "candidate", Stratum: "fault", Fault: "replay", Store: 29, Call: "call-29", Event: "PostToolUse", ExpectedAck: true, ExpectedFinal: 1, ExpectedDuplicate: true, ExpectedOutcome: "success"},
+		cell{ID: 31, Host: 2, Arm: "candidate", Stratum: "fault", Fault: "conflict", Store: 29, Call: "call-29", Event: "PostToolUseFailure", ExpectedFinal: 1, ExpectedOutcome: "conflict"},
+		cell{ID: 32, Host: 7, Arm: "candidate", Stratum: "fault", Fault: "crash", Store: 32, Call: "call-32", Event: "PostToolUse", ExpectedPending: 1, ExpectedOutcome: "crash"},
+	)
+	return p
+}
+
+// Optional private-frame check reads saved bytes only; no host is launched.
+func TestSavedFrameReview77(t *testing.T) {
+	name := os.Getenv("GANESH77_SAVED_PROTOCOL")
+	if name == "" {
+		t.Skip("saved private protocol not supplied")
+	}
+	body := load(name, 65536)
+	if hash(body) != planDigest {
+		t.Fatal("saved protocol digest mismatch")
+	}
+	var p protocol
+	if decode(body, &p) != nil || checkFrame77(p) != nil {
+		t.Fatal("saved frame inconsistent")
+	}
+}

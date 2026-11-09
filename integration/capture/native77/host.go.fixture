@@ -1,0 +1,262 @@
+package hooks
+
+// Disposable pinned-source host. No agent, provider or real tool runs.
+import (
+	"bufio"
+	"bytes"
+	"context"
+	"encoding/json"
+	"errors"
+	"io"
+	"log/slog"
+	"os"
+	"path/filepath"
+	"strconv"
+	"strings"
+	"sync"
+	"testing"
+	"time"
+
+	"github.com/charmbracelet/crush/internal/ganesh77/capture"
+	reducer "github.com/charmbracelet/crush/internal/ganesh77/crush"
+	"github.com/charmbracelet/crush/internal/shell"
+)
+
+const (
+	secret77 = "ghp_NATIVE77_SYNTHETIC"
+	path77   = "/native77/private"
+)
+
+type cell77 struct {
+	ID      int    `json:"id"`
+	Host    int    `json:"host"`
+	Arm     string `json:"arm"`
+	Stratum string `json:"stratum"`
+	Fault   string `json:"fault"`
+	Store   int    `json:"store"`
+	Call    string `json:"call"`
+	Event   string `json:"event"`
+}
+
+type reply77 struct {
+	Kind           string `json:"kind"`
+	ID             int    `json:"id"`
+	Outcome        string `json:"outcome"`
+	Ack            bool   `json:"ack"`
+	Duplicate      bool   `json:"duplicate"`
+	InternalNS     int64  `json:"internal_ns"`
+	ReturnNS       int64  `json:"return_ns"`
+	CollectorCalls int    `json:"collector_calls"`
+	ChildOutput    int64  `json:"child_output"`
+	Canary         bool   `json:"canary"`
+	ControlEffect  bool   `json:"control_effect"`
+}
+
+// Sink retains only enough transient overlap to detect split canaries.
+type sink77 struct {
+	mu   sync.Mutex
+	tail string
+	n    int64
+	leak bool
+}
+
+func (s *sink77) Write(p []byte) (int, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.n += int64(len(p))
+	v := s.tail + string(p)
+	s.leak = s.leak || strings.Contains(v, secret77) || strings.Contains(v, path77)
+	if len(v) > 64 {
+		v = v[len(v)-64:]
+	}
+	s.tail = v
+	return len(p), nil
+}
+
+type tee77 struct {
+	target io.Writer
+	sink   *sink77
+}
+
+func (w tee77) Write(p []byte) (int, error) { _, _ = w.sink.Write(p); return w.target.Write(p) }
+func (s *sink77) stats() (int64, bool)      { s.mu.Lock(); defer s.mu.Unlock(); return s.n, s.leak }
+
+func observe77(parent context.Context, ev Event, directory, fault, cwd string) (out reply77) {
+	start := time.Now()
+	out.Outcome = "panic"
+	defer func() {
+		if recover() != nil {
+			out.Ack = false
+			out.Outcome = "panic"
+		}
+		out.ReturnNS = time.Since(start).Nanoseconds()
+	}()
+	ctx, cancel := context.WithDeadline(parent, start.Add(750*time.Millisecond))
+	defer cancel()
+	if ctx.Err() != nil {
+		out.Outcome = "cancelled"
+		return
+	}
+	// The deadline starts before the actual pinned producer serializes.
+	body := BuildPayload(ev, cwd)
+	m, err := reducer.ReduceStream(ctx, bytes.NewReader(body))
+	if err != nil {
+		out.Outcome = "reduction"
+		return
+	}
+	r, err := capture.Spool77(directory, fault).Append(ctx, m)
+	switch {
+	case errors.Is(err, capture.Err77Write):
+		out.Outcome = "write_failure"
+	case errors.Is(err, capture.Err77Lost):
+		out.Outcome = "lost_ack"
+	case errors.Is(err, capture.ErrUnsafe):
+		out.Outcome = "unsafe"
+	case errors.Is(err, capture.ErrConflict):
+		out.Outcome = "conflict"
+	case err != nil:
+		out.Outcome = "storage"
+	case ctx.Err() != nil || time.Since(start) >= 750*time.Millisecond:
+		out.Outcome = "deadline"
+	default:
+		out.InternalNS = time.Since(start).Nanoseconds()
+		out.Outcome = "success"
+		out.Ack = true
+		out.Duplicate = r.Duplicate
+	}
+	return
+}
+
+func runCell77(c cell77, root, collector string) reply77 {
+	directory := filepath.Join(root, "stores", strconv.Itoa(c.Store))
+	if c.Fault == "unsafe" {
+		if os.Mkdir(directory, 0o755) != nil || os.Chmod(directory, 0o755) != nil {
+			return reply77{ID: c.ID, Outcome: "setup"}
+		}
+	}
+	ev := Event{
+		Name: c.Event, SessionID: "00000000-0000-4000-8000-000000000077",
+		Tool: &ToolCall{ID: c.Call, Name: "write", Input: `{"file_path":"/native77/private","content":"ghp_NATIVE77_SYNTHETIC"}`},
+	}
+	if c.Event == EventPostToolUse {
+		ev.ToolResponse = new(secret77)
+	} else {
+		ev.Error = secret77
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	if c.Fault == "cancelled" {
+		cancel()
+	}
+	logs := &sink77{}
+	slog.SetDefault(slog.New(slog.NewTextHandler(logs, &slog.HandlerOptions{Level: slog.LevelDebug})))
+	out := reply77{Kind: "cell", ID: c.ID, Outcome: "disabled"}
+	cwd := filepath.Join(root, "work")
+	runner := NewRunner(Static(map[string][]HookConfig{}), cwd, cwd)
+	child := &sink77{}
+	var controlMu sync.Mutex
+	controlAck := false
+	controlOutcome := "rejected"
+	controlCalls := 0
+	if c.Arm == "candidate" && c.Fault != "disabled" {
+		runner.capture77 = func(parent context.Context, event Event) {
+			out = observe77(parent, event, directory, c.Fault, cwd)
+			out.Kind = "cell"
+			out.ID = c.ID
+		}
+	} else if c.Arm == "control" {
+		quote := func(v string) string { return "'" + strings.ReplaceAll(v, "'", "'\\''") + "'" }
+		runner = NewRunner(Static(map[string][]HookConfig{c.Event: {{Command: quote(collector) + " hook crush --spool " + quote(directory), Timeout: 1}}}), cwd, cwd)
+		original := runShell
+		defer func() { runShell = original }()
+		runShell = func(ctx context.Context, opts shell.RunOptions) error {
+			controlMu.Lock()
+			controlCalls++
+			controlMu.Unlock()
+			opts.Stdout = tee77{opts.Stdout, child}
+			opts.Stderr = tee77{opts.Stderr, child}
+			err := original(ctx, opts)
+			controlMu.Lock()
+			defer controlMu.Unlock()
+			controlAck = err == nil
+			if controlAck {
+				controlOutcome = "success"
+			}
+			return err
+		}
+	}
+	start := time.Now()
+	agg := runner.Run(ctx, ev)
+	out.ReturnNS = time.Since(start).Nanoseconds()
+	if c.Arm == "control" {
+		controlMu.Lock()
+		out.Ack = controlAck
+		out.Outcome = controlOutcome
+		out.CollectorCalls = controlCalls
+		controlMu.Unlock()
+	}
+	out.ControlEffect = agg.Decision != DecisionNone || agg.Halt || agg.Context != "" || agg.Reason != "" || agg.UpdatedInput != "" || agg.UpdatedOutput != ""
+	if c.Arm == "control" && agg.HookCount != 1 {
+		out.ControlEffect = true
+	}
+	_, logLeak := logs.stats()
+	var childLeak bool
+	out.ChildOutput, childLeak = child.stats()
+	out.Canary = childLeak || logLeak
+	return out
+}
+
+// TestMain is host scaffolding only; the adapter never exits its process.
+func TestMain(m *testing.M) {
+	if os.Getenv("GANESH77_HOST") != "1" {
+		os.Exit(m.Run())
+	}
+	root := os.Getenv("GANESH77_ROOT")
+	host, err := strconv.Atoi(os.Getenv("GANESH77_ID"))
+	if err != nil {
+		os.Exit(81)
+	}
+	body, err := os.ReadFile(filepath.Join(root, "protocol.json"))
+	if err != nil {
+		os.Exit(82)
+	}
+	var protocol struct {
+		Cells []cell77 `json:"cells"`
+	}
+	if json.Unmarshal(body, &protocol) != nil {
+		os.Exit(83)
+	}
+	cells := map[int]cell77{}
+	for _, c := range protocol.Cells {
+		if c.Host == host {
+			cells[c.ID] = c
+		}
+	}
+	output := os.NewFile(3, "metrics")
+	if output == nil {
+		os.Exit(84)
+	}
+	enc := json.NewEncoder(output)
+	if enc.Encode(reply77{Kind: "ready"}) != nil {
+		os.Exit(85)
+	}
+	scanner := bufio.NewScanner(os.Stdin)
+	scanner.Buffer(make([]byte, 64), 256)
+	seen := map[int]bool{}
+	for scanner.Scan() {
+		id, err := strconv.Atoi(scanner.Text())
+		c, ok := cells[id]
+		if err != nil || !ok || seen[id] {
+			os.Exit(86)
+		}
+		seen[id] = true
+		out := runCell77(c, root, os.Getenv("GANESH77_COLLECTOR"))
+		if enc.Encode(out) != nil {
+			os.Exit(87)
+		}
+	}
+	if scanner.Err() != nil {
+		os.Exit(88)
+	}
+	os.Exit(0)
+}

@@ -1,0 +1,87 @@
+package main
+
+import (
+	"encoding/json"
+	"os"
+	"path/filepath"
+	"testing"
+	"time"
+)
+
+// These tests exercise scoring/inspection only, never a client or adapter.
+func TestFailedControlTailsStayVisibleAndCandidateFailureVetoes(t *testing.T) {
+	p := protocol{ApprovedAt: time.Now().Add(-time.Minute).UTC().Format(time.RFC3339), Deadline: time.Now().Add(time.Minute).UTC().Format(time.RFC3339), MaxReceiptMS: 600, ReturnMS: 1000}
+	var metrics []metric
+	var hosts []*host
+	for i, arm := range []string{"control", "candidate", "candidate", "control", "control", "candidate", "candidate", "control"} {
+		hosts = append(hosts, &host{id: i + 1, arm: arm, output: &sink{}, ready: true, processStarted: true, readyNS: 1})
+		for _, stratum := range []string{"first", "warm", "idle"} {
+			m := metric{ID: len(metrics) + 1, Arm: arm, Stratum: stratum, Attempted: true, Ack: arm == "candidate", Matched: arm == "candidate", StoreValid: true, Outcome: "rejected", ObservedNS: int64(time.Second), ParentReturnNS: int64(time.Millisecond)}
+			if arm == "candidate" {
+				m.Outcome, m.InternalNS, m.ObservedNS, m.Final = "success", int64(time.Millisecond), int64(2*time.Millisecond), 1
+			} else {
+				m.CollectorCalls = 1
+			}
+			metrics = append(metrics, m)
+		}
+	}
+	for i := 0; i < 8; i++ {
+		metrics = append(metrics, metric{ID: 25 + i, Arm: "candidate", Stratum: "fault", Attempted: true, Matched: true})
+	}
+	s := aggregate(p, metrics, hosts, "test", 12)
+	if !s.PrototypeRecommendation || s.Matched != 20 || s.FaultsMatched != 8 || s.StageGatePassed || s.CaptureProfileEnabled {
+		t.Fatal("candidate gate or assurance boundary changed")
+	}
+	if s.Groups[0].Failed != 4 || s.Groups[0].P95ObservedNS != int64(time.Second) || s.Groups[0].P95ReceiptNS != 0 {
+		t.Fatal("failed control tail was filtered into a receipt statistic")
+	}
+	metrics[3].Ack, metrics[3].Matched = false, false
+	if aggregate(p, metrics, hosts, "test", 12).PrototypeRecommendation {
+		t.Fatal("candidate failure did not veto")
+	}
+}
+
+func TestInspectRejectsWrongMeaningAndDetectsLeakedCanary(t *testing.T) {
+	root := t.TempDir()
+	dir := filepath.Join(root, "stores", "1")
+	if os.MkdirAll(dir, 0o700) != nil {
+		t.Fatal("mkdir")
+	}
+	c := cell{Store: 1, Call: "call-1"}
+	r := record{Metadata: expected(c), CapturedAt: time.Now(), State: "captured_local", Origin: "unknown", Coverage: "incomplete"}
+	name := filepath.Join(dir, r.Metadata.EventID+".json")
+	write := func() {
+		t.Helper()
+		body, err := json.Marshal(r)
+		if err != nil || os.WriteFile(name, body, 0o600) != nil {
+			t.Fatal("fixture write")
+		}
+	}
+	write()
+	if final, pending, valid, leak := inspect(root, c); final != 1 || pending != 0 || !valid || leak {
+		t.Fatal("valid fixture rejected")
+	}
+	r.Metadata.Outcome = "failed"
+	write()
+	if _, _, valid, _ := inspect(root, c); valid {
+		t.Fatal("same identity with wrong meaning accepted")
+	}
+	if os.WriteFile(filepath.Join(dir, ".pending-leak"), []byte(secret), 0o600) != nil {
+		t.Fatal("leak fixture")
+	}
+	if _, _, valid, leak := inspect(root, c); valid || !leak {
+		t.Fatal("pending leakage not rejected")
+	}
+}
+
+func TestCanarySpanningWritesAndSmallSampleTail(t *testing.T) {
+	s := &sink{}
+	_, _ = s.Write([]byte("ghp_NATIVE"))
+	_, _ = s.Write([]byte("77_SYNTHETIC"))
+	if _, leak := s.stats(); !leak {
+		t.Fatal("split canary missed")
+	}
+	if quantile([]int64{1, 2, 3, 1000}, 95) != 1000 || quantile([]int64{1, 2, 3, 1000}, 99) != 1000 {
+		t.Fatal("four-cell failed tail omitted")
+	}
+}

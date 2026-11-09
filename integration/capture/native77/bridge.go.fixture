@@ -1,0 +1,28 @@
+package capture
+
+// Overlay-only fault bridge; the copied runtime files remain unchanged.
+import (
+	"errors"
+	"os"
+	"syscall"
+)
+
+var (
+	Err77Write = errors.New("synthetic pre-sync failure")
+	Err77Lost  = errors.New("synthetic lost acknowledgment")
+)
+
+func Spool77(directory, fault string) Spool {
+	return Spool{Directory: directory, boundary: func(stage string) error {
+		switch {
+		case fault == "write_failure" && stage == "before_file_sync":
+			return Err77Write
+		case fault == "lost_ack" && stage == "before_receipt":
+			return Err77Lost
+		case fault == "crash" && stage == "before_publish":
+			_ = syscall.Kill(os.Getpid(), syscall.SIGKILL)
+			return ErrStorage
+		}
+		return nil
+	}}
+}
