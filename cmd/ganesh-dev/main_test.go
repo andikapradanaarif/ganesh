@@ -101,6 +101,30 @@ func TestRepositoryHeadProbeCommand(t *testing.T) {
 	}
 }
 
+func TestCIResultProbeCommand(t *testing.T) {
+	for _, args := range [][]string{
+		{"ci-result-probe", "extra"},
+		{"ci-result-probe", "--source", "ghp_SYNTHETIC_CANARY"},
+		{"ci-result-probe", "--endpoint", "ghp_SYNTHETIC_CANARY"},
+	} {
+		var stdout, stderr bytes.Buffer
+		if err := run(args, &stdout, &stderr); err != devtools.ErrCommand || stdout.Len() != 0 || stderr.Len() != 0 {
+			t.Fatal("external CI probe input accepted or echoed")
+		}
+	}
+	var stdout, stderr bytes.Buffer
+	if err := run([]string{"ci-result-probe"}, &stdout, &stderr); err != nil {
+		t.Fatal(err)
+	}
+	var report safetyprobe.CIResultReport
+	if json.Unmarshal(stdout.Bytes(), &report) != nil || report.Matched != 75 || report.Mismatched != 0 || report.StageGatePassed || report.PublicationAuthorized || stderr.Len() != 0 {
+		t.Fatal("invalid synthetic CI probe output")
+	}
+	if err := run([]string{"ci-result-probe"}, failingOutputWriter{}, &stderr); err != safetyprobe.ErrCIResultProbe {
+		t.Fatal("CI probe output error not normalized")
+	}
+}
+
 func TestCalibrationCommand(t *testing.T) {
 	for _, args := range [][]string{
 		{"calibration-summary"},

@@ -87,6 +87,14 @@ go run ./cmd/ganesh-dev repository-head-probe
 
 The fixed embedded set contains 43 digest-pinned synthetic cases frozen before candidate implementation. The separate scorer reports aggregate matches/mismatches, with publication/stage flags false; a valid mismatch report exits 1. No external input, connector or model call is accepted. See [the head probe record](s0-repository-head-probe.md) for branch-protection, source/scope, commit/revision and freshness checks, ignored prose, oracle separation and incomplete P03-D coverage. A valid commit lookup or tag is insufficient for a protected-branch head claim, and neither establishes deployment.
 
+Probe exact CI results with explicit current-head dependencies:
+
+```sh
+go run ./cmd/ganesh-dev ci-result-probe
+```
+
+The no-input command compares 75 digest-pinned synthetic cases with manually specified expectations frozen before implementation. It separates exact commit/run results from current-head qualification, using the existing protected-branch verifier only for the latter. The aggregate reports matches/mismatches with publication/stage flags false; a valid mismatch report exits 1. See [the CI probe record](s0-ci-result-probe.md) for workflow/run/attempt/revision binding, status/time constraints, old-run examples, ignored prose and incomplete integration/atomicity coverage. A workflow success does not mean all tests passed or deployment is safe.
+
 Build and run the active Go checks:
 
 ```sh

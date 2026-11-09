@@ -30,6 +30,8 @@ The expected set contains four supported-head outcomes and 39 withheld outcomes.
 
 This adds a narrow commit/head predicate slice. Together with the issue-state probe it does not complete the nine-case P03-D matrix. The seven other named cases remain incomplete: green CI for an old commit; unsupported decisions in PR comments; agent echo/corroboration; full source-text/tool-call handling; renamed/deleted sources; owner pin contradictions; and full unversioned A→B→A lifecycle handling. Local revision/prose negatives are not those complete lifecycle or consumer tests.
 
+The subsequent [CI-result probe](s0-ci-result-probe.md) adds the narrow old-run/current-head dependency slice by reusing this verifier; it leaves these head fixtures and the broader P03-D gate unchanged.
+
 Permissions, real API parsing/authentication, coequal conflicts, chronological storage, provenance, capture reconciliation, publication/display expiry, deletion/repair, secret scanning and unattended operation also remain outside this probe. No model/service calls, credentials, new corpus enrollment or paid API spending are authorized. Calibration #60, capture #34 and stage gates remain unresolved. The approved roadmap and execution sheet remain unchanged.
 
 ## Execution status
