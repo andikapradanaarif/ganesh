@@ -26,7 +26,7 @@ func parse(args []string) (options, error) {
 	flags := flag.NewFlagSet(opts.command, flag.ContinueOnError)
 	flags.SetOutput(io.Discard)
 	switch opts.command {
-	case "issue-state-probe", "repository-head-probe", "ci-result-probe", "decision-authority-probe":
+	case "issue-state-probe", "repository-head-probe", "ci-result-probe", "decision-authority-probe", "echo-origin-probe":
 		// Fixed embedded synthetic fixtures only; no external paths or endpoints.
 	case "crush-test":
 		flags.StringVar(&opts.source, "source", "", "pinned source checkout")
@@ -154,6 +154,18 @@ func run(args []string, stdout, stderr io.Writer) error {
 		encoder.SetIndent("", "  ")
 		if encoder.Encode(report) != nil || report.Mismatched != 0 {
 			return safetyprobe.ErrDecisionAuthorityProbe
+		}
+		return nil
+	}
+	if opts.command == "echo-origin-probe" {
+		report, err := safetyprobe.RunEchoOrigins()
+		if err != nil {
+			return err
+		}
+		encoder := json.NewEncoder(stdout)
+		encoder.SetIndent("", "  ")
+		if encoder.Encode(report) != nil || report.Mismatched != 0 {
+			return safetyprobe.ErrEchoOriginProbe
 		}
 		return nil
 	}

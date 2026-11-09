@@ -10,7 +10,7 @@ All projects, nodes, origin identities, classes, revisions, authentication/autho
 
 ## Exact trace contract
 
-The input is one closed single-project snapshot with source, tool, agent and copy nodes, parent IDs and selected target IDs. Validate the whole snapshot, including unselected nodes. Bounds are 1–32 nodes, 1–8 target entries, at most eight parent entries per node and at most 16 nodes on any source-to-target ancestry path. Duplicate parent/target entries are admitted within those bounds and cannot inflate counts. IDs use the existing bounded token grammar.
+The input is one closed single-project snapshot with source, tool, agent and copy nodes, parent IDs and selected target IDs. Validate the whole snapshot, including unselected nodes. Bounds are 1–32 nodes, 1–8 target entries, at most eight parent entries per node and at most 16 nodes on any ancestry path anywhere in the snapshot. Duplicate parent/target entries are admitted within those bounds and cannot inflate counts. IDs use the existing bounded token grammar.
 
 Sources have no parents and declare a source/object/revision identity plus `untrusted_narrative`, `unknown` or `structured_observation` class. Derived nodes require ancestry; their claimed class, source fields, authentication/author labels and prose cannot replace their parents' origins. Trace selected ancestry through a DAG, regardless of node/parent order.
 
@@ -41,4 +41,14 @@ Live provenance/capture reconciliation, root enrollment/alias discovery, source-
 
 ## Execution status
 
-Expectations are frozen before implementation. Candidate execution and validation results will be recorded after running the separate scorer; this initial freeze claims no passing result.
+The expected set was committed at `41fe4fd` before implementation. Run the fixed embedded snapshot set with:
+
+```sh
+go run ./cmd/ganesh-dev echo-origin-probe
+```
+
+The no-input command reports **50 matches / zero mismatches**, with 23 reported lineages and 27 incomplete snapshots. The scorer compares the complete outcome, including source/revision/class counts, level and independence flag. A candidate counting target votes as origins fails the saved oracle; the critical two-agent case expects one origin while that candidate invents two. A candidate promoting votes to verified independent support yields **50 mismatches**. Changed fixture bytes fail the pinned digest.
+
+Output contains fixed schema/status, counts, the fixture digest and `synthetic: true`, `independence_established: false`, `publication_authorized: false`, `stage_gate_passed: false`. It omits graph/node/origin identities, prose, author labels and paths. A valid mismatch report uses `status: fixture_mismatch` and exits 1; invalid embedded input or failed output writes use a static error. Matching expectations is bounded regression evidence only.
+
+Full Go tests, affected normal/race/vet, CLI argument/output checks, document targets and diff checks pass. Earlier issue/head/CI/decision code, frozen fixtures/digests and CLI results are preserved, as are approved baseline documents and original private calibration artifacts. No actual source/model/service call, corroboration grant, publication or stage pass occurred.

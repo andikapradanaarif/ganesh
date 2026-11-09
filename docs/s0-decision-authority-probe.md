@@ -36,6 +36,8 @@ Expected totals are five supported adoption records and 62 withheld outcomes. Th
 
 This adds one narrow decision-authority slice alongside the issue/head/CI probes; it does not complete P03-D. The five other named cases remain incomplete: agent echo/corroboration, full source-text/tool-call handling, renamed/deleted sources, owner pin contradictions and full unversioned A→B→A lifecycle handling. Local prose/revision negatives do not complete those chains or consumer tests.
 
+The subsequent [echo-origin probe](s0-echo-origin-probe.md) adds a separate declared-lineage slice for agent/tool echoes. It leaves these decision fixtures and the broader P03-D gate unchanged.
+
 Real owner/source enrollment, registry/owner-command integration, authenticated parsing, provenance, conflict/transition rules, policy revocation propagation, transactional publication, capture, expiry/deletion/repair and unattended operation remain outside this probe. Mock true authentication/writer controls are not attestation. Publication/stage flags remain false; #34 capture and #60 calibration remain unresolved. Approved baseline documents and earlier frozen fixtures remain unchanged.
 
 ## Execution status

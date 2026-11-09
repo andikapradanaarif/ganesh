@@ -103,6 +103,14 @@ go run ./cmd/ganesh-dev decision-authority-probe
 
 The no-input command compares 67 digest-pinned synthetic cases with manually specified expectations frozen before implementation. Positive controls use a fake designated structured registry; authenticated/owner-labeled PR prose cannot grant decision authority. The separate scorer includes adoption state in its comparison and reports only aggregate matches/mismatches with publication/stage flags false; a valid mismatch report exits 1. See [the authority probe record](s0-decision-authority-probe.md) for fake designation/authentication/writer controls, exact enum/state/revision checks, seven-day rechecks and missing real provenance/integration coverage. No actual registry is enrolled or source/model call made.
 
+Trace agent echoes without counting reports as independent evidence:
+
+```sh
+go run ./cmd/ganesh-dev echo-origin-probe
+```
+
+The no-input command compares 50 digest-pinned synthetic graphs with expected outcomes frozen before implementation. It traces source/object identities and revisions through tool/agent/copy nodes, validates the entire bounded DAG and preserves root-class counts. A closed lineage remains reported-only; invalid snapshots return incomplete lineage without partial counts. The aggregate retains independence/publication/stage flags false, and a valid mismatch report exits 1. See [the echo-origin record](s0-echo-origin-probe.md) for graph bounds, alias/revision semantics, oracle separation and missing real provenance/consumer coverage. No model/service call or real source enrollment occurs.
+
 Build and run the active Go checks:
 
 ```sh
