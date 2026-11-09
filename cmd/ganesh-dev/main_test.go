@@ -72,8 +72,32 @@ func TestIssueStateProbeCommand(t *testing.T) {
 	if json.Unmarshal(stdout.Bytes(), &report) != nil || report.Matched != 24 || report.Mismatched != 0 || report.StageGatePassed || report.PublicationAuthorized || stderr.Len() != 0 {
 		t.Fatal("invalid synthetic probe output")
 	}
-	if err := run([]string{"issue-state-probe"}, failingCalibrationWriter{}, &stderr); err != safetyprobe.ErrIssueStateProbe {
+	if err := run([]string{"issue-state-probe"}, failingOutputWriter{}, &stderr); err != safetyprobe.ErrIssueStateProbe {
 		t.Fatal("probe output error not normalized")
+	}
+}
+
+func TestRepositoryHeadProbeCommand(t *testing.T) {
+	for _, args := range [][]string{
+		{"repository-head-probe", "extra"},
+		{"repository-head-probe", "--source", "ghp_SYNTHETIC_CANARY"},
+		{"repository-head-probe", "--endpoint", "ghp_SYNTHETIC_CANARY"},
+	} {
+		var stdout, stderr bytes.Buffer
+		if err := run(args, &stdout, &stderr); err != devtools.ErrCommand || stdout.Len() != 0 || stderr.Len() != 0 {
+			t.Fatal("external head probe input accepted or echoed")
+		}
+	}
+	var stdout, stderr bytes.Buffer
+	if err := run([]string{"repository-head-probe"}, &stdout, &stderr); err != nil {
+		t.Fatal(err)
+	}
+	var report safetyprobe.RepositoryHeadReport
+	if json.Unmarshal(stdout.Bytes(), &report) != nil || report.Matched != 43 || report.Mismatched != 0 || report.StageGatePassed || report.PublicationAuthorized || stderr.Len() != 0 {
+		t.Fatal("invalid synthetic head probe output")
+	}
+	if err := run([]string{"repository-head-probe"}, failingOutputWriter{}, &stderr); err != safetyprobe.ErrRepositoryHeadProbe {
+		t.Fatal("head probe output error not normalized")
 	}
 }
 
@@ -121,7 +145,7 @@ func TestCalibrationCommand(t *testing.T) {
 	if json.Unmarshal(stdout.Bytes(), &report) != nil || report.Status != "incomplete" || report.Cases != 18 || report.CalibrationAccepted || stderr.Len() != 0 {
 		t.Fatal("invalid command output")
 	}
-	if err := run(args, failingCalibrationWriter{}, &stderr); err != devtools.ErrCalibration {
+	if err := run(args, failingOutputWriter{}, &stderr); err != devtools.ErrCalibration {
 		t.Fatal("output failure not normalized")
 	}
 	stdout.Reset()
@@ -131,9 +155,9 @@ func TestCalibrationCommand(t *testing.T) {
 	}
 }
 
-type failingCalibrationWriter struct{}
+type failingOutputWriter struct{}
 
-func (failingCalibrationWriter) Write([]byte) (int, error) {
+func (failingOutputWriter) Write([]byte) (int, error) {
 	return 0, fmt.Errorf("ghp_SYNTHETIC_CANARY")
 }
 

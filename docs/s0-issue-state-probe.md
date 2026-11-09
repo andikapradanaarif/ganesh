@@ -30,6 +30,8 @@ A positive result means only that the declared structured observation matches th
 
 This is preparation for the **issue-closure-without-resolution** predicate only. The remaining eight named P03-D verifier cases are incomplete: commit existence without deployment; green CI for an old commit; unsupported decisions in PR comments; agent echo/corroboration; full source-text/tool-call handling; renamed/deleted sources; owner pin contradictions; and full unversioned A→B→A lifecycle handling. The local revision/prose negatives do not complete those broader cases.
 
+The subsequent [repository-head probe](s0-repository-head-probe.md) adds a separate narrow commit/head slice; it preserves this issue-state fixture and does not complete the broader P03-D matrix.
+
 Chronological state storage, coequal conflicts, permissions, disclosure, typed publication, taint, provenance, secret scanning, capture reconciliation, lifecycle/deletion, control races, unattended operation and repair are also unimplemented here. Missing coverage stays incomplete. Source support is not product value; neither this probe nor a passing fixture permits a hosted build, narrative activation or a stage pass. Calibration [#60](https://github.com/andikapradanaarif/ganesh/issues/60) and capture [#34](https://github.com/andikapradanaarif/ganesh/issues/34) remain unresolved. No paid API spending is authorized.
 
 ## Execution status

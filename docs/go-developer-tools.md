@@ -79,6 +79,14 @@ go run ./cmd/ganesh-dev issue-state-probe
 
 This command takes no external inputs and performs no connector or model calls. It compares 24 digest-pinned synthetic cases with expectations committed before candidate implementation, reporting aggregate matches/mismatches and keeping publication/stage flags false. A mismatch report exits 1. See [the probe record](s0-issue-state-probe.md) for the exact predicate, simulated clock, oracle separation and substantial untested coverage. This is preparation for one P03-D case, not completion of S0b-1 or a production verifier.
 
+Probe exact protected-branch head support without deployment inference:
+
+```sh
+go run ./cmd/ganesh-dev repository-head-probe
+```
+
+The fixed embedded set contains 43 digest-pinned synthetic cases frozen before candidate implementation. The separate scorer reports aggregate matches/mismatches, with publication/stage flags false; a valid mismatch report exits 1. No external input, connector or model call is accepted. See [the head probe record](s0-repository-head-probe.md) for branch-protection, source/scope, commit/revision and freshness checks, ignored prose, oracle separation and incomplete P03-D coverage. A valid commit lookup or tag is insufficient for a protected-branch head claim, and neither establishes deployment.
+
 Build and run the active Go checks:
 
 ```sh
