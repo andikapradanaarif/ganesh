@@ -1,0 +1,705 @@
+// Completed-run producer for issue 77. The fixed window and exclusive ledger
+// deliberately prevent reuse of this source as permission for another study.
+package main
+
+import (
+	"bufio"
+	"bytes"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"sort"
+	"strconv"
+	"strings"
+	"sync"
+	"syscall"
+	"time"
+)
+
+const (
+	planDigest  = "b39eafca3f437fb33ddd9ae9f76e03a119de8a3f4c0a0063bfe4daa5f551ba00"
+	secret      = "ghp_NATIVE77_SYNTHETIC"
+	privatePath = "/native77/private"
+)
+
+type cell struct {
+	ID                int    `json:"id"`
+	Host              int    `json:"host"`
+	Arm               string `json:"arm"`
+	Stratum           string `json:"stratum"`
+	Fault             string `json:"fault"`
+	Store             int    `json:"store"`
+	Call              string `json:"call"`
+	Event             string `json:"event"`
+	ExpectedAck       bool   `json:"expected_ack"`
+	ExpectedFinal     int    `json:"expected_final"`
+	ExpectedPending   int    `json:"expected_pending"`
+	ExpectedDuplicate bool   `json:"expected_duplicate"`
+	ExpectedOutcome   string `json:"expected_outcome"`
+}
+
+type protocol struct {
+	Study          int    `json:"study"`
+	ApprovedAt     string `json:"approved_at"`
+	Deadline       string `json:"deadline"`
+	FrozenAt       string `json:"frozen_at"`
+	Runtime        string `json:"runtime"`
+	Crush          string `json:"crush"`
+	HostLimit      int    `json:"host_limit"`
+	CallbackLimit  int    `json:"callback_limit"`
+	CollectorLimit int    `json:"collector_limit"`
+	DispatchMS     int    `json:"dispatch_ms"`
+	ReturnMS       int    `json:"return_ms"`
+	ReadyMS        int    `json:"ready_ms"`
+	IdleMS         int    `json:"idle_ms"`
+	MaxReceiptMS   int    `json:"max_receipt_ms"`
+	PaidUSD        int    `json:"paid_usd"`
+	Cells          []cell `json:"cells"`
+}
+
+type reply struct {
+	Kind           string `json:"kind"`
+	ID             int    `json:"id"`
+	Outcome        string `json:"outcome"`
+	Ack            bool   `json:"ack"`
+	Duplicate      bool   `json:"duplicate"`
+	InternalNS     int64  `json:"internal_ns"`
+	ReturnNS       int64  `json:"return_ns"`
+	CollectorCalls int    `json:"collector_calls"`
+	ChildOutput    int64  `json:"child_output"`
+	Canary         bool   `json:"canary"`
+	ControlEffect  bool   `json:"control_effect"`
+}
+
+type metric struct {
+	ID              int    `json:"id"`
+	Host            int    `json:"host"`
+	Arm             string `json:"arm"`
+	Stratum         string `json:"stratum"`
+	Attempted       bool   `json:"attempted"`
+	Outcome         string `json:"outcome"`
+	Ack             bool   `json:"ack"`
+	Duplicate       bool   `json:"duplicate"`
+	ObservedNS      int64  `json:"observed_ns"`
+	ParentReturnNS  int64  `json:"parent_return_ns"`
+	InternalNS      int64  `json:"internal_ns"`
+	HostReturnNS    int64  `json:"host_return_ns"`
+	IdleNS          int64  `json:"idle_ns"`
+	LaunchToFirstNS int64  `json:"launch_to_first_ns"`
+	Final           int    `json:"final"`
+	Pending         int    `json:"pending"`
+	StoreValid      bool   `json:"store_valid"`
+	Canary          bool   `json:"canary"`
+	ControlEffect   bool   `json:"control_effect"`
+	ChildOutput     int64  `json:"child_output"`
+	CollectorCalls  int    `json:"collector_calls"`
+	Matched         bool   `json:"matched"`
+}
+
+type sink struct {
+	mu   sync.Mutex
+	n    int64
+	tail string
+	leak bool
+}
+
+func (s *sink) Write(p []byte) (int, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.n += int64(len(p))
+	v := s.tail + string(p)
+	s.leak = s.leak || strings.Contains(v, secret) || strings.Contains(v, privatePath)
+	if len(v) > 64 {
+		v = v[len(v)-64:]
+	}
+	s.tail = v
+	return len(p), nil
+}
+func (s *sink) stats() (int64, bool) { s.mu.Lock(); defer s.mu.Unlock(); return s.n, s.leak }
+
+type (
+	packet struct {
+		value reply
+		err   error
+	}
+	host struct {
+		id             int
+		arm            string
+		cmd            *exec.Cmd
+		input          io.WriteCloser
+		packets        chan packet
+		wait           chan error
+		output         *sink
+		started        time.Time
+		readyNS        int64
+		ready          bool
+		processStarted bool
+		dead           bool
+		exit           error
+		last           time.Time
+	}
+)
+
+func must(e error) {
+	if e != nil {
+		panic("native77 operation failed")
+	}
+}
+func hash(b []byte) string { s := sha256.Sum256(b); return hex.EncodeToString(s[:]) }
+func load(name string, max int64) []byte {
+	info, e := os.Lstat(name)
+	must(e)
+	if !info.Mode().IsRegular() || info.Mode().Perm() != 0o600 || info.Size() > max {
+		panic("unsafe input")
+	}
+	f, e := os.OpenFile(name, os.O_RDONLY|syscall.O_NOFOLLOW, 0)
+	must(e)
+	defer f.Close()
+	body, e := io.ReadAll(io.LimitReader(f, max+1))
+	must(e)
+	if int64(len(body)) > max {
+		panic("oversize input")
+	}
+	return body
+}
+
+func decode(body []byte, out any) error {
+	d := json.NewDecoder(bytes.NewReader(body))
+	d.DisallowUnknownFields()
+	if e := d.Decode(out); e != nil {
+		return e
+	}
+	if d.Decode(new(any)) != io.EOF {
+		return errors.New("trailing value")
+	}
+	return nil
+}
+
+func save(name string, v any) {
+	b, e := json.MarshalIndent(v, "", "  ")
+	must(e)
+	b = append(b, '\n')
+	f, e := os.OpenFile(name, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o600)
+	must(e)
+	_, e = f.Write(b)
+	must(e)
+	must(f.Sync())
+	must(f.Close())
+}
+
+func kill(h *host) {
+	if h.dead {
+		return
+	}
+	_ = syscall.Kill(-h.cmd.Process.Pid, syscall.SIGKILL)
+	select {
+	case h.exit = <-h.wait:
+	case <-time.After(time.Second):
+		h.exit = errors.New("wait unavailable")
+	}
+	h.dead = true
+}
+
+func finish(h *host) {
+	if h == nil || h.dead {
+		return
+	}
+	_ = h.input.Close()
+	select {
+	case h.exit = <-h.wait:
+		h.dead = true
+	case <-time.After(time.Second):
+		kill(h)
+	}
+}
+
+func start(root string, id int, arm string, readyMS int) *host {
+	h := &host{id: id, arm: arm, packets: make(chan packet, 2), wait: make(chan error, 1), output: &sink{}, started: time.Now()}
+	read, write, e := os.Pipe()
+	must(e)
+	cmd := exec.Command(filepath.Join(root, "artifacts", fmt.Sprintf("host-%d", id)))
+	cmd.Env = []string{"PATH=/usr/bin:/bin", "GOMAXPROCS=2", "GANESH77_HOST=1", "GANESH77_ROOT=" + root, "GANESH77_ID=" + strconv.Itoa(id), "GANESH77_COLLECTOR=" + filepath.Join(root, "artifacts", fmt.Sprintf("collector-%d", id))}
+	cmd.Dir = filepath.Join(root, "work")
+	cmd.ExtraFiles = []*os.File{write}
+	cmd.Stdout = h.output
+	cmd.Stderr = h.output
+	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+	cmd.WaitDelay = 100 * time.Millisecond
+	h.cmd = cmd
+	h.input, e = cmd.StdinPipe()
+	must(e)
+	if cmd.Start() != nil {
+		_ = read.Close()
+		_ = write.Close()
+		h.dead = true
+		h.readyNS = time.Since(h.started).Nanoseconds()
+		return h
+	}
+	h.processStarted = true
+	_ = write.Close()
+	go func() { h.wait <- cmd.Wait() }()
+	go func() {
+		defer read.Close()
+		s := bufio.NewScanner(read)
+		s.Buffer(make([]byte, 4096), 4096)
+		for s.Scan() {
+			var r reply
+			e := decode(s.Bytes(), &r)
+			h.packets <- packet{r, e}
+			if e != nil {
+				return
+			}
+		}
+		h.packets <- packet{err: io.EOF}
+	}()
+	timer := time.NewTimer(time.Until(h.started.Add(time.Duration(readyMS) * time.Millisecond)))
+	defer timer.Stop()
+	select {
+	case p := <-h.packets:
+		if p.err != nil || p.value.Kind != "ready" {
+			kill(h)
+		} else {
+			h.ready = true
+		}
+	case <-timer.C:
+		kill(h)
+	}
+	h.readyNS = time.Since(h.started).Nanoseconds()
+	return h
+}
+
+type (
+	metadata struct {
+		SchemaVersion int    `json:"schema_version"`
+		EventID       string `json:"event_id"`
+		SessionID     string `json:"session_id"`
+		Event         string `json:"event"`
+		Outcome       string `json:"outcome"`
+	}
+	record struct {
+		Metadata   metadata  `json:"metadata"`
+		CapturedAt time.Time `json:"captured_at"`
+		State      string    `json:"state"`
+		Origin     string    `json:"origin"`
+		Coverage   string    `json:"coverage"`
+	}
+)
+
+// Independent expected identity derivation; never calls the copied reducer.
+func expected(c cell) metadata {
+	session := "00000000-0000-4000-8000-000000000077"
+	s := sha256.Sum256([]byte("crush-tool-hooks-v1-aed2bae\x00" + session + "\x00" + c.Call + "\x00result"))
+	id := s[:16]
+	id[6] = id[6]&0x0f | 0x80
+	id[8] = id[8]&0x3f | 0x80
+	return metadata{1, fmt.Sprintf("%x-%x-%x-%x-%x", id[:4], id[4:6], id[6:8], id[8:10], id[10:]), session, "tool_result", "succeeded"}
+}
+
+func inspect(root string, c cell) (final, pending int, valid, leak bool) {
+	valid = true
+	directory := filepath.Join(root, "stores", strconv.Itoa(c.Store))
+	info, e := os.Lstat(directory)
+	if errors.Is(e, os.ErrNotExist) {
+		return
+	}
+	if e != nil || !info.IsDir() || info.Mode()&os.ModeSymlink != 0 {
+		return 0, 0, false, false
+	}
+	if c.Fault != "unsafe" && info.Mode().Perm() != 0o700 {
+		valid = false
+	}
+	entries, e := os.ReadDir(directory)
+	if e != nil {
+		return 0, 0, false, false
+	}
+	want := expected(c)
+	for _, entry := range entries {
+		name := filepath.Join(directory, entry.Name())
+		stat, e := os.Lstat(name)
+		if e != nil || !stat.Mode().IsRegular() || stat.Mode().Perm() != 0o600 || stat.Size() > 65536 {
+			valid = false
+			continue
+		}
+		body := load(name, 65536)
+		if bytes.Contains(body, []byte(secret)) || bytes.Contains(body, []byte(privatePath)) {
+			leak = true
+		}
+		if entry.Name() == ".lock" {
+			if len(body) != 0 {
+				valid = false
+			}
+			continue
+		}
+		var r record
+		if decode(body, &r) != nil || r.Metadata != want || r.CapturedAt.IsZero() || r.State != "captured_local" || r.Origin != "unknown" || r.Coverage != "incomplete" {
+			valid = false
+		}
+		switch {
+		case entry.Name() == want.EventID+".json":
+			final++
+		case strings.HasPrefix(entry.Name(), ".pending-"):
+			pending++
+		default:
+			valid = false
+		}
+	}
+	return
+}
+
+func invoke(root string, c cell, h *host, p protocol) metric {
+	m := metric{ID: c.ID, Host: c.Host, Arm: c.Arm, Stratum: c.Stratum, Outcome: "unavailable"}
+	if h == nil || h.dead {
+		return m
+	}
+	if c.Stratum == "idle" {
+		gap := time.Since(h.last)
+		if left := time.Duration(p.IdleMS)*time.Millisecond - gap; left > 0 {
+			time.Sleep(left)
+		}
+		m.IdleNS = time.Since(h.last).Nanoseconds()
+	}
+	m.Attempted = true
+	start := time.Now()
+	_, e := fmt.Fprintln(h.input, c.ID)
+	if e != nil {
+		m.Outcome = "transport"
+		kill(h)
+	} else {
+		timer := time.NewTimer(time.Until(start.Add(time.Duration(p.ReturnMS) * time.Millisecond)))
+		select {
+		case packet := <-h.packets:
+			m.ParentReturnNS = time.Since(start).Nanoseconds()
+			if packet.err != nil {
+				m.Outcome = "host_exit"
+				kill(h)
+				var exit *exec.ExitError
+				if c.Fault == "crash" && errors.As(h.exit, &exit) {
+					if st, ok := exit.Sys().(syscall.WaitStatus); ok && st.Signaled() && st.Signal() == syscall.SIGKILL {
+						m.Outcome = "crash"
+					}
+				}
+			} else {
+				r := packet.value
+				m.Outcome = r.Outcome
+				m.Ack = r.Ack
+				m.Duplicate = r.Duplicate
+				m.InternalNS = r.InternalNS
+				m.HostReturnNS = r.ReturnNS
+				m.Canary = r.Canary
+				m.ControlEffect = r.ControlEffect
+				m.ChildOutput = r.ChildOutput
+				m.CollectorCalls = r.CollectorCalls
+				if r.Kind != "cell" || r.ID != c.ID {
+					m.Outcome = "protocol"
+					kill(h)
+				}
+			}
+		case <-timer.C:
+			m.Outcome = "watchdog"
+			m.ParentReturnNS = time.Since(start).Nanoseconds()
+			kill(h)
+		}
+		timer.Stop()
+	}
+	var storeLeak bool
+	m.Final, m.Pending, m.StoreValid, storeLeak = inspect(root, c)
+	_, outputLeak := h.output.stats()
+	m.Canary = m.Canary || storeLeak || outputLeak
+	m.Ack = m.Ack && m.StoreValid && m.Final == 1
+	m.ObservedNS = time.Since(start).Nanoseconds()
+	h.last = time.Now()
+	if c.Stratum == "first" && m.Ack {
+		m.LaunchToFirstNS = time.Since(h.started).Nanoseconds()
+	}
+	m.Matched = m.Outcome == c.ExpectedOutcome && m.Ack == c.ExpectedAck && m.Final == c.ExpectedFinal && m.Pending == c.ExpectedPending && m.Duplicate == c.ExpectedDuplicate && m.StoreValid && !m.Canary && !m.ControlEffect && m.ChildOutput == 0
+	if c.Arm == "candidate" && m.CollectorCalls != 0 {
+		m.Matched = false
+	}
+	if c.Arm == "control" && m.CollectorCalls != 1 {
+		m.Matched = false
+	}
+	if c.Fault != "crash" && m.ParentReturnNS > int64(time.Duration(p.ReturnMS)*time.Millisecond) {
+		m.Matched = false
+	}
+	return m
+}
+
+type group struct {
+	Arm           string `json:"arm"`
+	Stratum       string `json:"stratum"`
+	Planned       int    `json:"planned"`
+	Attempted     int    `json:"attempted"`
+	Acknowledged  int    `json:"acknowledged"`
+	Failed        int    `json:"failed"`
+	Missing       int    `json:"missing"`
+	P95ObservedNS int64  `json:"p95_observed_ns"`
+	P99ObservedNS int64  `json:"p99_observed_ns"`
+	P95ReceiptNS  int64  `json:"p95_receipt_ns"`
+	P99ReceiptNS  int64  `json:"p99_receipt_ns"`
+	InternalCount int    `json:"internal_count"`
+	P95InternalNS int64  `json:"p95_internal_ns"`
+}
+type (
+	hostMetric struct {
+		ID          int    `json:"id"`
+		Arm         string `json:"arm"`
+		Started     bool   `json:"started"`
+		Ready       bool   `json:"ready"`
+		ReadyNS     int64  `json:"ready_ns"`
+		OutputBytes int64  `json:"output_bytes"`
+		Canary      bool   `json:"canary"`
+	}
+	summary struct {
+		Study                   int          `json:"study"`
+		ProtocolSHA256          string       `json:"protocol_sha256"`
+		BindingSHA256           string       `json:"binding_sha256"`
+		FinishedAt              string       `json:"finished_at"`
+		ElapsedSeconds          float64      `json:"elapsed_seconds"`
+		Planned                 int          `json:"planned"`
+		Attempted               int          `json:"attempted"`
+		Matched                 int          `json:"matched"`
+		FaultsMatched           int          `json:"faults_matched"`
+		HostLaunches            int          `json:"host_launches"`
+		ControlRequests         int          `json:"control_requests"`
+		ObservedCollectorCalls  int          `json:"observed_collector_calls"`
+		UnknownCollectorCalls   bool         `json:"unknown_collector_calls"`
+		Canary                  bool         `json:"canary"`
+		ControlEffect           bool         `json:"control_effect"`
+		UnexpectedOutput        bool         `json:"unexpected_output"`
+		WithinEffort            bool         `json:"within_effort"`
+		PrototypeRecommendation bool         `json:"prototype_recommendation"`
+		CaptureProfileEnabled   bool         `json:"capture_profile_enabled"`
+		StageGatePassed         bool         `json:"stage_gate_passed"`
+		Groups                  []group      `json:"groups"`
+		Hosts                   []hostMetric `json:"hosts"`
+	}
+)
+
+func quantile(v []int64, percent int) int64 {
+	if len(v) == 0 {
+		return 0
+	}
+	sort.Slice(v, func(i, j int) bool { return v[i] < v[j] })
+	return v[(len(v)*percent+99)/100-1]
+}
+
+func aggregate(p protocol, metrics []metric, hosts []*host, binding string, requests int) summary {
+	approved, e := time.Parse(time.RFC3339, p.ApprovedAt)
+	must(e)
+	deadline, e := time.Parse(time.RFC3339, p.Deadline)
+	must(e)
+	s := summary{Study: 77, ProtocolSHA256: planDigest, BindingSHA256: binding, FinishedAt: time.Now().UTC().Format(time.RFC3339Nano), ElapsedSeconds: time.Since(approved).Seconds(), Planned: 32, ControlRequests: requests, WithinEffort: time.Now().Before(deadline)}
+	good := true
+	for _, m := range metrics {
+		if m.Attempted {
+			s.Attempted++
+		}
+		if m.Matched {
+			s.Matched++
+			if m.Stratum == "fault" {
+				s.FaultsMatched++
+			}
+		}
+		s.Canary = s.Canary || m.Canary
+		s.ControlEffect = s.ControlEffect || m.ControlEffect
+		s.UnexpectedOutput = s.UnexpectedOutput || m.ChildOutput > 0
+		s.ObservedCollectorCalls += m.CollectorCalls
+		if m.Arm == "control" && m.Attempted && m.CollectorCalls != 1 {
+			s.UnknownCollectorCalls = true
+		}
+		if m.Arm == "candidate" && !m.Matched {
+			good = false
+		}
+		if m.Arm == "control" && (!m.StoreValid || m.CollectorCalls > 1 || (m.Outcome == "success" && !m.Ack) || m.Final > 1) {
+			good = false
+		}
+		if m.Arm == "candidate" && m.Stratum != "fault" && (!m.Ack || m.ObservedNS <= 0 || m.ObservedNS > int64(p.MaxReceiptMS)*int64(time.Millisecond) || m.InternalNS <= 0 || m.ParentReturnNS > int64(p.ReturnMS)*int64(time.Millisecond)) {
+			good = false
+		}
+	}
+	for _, h := range hosts {
+		if h == nil {
+			continue
+		}
+		n, leak := h.output.stats()
+		s.HostLaunches++
+		s.Hosts = append(s.Hosts, hostMetric{h.id, h.arm, h.processStarted, h.ready, h.readyNS, n, leak})
+		s.Canary = s.Canary || leak
+		s.UnexpectedOutput = s.UnexpectedOutput || n > 0
+	}
+	for _, arm := range []string{"control", "candidate"} {
+		for _, stratum := range []string{"first", "warm", "idle"} {
+			g := group{Arm: arm, Stratum: stratum}
+			var observed, receipt, internal []int64
+			for _, m := range metrics {
+				if m.Arm != arm || m.Stratum != stratum {
+					continue
+				}
+				g.Planned++
+				if m.Attempted {
+					g.Attempted++
+				}
+				if m.Ack {
+					g.Acknowledged++
+					receipt = append(receipt, m.ObservedNS)
+				} else {
+					g.Failed++
+				}
+				if m.ObservedNS > 0 {
+					observed = append(observed, m.ObservedNS)
+				} else {
+					g.Missing++
+				}
+				if m.InternalNS > 0 {
+					internal = append(internal, m.InternalNS)
+				}
+			}
+			g.P95ObservedNS = quantile(observed, 95)
+			g.P99ObservedNS = quantile(observed, 99)
+			g.P95ReceiptNS = quantile(receipt, 95)
+			g.P99ReceiptNS = quantile(receipt, 99)
+			g.InternalCount = len(internal)
+			g.P95InternalNS = quantile(internal, 95)
+			s.Groups = append(s.Groups, g)
+		}
+	}
+	s.PrototypeRecommendation = good && s.FaultsMatched == 8 && !s.Canary && !s.ControlEffect && !s.UnexpectedOutput && s.WithinEffort && s.HostLaunches == 8 && s.Attempted == 32 && requests <= 12
+	return s
+}
+
+func checkBindings(root, pin string) {
+	body := load(filepath.Join(root, "run-bindings.json"), 1<<20)
+	if hash(body) != pin {
+		panic("binding pin mismatch")
+	}
+	var bindings []struct {
+		Path   string `json:"path"`
+		SHA256 string `json:"sha256"`
+	}
+	must(decode(body, &bindings))
+	if len(bindings) < 20 {
+		panic("incomplete binding")
+	}
+	seen := map[string]bool{}
+	for _, b := range bindings {
+		if filepath.IsAbs(b.Path) || filepath.Clean(b.Path) != b.Path || strings.HasPrefix(b.Path, "..") || seen[b.Path] {
+			panic("invalid binding")
+		}
+		seen[b.Path] = true
+		name := filepath.Join(root, b.Path)
+		info, e := os.Lstat(name)
+		must(e)
+		if !info.Mode().IsRegular() || info.Mode()&os.ModeSymlink != 0 || info.Size() > 100<<20 {
+			panic("unsafe artifact")
+		}
+		file, e := os.Open(name)
+		must(e)
+		h := sha256.New()
+		_, e = io.Copy(h, file)
+		must(e)
+		must(file.Close())
+		if hex.EncodeToString(h.Sum(nil)) != b.SHA256 {
+			panic("artifact drift")
+		}
+	}
+}
+
+func main() {
+	if len(os.Args) != 2 || len(os.Args[1]) != 64 {
+		panic("binding pin required")
+	}
+	repo, e := os.Getwd()
+	must(e)
+	root := filepath.Join(repo, ".local/s0/native-capture-77")
+	info, e := os.Lstat(root)
+	must(e)
+	if !info.IsDir() || info.Mode().Perm() != 0o700 {
+		panic("unsafe root")
+	}
+	body := load(filepath.Join(root, "protocol.json"), 65536)
+	if hash(body) != planDigest {
+		panic("protocol drift")
+	}
+	var p protocol
+	must(decode(body, &p))
+	deadline, e := time.Parse(time.RFC3339, p.Deadline)
+	must(e)
+	if !time.Now().Before(deadline) || p.Study != 77 || len(p.Cells) != 32 || p.HostLimit != 8 || p.CallbackLimit != 32 || p.CollectorLimit != 12 || p.PaidUSD != 0 {
+		panic("closed study")
+	}
+	checkBindings(root, os.Args[1])
+	must(os.Mkdir(filepath.Join(root, "metrics"), 0o700))
+	save(filepath.Join(root, "run.started"), struct {
+		Started string `json:"started"`
+		Binding string `json:"binding"`
+	}{time.Now().UTC().Format(time.RFC3339Nano), os.Args[1]})
+	var hosts []*host
+	defer func() {
+		for _, h := range hosts {
+			finish(h)
+		}
+	}()
+	metrics := make([]metric, 32)
+	requests := 0
+	for id := 1; id <= 8; id++ {
+		first := p.Cells[(id-1)*3]
+		if first.ID != (id-1)*3+1 || first.Host != id {
+			panic("cell frame invalid")
+		}
+		if !time.Now().Before(deadline) {
+			panic("effort cap reached")
+		}
+		save(filepath.Join(root, "metrics", fmt.Sprintf("launch-%d.started.json", id)), struct {
+			Host int    `json:"host"`
+			Arm  string `json:"arm"`
+		}{id, first.Arm})
+		h := start(root, id, first.Arm, p.ReadyMS)
+		hosts = append(hosts, h)
+		fmt.Printf("host %d started; ready=%t\n", id, !h.dead)
+		for offset := 0; offset < 3; offset++ {
+			c := p.Cells[(id-1)*3+offset]
+			if !time.Now().Before(deadline) {
+				panic("effort cap reached")
+			}
+			if c.Arm == "control" && !h.dead {
+				requests++
+				if requests > 12 {
+					panic("collector cap reached")
+				}
+			}
+			save(filepath.Join(root, "metrics", fmt.Sprintf("cell-%02d.started.json", c.ID)), struct {
+				ID int `json:"id"`
+			}{c.ID})
+			m := invoke(root, c, h, p)
+			metrics[c.ID-1] = m
+			save(filepath.Join(root, "metrics", fmt.Sprintf("cell-%02d.json", c.ID)), m)
+			fmt.Printf("cell %02d complete: %s ack=%t matched=%t\n", c.ID, m.Outcome, m.Ack, m.Matched)
+		}
+	}
+	for _, c := range p.Cells[24:] {
+		if !time.Now().Before(deadline) {
+			panic("effort cap reached")
+		}
+		save(filepath.Join(root, "metrics", fmt.Sprintf("cell-%02d.started.json", c.ID)), struct {
+			ID int `json:"id"`
+		}{c.ID})
+		m := invoke(root, c, hosts[c.Host-1], p)
+		metrics[c.ID-1] = m
+		save(filepath.Join(root, "metrics", fmt.Sprintf("cell-%02d.json", c.ID)), m)
+		fmt.Printf("cell %02d complete: %s ack=%t matched=%t\n", c.ID, m.Outcome, m.Ack, m.Matched)
+	}
+	for _, h := range hosts {
+		finish(h)
+	}
+	s := aggregate(p, metrics, hosts, os.Args[1], requests)
+	save(filepath.Join(root, "summary.json"), s)
+	out, e := json.Marshal(s)
+	must(e)
+	fmt.Println(string(out))
+}
