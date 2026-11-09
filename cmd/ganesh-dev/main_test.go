@@ -149,6 +149,30 @@ func TestDecisionAuthorityProbeCommand(t *testing.T) {
 	}
 }
 
+func TestEchoOriginProbeCommand(t *testing.T) {
+	for _, args := range [][]string{
+		{"echo-origin-probe", "extra"},
+		{"echo-origin-probe", "--source", "ghp_SYNTHETIC_CANARY"},
+		{"echo-origin-probe", "--endpoint", "ghp_SYNTHETIC_CANARY"},
+	} {
+		var stdout, stderr bytes.Buffer
+		if err := run(args, &stdout, &stderr); err != devtools.ErrCommand || stdout.Len() != 0 || stderr.Len() != 0 {
+			t.Fatal("external echo probe input accepted or echoed")
+		}
+	}
+	var stdout, stderr bytes.Buffer
+	if err := run([]string{"echo-origin-probe"}, &stdout, &stderr); err != nil {
+		t.Fatal(err)
+	}
+	var report safetyprobe.EchoOriginReport
+	if json.Unmarshal(stdout.Bytes(), &report) != nil || report.Matched != 50 || report.Mismatched != 0 || report.IndependenceEstablished || report.StageGatePassed || report.PublicationAuthorized || stderr.Len() != 0 {
+		t.Fatal("invalid synthetic echo probe output")
+	}
+	if err := run([]string{"echo-origin-probe"}, failingOutputWriter{}, &stderr); err != safetyprobe.ErrEchoOriginProbe {
+		t.Fatal("echo probe output error not normalized")
+	}
+}
+
 func TestCalibrationCommand(t *testing.T) {
 	for _, args := range [][]string{
 		{"calibration-summary"},
