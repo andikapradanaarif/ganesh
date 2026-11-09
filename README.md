@@ -53,6 +53,6 @@ The [local capture primitive](docs/s0-local-capture.md) accepts bounded normaliz
 
 The [standalone collector experiment](docs/s0-standalone-capture.md) extracts shared capture CLI code and provides `make build-collector`. Its dedicated Go binary excludes preparation/discovery, but it did not pass the frozen timing or headroom gates. It remains experimental; `make build` continues to produce the general CLI and no client configuration changes automatically.
 
-The [capture path proposal](docs/s0-capture-path-proposal.md) maps the remaining startup blocker and proposes a bounded native in-process experiment. Its different timing anchor and experiment ceilings await owner approval; no implementation or new timing run is authorized by the proposal.
+The [capture path proposal](docs/s0-capture-path-proposal.md) maps the remaining startup blocker. The separately approved [native capture experiment](docs/s0-native-capture-experiment.md) completed its bounded synthetic run: all 12 ordinary native callbacks acknowledged and eight fault cases matched. This supports an integration follow-up; full-client behavior and supported installation remain unproven, and capture profiles stay disabled.
 
 Current validation tooling uses Go; see [Go developer tools](docs/go-developer-tools.md). Completed Python experiments remain historical evidence at their original paths.
