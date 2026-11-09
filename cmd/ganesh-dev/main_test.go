@@ -125,6 +125,30 @@ func TestCIResultProbeCommand(t *testing.T) {
 	}
 }
 
+func TestDecisionAuthorityProbeCommand(t *testing.T) {
+	for _, args := range [][]string{
+		{"decision-authority-probe", "extra"},
+		{"decision-authority-probe", "--source", "ghp_SYNTHETIC_CANARY"},
+		{"decision-authority-probe", "--endpoint", "ghp_SYNTHETIC_CANARY"},
+	} {
+		var stdout, stderr bytes.Buffer
+		if err := run(args, &stdout, &stderr); err != devtools.ErrCommand || stdout.Len() != 0 || stderr.Len() != 0 {
+			t.Fatal("external decision probe input accepted or echoed")
+		}
+	}
+	var stdout, stderr bytes.Buffer
+	if err := run([]string{"decision-authority-probe"}, &stdout, &stderr); err != nil {
+		t.Fatal(err)
+	}
+	var report safetyprobe.DecisionAuthorityReport
+	if json.Unmarshal(stdout.Bytes(), &report) != nil || report.Matched != 67 || report.Mismatched != 0 || report.StageGatePassed || report.PublicationAuthorized || stderr.Len() != 0 {
+		t.Fatal("invalid synthetic decision probe output")
+	}
+	if err := run([]string{"decision-authority-probe"}, failingOutputWriter{}, &stderr); err != safetyprobe.ErrDecisionAuthorityProbe {
+		t.Fatal("decision probe output error not normalized")
+	}
+}
+
 func TestCalibrationCommand(t *testing.T) {
 	for _, args := range [][]string{
 		{"calibration-summary"},

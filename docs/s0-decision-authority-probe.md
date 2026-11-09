@@ -40,4 +40,14 @@ Real owner/source enrollment, registry/owner-command integration, authenticated 
 
 ## Execution status
 
-Expectations are frozen before implementation. Candidate results and validation will be recorded after execution; this initial freeze claims no passing result.
+The expectations were committed at `91e6043` before candidate implementation. Run the fixed embedded set with:
+
+```sh
+go run ./cmd/ganesh-dev decision-authority-probe
+```
+
+The no-input command reports **67 matches / zero mismatches**, with five supported adoption records and 62 withheld. The separate scorer compares kind, reason, adoption state and value against the frozen records. Intentionally always-adopt and always-deny candidates each yield **63 mismatches**; a candidate omitting the adoption state yields **67 mismatches**. Modified fixture bytes fail the pinned digest.
+
+Output contains fixed schema/status, aggregate counts, the fixture digest and `synthetic: true`, `publication_authorized: false`, `stage_gate_passed: false`. It omits fixture identities, enum values, source prose, author labels and paths. A valid mismatch report uses `status: fixture_mismatch` and exits 1; invalid embedded input or failed output writes use a static error. Matching expectations establishes only this inspected synthetic regression result.
+
+Full Go tests, affected normal/race/vet, CLI argument/output checks, documentation targets and diff checks pass. Earlier issue/head/CI fixtures, code and CLI results remain unchanged (24/24, 43/43 and 75/75). Approved baseline documents and original private calibration artifacts are preserved. No actual registry enrollment, model/service call, publication or stage pass occurred.
