@@ -52,3 +52,9 @@ The no-input command reports **50 matches / zero mismatches**, with 23 reported 
 Output contains fixed schema/status, counts, the fixture digest and `synthetic: true`, `independence_established: false`, `publication_authorized: false`, `stage_gate_passed: false`. It omits graph/node/origin identities, prose, author labels and paths. A valid mismatch report uses `status: fixture_mismatch` and exits 1; invalid embedded input or failed output writes use a static error. Matching expectations is bounded regression evidence only.
 
 Full Go tests, affected normal/race/vet, CLI argument/output checks, document targets and diff checks pass. Earlier issue/head/CI/decision code, frozen fixtures/digests and CLI results are preserved, as are approved baseline documents and original private calibration artifacts. No actual source/model/service call, corroboration grant, publication or stage pass occurred.
+
+## Review follow-up: shared-ancestor depth
+
+A separate [four-case depth fixture](../internal/safetyprobe/testdata/echo_depth_v1.json), schema `synthetic-echo-depth-v1`, freezes SHA-256 `f8cabe0c7e074f18ea0a6a855cf61635cc871ea3ae8751e0757deb8bddaa433e`. Each graph lists its joining target first and gives it both a short route through a shared ancestor and a longer route through that same ancestor. The 17-node path must return `depth_limit` without partial counts; the 16-node control must remain reported-only. Both parent orders are recorded, including short-path-first traversal that could otherwise populate a misleading visited-node cache.
+
+The supplemental expectations are frozen before their test execution with the existing tracer visible and unchanged. They are regression coverage, not held-out evidence. The original 50-case fixture, CLI and declared-origin/independence limitations remain unchanged.
