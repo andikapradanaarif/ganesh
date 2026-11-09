@@ -71,6 +71,14 @@ go run ./cmd/ganesh-dev calibration-summary --dir .local/s0/issue-60-20261108/gr
 
 The digest pins the preserved `owner-labels.blank.json` frame. Optional `owner-labels.json` and `grader-labels.json` use the same packet format; missing files and null judgments remain incomplete. The reader requires exact joins for six tasks / 18 cases, private 0700/0600 storage and at most 128 KiB per file. It reports aggregate comparison counts and input hashes, never notes, identities or answer text. It does not run a model or accept calibration. See [the comparison workflow](s0-calibration-comparison.md) for status/metadata fields, denominators, validation and provenance limits.
 
+Run the disposable issue-state verifier against its fixed synthetic expectations:
+
+```sh
+go run ./cmd/ganesh-dev issue-state-probe
+```
+
+This command takes no external inputs and performs no connector or model calls. It compares 24 digest-pinned synthetic cases with expectations committed before candidate implementation, reporting aggregate matches/mismatches and keeping publication/stage flags false. A mismatch report exits 1. See [the probe record](s0-issue-state-probe.md) for the exact predicate, simulated clock, oracle separation and substantial untested coverage. This is preparation for one P03-D case, not completion of S0b-1 or a production verifier.
+
 Build and run the active Go checks:
 
 ```sh

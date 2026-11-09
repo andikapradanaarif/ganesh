@@ -13,6 +13,7 @@ import (
 	"testing"
 
 	"github.com/andikapradanaarif/ganesh/internal/devtools"
+	"github.com/andikapradanaarif/ganesh/internal/safetyprobe"
 )
 
 func TestParse(t *testing.T) {
@@ -49,6 +50,30 @@ func TestParse(t *testing.T) {
 	got, err = parse([]string{"devin-candidates", "--dir", "/private/evidence", "--transcript-root", "/synthetic/transcripts", "--grant-map-dir", "/private/grants", "--manifest-sha256", strings.Repeat("a", 64), "--output-dir", "/private/output"})
 	if err != nil || got.expectedManifest != strings.Repeat("a", 64) || got.outputDirectory != "/private/output" {
 		t.Fatal("valid candidate command rejected")
+	}
+}
+
+func TestIssueStateProbeCommand(t *testing.T) {
+	for _, args := range [][]string{
+		{"issue-state-probe", "extra"},
+		{"issue-state-probe", "--dir", "ghp_SYNTHETIC_CANARY"},
+		{"issue-state-probe", "--endpoint", "ghp_SYNTHETIC_CANARY"},
+	} {
+		var stdout, stderr bytes.Buffer
+		if err := run(args, &stdout, &stderr); err != devtools.ErrCommand || stdout.Len() != 0 || stderr.Len() != 0 {
+			t.Fatal("external probe input accepted or echoed")
+		}
+	}
+	var stdout, stderr bytes.Buffer
+	if err := run([]string{"issue-state-probe"}, &stdout, &stderr); err != nil {
+		t.Fatal(err)
+	}
+	var report safetyprobe.IssueStateReport
+	if json.Unmarshal(stdout.Bytes(), &report) != nil || report.Matched != 24 || report.Mismatched != 0 || report.StageGatePassed || report.PublicationAuthorized || stderr.Len() != 0 {
+		t.Fatal("invalid synthetic probe output")
+	}
+	if err := run([]string{"issue-state-probe"}, failingCalibrationWriter{}, &stderr); err != safetyprobe.ErrIssueStateProbe {
+		t.Fatal("probe output error not normalized")
 	}
 }
 

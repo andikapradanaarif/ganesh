@@ -34,4 +34,14 @@ Chronological state storage, coequal conflicts, permissions, disclosure, typed p
 
 ## Execution status
 
-Expectations are frozen before candidate implementation. Candidate results and validation will be recorded after execution; no passing result is claimed by this initial freeze.
+The expectation file was committed at `a17b769` before candidate implementation. Run the fixed embedded synthetic set with:
+
+```sh
+go run ./cmd/ganesh-dev issue-state-probe
+```
+
+The command accepts no source directory, endpoint, credential or external input. Its aggregate JSON reports **24 matches / zero mismatches**, with four supported enum results and 20 withheld results. A separate scorer compares all three outcome fields against the frozen expected records. An intentionally always-positive verifier matches only three cases and produces 21 mismatches, demonstrating that the scorer does not use the candidate as its own oracle. Modified fixture bytes fail the pinned digest check.
+
+Output contains only fixed status/schema values, counts, the fixture digest, `synthetic: true`, `publication_authorized: false` and `stage_gate_passed: false`. It omits object IDs, source prose and per-case content. A valid mismatch report uses `status: fixture_mismatch` and exits 1; invalid embedded input or output errors return a static error. A matched set uses `status: fixture_expectations_matched`, which establishes only agreement on this synthetic subset.
+
+Affected normal/race/vet checks, the full Go suite, CLI argument/output checks and source/document checks pass. No live model/API call or stage outcome is inferred. These are previously inspected regression cases, not held-out results. The original private calibration packet, expected outcomes and source hashes are unchanged.

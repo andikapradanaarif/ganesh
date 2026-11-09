@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/andikapradanaarif/ganesh/internal/devtools"
+	"github.com/andikapradanaarif/ganesh/internal/safetyprobe"
 )
 
 type options struct{ command, source, profile, directory, study, raw, transcriptRoot, sessionsRoot, grantMapDirectory, expectedManifest, outputDirectory, expectedFrame string }
@@ -25,6 +26,8 @@ func parse(args []string) (options, error) {
 	flags := flag.NewFlagSet(opts.command, flag.ContinueOnError)
 	flags.SetOutput(io.Discard)
 	switch opts.command {
+	case "issue-state-probe":
+		// Fixed embedded synthetic fixtures only; no external paths or endpoints.
 	case "crush-test":
 		flags.StringVar(&opts.source, "source", "", "pinned source checkout")
 		flags.StringVar(&opts.profile, "build-profile", "development", "fixed build profile")
@@ -105,6 +108,18 @@ func run(args []string, stdout, stderr io.Writer) error {
 	opts, err := parse(args)
 	if err != nil {
 		return err
+	}
+	if opts.command == "issue-state-probe" {
+		report, err := safetyprobe.RunIssueState()
+		if err != nil {
+			return err
+		}
+		encoder := json.NewEncoder(stdout)
+		encoder.SetIndent("", "  ")
+		if encoder.Encode(report) != nil || report.Mismatched != 0 {
+			return safetyprobe.ErrIssueStateProbe
+		}
+		return nil
 	}
 	if opts.command == "study-summary" {
 		study := 34
