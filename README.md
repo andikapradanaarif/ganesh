@@ -35,6 +35,8 @@ The [Codex source-link audit](docs/s0-codex-source-audit.md) similarly rechecks 
 
 [CI-result verifier probe](docs/s0-ci-result-probe.md) keeps old-commit run results separate from current-head-qualified results, with exact workflow/run/attempt and head dependencies.
 
+[Decision-authority verifier probe](docs/s0-decision-authority-probe.md) tests why authenticated PR prose cannot become an authoritative decision, using a fake designated registry as its positive control.
+
 [Initial origin accounting](docs/s0-origin-screen.md) freezes the handoff-need denominator and reports the A1 route from screener declarations. It does not inspect sources or verify provenance.
 
 [Evaluation planning](docs/s0-evaluation-plan.md) freezes the standard S0 task/diagnostic split and counterbalanced 108-answer schedule, with 24 conditional eligible-origin slots. Real inputs and execution/acceptance remain pending.

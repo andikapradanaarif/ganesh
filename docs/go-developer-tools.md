@@ -95,6 +95,14 @@ go run ./cmd/ganesh-dev ci-result-probe
 
 The no-input command compares 75 digest-pinned synthetic cases with manually specified expectations frozen before implementation. It separates exact commit/run results from current-head qualification, using the existing protected-branch verifier only for the latter. The aggregate reports matches/mismatches with publication/stage flags false; a valid mismatch report exits 1. See [the CI probe record](s0-ci-result-probe.md) for workflow/run/attempt/revision binding, status/time constraints, old-run examples, ignored prose and incomplete integration/atomicity coverage. A workflow success does not mean all tests passed or deployment is safe.
 
+Probe decision authority without promoting PR prose:
+
+```sh
+go run ./cmd/ganesh-dev decision-authority-probe
+```
+
+The no-input command compares 67 digest-pinned synthetic cases with manually specified expectations frozen before implementation. Positive controls use a fake designated structured registry; authenticated/owner-labeled PR prose cannot grant decision authority. The separate scorer includes adoption state in its comparison and reports only aggregate matches/mismatches with publication/stage flags false; a valid mismatch report exits 1. See [the authority probe record](s0-decision-authority-probe.md) for fake designation/authentication/writer controls, exact enum/state/revision checks, seven-day rechecks and missing real provenance/integration coverage. No actual registry is enrolled or source/model call made.
+
 Build and run the active Go checks:
 
 ```sh

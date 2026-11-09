@@ -33,6 +33,8 @@ Expected totals are eight supported commit-qualified results, four supported cur
 
 This adds a narrow CI predicate slice alongside the issue-state and head probes. The other six named P03-D cases remain incomplete: unsupported decisions in PR comments; agent echo/corroboration; full source-text/tool-call handling; renamed/deleted sources; owner pin contradictions; and full unversioned A→B→A lifecycle handling. These local snapshots do not complete chronological storage or lifecycle tests.
 
+The subsequent [decision-authority probe](s0-decision-authority-probe.md) adds a separate narrow registry/PR-comment slice without changing these CI fixtures or completing the broader P03-D matrix.
+
 Real API parsing/authentication, atomic cross-source snapshots and publication-time race handling, coequal conflicts, permissions, source provenance, capture, expiry, deletion/repair, secret scanning, consumer behavior and unattended operation remain unimplemented. Fresh consistent fake snapshots do not prove real integration or atomicity. Publication and stage-pass flags stay false. Calibration #60 and capture #34 remain unresolved; approved baseline documents and previous frozen fixtures are preserved.
 
 ## Execution status
