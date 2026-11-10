@@ -15,7 +15,7 @@ import (
 	"github.com/andikapradanaarif/ganesh/internal/safetyprobe"
 )
 
-type options struct{ command, source, profile, directory, study, raw, transcriptRoot, sessionsRoot, grantMapDirectory, expectedManifest, outputDirectory, expectedFrame string }
+type options struct{ command, source, profile, directory, study, raw, transcriptRoot, sessionsRoot, grantMapDirectory, expectedManifest, outputDirectory, expectedFrame, expectedResponse string }
 
 func parse(args []string) (options, error) {
 	var opts options
@@ -40,6 +40,10 @@ func parse(args []string) (options, error) {
 	case "calibration-summary":
 		flags.StringVar(&opts.directory, "dir", "", "private saved calibration label directory")
 		flags.StringVar(&opts.expectedFrame, "frame-sha256", "", "pinned immutable blank packet SHA-256")
+	case "grader-evidence-check":
+		flags.StringVar(&opts.directory, "dir", "", "private single-case answer and evidence directory")
+		flags.StringVar(&opts.expectedFrame, "frame-sha256", "", "pinned answer/requirements frame SHA-256")
+		flags.StringVar(&opts.expectedResponse, "response-sha256", "", "pinned structured grader response SHA-256")
 	case "devin-audit", "devin-candidates":
 		flags.StringVar(&opts.directory, "dir", "", "private Devin evidence directory")
 		flags.StringVar(&opts.transcriptRoot, "transcript-root", "", "explicit Devin transcript directory")
@@ -68,6 +72,9 @@ func parse(args []string) (options, error) {
 		return options{}, devtools.ErrCommand
 	}
 	if opts.command == "calibration-summary" && (strings.TrimSpace(opts.directory) == "" || len(opts.expectedFrame) != 64 || strings.Trim(opts.expectedFrame, "0123456789abcdef") != "") {
+		return options{}, devtools.ErrCommand
+	}
+	if opts.command == "grader-evidence-check" && (strings.TrimSpace(opts.directory) == "" || len(opts.expectedFrame) != 64 || strings.Trim(opts.expectedFrame, "0123456789abcdef") != "" || len(opts.expectedResponse) != 64 || strings.Trim(opts.expectedResponse, "0123456789abcdef") != "") {
 		return options{}, devtools.ErrCommand
 	}
 	if (opts.command == "devin-audit" || opts.command == "devin-candidates") && (strings.TrimSpace(opts.directory) == "" || strings.TrimSpace(opts.transcriptRoot) == "" || strings.TrimSpace(opts.grantMapDirectory) == "") {
@@ -206,6 +213,18 @@ func run(args []string, stdout, stderr io.Writer) error {
 		encoder.SetIndent("", "  ")
 		if encoder.Encode(report) != nil {
 			return devtools.ErrCalibration
+		}
+		return nil
+	}
+	if opts.command == "grader-evidence-check" {
+		report, err := devtools.CheckGraderEvidence(opts.directory, opts.expectedFrame, opts.expectedResponse)
+		if err != nil {
+			return err
+		}
+		encoder := json.NewEncoder(stdout)
+		encoder.SetIndent("", "  ")
+		if encoder.Encode(report) != nil {
+			return devtools.ErrGraderEvidence
 		}
 		return nil
 	}

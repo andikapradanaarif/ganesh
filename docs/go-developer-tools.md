@@ -71,6 +71,14 @@ go run ./cmd/ganesh-dev calibration-summary --dir .local/s0/issue-60-20261108/gr
 
 The digest pins the preserved `owner-labels.blank.json` frame. Optional `owner-labels.json` and `grader-labels.json` use the same packet format; missing files and null judgments remain incomplete. The reader requires exact joins for six tasks / 18 cases, private 0700/0600 storage and at most 128 KiB per file. It reports aggregate comparison counts and input hashes, never notes, identities or answer text. It does not run a model or accept calibration. See [the comparison workflow](s0-calibration-comparison.md) for status/metadata fields, denominators, validation and provenance limits.
 
+Check a proposed structured single-case grading response offline:
+
+```sh
+go run ./cmd/ganesh-dev grader-evidence-check --dir .local/s0/structured-case --frame-sha256 "$S0_ANSWER_FRAME_SHA256" --response-sha256 "$S0_GRADER_RESPONSE_SHA256"
+```
+
+The caller pins fixed `answer-frame.json` and `grader-evidence.json` files, each at most 64 KiB, in private 0700/0600 storage. The new versioned format requires four final criterion dispositions, exact UTF-8 byte spans for met criteria and consistent derived completion. It emits aggregate metadata only. A real but irrelevant quotation can pass the mechanical check; semantic relevance, calibration acceptance and model dispatch remain false. The [evidence contract](s0-grader-evidence.md) specifies strict fields, bounds, null/contradiction behavior and the remaining relevance audit. No earlier packet is converted or model called.
+
 Run the disposable issue-state verifier against its fixed synthetic expectations:
 
 ```sh
