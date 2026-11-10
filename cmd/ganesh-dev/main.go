@@ -15,7 +15,7 @@ import (
 	"github.com/andikapradanaarif/ganesh/internal/safetyprobe"
 )
 
-type options struct{ command, source, profile, directory, study, raw, transcriptRoot, sessionsRoot, grantMapDirectory, expectedManifest, outputDirectory, expectedFrame, expectedResponse string }
+type options struct{ command, source, profile, directory, study, raw, transcriptRoot, sessionsRoot, grantMapDirectory, expectedManifest, outputDirectory, expectedFrame, expectedResponse, expectedUsage string }
 
 func parse(args []string) (options, error) {
 	var opts options
@@ -44,6 +44,9 @@ func parse(args []string) (options, error) {
 		flags.StringVar(&opts.directory, "dir", "", "private single-case answer and evidence directory")
 		flags.StringVar(&opts.expectedFrame, "frame-sha256", "", "pinned answer/requirements frame SHA-256")
 		flags.StringVar(&opts.expectedResponse, "response-sha256", "", "pinned structured grader response SHA-256")
+	case "go-usage-check":
+		flags.StringVar(&opts.directory, "dir", "", "private saved Go usage directory")
+		flags.StringVar(&opts.expectedUsage, "usage-sha256", "", "pinned native usage object SHA-256")
 	case "devin-audit", "devin-candidates":
 		flags.StringVar(&opts.directory, "dir", "", "private Devin evidence directory")
 		flags.StringVar(&opts.transcriptRoot, "transcript-root", "", "explicit Devin transcript directory")
@@ -75,6 +78,9 @@ func parse(args []string) (options, error) {
 		return options{}, devtools.ErrCommand
 	}
 	if opts.command == "grader-evidence-check" && (strings.TrimSpace(opts.directory) == "" || len(opts.expectedFrame) != 64 || strings.Trim(opts.expectedFrame, "0123456789abcdef") != "" || len(opts.expectedResponse) != 64 || strings.Trim(opts.expectedResponse, "0123456789abcdef") != "") {
+		return options{}, devtools.ErrCommand
+	}
+	if opts.command == "go-usage-check" && (strings.TrimSpace(opts.directory) == "" || len(opts.expectedUsage) != 64 || strings.Trim(opts.expectedUsage, "0123456789abcdef") != "") {
 		return options{}, devtools.ErrCommand
 	}
 	if (opts.command == "devin-audit" || opts.command == "devin-candidates") && (strings.TrimSpace(opts.directory) == "" || strings.TrimSpace(opts.transcriptRoot) == "" || strings.TrimSpace(opts.grantMapDirectory) == "") {
@@ -225,6 +231,18 @@ func run(args []string, stdout, stderr io.Writer) error {
 		encoder.SetIndent("", "  ")
 		if encoder.Encode(report) != nil {
 			return devtools.ErrGraderEvidence
+		}
+		return nil
+	}
+	if opts.command == "go-usage-check" {
+		report, err := devtools.CheckGoUsage(opts.directory, opts.expectedUsage)
+		if err != nil {
+			return err
+		}
+		encoder := json.NewEncoder(stdout)
+		encoder.SetIndent("", "  ")
+		if encoder.Encode(report) != nil {
+			return devtools.ErrGoUsage
 		}
 		return nil
 	}
