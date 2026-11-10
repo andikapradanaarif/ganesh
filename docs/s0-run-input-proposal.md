@@ -4,6 +4,8 @@ Continuation of [#60](https://github.com/andikapradanaarif/ganesh/issues/60), un
 
 ## Proposed model profile
 
+**Historical candidate profile:** the subsequent [owner-selected OpenCode Go amendment](s0-opencode-go-grader-amendment.md) instead selects OpenAI answers with a DeepSeek grader. The model roles, prices and proposed limits below are retained as the earlier proposal, not approved settings for that run.
+
 Checked against official documentation on 2026-11-08. Account availability, API permissions and returned model/version metadata have not been checked.
 
 | Role | Proposed request ID | Documented context | Standard uncached text price per million tokens, input / output |
