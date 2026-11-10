@@ -55,7 +55,7 @@ func TestGoUsageCachedAndOptionalMetadata(t *testing.T) {
 }
 
 func TestGoUsageCounterVariants(t *testing.T) {
-	for _, name := range []string{"uncached with zero buckets", "uncached with absent buckets", "all cached", "write buckets", "optional standard cache absent", "optional standard cache null", "maximum prompt without overflow", "zero cost exponent", "negative zero allowance", "precise allowance"} {
+	for _, name := range []string{"uncached with zero buckets", "uncached with absent buckets", "all cached", "write buckets", "optional standard cache absent", "optional standard cache null", "maximum prompt without overflow", "zero cost exponent", "negative zero allowance", "precise allowance", "tiny positive allowance"} {
 		t.Run(name, func(t *testing.T) {
 			u := usageFixture()
 			tokens := usageTokens(u)
@@ -93,6 +93,8 @@ func TestGoUsageCounterVariants(t *testing.T) {
 				u["opencode"].(map[string]any)["allowance"] = json.Number("-0.00")
 			case "precise allowance":
 				u["opencode"].(map[string]any)["allowance"] = json.Number("0.123456789012345678901234567890")
+			case "tiny positive allowance":
+				u["opencode"].(map[string]any)["allowance"] = json.Number("1e-9999")
 			}
 			report, err := ParseGoUsage(evidenceJSON(t, u))
 			if err != nil {
@@ -100,6 +102,9 @@ func TestGoUsageCounterVariants(t *testing.T) {
 			}
 			if name == "precise allowance" && report.ReportedAllowance != "0.123456789012345678901234567890" {
 				t.Fatal("allowance rounded")
+			}
+			if name == "tiny positive allowance" && report.ReportedAllowance != "1e-9999" {
+				t.Fatal("allowance underflow changed reported value")
 			}
 		})
 	}
