@@ -22,13 +22,19 @@ A successful receipt must match the reduced event identity, carry a nonzero capt
 | Known storage rejection | Zero receipt and the exact static storage sentinel. |
 | Builder/reader/storage panic, unknown error or invalid receipt | Zero receipt and static `ErrCollector`; no panic body or wrapped diagnostic. |
 
+After a builder, reduction or append returns normally, context cancellation/expiry is checked before its stage error is normalized. Thus a malformed envelope with an expired context reports `DeadlineExceeded` rather than `ErrPayload`; callers cannot infer payload validity from that context error. This precedence is deliberate and consistent across those stages. A recovered panic follows the separate `ErrCollector` policy.
+
 Every error returns a zero receipt, even if a store returns success after cancellation/deadline or a panic follows publication. **Zero receipt does not mean no durable effect.** An existing record may require exact replay; the collector neither silently deletes it nor invents an acknowledgment. Wrapped storage errors are normalized rather than exposed, so their private diagnostic text cannot escape via this API. No output, logging or client decision/context channel is added.
 
 Recovery uses a separate call frame and a normal-completion guard, including for `panic(nil)` under legacy `GODEBUG=panicnil=1`. Final review reproduced zero-receipt/nil-error returns in the initial guard for builder, reader and append nil panics under that setting; all three regression cases pass after the guard correction. No released client or capture profile used that initial implementation.
 
+Recovery also covers ordinary runtime panics such as nil dereferences. These deliberately become the same `ErrCollector`, so that error alone cannot distinguish a programming fault from another generic capture failure. Panic bodies and stacks are not exposed or logged by this boundary; controlled reproductions and tests remain necessary for diagnosis.
+
 ## Cancellation limitation
 
 The boundary is deliberately synchronous. Cancellation is checked between operations; it cannot interrupt every builder, reader or filesystem syscall. A blocked append can keep `Capture` blocked past the context deadline. It keeps this collector busy until it actually returns; cancellation does not release the admission guard or detach unfinished work. Once the append returns, an expired/cancelled context suppresses its receipt.
+
+Cancellation or expiry can still race the final context check and the return or observation of a successful receipt. That receipt acknowledges local storage based on the final cooperative check; it provides no atomic deadline/return guarantee or assurance that the context remains active when the caller observes it.
 
 Consequently this API **does not guarantee a one-second callback return** and does not solve stalled-I/O isolation in a live client. The earlier experiment's whole-host SIGKILL is not reused. Installing this collector as an unqualified hook would leave that host-safety requirement unresolved. Capture profiles remain disabled and [#34](https://github.com/andikapradanaarif/ganesh/issues/34) remains open.
 
