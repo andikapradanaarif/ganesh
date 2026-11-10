@@ -40,7 +40,7 @@ func TestFrameAndReceiptRoundTrip(t *testing.T) {
 			t.Fatal(err)
 		}
 		var wire bytes.Buffer
-		if writeFrame(&wire, body) != nil {
+		if writeFrame(oneByteWriter{&wire}, body) != nil {
 			t.Fatal("frame write")
 		}
 		payload, err := readFrame(iotest.OneByteReader(&wire))
@@ -143,6 +143,16 @@ type failedWriter struct{}
 
 func (failedWriter) Write([]byte) (int, error) { return 0, errors.New("ghp_SYNTHETIC_SECRET") }
 
+type oneByteWriter struct{ output io.Writer }
+
+func (w oneByteWriter) Write(p []byte) (int, error) {
+	return w.output.Write(p[:1])
+}
+
+type stalledWriter struct{}
+
+func (stalledWriter) Write([]byte) (int, error) { return 0, nil }
+
 func TestCodecRejectsInvalidValuesAndMasksIOErrors(t *testing.T) {
 	m := testMetadata()
 	m.EventID = "ghp_SYNTHETIC_SECRET"
@@ -159,6 +169,9 @@ func TestCodecRejectsInvalidValuesAndMasksIOErrors(t *testing.T) {
 	}
 	if err := writeFrame(failedWriter{}, []byte("{}")); err != ErrExchange {
 		t.Fatal("writer detail escaped")
+	}
+	if err := writeFrame(stalledWriter{}, []byte("{}")); err != ErrExchange {
+		t.Fatal("stalled writer was retried indefinitely")
 	}
 	if b, err := readFrame(iotest.ErrReader(errors.New("ghp_SYNTHETIC_SECRET"))); err != ErrExchange || b != nil {
 		t.Fatal("reader detail escaped")
