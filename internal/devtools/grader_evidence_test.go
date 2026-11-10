@@ -251,6 +251,32 @@ func TestGraderEvidenceUTF8ByteSpans(t *testing.T) {
 	}
 }
 
+func TestGraderEvidenceRejectsNullSpanElement(t *testing.T) {
+	for _, name := range []string{"only null", "null after valid span"} {
+		t.Run(name, func(t *testing.T) {
+			frame, response := evidenceFixture(t)
+			var object map[string]json.RawMessage
+			if json.Unmarshal(evidenceJSON(t, response), &object) != nil {
+				t.Fatal("response fixture")
+			}
+			var criteria []map[string]json.RawMessage
+			if json.Unmarshal(object["criteria"], &criteria) != nil {
+				t.Fatal("criterion fixture")
+			}
+			spans := []any{nil}
+			if name == "null after valid span" {
+				spans = []any{response.Criteria[0].Spans[0], nil}
+			}
+			criteria[0]["spans"] = evidenceJSON(t, spans)
+			object["criteria"] = evidenceJSON(t, criteria)
+			report, err := checkGraderEvidence(evidenceJSON(t, frame), evidenceJSON(t, object))
+			if err != ErrGraderEvidence || !reflect.DeepEqual(report, GraderEvidenceReport{}) {
+				t.Fatal("null span admitted or earlier verified-span count exposed")
+			}
+		})
+	}
+}
+
 func TestGraderEvidencePrivateReader(t *testing.T) {
 	for _, name := range []string{"valid", "frame pin", "response pin", "missing frame", "missing response", "frame mode", "response mode", "dir mode", "dir symlink", "frame symlink", "response symlink", "frame too large", "response too large", "nonregular", "invalid digest"} {
 		t.Run(name, func(t *testing.T) {
