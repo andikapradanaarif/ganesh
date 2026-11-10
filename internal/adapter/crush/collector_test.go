@@ -302,3 +302,59 @@ func TestCollectorRejectsUnboundOrPromotedReceipts(t *testing.T) {
 		}
 	}
 }
+
+func TestCollectorSuppressesReceiptWhenAppendOutlastsDeadline(t *testing.T) {
+	ctx, cancel := context.WithTimeout(collectorContext(t), 100*time.Millisecond)
+	defer cancel()
+	appended := false
+	c := &Collector{store: collectorAppendFunc(func(got context.Context, m capture.Metadata) (capture.Receipt, error) {
+		appended = true
+		<-got.Done()
+		// A non-cooperative store can report success after the caller's limit.
+		return collectorReceipt(m), nil
+	})}
+	r, err := c.Capture(ctx, collectorBuilder(attempt))
+	if !appended || err != context.DeadlineExceeded || r != (capture.Receipt{}) {
+		t.Fatal("late successful append was acknowledged")
+	}
+}
+
+func TestCollectorPreservesPrivateStoreAndCapacityErrors(t *testing.T) {
+	for _, kind := range []string{"unsafe", "capacity"} {
+		t.Run(kind, func(t *testing.T) {
+			spool := capture.Spool{Directory: filepath.Join(t.TempDir(), "spool")}
+			want := capture.ErrCapacity
+			if kind == "unsafe" {
+				if os.Mkdir(spool.Directory, 0o700) != nil || os.Chmod(spool.Directory, 0o755) != nil {
+					t.Fatal("unsafe fixture setup failed")
+				}
+				want = capture.ErrUnsafe
+			} else {
+				spool.MaxBytes = 1
+			}
+			r, err := NewCollector(spool).Capture(collectorContext(t), collectorBuilder(attempt))
+			if err != want || r != (capture.Receipt{}) {
+				t.Fatal("store rejection changed or acknowledged")
+			}
+		})
+	}
+}
+
+func TestCollectorRejectsUnconfiguredCallsAndNilReaders(t *testing.T) {
+	valid := &Collector{store: collectorAppendFunc(func(_ context.Context, m capture.Metadata) (capture.Receipt, error) {
+		return collectorReceipt(m), nil
+	})}
+	for _, c := range []*Collector{nil, {}} {
+		if r, err := c.Capture(collectorContext(t), collectorBuilder(attempt)); err != ErrCollector || r != (capture.Receipt{}) {
+			t.Fatal("unconfigured collector admitted work")
+		}
+	}
+	for _, build := range []PayloadBuilder{nil, func(context.Context) (io.Reader, error) { return nil, nil }} {
+		if r, err := valid.Capture(collectorContext(t), build); err != ErrCollector || r != (capture.Receipt{}) {
+			t.Fatal("missing builder/reader admitted work")
+		}
+	}
+	if r, err := valid.Capture(nil, collectorBuilder(attempt)); err != ErrCollector || r != (capture.Receipt{}) {
+		t.Fatal("missing context admitted work")
+	}
+}

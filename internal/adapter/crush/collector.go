@@ -60,7 +60,7 @@ func (c *Collector) Capture(ctx context.Context, build PayloadBuilder) (receipt 
 		return capture.Receipt{}, ErrCollectorBusy
 	}
 	defer c.busy.Store(false)
-	// Recheck after admission so cancellation cannot start serialization.
+	// Recheck cancellation after admission before invoking serialization.
 	if err := collectorContextError(ctx); err != nil {
 		return capture.Receipt{}, err
 	}
