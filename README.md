@@ -29,6 +29,8 @@ The [Codex source-link audit](docs/s0-codex-source-audit.md) similarly rechecks 
 
 [Offline calibration comparison](docs/s0-calibration-comparison.md) compares saved owner and grader judgments without model calls; missing labels remain incomplete.
 
+The [OpenCode Go grader amendment](docs/s0-opencode-go-grader-amendment.md) records the owner's DeepSeek candidate choice for OpenAI answers. Calibration, account checks and provider-disclosure/run limits remain pending.
+
 [Issue-state verifier probe](docs/s0-issue-state-probe.md) tests exact enum support against frozen synthetic expectations without inferring resolution or deployment readiness.
 
 [Repository-head verifier probe](docs/s0-repository-head-probe.md) separates protected-branch resolution from commit existence, tags and deployment claims using fixed synthetic inputs.
