@@ -55,4 +55,6 @@ The [standalone collector experiment](docs/s0-standalone-capture.md) extracts sh
 
 The [capture path proposal](docs/s0-capture-path-proposal.md) maps the remaining startup blocker. The separately approved [native capture experiment](docs/s0-native-capture-experiment.md) completed its bounded synthetic run: all 12 ordinary native callbacks acknowledged and eight fault cases matched. This supports an integration follow-up; full-client behavior and supported installation remain unproven, and capture profiles stay disabled.
 
+The experimental [synchronous native collector](docs/s0-native-capture-collector.md) now reuses the strict reducer/spool behind caller-deadline admission and local receipt checks. It creates no background work and cannot interrupt blocked filesystem I/O; it is not a supported hook installation.
+
 Current validation tooling uses Go; see [Go developer tools](docs/go-developer-tools.md). Completed Python experiments remain historical evidence at their original paths.
