@@ -54,6 +54,21 @@ func TestGoUsageCachedAndOptionalMetadata(t *testing.T) {
 	}
 }
 
+func TestGoUsageAccountingNamespaces(t *testing.T) {
+	u := usageFixture()
+	// A token-counter name outside the tokens object has no accounting role.
+	u["Input"] = "ghp_NAMESPACE_CANARY"
+	u["opencode"].(map[string]any)["Prompt_Tokens"] = 999999
+	report, err := ParseGoUsage(evidenceJSON(t, u))
+	if err != nil || report.PromptTokens != 1787 || report.UncachedInputTokens != 1275 || strings.Contains(string(evidenceJSON(t, report)), "ghp_") {
+		t.Fatal("out-of-namespace metadata changed or leaked into accounting")
+	}
+	usageTokens(u)["Input"] = 1275
+	if report, err := ParseGoUsage(evidenceJSON(t, u)); err != ErrGoUsage || !reflect.DeepEqual(report, GoUsageReport{}) {
+		t.Fatal("in-namespace accounting alias accepted or partial report exposed")
+	}
+}
+
 func TestGoUsageCounterVariants(t *testing.T) {
 	for _, name := range []string{"uncached with zero buckets", "uncached with absent buckets", "all cached", "write buckets", "optional standard cache absent", "optional standard cache null", "maximum prompt without overflow", "zero cost exponent", "negative zero allowance", "precise allowance", "tiny positive allowance"} {
 		t.Run(name, func(t *testing.T) {
@@ -105,6 +120,9 @@ func TestGoUsageCounterVariants(t *testing.T) {
 			}
 			if name == "tiny positive allowance" && report.ReportedAllowance != "1e-9999" {
 				t.Fatal("allowance underflow changed reported value")
+			}
+			if name == "zero cost exponent" && report.ReportedCost != "-0.000e+9999" {
+				t.Fatal("zero-cost source representation changed")
 			}
 		})
 	}

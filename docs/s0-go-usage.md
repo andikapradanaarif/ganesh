@@ -18,6 +18,8 @@ The directory must be 0700 and the file regular 0600, capped at 32 KiB. Final-co
 
 Malformed JSON, invalid UTF-8, duplicate keys (including escaped spellings), more than 64 JSON nesting levels, unsafe files or a mismatched digest return the static error `private bounded zero-cost Go usage required`, exit 1 and no JSON report. Case aliases of recognized accounting keys fail at every interpreted level. Unrelated provider metadata is bounded and parsed as JSON but ignored: it does not become accounting evidence or appear in output. This permits harmless provider extensions without pretending to verify the whole API schema.
 
+Accounting names are scoped to their object: root-level `Input` is unrelated metadata, while `Input` inside `opencode.tokens` is a rejected alias of `input`. Names recognized elsewhere do not acquire accounting meaning at another level.
+
 ## Accounting profile
 
 The [official OpenCode API documentation](https://opencode.ai/docs/console/api/inference/) separates native token usage from billable components. Go's input counter excludes cache reads/writes, while its output includes reasoning. Its allowance field describes plan consumption, separately from the reported additional balance charge. Those distinctions motivate this parser; a metadata assertion is not authenticated billing evidence.
