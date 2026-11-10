@@ -249,12 +249,19 @@ type collectorPanicReader struct{}
 
 func (collectorPanicReader) Read([]byte) (int, error) { panic("ghp_SYNTHETIC_SECRET") }
 
+type collectorNilPanicReader struct{}
+
+func (collectorNilPanicReader) Read([]byte) (int, error) { panic(nil) }
+
 func TestCollectorPanicsAndWrappedErrorsAreContentFree(t *testing.T) {
-	for _, phase := range []string{"build panic", "reader panic", "append panic", "build error", "append wrapper"} {
+	for _, phase := range []string{"build panic", "reader panic", "append panic", "build nil panic", "reader nil panic", "append nil panic", "build error", "append wrapper"} {
 		t.Run(phase, func(t *testing.T) {
 			c := &Collector{store: collectorAppendFunc(func(_ context.Context, m capture.Metadata) (capture.Receipt, error) {
 				if phase == "append panic" {
 					panic("ghp_SYNTHETIC_SECRET")
+				}
+				if phase == "append nil panic" {
+					panic(nil)
 				}
 				if phase == "append wrapper" {
 					return collectorReceipt(m), fmt.Errorf("ghp_SYNTHETIC_SECRET: %w", capture.ErrUnsafe)
@@ -267,6 +274,10 @@ func TestCollectorPanicsAndWrappedErrorsAreContentFree(t *testing.T) {
 					panic("ghp_SYNTHETIC_SECRET")
 				case "reader panic":
 					return collectorPanicReader{}, nil
+				case "build nil panic":
+					panic(nil)
+				case "reader nil panic":
+					return collectorNilPanicReader{}, nil
 				case "build error":
 					return nil, errors.New("ghp_SYNTHETIC_SECRET")
 				}

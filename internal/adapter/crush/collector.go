@@ -45,11 +45,21 @@ func NewCollector(spool capture.Spool) *Collector {
 // method neither selects a timing anchor nor resets a clock. Overlapping calls
 // on this collector fail immediately without invoking their builders.
 func (c *Collector) Capture(ctx context.Context, build PayloadBuilder) (receipt capture.Receipt, err error) {
+	completed := false
 	defer func() {
-		if recover() != nil {
+		_ = recover()
+		if !completed {
 			receipt, err = capture.Receipt{}, ErrCollector
 		}
 	}()
+	receipt, err = c.collect(ctx, build)
+	completed = true
+	return
+}
+
+// A separate call frame distinguishes normal returns from panic(nil), even
+// with legacy panicnil behavior where recover itself returns nil.
+func (c *Collector) collect(ctx context.Context, build PayloadBuilder) (capture.Receipt, error) {
 	if c == nil || c.store == nil || ctx == nil || build == nil {
 		return capture.Receipt{}, ErrCollector
 	}

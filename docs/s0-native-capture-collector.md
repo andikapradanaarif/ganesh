@@ -24,6 +24,8 @@ A successful receipt must match the reduced event identity, carry a nonzero capt
 
 Every error returns a zero receipt, even if a store returns success after cancellation/deadline or a panic follows publication. **Zero receipt does not mean no durable effect.** An existing record may require exact replay; the collector neither silently deletes it nor invents an acknowledgment. Wrapped storage errors are normalized rather than exposed, so their private diagnostic text cannot escape via this API. No output, logging or client decision/context channel is added.
 
+Recovery uses a separate call frame and a normal-completion guard, including for `panic(nil)` under legacy `GODEBUG=panicnil=1`. Final review reproduced zero-receipt/nil-error returns in the initial guard for builder, reader and append nil panics under that setting; all three regression cases pass after the guard correction. No released client or capture profile used that initial implementation.
+
 ## Cancellation limitation
 
 The boundary is deliberately synchronous. Cancellation is checked between operations; it cannot interrupt every builder, reader or filesystem syscall. A blocked append can keep `Capture` blocked past the context deadline. It keeps this collector busy until it actually returns; cancellation does not release the admission guard or detach unfinished work. Once the append returns, an expired/cancelled context suppresses its receipt.
