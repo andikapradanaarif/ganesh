@@ -91,8 +91,36 @@ func TestClientRoundTripAndSingleUse(t *testing.T) {
 		if err := <-peerDone; err != nil {
 			t.Fatal(err)
 		}
+		if err := c.Close(); err != nil {
+			t.Fatal("cleanup after successful Submit was not idempotent")
+		}
 		if r, err := c.Submit(exchangeContext(t), testMetadata()); err != ErrUsed || r != (capture.Receipt{}) {
 			t.Fatal("connection reused")
+		}
+	}
+}
+
+func TestClientCloseIsIdempotentBeforeSubmit(t *testing.T) {
+	client, peer := unixPair(t)
+	c := NewClient(client)
+	if c.Close() != nil || c.Close() != nil {
+		t.Fatal("repeated close failed")
+	}
+	if _, err := readFrame(peer); err != ErrExchange {
+		t.Fatal("unused connection remained open")
+	}
+	if r, err := c.Submit(exchangeContext(t), testMetadata()); err != ErrExchange || r != (capture.Receipt{}) {
+		t.Fatal("closed connection admitted an exchange")
+	}
+	if c.Close() != nil {
+		t.Fatal("cleanup after failed Submit was not idempotent")
+	}
+	if _, err := c.Submit(exchangeContext(t), testMetadata()); err != ErrUsed {
+		t.Fatal("failed exchange became reusable")
+	}
+	for _, invalid := range []*Client{nil, {}, NewClient(nil), NewClient(&net.UnixConn{})} {
+		if invalid.Close() != ErrExchange {
+			t.Fatal("unconfigured close lost its static error")
 		}
 	}
 }

@@ -27,12 +27,13 @@ type Client struct {
 // NewClient takes exclusive ownership of conn, including its deadlines.
 func NewClient(conn *net.UnixConn) *Client { return &Client{conn: conn} }
 
-// Close releases an unused or active connection. It is safe during Submit.
+// Close releases an unused or active connection. An already closed connection
+// succeeds, so deferred cleanup after Submit is safe and quiet.
 func (c *Client) Close() error {
 	if c == nil || c.conn == nil {
 		return ErrExchange
 	}
-	if c.conn.Close() != nil {
+	if err := c.conn.Close(); err != nil && !errors.Is(err, net.ErrClosed) {
 		return ErrExchange
 	}
 	return nil
