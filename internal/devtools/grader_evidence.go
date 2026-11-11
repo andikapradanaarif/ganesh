@@ -127,6 +127,9 @@ func checkGraderEvidence(frameBody, responseBody []byte) (report GraderEvidenceR
 		return report, ErrGraderEvidence
 	}
 	_, completionPresent := object["completion"]
+	// These counts pin the schema: decodeStudy permits only evidenceResponse's
+	// nine JSON fields; version 2 omits completion. Adding a field to that struct
+	// requires revisiting these version contracts and their strictness tests.
 	switch response.Version {
 	case 1:
 		if len(object) != 9 || !completionPresent {
