@@ -35,6 +35,8 @@ The [Codex source-link audit](docs/s0-codex-source-audit.md) similarly rechecks 
 
 [Criterion-specific defeat proposal](docs/s0-criterion-specific-defeat.md) separates attribution, action safety and capture/provenance subjects, with private contrasts for true defeats and unrelated-action controls. It leaves the previous diagnostic uncleared.
 
+[Grading-strategy decision](docs/s0-grading-strategy.md) records the remaining criterion-scope failures and compares a different candidate through the existing subscription with pausing semantic runs. Candidate selection, disclosure and fresh run limits remain pending.
+
 [Saved Go usage reconciliation](docs/s0-go-usage.md) checks optional reasoning metadata, cache-aware token accounting and exact zero additional cost without calling a provider or accepting the grader.
 
 The [OpenCode Go grader amendment](docs/s0-opencode-go-grader-amendment.md) records the owner's DeepSeek candidate choice for OpenAI answers. Calibration, account checks and provider-disclosure/run limits remain pending.
