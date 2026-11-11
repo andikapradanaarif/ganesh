@@ -55,6 +55,7 @@ type evidenceResponse struct {
 
 type GraderEvidenceReport struct {
 	Status                    string `json:"status"`
+	ResponseSchemaVersion     int    `json:"response_schema_version"`
 	Criteria                  int    `json:"criteria"`
 	Met                       int    `json:"met"`
 	Unmet                     int    `json:"unmet"`
@@ -116,12 +117,29 @@ func checkGraderEvidence(frameBody, responseBody []byte) (report GraderEvidenceR
 		seen[criterion.ID] = true
 	}
 	var response evidenceResponse
-	if decodeStudy(responseBody, &response) != nil || !evidenceFields(responseBody, "schema_version", "task_id", "case_id", "answer_frame_sha256", "criteria", "notes") || response.Version != 1 || response.Task != frame.Task || response.Case != frame.Case || response.Frame != devinDigest(frameBody) || len(response.Criteria) != 4 || len(response.Notes) > 4096 {
+	if decodeStudy(responseBody, &response) != nil || !evidenceFields(responseBody, "schema_version", "task_id", "case_id", "answer_frame_sha256", "criteria", "notes") || response.Task != frame.Task || response.Case != frame.Case || response.Frame != devinDigest(frameBody) || len(response.Criteria) != 4 || len(response.Notes) > 4096 {
 		return report, ErrGraderEvidence
 	}
-	// Explicit null is meaningful; absent nullable judgments are malformed.
+	// Version 1 requires the redundant supplied completion, including explicit
+	// null. Version 2 forbids that field: only the application derives it.
 	var object map[string]json.RawMessage
-	if json.Unmarshal(responseBody, &object) != nil || len(object) != 9 {
+	if json.Unmarshal(responseBody, &object) != nil {
+		return report, ErrGraderEvidence
+	}
+	_, completionPresent := object["completion"]
+	// These counts pin the schema: decodeStudy permits only evidenceResponse's
+	// nine JSON fields; version 2 omits completion. Adding a field to that struct
+	// requires revisiting these version contracts and their strictness tests.
+	switch response.Version {
+	case 1:
+		if len(object) != 9 || !completionPresent {
+			return report, ErrGraderEvidence
+		}
+	case 2:
+		if len(object) != 8 || completionPresent {
+			return report, ErrGraderEvidence
+		}
+	default:
 		return report, ErrGraderEvidence
 	}
 	seen = make(map[string]bool)
@@ -172,10 +190,11 @@ func checkGraderEvidence(frameBody, responseBody []byte) (report GraderEvidenceR
 		v := true
 		derived = &v
 	}
-	if (derived == nil) != (response.Completion == nil) || (derived != nil && *derived != *response.Completion) {
+	if response.Version == 1 && ((derived == nil) != (response.Completion == nil) || (derived != nil && *derived != *response.Completion)) {
 		return report, ErrGraderEvidence
 	}
 	report.Status, report.Criteria = "mechanically_checked", 4
+	report.ResponseSchemaVersion = response.Version
 	report.DerivedCompletion, report.IntroducedCriticalError, report.UnsupportedClaim = derived, response.Critical, response.Unsupported
 	report.FrameSHA256, report.ResponseSHA256 = devinDigest(frameBody), devinDigest(responseBody)
 	// Quote membership and consistent declarations cannot establish relevance.

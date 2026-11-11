@@ -6,6 +6,8 @@ The prior private repair run showed that a grader can quote real answer text whi
 
 This format is proposed for a future calibration version. It does not convert earlier free-form notes into evidence, rewrite saved responses, adopt reference labels or authorize another run. The [original comparison](s0-calibration-comparison.md), required owner checks and [S0 execution sheet](s0-execution-sheet.md) remain unchanged. Grader quality and stage acceptance remain unresolved.
 
+[Issue #89](https://github.com/andikapradanaarif/ganesh/issues/89) adds response version 2, which omits the model's redundant completion field and derives it locally. A model can still misjudge criterion coverage. Unresolved coverage remains unknown; this format change does not repair semantic grading or accept the stopped diagnostic. Response version 1 and its consistency checks remain supported unchanged.
+
 ## Invocation and storage
 
 ```sh
@@ -49,7 +51,19 @@ All nine top-level fields are required. Only the three judgment fields accept ex
 | `criteria` | Exactly one disposition for each frame criterion ID |
 | `notes` | Bounded non-null string; may be empty |
 
+## Response schema, version 2
+
+Version 2 has exactly the same fields as version 1 except `schema_version` is the integer `2` and `completion` is forbidden, including explicit null. All eight fields must exist; only `introduced_critical_error` and `unsupported_claim` are nullable. The answer/requirements frame remains at version 1. Criterion/span bounds, exact fields and private-file rules are identical for both response versions.
+
+Completion is calculated by the application using the same table below. The model supplies final criterion dispositions and the critical/unsupported judgments; it never supplies completion in this version. Unknown versions, mixed layouts and attempts to supply `derived_completion` in a response are rejected. A live protocol that pins one response version must also check the reported `response_schema_version` against that protocol; the offline reader supports both versions and does not establish which a model was authorized to return.
+
+Do not convert an old response by deleting completion, changing its version or repinning it to claim recovery. Old version-1 inconsistencies remain invalid. New version-2 examples and model results need their own frozen provenance and protocol.
+
+## Criterion and span fields, both response versions
+
 Each criterion object contains exactly `id`, `status`, `spans` and `explanation`. `status` is exactly `met`, `unmet` or `unresolved`; prose such as “met in part but defeated” is invalid. A met criterion needs at least one span. An unmet or unresolved criterion needs a nonblank explanation and may also cite spans, for example to identify a contradiction. Empty span lists are `[]`, not null. A met explanation may be empty, but its field must exist.
+
+For future grading instructions, **unmet** includes clearly missing required substance, even without contradiction. **Unresolved** means genuine uncertainty about whether the answer satisfies a requirement. A source's underlying project state may remain unverified while the answer clearly meets a requirement to preserve that uncertainty. These are semantic definitions for the rubric/reviewer: the reader checks the declared status and explanation shape, not their correctness. It does not relabel an unresolved criterion as unmet based on words in its explanation.
 
 Each span has exactly three required fields: integer `start`, integer `end` and string `quote`. Its half-open range `[start,end)` indexes UTF-8 bytes of the decoded frame answer: `0 ≤ start < end ≤ len(answer)`. Both boundaries must delimit complete code points. The quote must equal that exact substring. Duplicate ranges within one criterion fail; a range may support more than one criterion, and overlapping distinct ranges are permitted. These rules neither establish that the selected spans are sufficient nor require semantically equivalent answers to use identical wording.
 
@@ -68,7 +82,7 @@ This is one entry, not a complete four-criterion response. A multibyte character
 
 ## Completion and output
 
-The command derives completion and rejects a contradictory supplied declaration:
+The command derives completion for both response versions. Version 1 rejects a contradictory supplied declaration; version 2 has no supplied completion to compare:
 
 | Dispositions / critical judgment | Derived completion |
 |---|---|
@@ -78,8 +92,8 @@ The command derives completion and rejects a contradictory supplied declaration:
 
 Unsupported-claim uncertainty remains separate; it does not silently become false or overwrite the completion rule. The command checks no semantic definition of unsupported claims or critical failures. A future run must freeze those definitions and their calibration evidence separately.
 
-A mechanically valid report exits 0 with `status: mechanically_checked`, including when the derived completion is false or null. Output contains criterion/status/span counts, derived completion, the two separately declared flags and input hashes. It omits IDs, requirements, answers, quotes, explanations, notes and paths. Even these aggregate declarations and digests may be private. An output-writer failure returns the same static error; bytes already written to that writer cannot be retracted, and contain only report metadata.
+A mechanically valid report exits 0 with `status: mechanically_checked`, including when the derived completion is false or null. Output contains `response_schema_version`, criterion/status/span counts, derived completion, the two separately declared flags and input hashes. It omits IDs, requirements, answers, quotes, explanations, notes and paths. Even these aggregate declarations and digests may be private. An output-writer failure returns the same static error; bytes already written to that writer cannot be retracted, and contain only report metadata.
 
 Every success report retains `semantic_relevance_verified: false`, `calibration_accepted: false` and `model_dispatch_authorized: false`. An actual quotation can be irrelevant, a met status can be mistaken and a pinned frame can contain a bad rubric. A separate source/rubric relevance review is required before any calibration progression decision. There is no keyword-based semantic oracle here, no acceptance threshold, live usage/cache parser, new model allowance or production eligibility.
 
-Synthetic executable checks cover exact decoding, caller pins, private-file boundaries, UTF-8 spans, omitted/null/unknown fields, completion precedence, criterion-order independence, invalid quoting and the real-but-irrelevant quotation boundary. They establish the implemented mechanical contract only. No model behavior or completed evaluation follows from passing these checks.
+Synthetic executable checks cover exact decoding, caller pins, private-file boundaries, UTF-8 spans, omitted/null/unknown fields, completion precedence for both response versions, criterion-order independence, invalid quoting and the real-but-irrelevant quotation boundary. A synthetic missing-coverage example with an unresolved status stays invalid when version 1 supplies false; version 2 derives null and still establishes no semantic truth. Tests also reject any completion field in version 2. These establish the implemented mechanical contract only. No model behavior or completed evaluation follows from passing these checks.

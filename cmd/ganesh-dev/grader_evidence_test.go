@@ -54,7 +54,7 @@ func TestGraderEvidenceCommand(t *testing.T) {
 		t.Fatal("valid command rejected")
 	}
 	var report devtools.GraderEvidenceReport
-	if json.Unmarshal(stdout.Bytes(), &report) != nil || report.Status != "mechanically_checked" || report.VerifiedSpans != 4 || report.DerivedCompletion == nil || !*report.DerivedCompletion || report.UnsupportedClaim != nil || report.SemanticRelevanceVerified || report.CalibrationAccepted || report.ModelDispatchAuthorized {
+	if json.Unmarshal(stdout.Bytes(), &report) != nil || report.Status != "mechanically_checked" || report.ResponseSchemaVersion != 1 || report.VerifiedSpans != 4 || report.DerivedCompletion == nil || !*report.DerivedCompletion || report.UnsupportedClaim != nil || report.SemanticRelevanceVerified || report.CalibrationAccepted || report.ModelDispatchAuthorized {
 		t.Fatal("incorrect evidence report")
 	}
 	for _, private := range []string{"ghp_", "private-task-canary", "private-case-canary", "Private requirement", "Private note", dir} {
@@ -74,5 +74,29 @@ func TestGraderEvidenceCommand(t *testing.T) {
 	args[len(args)-1] = write("grader-evidence.json", response)
 	if err := run(args, &stdout, &stderr); err != devtools.ErrGraderEvidence || stdout.Len() != 0 || stderr.Len() != 0 {
 		t.Fatal("contradiction accepted or malformed input emitted")
+	}
+	response["schema_version"] = 2
+	delete(response, "completion")
+	args[len(args)-1] = write("grader-evidence.json", response)
+	if err := run(args, &stdout, &stderr); err != nil || json.Unmarshal(stdout.Bytes(), &report) != nil || report.ResponseSchemaVersion != 2 || report.DerivedCompletion == nil || !*report.DerivedCompletion || report.SemanticRelevanceVerified || report.CalibrationAccepted || report.ModelDispatchAuthorized {
+		t.Fatal("version 2 command failed to derive completion or promoted authority")
+	}
+	if strings.Contains(stdout.String(), "ghp_") || strings.Contains(stdout.String(), dir) {
+		t.Fatal("version 2 private output")
+	}
+	stdout.Reset()
+	response["introduced_critical_error"] = nil
+	args[len(args)-1] = write("grader-evidence.json", response)
+	if err := run(args, &stdout, &stderr); err != nil || json.Unmarshal(stdout.Bytes(), &report) != nil || report.ResponseSchemaVersion != 2 || report.DerivedCompletion != nil {
+		t.Fatal("version 2 unknown critical judgment was collapsed")
+	}
+	if err := run(args, failingOutputWriter{}, &stderr); err != devtools.ErrGraderEvidence {
+		t.Fatal("version 2 writer error not normalized")
+	}
+	stdout.Reset()
+	response["completion"] = nil
+	args[len(args)-1] = write("grader-evidence.json", response)
+	if err := run(args, &stdout, &stderr); err != devtools.ErrGraderEvidence || stdout.Len() != 0 || stderr.Len() != 0 {
+		t.Fatal("version 2 supplied completion accepted")
 	}
 }

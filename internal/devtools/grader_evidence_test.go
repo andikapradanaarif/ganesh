@@ -36,6 +36,18 @@ func evidenceFixture(t *testing.T) (evidenceFrame, evidenceResponse) {
 	return frame, response
 }
 
+// Construct a future synthetic response, not an importer for old model output.
+func evidenceV2JSON(t *testing.T, response evidenceResponse) []byte {
+	t.Helper()
+	response.Version = 2
+	var object map[string]json.RawMessage
+	if json.Unmarshal(evidenceJSON(t, response), &object) != nil {
+		t.Fatal("synthetic response")
+	}
+	delete(object, "completion")
+	return evidenceJSON(t, object)
+}
+
 func TestGraderEvidencePrivacyAndMeaningBoundary(t *testing.T) {
 	frame, response := evidenceFixture(t)
 	// A real quote can still fail the requirement it purports to cover. This
@@ -54,6 +66,10 @@ func TestGraderEvidencePrivacyAndMeaningBoundary(t *testing.T) {
 	}
 	if report.FrameSHA256 != devinDigest(frameBody) || report.ResponseSHA256 != devinDigest(responseBody) {
 		t.Fatal("digest binding")
+	}
+	v2, err := checkGraderEvidence(frameBody, evidenceV2JSON(t, response))
+	if err != nil || v2.ResponseSchemaVersion != 2 || v2.Met != 4 || v2.DerivedCompletion == nil || !*v2.DerivedCompletion || v2.SemanticRelevanceVerified || v2.CalibrationAccepted || v2.ModelDispatchAuthorized {
+		t.Fatal("version 2 promoted real but irrelevant quotations to assurance")
 	}
 	// The observed over-credit failure becomes structurally inconsistent once
 	// the missing coverage is actually declared unmet.
@@ -100,8 +116,12 @@ func TestGraderEvidenceCompletionAndOrder(t *testing.T) {
 			fb := evidenceJSON(t, frame)
 			response.Frame = devinDigest(fb)
 			report, err := checkGraderEvidence(fb, evidenceJSON(t, response))
-			if err != nil || !reflect.DeepEqual(report.DerivedCompletion, test.completion) || report.UnsupportedClaim != nil || report.SemanticRelevanceVerified {
+			if err != nil || report.ResponseSchemaVersion != 1 || !reflect.DeepEqual(report.DerivedCompletion, test.completion) || report.UnsupportedClaim != nil || report.SemanticRelevanceVerified {
 				t.Fatal("tri-state derivation or criterion ID join")
+			}
+			report, err = checkGraderEvidence(fb, evidenceV2JSON(t, response))
+			if err != nil || report.ResponseSchemaVersion != 2 || !reflect.DeepEqual(report.DerivedCompletion, test.completion) || report.UnsupportedClaim != nil || report.SemanticRelevanceVerified || report.CalibrationAccepted || report.ModelDispatchAuthorized {
+				t.Fatal("version 2 changed tri-state derivation, ID join or authority")
 			}
 			for _, wrong := range []*bool{nil, evidenceBool(false), evidenceBool(true)} {
 				if reflect.DeepEqual(wrong, test.completion) {
@@ -167,7 +187,7 @@ func TestGraderEvidenceRejectsMalformedStructure(t *testing.T) {
 			frame, response := evidenceFixture(t)
 			switch name {
 			case "wrong version":
-				response.Version = 2
+				response.Version = 3
 			case "wrong case":
 				response.Case = "different-case"
 			case "wrong task":

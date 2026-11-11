@@ -77,7 +77,7 @@ Check a proposed structured single-case grading response offline:
 go run ./cmd/ganesh-dev grader-evidence-check --dir .local/s0/structured-case --frame-sha256 "$S0_ANSWER_FRAME_SHA256" --response-sha256 "$S0_GRADER_RESPONSE_SHA256"
 ```
 
-The caller pins fixed `answer-frame.json` and `grader-evidence.json` files, each at most 64 KiB, in private 0700/0600 storage. The new versioned format requires four final criterion dispositions, exact UTF-8 byte spans for met criteria and consistent derived completion. It emits aggregate metadata only. A real but irrelevant quotation can pass the mechanical check; semantic relevance, calibration acceptance and model dispatch remain false. The [evidence contract](s0-grader-evidence.md) specifies strict fields, bounds, null/contradiction behavior and the remaining relevance audit. No earlier packet is converted or model called.
+The caller pins fixed `answer-frame.json` and `grader-evidence.json` files, each at most 64 KiB, in private 0700/0600 storage. The versioned format requires four final criterion dispositions and exact UTF-8 byte spans for met criteria. Response version 1 requires a consistent supplied completion; version 2 forbids that field and derives completion locally. Both preserve unknowns and emit aggregate metadata only, including the response schema version. A real but irrelevant quotation can pass the mechanical check; semantic relevance, calibration acceptance and model dispatch remain false. The [evidence contract](s0-grader-evidence.md) specifies strict fields, bounds, null/contradiction behavior and the remaining relevance audit. No earlier packet is converted or model called.
 
 Reconcile saved native OpenCode Go usage without another model call:
 
