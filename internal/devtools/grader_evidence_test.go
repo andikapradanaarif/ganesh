@@ -187,7 +187,7 @@ func TestGraderEvidenceRejectsMalformedStructure(t *testing.T) {
 			frame, response := evidenceFixture(t)
 			switch name {
 			case "wrong version":
-				response.Version = 3
+				response.Version = 4
 			case "wrong case":
 				response.Case = "different-case"
 			case "wrong task":
