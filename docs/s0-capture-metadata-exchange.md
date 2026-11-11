@@ -4,6 +4,8 @@
 
 A future composition could set an approved caller deadline, reduce the native event locally, connect to an independently admitted worker, exchange metadata and wait for that worker's durable receipt. This issue implements only the metadata wire/exchange component. It neither moves the current collector's append into another process nor qualifies that future composition. No worker or application integration is built or started.
 
+The subsequent [metadata peer](s0-capture-metadata-peer.md) supplies reusable one-request receiving/append/receipt handling on an already admitted connection. It adds no listener, authentication or separate-process lifecycle; the original client and wire contract remain unchanged.
+
 ## Connection and deadline ownership
 
 `captureipc.NewClient(conn)` takes exclusive ownership of an already connected `*net.UnixConn`. Only Unix **stream** sockets are admitted. The caller must establish the connection and independently authorize/authenticate the peer before handing it over. There is no dial, path selection, peer-credential check, enrollment or worker lifecycle in this package. Do not wrap the same connection in multiple clients or continue using it directly. `Close` releases an unused connection and can interrupt an active exchange. It is idempotent for an already closed connection, including deferred cleanup after `Submit`; an unconfigured client still returns static `ErrExchange`.
