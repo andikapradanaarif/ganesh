@@ -79,6 +79,14 @@ go run ./cmd/ganesh-dev grader-evidence-check --dir .local/s0/structured-case --
 
 The caller pins fixed `answer-frame.json` and `grader-evidence.json` files, each at most 64 KiB, in private 0700/0600 storage. The new versioned format requires four final criterion dispositions, exact UTF-8 byte spans for met criteria and consistent derived completion. It emits aggregate metadata only. A real but irrelevant quotation can pass the mechanical check; semantic relevance, calibration acceptance and model dispatch remain false. The [evidence contract](s0-grader-evidence.md) specifies strict fields, bounds, null/contradiction behavior and the remaining relevance audit. No earlier packet is converted or model called.
 
+Reconcile saved native OpenCode Go usage without another model call:
+
+```sh
+go run ./cmd/ganesh-dev go-usage-check --dir .local/s0/saved-usage --usage-sha256 "$S0_GO_USAGE_SHA256"
+```
+
+The caller pins a private regular 0600 `go-usage.json` in a 0700 directory, capped at 32 KiB. The pure parser checks zero-cost Go billing, explicit zero Go reasoning, optional standard metadata and total/native-versus-cached input consistency with overflow-safe arithmetic. Exact numeric cost checking rejects tiny nonzero charges; allowance text and absent optional counters are preserved. Output contains accounting metadata only and keeps model identity, grading, calibration acceptance and dispatch unverified/false. The [usage contract](s0-go-usage.md) documents the fixed 2,048-output-token profile, ignored provider extensions, private trust boundary and 23-object saved-record audit. No stream/model/answer validation or live runner is added.
+
 Run the disposable issue-state verifier against its fixed synthetic expectations:
 
 ```sh
