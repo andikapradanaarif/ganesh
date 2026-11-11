@@ -8,6 +8,8 @@
 
 The caller must admit/authenticate the connecting client separately. Only Unix **stream** sockets are accepted. A socket path, UUID, successful append or unkeyed request digest cannot establish client identity, source authority, complete capture or first-party origin. This implementation has no path selection, dial, listener, credentials or enrollment API.
 
+The later [PID/UID admission helper](s0-capture-peer-credentials.md) can check a connected socket before `ServeOne`; its kernel fields have OS-specific snapshot semantics and require independently trusted expected values. It does not establish process lifecycle, executable identity or each message's writer, and `ServeOne` does not invoke it automatically.
+
 The caller supplies a deadline before entry; the identical context object reaches `Spool.Append`. The peer neither chooses a duration nor receives the remote client's context/deadline through the metadata protocol. A future worker must define its own admitted request budget and lifecycle. The current client's callback budget must also include reduction and connection establishment; neither this method nor a successful socket test qualifies it.
 
 Reuse **one peer instance** to admit at most one exchange at a time. Overlapping calls on other exclusively owned connections return `ErrBusy` without reading or appending and close those rejected connections. No queue or detached append is created. Separate peer instances have separate guards; creating a peer per request would not impose a worker-wide bound. Listener/accept limits, connection admission before this method and process-wide resource control remain future work.

@@ -207,7 +207,7 @@ func TestAdmissionCredentialHelper(t *testing.T) {
 	if conn.SetDeadline(time.Now().Add(5*time.Second)) != nil {
 		t.Fatal("helper deadline")
 	}
-	if _, err := conn.Write([]byte("X")); err != nil {
+	if _, err := conn.Write([]byte("XQ")); err != nil {
 		t.Fatal("helper marker")
 	}
 	var marker [1]byte
@@ -253,6 +253,16 @@ func TestAdmissionSeparateProcessCredentials(t *testing.T) {
 				t.Fatal("child connection missing")
 			}
 			t.Cleanup(func() { _ = conn.Close() })
+			if conn.SetDeadline(time.Now().Add(5*time.Second)) != nil {
+				t.Fatal("child socket deadline")
+			}
+			// Synchronize before either deliberate rejection can close the
+			// connection. Leave the second byte queued to check that admission
+			// itself consumes no payload while the child waits for our reply.
+			var ready [1]byte
+			if _, err := io.ReadFull(conn, ready[:]); err != nil || ready[0] != 'X' {
+				t.Fatal("child readiness marker")
+			}
 			expected := PeerIdentity{PID: childPID, UID: uint32(os.Geteuid())}
 			if mode == "same UID wrong process" {
 				expected.PID = os.Getpid()
@@ -266,7 +276,7 @@ func TestAdmissionSeparateProcessCredentials(t *testing.T) {
 					t.Fatal("actual child credentials mismatch")
 				}
 				var marker [1]byte
-				if _, err := io.ReadFull(admitted, marker[:]); err != nil || marker[0] != 'X' {
+				if _, err := io.ReadFull(admitted, marker[:]); err != nil || marker[0] != 'Q' {
 					t.Fatal("admission consumed child bytes")
 				}
 				if _, err := admitted.Write([]byte("Y")); err != nil {

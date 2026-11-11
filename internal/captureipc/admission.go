@@ -8,11 +8,13 @@ import (
 
 var ErrAdmission = errors.New("local capture peer credentials not admitted")
 
-// PeerIdentity is an exact expected connection-origin identity supplied by a
-// trusted caller. PID must be positive and fit a kernel pid_t. UID zero means
-// root, not any user. Never fill this policy from the socket being checked.
-// PID reuse and descriptor inheritance/transfer require separate lifecycle
-// custody; this pair identifies neither executable bytes nor the current writer.
+// PeerIdentity contains exact expected kernel-reported PID/UID fields supplied
+// by a trusted caller. PID must be positive and fit a kernel pid_t. UID zero
+// means root, not any user; the all-ones UID sentinel is invalid. Never fill
+// this policy from the socket being checked. OS snapshot semantics differ:
+// these fields are not a portable atomic process-identity token. PID reuse and
+// descriptor inheritance/transfer require separate lifecycle custody; a match
+// identifies neither executable bytes nor each subsequent message's writer.
 type PeerIdentity struct {
 	PID int
 	UID uint32

@@ -6,6 +6,8 @@ A future composition could set an approved caller deadline, reduce the native ev
 
 The subsequent [metadata peer](s0-capture-metadata-peer.md) supplies reusable one-request receiving/append/receipt handling on an already admitted connection. It adds no listener, authentication or separate-process lifecycle; the original client and wire contract remain unchanged.
 
+An optional [kernel PID/UID check](s0-capture-peer-credentials.md) now compares an existing socket with caller-supplied expectations. It does not supply trusted expected-identity/lifecycle custody or full application authentication; this client still requires the caller to admit the peer before handoff.
+
 ## Connection and deadline ownership
 
 `captureipc.NewClient(conn)` takes exclusive ownership of an already connected `*net.UnixConn`. Only Unix **stream** sockets are admitted. The caller must establish the connection and independently authorize/authenticate the peer before handing it over. There is no dial, path selection, peer-credential check, enrollment or worker lifecycle in this package. Do not wrap the same connection in multiple clients or continue using it directly. `Close` releases an unused connection and can interrupt an active exchange. It is idempotent for an already closed connection, including deferred cleanup after `Submit`; an unconfigured client still returns static `ErrExchange`.

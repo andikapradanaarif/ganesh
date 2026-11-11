@@ -73,4 +73,6 @@ The internal [metadata receipt exchange](docs/s0-capture-metadata-exchange.md) a
 
 Its [receiving metadata peer](docs/s0-capture-metadata-peer.md) now appends one canonical request to the existing private spool before writing a bound receipt. Per-instance admission stays occupied during blocked storage; authentication, worker lifecycle and installation remain pending.
 
+The [connected-peer credential check](docs/s0-capture-peer-credentials.md) can compare an existing socket's kernel-reported PID/UID with explicit trusted expectations before handoff. OS snapshot semantics, descriptor custody and process lifecycle still limit what that match establishes.
+
 Current validation tooling uses Go; see [Go developer tools](docs/go-developer-tools.md). Completed Python experiments remain historical evidence at their original paths.
