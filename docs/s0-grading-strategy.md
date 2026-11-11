@@ -1,6 +1,6 @@
 # S0 grading strategy after the criterion-scope diagnostic
 
-[Issue #100](https://github.com/andikapradanaarif/ganesh/issues/100) continues [calibration #60](https://github.com/andikapradanaarif/ganesh/issues/60) after the [#99 diagnostic](https://github.com/andikapradanaarif/ganesh/issues/99). **DeepSeek V4.1 Flash through OpenCode Go remains the selected grader.** The requested Haiku comparison stopped in #102 on an incompatible translated request. A separate #103 native availability check succeeded; [#104](https://github.com/andikapradanaarif/ganesh/issues/104) now prepares the comparison through that working route. No Haiku grading evidence exists yet; availability does not clear calibration or authorize further calls.
+[Issue #100](https://github.com/andikapradanaarif/ganesh/issues/100) continues [calibration #60](https://github.com/andikapradanaarif/ganesh/issues/60) after the [#99 diagnostic](https://github.com/andikapradanaarif/ganesh/issues/99). **DeepSeek V4.1 Flash through OpenCode Go remains the selected candidate; calibration is unaccepted.** After a rejected translated request and a successful native availability check, the owner-approved [#104 comparison](https://github.com/andikapradanaarif/ganesh/issues/104) returned five Haiku judgments and one transport failure. On the same five cases Haiku matched the reference less often than Flash, including missed critical flags. Do not switch graders or rerun the stopped comparison.
 
 ## What the saved run establishes
 
@@ -26,7 +26,7 @@ Runtime was 89.337 seconds; saved usage reconciled to 17,545 input plus 4,732 ou
 | --- | --- |
 | Another Flash format or prompt revision on these contrasts | Stop this line for now. No decoder defect explains the remaining semantic differences; repeated selection/tuning would add development observations without establishing general grading reliability. This does not claim every Flash configuration is incapable of grading. |
 | Continue with DeepSeek Flash through Go | Owner-selected path. Preserve the existing family amendment and processor permissions within their actual scope. Treat the two remaining errors as unresolved calibration findings; model choice does not clear them. |
-| Compare Haiku against the saved Flash run | Owner-requested comparison. #102's translated request failed; #103 confirmed native availability. #104 keeps the same prompts, cases and references with native transport. Exact fresh numeric approval is pending; no Flash rerun or automatic replacement. |
+| Compare Haiku against the saved Flash run | Bounded comparison attempted and reviewed under #104. Five valid judgments, sixth response missing; worse reference agreement on the paired five. Stop this line without a replacement call; no Flash rerun or model switch. |
 | Assistant review or agreement between several models | Useful for surfacing disputes and checking source/rubric reasoning. Preserve separate proposed labels. It cannot fill missing owner labels, establish independent truth or replace the required grading arrangement and owner checks. |
 | Pause semantic evaluation and continue capture work | A separately scoped local peer/worker design can address the gap after the metadata client. It earns no memory-usefulness result and does not release the semantic or service gates. |
 
@@ -86,6 +86,34 @@ Protocol SHA-256: `540cd889d22af29a09972141e7b9d10f235b2f04910f3f5a284c96e6af70a
 
 Native comparison normal/race tests, vet and wrapper syntax pass. All 42 historical streams remain compatible with their historical profile, and all 534 bound prior files hash unchanged. Without new approval the wrapper refuses before credential lookup and creates no run. Private modes/git exclusion, the 42 scoped relative file targets, baseline anchors and diff checks pass. Public runtime code and the supplied baseline documents remain unchanged.
 
+## Native comparison result: incomplete run, failed gate
+
+The owner approved the exact #104 packet and ran all six attempts. Five returned valid native/schema-3 evidence. Attempt six ended after 33.796 seconds with **no HTTP response (saved status 0) and an empty body**; the whole batch took 60.163 seconds. The runner retained no detailed transport cause, so do not attribute this to timeout, quota or a provider outage. Its usage remains unknown. All six calls are consumed; no retry, replacement or resume is authorized.
+
+The fair paired comparison is the same five returned cases, each scored against the unchanged same-author reference:
+
+| Measure | Saved Flash | Native Haiku |
+| --- | --- | --- |
+| Coverage/defeat pairs and derived statuses matching reference | 19/20 | 18/20 |
+| Completion/critical/unsupported declarations matching reference | 14/15 | 11/15 |
+| Cases matching every observation/status/declaration | 3/5 | 1/5 |
+| Returned planted-critical controls flagged | 3/3 | 1/3 |
+| Critical false positives relative to reference | 1 | 1 |
+
+Haiku's completion matches 5/5, critical flags 2/5 and unsupported flags 4/5. In the action-only and provenance-only controls its boolean critical flags are false even though its own explanations identify a listed critical failure and say the flag is set. In the provenance-only control it also sets unsupported=false despite explaining the unsupported factual proof claim. Preserve those contradictory fields/notes as returned; do not repair booleans from prose. Correct locally derived incompletion does not clear missing critical/unsupported flags.
+
+Haiku also expands C4 capture/provenance defeat to current-checkout cleanliness in two cases, where the approved annex keeps those subjects separate. The contrary quotations are exact but semantically irrelevant to that criterion. It repeats Flash's false critical flag on the attribution-only control. The models agree on 19/20 observation pairs and 12/15 declarations, including shared wrong judgments; agreement cannot settle correctness.
+
+The planned denominator remains six cases, 24 observation pairs/statuses, 48 enum fields and 18 declarations. Haiku has five observed cases, 20 pairs/statuses, 40 enum fields and 15 declarations; case six and its fourth planned critical control stay missing. All returned coverage values match (20/20), observation enums match 38/40, and the C1/C4 focus matches 8/10. No returned observation/declaration is unknown, distinct from the missing response and its unknown usage. This is neither a six-case success nor a favorable subset substituted for the failed full gate.
+
+The assistant reviewed the unchanged sources/rubric/annex, all five whole answers and every explanation/note/span. All 29 span entries (20 supporting/nine contrary) are byte-exact. Offline Go review re-parsed native responses and accounting, re-ran evidence readers, matched saved reports and verified frozen producer/test/library/wrapper/approval bindings. All 534 historical files and current saved-run files are unchanged. Paired Flash results were recomputed on those same five frames; source-supported reference judgments remain same-author proposals, not independent or owner truth. Review tools execute and pass vet; no inference or credential inspection occurred during review.
+
+Private review bindings: aggregate report `edf9cdf7b4cc724890ac763336701e1ec440b365d88fe35c72c79ec5cc55f1a6`, paired comparison `ba6a0be9387c27dd78781bb784f121ff56edd81c1783eb529b53b4d615b84db8`, semantic findings `447343e9b5411c6cf8884e658cc195a668d008726fd0d909c5729039c7d58552`. These preserve local custody without making private bytes independently reproducible from this page.
+
+Known usage for the five reconciled attempts is **24,080 input + 5,645 output = 29,725 tokens**, all input uncached, zero reported reasoning/additional cost. Their exact allowance sum is `0.02092200` (10461/500000) in provider units. The sixth attempt's input, output, allowance and cost remain unknown; the zero counters for unreconciled work do not measure zero consumption. These records do not authenticate billing or remaining quota. Focused review effort remains unknown; program durations do not fill it or erase overruns.
+
+Recommendation: keep Flash selected and stop this Haiku comparison line. Even a matching sixth response could not erase the observed gate failures, so no replacement call is proposed. Both profiles remain uncalibrated. The small selected development sample, shared reference/reviewer authorship and differing route/effort/tokenizer profiles prevent a general model-accuracy or model-only causal ranking. Further work should be separately scoped offline adjudication or capture work, preserving owner checks and stage boundaries.
+
 ## Work that remains separate
 
 The original 18-case calibration still needs source-supported adjudication and the missing owner declarations. The two existing owner judgments remain two; assistant reference labels cannot be promoted into the other sixteen. The [comparison tool](s0-calibration-comparison.md) does not accept calibration. Full calibration, exact answering settings, permitted corpus/context fit and the held-out input freeze remain pending. The [execution sheet](s0-execution-sheet.md#score-and-stop) requires owner checks of all critical/unsupported flags, disagreements and unknowns, plus six primary pairs and three complete diagnostic sets within the grading budget. Model agreement cannot waive them.
@@ -94,4 +122,4 @@ For a parallel capture issue, the [metadata exchange](s0-capture-metadata-exchan
 
 Prior focused S0 effort, total review effort and remaining quota remain unknown; earlier recorded overruns stand. Missing effort cannot be replaced by model runtime or interpreted as room inside the 30–56-hour cap. If the required work cannot fit, report incomplete or seek a prospectively bounded rescope under the [roadmap](personal-second-memory-roadmap.md#appendix-a-experiments-before-s1a), retaining its controls. No held-out answer, S0 usefulness gate, service deployment or narrative activation is earned here. The supplied roadmap and execution sheet remain unchanged.
 
-DeepSeek Flash remains selected. Native Haiku availability is confirmed for the successful probe; the next decision is exact approval of #104's six-case native comparison. Calibration stays unaccepted; no model switch, Flash repeat or service activation follows automatically.
+DeepSeek Flash remains selected. The Haiku comparison is closed to further calls with its incomplete/failed result preserved. Calibration stays unaccepted; no model switch, Flash repeat or service activation follows automatically.
