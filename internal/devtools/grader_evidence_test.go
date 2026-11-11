@@ -67,6 +67,10 @@ func TestGraderEvidencePrivacyAndMeaningBoundary(t *testing.T) {
 	if report.FrameSHA256 != devinDigest(frameBody) || report.ResponseSHA256 != devinDigest(responseBody) {
 		t.Fatal("digest binding")
 	}
+	v2, err := checkGraderEvidence(frameBody, evidenceV2JSON(t, response))
+	if err != nil || v2.ResponseSchemaVersion != 2 || v2.Met != 4 || v2.DerivedCompletion == nil || !*v2.DerivedCompletion || v2.SemanticRelevanceVerified || v2.CalibrationAccepted || v2.ModelDispatchAuthorized {
+		t.Fatal("version 2 promoted real but irrelevant quotations to assurance")
+	}
 	// The observed over-credit failure becomes structurally inconsistent once
 	// the missing coverage is actually declared unmet.
 	response.Criteria[3].Status, response.Criteria[3].Explanation = "unmet", "Required distinction absent."
