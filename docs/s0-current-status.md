@@ -1,0 +1,53 @@
+# Current S0 status and next work
+
+Snapshot after PR #108, 2026-11-12. [Issue #109](https://github.com/andikapradanaarif/ganesh/issues/109) responds to the owner's project review. This is a filled companion to the preserved [execution sheet](s0-execution-sheet.md), not a replacement protocol or run approval.
+
+**Owner decision: “Keep original 108-answer S0.”** Retain 30 primary tasks, 20 within-project/ten cross-project, the 12-task diagnostic subset and all 0/A/B/C/D/F controls; preserve the conditional 24-answer eligible-origin rerun. No smaller pilot or human-only replacement for the grading protocol is selected.
+
+**Current result: incomplete, 0/108 recorded held-out answers.** There is no accepted grader or qualified installed capture profile. The sequencing problem is real: capture and verifier development continued without producing the primary memory-value comparison. Further infrastructure and grader-format work should not be the default next issue.
+
+## Filled run-input status
+
+| Execution-sheet input | Recorded state | Still needed |
+| --- | --- | --- |
+| Projects and permissions | Five selected projects in the [inventory](s0-day-one-inventory.md). Aurum/Borneo/Valo-backend/Kiosk history has recorded local processing grants; Nexus is an architectural reference, not enrolled corpus. | Exact evaluation source subset and disclosure destinations. Existing narrow grants do not authorize all candidate text to every provider. |
+| Capture client/build/installation | Inventory selected Crush `v0.99.1-fork.1` on local macOS. No supported installed profile. | A later installation needs its actual revision/configuration, scope and separate qualification. |
+| Cold-start and receipt latency | Closed studies retain first-launch failures and negative headroom; a later native prototype passed its bounded callbacks/faults. | No qualified live-client p95/p99 or first/warm/idle profile. Measurement allowances exhausted. |
+| SessionEnd/competing hooks | Existing CLI uses 750 ms from OS process start and a one-second configured hook timeout; pinned runner grace can extend observed return. | Actual installed hook set and complete joint behavior remain unqualified. |
+| Models | OpenAI answering family selected, exact answering profile unfilled. Flash through Go is an unaccepted grader candidate; Haiku did not improve the comparison. | Exact answering ID/client/access and an acceptable calibrated grading arrangement. Future inference authority is zero. |
+| Limits | Additional paid API spend stays $0; Go Extra Usage stays off. Past diagnostic allowances consumed or expired. | One complete experiment-level request/token/time/retry/allowance record before calls; subscription quota/reset unknown. |
+| Corpus | Recorded candidate fields: 21 Crush digests, 7,892 bytes; 27 Devin excerpts, 43,724 bytes. Total 51,616 text bytes. | Reviewed, permitted, source-linked frozen summary set; overlap/redaction fidelity and whole-request fit. Candidate bytes are not measured tokens or the complete prompt. |
+| Tasks/rubrics and arms | Six calibration tasks/18 variants exist and are reserved development material. No frozen 30-task held-out set or operational 0/A/B/C/D/F inputs. | Distinct source-backed tasks, source-keyed oracles, unchanged baseline instructions/access map, typed cards, arm corpus and fresh-session/order record. Do not rename calibration cases as held out. |
+| Calibration/owner review | Two actual owner judgments in the 18-case packet; assistant references stay separate. [Flash/Haiku review](s0-grading-strategy.md) remains failed/incomplete. | Required source-based owner adjudication and an accepted grader. No new format loop is proposed. |
+| Origin/A2.3 | Frozen screen H=17, M=3, U=12, E=1: 17.65% mixed, 70.59% unknown, 88.24% combined, 5.88% eligible. One declared eligible lesson/project. | Early mixed threshold is not triggered. Final S0b-2 recheck remains pending; no six-lesson/two-project pass or funded A2.3 record. Preserve the denominator and unknowns. |
+| Effort | Overall focused effort unknown; the 42m20s preparation overrun and closed study ceilings stand. | Prospective limits and reconciliation supported by records. Touched commit hours establish neither focused-time compliance nor a focused-time upper bound. |
+
+Sources: [corpus preflight](s0-corpus-calibration-preflight.md), [Devin candidates](s0-devin-excerpt-candidates.md), [calibration preparation](s0-calibration-candidates.md) and [run-input proposal](s0-run-input-proposal.md). Counts describe recorded artifacts; no new transcript/source-content inspection occurred for this status sheet.
+
+The five-field local capture record, an IPC receipt and a PID/UID match supply no file-version/read-class provenance and cannot automatically raise E. Capture qualification blocks hook enrollment; it should not require a worker build before a permitted history-value experiment. The roadmap allows the primary pilot to report capture unknown rather than manufacture eligibility. Automatic discovery-to-reuse and unattended upkeep remain separate mandatory product evidence.
+
+## Review disposition
+
+| Review point | Disposition |
+| --- | --- |
+| Premature verifier/IPC sequencing | Agree. Local capture IPC is not a hosted gateway, but it did not advance 0/108. Keep the code; remove more infrastructure from the present critical path. |
+| Too much machinery and tiny approval batches | Agree on proportionality. Preserve failures and freeze relevant current inputs, rather than repeatedly rehashing unrelated historical files. Prefer one whole-experiment protocol/allowance; old expired approvals cannot be broadened retroactively. |
+| First-copy latency is installation-only | Plausible, unproven. Reviewer reports five copied executables with slow first runs and fast repeats. That does not establish the macOS mechanism, installed-hook headroom, warm/idle behavior or competing-hook safety. Earlier warm failures/load remain visible; no warm-up exception or new study is authorized. |
+| Overloaded host and red compiled CLI test | Retain as reviewer-reported observations. Rejection occurred on head and base; keep the 750 ms rule and failures. Correctness CI and explicit startup qualification need a bounded separation follow-up. No GitHub Actions workflow exists. |
+| Full-context fit | No demonstrated capacity problem at this candidate size. Make it a short exact-profile preflight, not a tooling project. Freeze the actual permitted corpus and whole request; ~13k estimated tokens is not measured fit. |
+| Seventy-one touched clock-hours bounds effort | It demonstrates prolonged activity, not active focus: commits may contain little work and uncommitted work may take hours. Timebox future work without inventing retrospective totals. |
+| Arm A weak; richer history may win | Reasonable hypotheses, not observed results. The owner retains all standard arms, including A/B/C and required D/F diagnostics. Preparing the common summary corpus can move first; no arm is dropped. |
+| Corpus may not support 30 natural tasks | A real risk to test before answers. Report insufficiency rather than pad scenarios, repeat tasks or relabel calibration cases. |
+| Strong paid grading may cost less than repeated small-model tuning | A decision, not demonstrated superiority or an approved budget. Historical $39.813120 was an output-only ceiling excluding input/tools/retries/calibration. The owner's $0 additional-spend preference remains. |
+| README/docs obscure next action | Addressed: short README, this filled status and the [historical development record](../DEVELOPMENT.md). Baseline documents and original evidence remain intact. |
+
+## Next preparation sequence
+
+1. **Establish task and corpus sufficiency.** Inventory enough distinct, non-calibration source-backed tasks for the exact 30-task mix: coder 7/3, planner 7/3, reviewer 6/4 within/cross; select the 12 diagnostics at 6/6. First prepare the permitted summary set shared by D/F and the reference-prose inputs for C. Keep source/origin labels and access differences explicit. Stop and report insufficient material if the required task population cannot be supported; no automatic smaller-plan fallback.
+2. **Complete all arm inputs and evaluation freeze.** Prepare A's verified typed cards and B's packaging alongside the unchanged 0 baseline. Bind task/rubric/oracle, corpus, permission/access map, instructions, variants, exact answering profile, whole-request fit and clean-session counterbalanced schedule. Use existing file/agent tools and the existing standard planner; no new memory engine, retrieval service or test harness by default.
+3. **Resolve grading and owner checks as one decision.** Keep the two real owner labels separate from assistant references; finish the required source-based adjudication. Flash is selected but uncalibrated, so its status cannot be promoted by good formatting. Prepare a finite grading choice and its acceptance/stop rule once the actual inputs are ready; no repeated ad hoc prompt variants. Any different model/provider or budget requires its actual choice, permission and bounded allowance before calls.
+4. **Approve one complete execution record, then run.** Freeze total request/output/reasoning/time/retry/allowance/spend limits for the whole 108-answer experiment and any required predeclared conditional work. Retain $0 additional spend until changed explicitly. Failed calls, unknown usage, required owner samples and the 24-answer D/F trigger stay accounted for. No silent truncation, control omission or per-six-call permission loop.
+
+Preparation of source text beyond an existing grant still needs its explicit scope; nothing is enrolled by this document. Full-context token counting with a provider also discloses data and is covered by the eventual packet permission. The historical larger-model cost proposal is not a current price quote or execution authority.
+
+The owner decisions that remain are concrete: confirm any needed packet disclosure/model/budget choice and provide the source-supported judgments the approved protocol reserves to the owner. The assistant prepares the candidate material and comparison; it cannot invent those owner labels. No additional infrastructure implementation, provider request, timing attempt, CI deployment, smaller pilot or baseline edit is selected here. The next deliverable is a complete original-S0 input proposal or a documented insufficient-corpus/incomplete outcome.
