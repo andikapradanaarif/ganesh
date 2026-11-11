@@ -35,6 +35,8 @@ The [Codex source-link audit](docs/s0-codex-source-audit.md) similarly rechecks 
 
 [Criterion-specific defeat proposal](docs/s0-criterion-specific-defeat.md) separates attribution, action safety and capture/provenance subjects, with private contrasts for true defeats and unrelated-action controls. It leaves the previous diagnostic uncleared.
 
+[Grading-strategy decision](docs/s0-grading-strategy.md) retains DeepSeek Flash after the native Haiku comparison returned five judgments and one transport failure. Haiku matched the reference less often on the same five cases; both profiles remain uncalibrated and no further calls are authorized.
+
 [Saved Go usage reconciliation](docs/s0-go-usage.md) checks optional reasoning metadata, cache-aware token accounting and exact zero additional cost without calling a provider or accepting the grader.
 
 The [OpenCode Go grader amendment](docs/s0-opencode-go-grader-amendment.md) records the owner's DeepSeek candidate choice for OpenAI answers. Calibration, account checks and provider-disclosure/run limits remain pending.
