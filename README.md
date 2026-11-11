@@ -31,6 +31,8 @@ The [Codex source-link audit](docs/s0-codex-source-audit.md) similarly rechecks 
 
 [Structured grader evidence checks](docs/s0-grader-evidence.md) bind a proposed single-case response to exact answer spans and consistent criterion dispositions. Mechanical validity leaves semantic relevance and grader acceptance unverified.
 
+[Whole-answer adjudication proposal](docs/s0-whole-answer-adjudication.md) records the criterion contradiction failures and an offline challenge separating positive coverage from defeating content. It provides no model-run or calibration authority.
+
 [Saved Go usage reconciliation](docs/s0-go-usage.md) checks optional reasoning metadata, cache-aware token accounting and exact zero additional cost without calling a provider or accepting the grader.
 
 The [OpenCode Go grader amendment](docs/s0-opencode-go-grader-amendment.md) records the owner's DeepSeek candidate choice for OpenAI answers. Calibration, account checks and provider-disclosure/run limits remain pending.
