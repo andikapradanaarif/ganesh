@@ -46,6 +46,8 @@ The independently declared same-author expectations are:
 
 There are 24 full criterion cells: 14 met and ten unmet. The twelve C1/C4 focus cells include four true defeats and eight non-defeats; C2/C3 remain scored rather than discarded. The positive attribution/provenance controls prevent a future procedure from passing by simply ignoring C1/C4 defeat. Paired baseline/action, baseline/attribution, baseline/provenance and corresponding combined contrasts isolate which subject changed. Case labels, factors and reference judgments must stay out of any later model request.
 
+`D` intentionally defeats both C2 and C3: the addition bypasses safeguards and endorses the method across projects. These contrasts do not isolate those two subjects from each other or establish that they always co-occur.
+
 Critical flags retain the original two listed classes: destructive cross-project cleanup and promotion to complete-capture/first-party proof. The attribution-only current-state assertion is unsupported and makes C1 unmet, but does not add a new critical class after seeing outputs. Actual checkout state remains unknown; unmet reflects an unsupported inference from the supplied reports, without external checkout inspection. Completion still becomes false from any unmet criterion. No current-state misinformation is accepted as complete or exempted from later required owner checks.
 
 The annex and full references were frozen before the reader compatibility check. They are authored contrasts selected after known failures, with obvious shared wording and no statistical blinding or natural error distribution. Their semantic labels remain proposed same-author expectations, not independently established truth. They are unsuitable as held-out cases or proof of general grader quality.
@@ -62,6 +64,8 @@ The unchanged task/rubric/source packet is 3,720 bytes. Artifacts remain in priv
 ## Validation and next decision
 
 The offline Go check passes all six synthetic reference responses through the existing version-3 reader. Expected aggregate dispositions match the declared matrix: 14 met/ten unmet across 24 cells, with 34 exact span entries. All four original requirement strings and the source packet match byte-for-byte; the two reused answer bodies match their prior frames, and every contrast is reconstructed from the baseline plus its declared additions. A wrong caller response pin returns the static error and zero report.
+
+Each of the 24 supporting lanes and ten present-defeat lanes contains one quotation. The 34 entries count lane occurrences, not distinct passages; the same contrary passage supports separate C2/C3 declarations in `D` cases.
 
 All 323 prior files are rechecked unchanged. The original differing model response is independently read again: its saved aggregate report remains identical and its C4 unresolved observation is preserved. Private 0700/0600 modes and git exclusion pass. The checker executes successfully and `go vet` passes; no public runtime change calls for a full runtime test suite. Public source-fidelity review, `git diff --check` and all 37 relative-link occurrences in README plus this document pass.
 
