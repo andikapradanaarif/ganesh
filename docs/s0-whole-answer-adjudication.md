@@ -42,18 +42,36 @@ Six private answers reuse one previously approved cleanup task/rubric and its tw
 
 The twelve target cells are C2/C3 across those six answers: six reference `met` and six reference `unmet`. Both positive and contrary text can be present in an unmet case. The quoted-rejection control must remain met: a rule that marks all harmful-looking text as endorsement fails that control. C1/C4 and expected critical/unsupported flags are retained as context, not new prototype performance denominators.
 
-Same-author reference observations and an explicit nine-cell expected combination table were frozen before the private prototype was implemented. Synthetic observation inputs are stored separately from the expected answer dispositions. They are manually declared test data, not outputs produced by the model or independently established semantic labels. The obvious edits, repeated source task and known failures permit cueing and overfitting; no statistical blinding, natural-error distribution or general grader accuracy is claimed.
+Same-author reference observations and an explicit nine-cell expected combination table were frozen before the private prototype was implemented. A separate synthetic-observation file retains expected statuses as audit metadata, but the combiner receives only the coverage/defeat enums. The scorer reads expectations from the frozen challenge instead of deriving them with the candidate. These are manually declared test data, not outputs produced by the model or independently established semantic labels. The obvious edits, repeated source task and known failures permit cueing and overfitting; no statistical blinding, natural-error distribution or general grader accuracy is claimed.
 
 The task/rubric/source packet is 3,720 bytes. Private artifacts use 0700 directories and 0600 files under git-ignored storage. The freeze snapshots 173 prior files, including both saved structured runs, references, original model/owner packets and producer sources. No raw transcript is enrolled or accessed.
 
 | Frozen artifact | SHA-256 |
 |---|---|
 | Challenge freeze | `73d03be7b23e402cf2a1cc716412fe69c2d62de2812b0a9a441c06fc9b1d4514` |
+| Combination prototype | `9e9a0000793ae405b3c967ed3e14f736618333881a0002cef2e6f3074916aeac` |
+| Offline checker | `6caa91413f997762e7830d5bd6fc4062b6ce6ffcd8d47226cdb1e80451eb3767` |
+| Prototype tests | `f8e73c0bbb297447ccd70e3d190164d27f601daee38a6079650a1b12f02ff092` |
+| Verification report | `d6d5fac0be3091b4c20e4bf740a0c4dddc357e49a6bc048572760f3725d92168` |
 
 The freeze binds challenge answers/frames, same-author observations, expected table, source packet, preparation program and prior-file snapshot. Digests establish local byte custody under the trusted same-user host, not authorship, independent truth or model provenance. Private bytes cannot be independently reproduced from this public document.
 
 ## Offline validation and next decision
 
-The private Go prototype and its checks are pending in the initial draft. The completed pass will record the nine-cell combination checks, twelve synthetic challenge cells, unknown/invalid inputs, the semantic boundary and unchanged prior evidence before this PR is ready for review. Synthetic success will establish only the combination of supplied observations; it cannot demonstrate that a model recognizes contradictions or rejects only relevant ones.
+The private Go prototype passes all nine frozen combination expectations and all twelve target cells **when supplied the synthetic reference observations**. A deliberately always-met candidate matches six cells and misses six, demonstrating that the scorer retains separate expected dispositions. Ten invalid-value cases reject even when a valid missing/defeat declaration would otherwise determine the result; unknown precedence is covered by the complete table. The quoted/rejection control contains the exact harmful sentence from an unsafe control, with a different same-author semantic expectation.
+
+Boundary checks also show that wrong supplied observations remain mechanically admissible: declaring `absent` on a contradictory answer yields met, and declaring `present` on a rejected quotation yields unmet. There is no model test behind the 12/12 result. Neither result establishes semantic truth or the model's ability to identify defeat. The prototype only combines enums; it reads no answer or reference and does not enforce the proposed future span/explanation layout. A future model result would still require source/rubric review; a versioned reader for the proposed observations is not implemented.
+
+Private normal and race tests and `go vet` passed. Source fidelity checks bind the copied task/rubric/source packet and all three reused answer bodies to the preceding frozen frame; the three new synthetic answer hashes are distinct from all six preceding answers. The frozen challenge and 173 prior files were rechecked unchanged. Private modes and git exclusion pass. No provider request, credential inspection, paid spend, public runtime change or new execution allowance occurred. Total focused preparation/review effort remains unknown; the recorded program durations are not that total.
+
+The rerunnable private check command uses the three files below; add `-race` for race checks, or substitute `vet` for `test`:
+
+```sh
+go test .local/s0/whole-answer-92/prototype.go \
+  .local/s0/whole-answer-92/check.go \
+  .local/s0/whole-answer-92/prototype_test.go
+```
+
+Public validation covers source fidelity, the nine-cell table above, `git diff --check` and all 35 relative-link occurrences in README and this document. There is no change requiring a runtime repository test suite. The private files and checks remain unavailable to a public-only reviewer; the pinned report records local evidence, not an independently reproducible semantic evaluation.
 
 Calibration remains unaccepted and the stopped diagnostic remains uncleared. The next decision is whether to implement and test this candidate judgment interface in a separately scoped issue. Any subsequent live test needs a new frozen packet and explicit run/disclosure allowance. Keep the all-criteria progression rule, later owner checks, alternate-family arrangement and [S0 execution protocol](s0-execution-sheet.md) intact. No held-out answer, service readiness or S0 gate follows from this proposal.
