@@ -99,4 +99,45 @@ func TestGraderEvidenceCommand(t *testing.T) {
 	if err := run(args, &stdout, &stderr); err != devtools.ErrGraderEvidence || stdout.Len() != 0 || stderr.Len() != 0 {
 		t.Fatal("version 2 supplied completion accepted")
 	}
+	// New synthetic observations, not a conversion path for saved outputs.
+	var observations []map[string]any
+	for _, id := range []string{"C1", "C2", "C3", "C4"} {
+		observations = append(observations, map[string]any{
+			"id": id, "coverage": "covered", "supporting_spans": []map[string]any{{"start": 0, "end": len(answer), "quote": answer}}, "coverage_explanation": "",
+			"defeat": "absent", "contrary_spans": []map[string]any{}, "defeat_explanation": "Private no-defeat declaration.",
+		})
+	}
+	response["schema_version"], response["introduced_critical_error"], response["criteria"] = 3, false, observations
+	delete(response, "completion")
+	args[len(args)-1] = write("grader-evidence.json", response)
+	if err := run(args, &stdout, &stderr); err != nil || json.Unmarshal(stdout.Bytes(), &report) != nil || report.ResponseSchemaVersion != 3 || report.Met != 4 || report.VerifiedSpans != 4 || report.DerivedCompletion == nil || !*report.DerivedCompletion || report.UnsupportedClaim != nil || report.SemanticRelevanceVerified || report.CalibrationAccepted || report.ModelDispatchAuthorized {
+		t.Fatal("version 3 command output or authority")
+	}
+	for _, private := range []string{"ghp_", "private-task-canary", "private-case-canary", "Private", dir} {
+		if strings.Contains(stdout.String(), private) {
+			t.Fatal("version 3 private output")
+		}
+	}
+	stdout.Reset()
+	observations[0]["defeat"] = "present"
+	observations[0]["contrary_spans"] = observations[0]["supporting_spans"]
+	args[len(args)-1] = write("grader-evidence.json", response)
+	if err := run(args, &stdout, &stderr); err != nil || json.Unmarshal(stdout.Bytes(), &report) != nil || report.Unmet != 1 || report.VerifiedSpans != 5 || report.DerivedCompletion == nil || *report.DerivedCompletion {
+		t.Fatal("version 3 failed to derive defeat")
+	}
+	stdout.Reset()
+	observations[0]["defeat"], observations[0]["contrary_spans"] = "unknown", []map[string]any{}
+	args[len(args)-1] = write("grader-evidence.json", response)
+	if err := run(args, &stdout, &stderr); err != nil || json.Unmarshal(stdout.Bytes(), &report) != nil || report.Unresolved != 1 || report.DerivedCompletion != nil {
+		t.Fatal("version 3 collapsed uncertainty")
+	}
+	if err := run(args, failingOutputWriter{}, &stderr); err != devtools.ErrGraderEvidence {
+		t.Fatal("version 3 writer error not normalized")
+	}
+	stdout.Reset()
+	observations[0]["status"] = nil
+	args[len(args)-1] = write("grader-evidence.json", response)
+	if err := run(args, &stdout, &stderr); err != devtools.ErrGraderEvidence || stdout.Len() != 0 || stderr.Len() != 0 {
+		t.Fatal("version 3 admitted model-supplied final status or emitted rejected text")
+	}
 }

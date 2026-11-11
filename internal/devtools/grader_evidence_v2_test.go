@@ -61,7 +61,7 @@ func TestGraderEvidenceV2RejectsMixedAndMissingFields(t *testing.T) {
 			case "unknown field":
 				object["derived_completion"] = json.RawMessage(`true`)
 			case "unknown version":
-				object["schema_version"] = json.RawMessage(`3`)
+				object["schema_version"] = json.RawMessage(`4`)
 			case "float version":
 				object["schema_version"] = json.RawMessage(`2.0`)
 			case "null spans":

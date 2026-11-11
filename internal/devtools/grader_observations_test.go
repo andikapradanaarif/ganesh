@@ -268,7 +268,13 @@ func TestObservationStrictDecoderAndLaneSpans(t *testing.T) {
 				case "duplicate range":
 					spans = []any{span, span}
 				case "too many":
-					spans = []any{span, span, span, span, span}
+					spans = []any{
+						map[string]any{"start": 0, "end": 1, "quote": "A"},
+						map[string]any{"start": 1, "end": 3, "quote": "é"},
+						map[string]any{"start": 3, "end": 7, "quote": "🙂"},
+						map[string]any{"start": 7, "end": 8, "quote": "Z"},
+						map[string]any{"start": 8, "end": 9, "quote": "x"},
+					}
 				case "negative":
 					span["start"] = -1
 				case "oversize end":
@@ -351,4 +357,28 @@ func TestObservationPrivateReader(t *testing.T) {
 	if err != ErrGraderEvidence || report != (GraderEvidenceReport{}) || strings.Contains(err.Error(), dir) {
 		t.Fatal("unsafe version 3 reader or private error")
 	}
+}
+
+func TestObservationLaneAndEnvelopeBounds(t *testing.T) {
+	f, r := observationFixture(t)
+	f.Answer = "Aé🙂Z"
+	spans := []evidenceSpan{{0, 1, "A"}, {1, 3, "é"}, {3, 7, "🙂"}, {7, 8, "Z"}}
+	for i := range r.Criteria {
+		r.Criteria[i].SupportingSpans, r.Criteria[i].ContrarySpans = spans, spans
+		r.Criteria[i].Defeat = "present"
+		r.Criteria[i].CoverageExplanation, r.Criteria[i].DefeatExplanation = strings.Repeat("x", 1024), strings.Repeat("x", 1024)
+	}
+	r.Notes = strings.Repeat("x", 4096)
+	report, err := checkObservation(t, f, r)
+	if err != nil || report.VerifiedSpans != 32 || report.Unmet != 4 {
+		t.Fatal("valid per-lane counts, UTF-8 boundaries or explanation/notes caps rejected")
+	}
+	fb := evidenceJSON(t, f)
+	r.Frame = devinDigest(fb)
+	rb := evidenceJSON(t, r)
+	tooLargeResponse := append(append([]byte{}, rb...), bytes.Repeat([]byte(" "), evidenceFileLimit+1-len(rb))...)
+	assertObservationRejected(t, fb, tooLargeResponse)
+	tooLargeFrame := append(append([]byte{}, fb...), bytes.Repeat([]byte(" "), evidenceFileLimit+1-len(fb))...)
+	r.Frame = devinDigest(tooLargeFrame)
+	assertObservationRejected(t, tooLargeFrame, evidenceJSON(t, r))
 }

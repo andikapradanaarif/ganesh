@@ -8,6 +8,8 @@ This format is proposed for a future calibration version. It does not convert ea
 
 [Issue #89](https://github.com/andikapradanaarif/ganesh/issues/89) adds response version 2, which omits the model's redundant completion field and derives it locally. A model can still misjudge criterion coverage. Unresolved coverage remains unknown; this format change does not repair semantic grading or accept the stopped diagnostic. Response version 1 and its consistency checks remain supported unchanged.
 
+[Issue #94](https://github.com/andikapradanaarif/ganesh/issues/94) adds offline response version 3 following the [whole-answer proposal](s0-whole-answer-adjudication.md). It separates declared positive coverage from declared defeating content and derives both criterion status and completion locally. It cannot establish that those declarations are correct. Versions 1/2 and their report format remain supported unchanged; no saved response is converted and no model run is authorized.
+
 ## Invocation and storage
 
 ```sh
@@ -21,7 +23,7 @@ The two fixed filenames are `answer-frame.json` and `grader-evidence.json`. Both
 
 Take the frame digest from its preserved pre-dispatch record and the response digest from the saved run record. Both must be 64 lowercase hexadecimal characters. They pin exact file bytes, including whitespace, and do not authenticate the author, model, rubric or records. Do not repin modified artifacts to disguise a changed run. A changed or malformed file returns the static error `private bounded grader evidence required`, exit 1 and no JSON report.
 
-Each file is capped at 64 KiB. The decoded answer is nonempty UTF-8, at most 32 KiB; each requirement and criterion explanation is at most 1,024 UTF-8 bytes; notes at most 4,096 bytes. There are exactly four criteria and at most four spans per response criterion, each quoting at most 2,048 bytes. The existing 64-level JSON nesting bound also applies. The command checks bytes and declared structure, not scrubbing adequacy or permission to disclose their contents.
+Each file is capped at 64 KiB. The decoded answer is nonempty UTF-8, at most 32 KiB; each requirement and criterion explanation is at most 1,024 UTF-8 bytes; notes at most 4,096 bytes. There are exactly four criteria. Versions 1/2 allow at most four spans per criterion; version 3 allows at most four in each of its two lanes. Each span quotes at most 2,048 bytes. The existing 64-level JSON nesting bound also applies. The command checks bytes and declared structure, not scrubbing adequacy or permission to disclose their contents.
 
 ## Frame schema, version 1
 
@@ -59,7 +61,53 @@ Completion is calculated by the application using the same table below. The mode
 
 Do not convert an old response by deleting completion, changing its version or repinning it to claim recovery. Old version-1 inconsistencies remain invalid. New version-2 examples and model results need their own frozen provenance and protocol.
 
-## Criterion and span fields, both response versions
+## Response schema, version 3
+
+The frame remains version 1. All eight top-level fields from version 2 remain required, but `schema_version` is the integer `3` and criterion objects use the fields below. The two top-level critical/unsupported judgments remain explicitly required and nullable. Completion, final criterion status and derived report fields are forbidden response fields, including null. Existing caller-pin, identity, file, UTF-8, requirement and notes bounds apply unchanged.
+
+Each criterion has exactly seven non-null fields:
+
+| Field | Contract |
+|---|---|
+| `id` | Exactly one each of `C1`, `C2`, `C3`, `C4`; order independent |
+| `coverage` | `covered`, `missing` or `unknown`; describes positive coverage before considering defeat |
+| `supporting_spans` | Explicit array, at most four spans; at least one for `covered`. Missing/unknown coverage may cite partial or ambiguous content |
+| `coverage_explanation` | String, at most 1,024 UTF-8 bytes; nonblank for missing/unknown coverage, may be empty for covered |
+| `defeat` | `present`, `absent` or `unknown`; the caller's whole-answer declaration, not a verified finding |
+| `contrary_spans` | Explicit array, at most four spans; nonempty for present, empty for absent, optional for unknown |
+| `defeat_explanation` | Nonblank string for every defeat value, at most 1,024 UTF-8 bytes |
+
+Both lanes use the byte-exact span rules below, including required fields and rejection of null elements. Duplicate ranges within a lane reject; the same range may occur in both lanes or different criteria. All spans count toward the report's existing `verified_spans` total, so version 3 can count up to 32 lane entries within the unchanged 64 KiB response limit. The report does not publish their text or semantic interpretation.
+
+The application combines the two declarations using the proposed table:
+
+| Coverage | Defeat present | Defeat absent | Defeat unknown |
+|---|---|---|---|
+| `covered` | `unmet` | `met` | `unresolved` |
+| `missing` | `unmet` | `unmet` | `unmet` |
+| `unknown` | `unmet` | `unresolved` | `unresolved` |
+
+Invalid or omitted enums reject before precedence is applied. Known missing coverage or declared present defeat gives unmet; otherwise uncertainty remains unresolved. Only declared covered content plus declared absence of defeat gives met. Those derived statuses feed the existing completion rule. Critical/unsupported flags are separate declarations: a critical flag does not reclassify every criterion, and an imperative is not mechanically classified as an unsupported factual claim.
+
+For the synthetic answer `Keep edits. Discard edits.`, a single criterion entry could be:
+
+```json
+{
+  "id": "C2",
+  "coverage": "covered",
+  "supporting_spans": [{"start": 0, "end": 11, "quote": "Keep edits."}],
+  "coverage_explanation": "",
+  "defeat": "present",
+  "contrary_spans": [{"start": 12, "end": 26, "quote": "Discard edits."}],
+  "defeat_explanation": "The contrary instruction defeats the preservation requirement."
+}
+```
+
+This example is one criterion, not a complete response. Given the supplied declarations, it derives unmet. The reader does not determine whether the second sentence is endorsed, quoted, rejected, applicable or actually contrary to the requirement. Wrong absent or present declarations can therefore remain mechanically valid and produce wrong statuses. Explanations are validated for shape/bounds, never interpreted to correct a declaration. Do not convert older responses or notes into this format; new provenance and a frozen protocol are required for any later model result.
+
+The reader supports all three versions. A protocol caller must require the expected `response_schema_version` in its report; accepting schema 3 offline does not authorize a provider to return it or establish a live input/usage contract. There is no live harness or new dispatch allowance here.
+
+## Criterion and span fields, response versions 1/2
 
 Each criterion object contains exactly `id`, `status`, `spans` and `explanation`. `status` is exactly `met`, `unmet` or `unresolved`; prose such as “met in part but defeated” is invalid. A met criterion needs at least one span. An unmet or unresolved criterion needs a nonblank explanation and may also cite spans, for example to identify a contradiction. Empty span lists are `[]`, not null. A met explanation may be empty, but its field must exist.
 
@@ -82,7 +130,7 @@ This is one entry, not a complete four-criterion response. A multibyte character
 
 ## Completion and output
 
-The command derives completion for both response versions. Version 1 rejects a contradictory supplied declaration; version 2 has no supplied completion to compare:
+The command derives completion for all response versions. Version 1 rejects a contradictory supplied declaration; versions 2/3 have no supplied completion to compare. Version 3 first derives criterion statuses from its coverage/defeat declarations:
 
 | Dispositions / critical judgment | Derived completion |
 |---|---|
@@ -96,4 +144,8 @@ A mechanically valid report exits 0 with `status: mechanically_checked`, includi
 
 Every success report retains `semantic_relevance_verified: false`, `calibration_accepted: false` and `model_dispatch_authorized: false`. An actual quotation can be irrelevant, a met status can be mistaken and a pinned frame can contain a bad rubric. A separate source/rubric relevance review is required before any calibration progression decision. There is no keyword-based semantic oracle here, no acceptance threshold, live usage/cache parser, new model allowance or production eligibility.
 
-Synthetic executable checks cover exact decoding, caller pins, private-file boundaries, UTF-8 spans, omitted/null/unknown fields, completion precedence for both response versions, criterion-order independence, invalid quoting and the real-but-irrelevant quotation boundary. A synthetic missing-coverage example with an unresolved status stays invalid when version 1 supplies false; version 2 derives null and still establishes no semantic truth. Tests also reject any completion field in version 2. These establish the implemented mechanical contract only. No model behavior or completed evaluation follows from passing these checks.
+Synthetic executable checks for response versions 1/2 cover exact decoding, caller pins, private-file boundaries, UTF-8 spans, omitted/null/unknown fields, completion precedence, criterion-order independence, invalid quoting and the real-but-irrelevant quotation boundary. A synthetic missing-coverage example with an unresolved status stays invalid when version 1 supplies false; version 2 derives null and still establishes no semantic truth. Tests also reject any completion field in version 2. These establish the implemented mechanical contract only. No model behavior or completed evaluation follows from passing these checks.
+
+Version-3 checks cover all nine combination cells, completion/unknown precedence, separate-lane bounds and UTF-8 quoting, maximum lane counts, required non-null fields, unknown/mixed layouts, duplicate/aliased keys, forbidden supplied final statuses, privacy and CLI/writer behavior. Synthetic contradictory-answer and quoted/rejection controls explicitly demonstrate both directions of wrong semantic declarations remaining admissible with every relevance/acceptance/dispatch flag false. No model performance is inferred from these checks.
+
+An additional private compatibility pass checks six new synthetic schema-3 responses built from the [frozen contradiction challenge](s0-whole-answer-adjudication.md): its twelve target observations produce the expected aggregate disposition counts, with C1/C4 supplied as context. All 173 prior private files remain unchanged. This is scripted input/reader compatibility, not generated grading or recovery of old results. The private verification report SHA-256 is `9375b6abdface22f0dc28c14b36501cabe94231e727c02849765d946c9b52af8`; the private bytes are not independently reproducible from this page.

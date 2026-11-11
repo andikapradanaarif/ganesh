@@ -76,7 +76,8 @@ func evidenceDigest(s string) bool {
 }
 
 // decodeStudy already rejects duplicate, unknown and case-aliased keys. Require
-// every field too; only the three explicitly nullable judgments may be null.
+// non-null fields here; each response version separately requires its nullable
+// judgment fields to be present.
 func evidenceFields(body []byte, nonnull ...string) bool {
 	return corpusRequired(body, nonnull...)
 }

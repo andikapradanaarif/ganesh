@@ -29,7 +29,7 @@ The [Codex source-link audit](docs/s0-codex-source-audit.md) similarly rechecks 
 
 [Offline calibration comparison](docs/s0-calibration-comparison.md) compares saved owner and grader judgments without model calls; missing labels remain incomplete.
 
-[Structured grader evidence checks](docs/s0-grader-evidence.md) bind a proposed single-case response to exact answer spans and consistent criterion dispositions. Mechanical validity leaves semantic relevance and grader acceptance unverified.
+[Structured grader evidence checks](docs/s0-grader-evidence.md) bind a single-case response to exact answer spans and consistent declarations, including separate coverage/defeat evidence in response version 3. Mechanical validity leaves semantic relevance and grader acceptance unverified.
 
 [Whole-answer adjudication proposal](docs/s0-whole-answer-adjudication.md) records the criterion contradiction failures and an offline challenge separating positive coverage from defeating content. It provides no model-run or calibration authority.
 
