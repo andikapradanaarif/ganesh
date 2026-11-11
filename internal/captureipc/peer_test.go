@@ -378,3 +378,95 @@ func TestPeerAppendFailuresPanicsAndReceipts(t *testing.T) {
 		})
 	}
 }
+
+func TestPeerContextBoundaryFailures(t *testing.T) {
+	for _, tc := range []struct {
+		name string
+		ctx  context.Context
+		err  error
+	}{
+		{"elapsed before notification", elapsedContext{context.Background()}, context.DeadlineExceeded},
+		{"exotic error", exoticContext{exchangeContext(t)}, ErrExchange},
+		{"panic", panicContext{exchangeContext(t), false}, ErrExchange},
+		{"nil panic", panicContext{exchangeContext(t), true}, ErrExchange},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			client, conn := unixPair(t)
+			p := &Peer{store: appendMetadataFunc(func(context.Context, capture.Metadata) (capture.Receipt, error) {
+				t.Error("failed context reached storage")
+				return capture.Receipt{}, nil
+			})}
+			if p.ServeOne(tc.ctx, conn) != tc.err {
+				t.Fatal("context failure or panic escaped")
+			}
+			if _, err := readFrame(client); err != ErrExchange {
+				t.Fatal("context failure retained connection")
+			}
+		})
+	}
+}
+
+func TestPeerRejectsDatagramSocket(t *testing.T) {
+	directory, err := os.MkdirTemp("/tmp", "ganesh-peer-")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.RemoveAll(directory) })
+	conn, err := net.ListenUnixgram("unixgram", &net.UnixAddr{Net: "unixgram", Name: filepath.Join(directory, "peer.sock")})
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = conn.Close() })
+	p := &Peer{store: appendMetadataFunc(func(context.Context, capture.Metadata) (capture.Receipt, error) {
+		t.Error("datagram reached storage")
+		return capture.Receipt{}, nil
+	})}
+	if p.ServeOne(exchangeContext(t), conn) != ErrExchange {
+		t.Fatal("non-stream socket admitted")
+	}
+}
+
+func TestPeerDoesNotProcessSecondRequestOnSameConnection(t *testing.T) {
+	client, conn := unixPair(t)
+	first := testMetadata()
+	second := first
+	second.EventID = "00000000-0000-4000-8000-000000000003"
+	for _, m := range []capture.Metadata{first, second} {
+		body, _ := encodeMetadata(m)
+		if writeFrame(client, body) != nil {
+			t.Fatal("pipelined fixture")
+		}
+	}
+	calls := 0
+	p := &Peer{store: appendMetadataFunc(func(_ context.Context, m capture.Metadata) (capture.Receipt, error) {
+		calls++
+		if m != first {
+			t.Error("second request reached append")
+		}
+		return testReceipt(), nil
+	})}
+	if p.ServeOne(exchangeContext(t), conn) != nil || calls != 1 {
+		t.Fatal("peer handled more than one request")
+	}
+	// Closing with unread pipelined data can discard socket output. A second
+	// request is never stored; no client receipt is promised for this misuse.
+	if _, err := conn.Write([]byte("x")); !errors.Is(err, net.ErrClosed) {
+		t.Fatal("connection not consumed")
+	}
+}
+
+func TestPeerCancellationDominatesReturnedAppendError(t *testing.T) {
+	client, conn := unixPair(t)
+	ctx, cancel := context.WithCancel(exchangeContext(t))
+	defer cancel()
+	p := &Peer{store: appendMetadataFunc(func(context.Context, capture.Metadata) (capture.Receipt, error) {
+		cancel()
+		return testReceipt(), errors.New("ghp_peer_private /synthetic/private")
+	})}
+	done := make(chan error, 1)
+	go func() { done <- p.ServeOne(ctx, conn) }()
+	got, err := NewClient(client).Submit(exchangeContext(t), testMetadata())
+	if err != ErrExchange || got != (capture.Receipt{}) || awaitPeer(t, done) != context.Canceled {
+		t.Fatal("late receipt or wrapped append error escaped cancellation")
+	}
+}

@@ -71,4 +71,6 @@ The experimental [synchronous native collector](docs/s0-native-capture-collector
 
 The internal [metadata receipt exchange](docs/s0-capture-metadata-exchange.md) adds bounded frames and a cancellable one-shot local socket client. Worker implementation, peer admission and live capture integration remain pending; a matching receipt digest does not prove durable storage.
 
+Its [receiving metadata peer](docs/s0-capture-metadata-peer.md) now appends one canonical request to the existing private spool before writing a bound receipt. Per-instance admission stays occupied during blocked storage; authentication, worker lifecycle and installation remain pending.
+
 Current validation tooling uses Go; see [Go developer tools](docs/go-developer-tools.md). Completed Python experiments remain historical evidence at their original paths.

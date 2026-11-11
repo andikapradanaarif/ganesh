@@ -26,6 +26,8 @@ type Peer struct {
 	busy  atomic.Bool
 }
 
+// NewPeer configures a reusable admission boundary for a dedicated private
+// spool. It opens no socket or storage and starts no work.
 func NewPeer(spool capture.Spool) *Peer { return &Peer{store: spool} }
 
 // ServeOne takes exclusive ownership of an already admitted Unix stream
@@ -87,10 +89,16 @@ func (p *Peer) serveOne(ctx context.Context, conn *net.UnixConn) error {
 		return err
 	}
 	m, err := capture.Decode(body)
+	if ctxErr := contextError(ctx); ctxErr != nil {
+		return ctxErr
+	}
 	if err != nil {
 		return ErrFrame
 	}
 	canonical, err := encodeMetadata(m)
+	if ctxErr := contextError(ctx); ctxErr != nil {
+		return ctxErr
+	}
 	if err != nil || !bytes.Equal(body, canonical) {
 		return ErrFrame
 	}
@@ -107,11 +115,11 @@ func (p *Peer) serveOne(ctx context.Context, conn *net.UnixConn) error {
 		return ErrExchange
 	}
 	response, err := EncodeReceipt(m, r)
-	if err != nil {
-		return ErrExchange
-	}
 	if err := contextError(ctx); err != nil {
 		return err
+	}
+	if err != nil {
+		return ErrExchange
 	}
 	err = writeFrame(conn, response)
 	if ctxErr := contextError(ctx); ctxErr != nil {
