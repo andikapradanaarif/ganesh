@@ -94,6 +94,52 @@ func evidenceCriteria(body []byte) []json.RawMessage {
 	return criteria
 }
 
+func evidenceCriterionID(id string) bool {
+	return id == "C1" || id == "C2" || id == "C3" || id == "C4"
+}
+
+func decodeEvidenceFrame(body []byte) (evidenceFrame, error) {
+	var frame evidenceFrame
+	if len(body) > evidenceFileLimit || !utf8.Valid(body) || decodeStudy(body, &frame) != nil || !evidenceFields(body, "schema_version", "task_id", "case_id", "answer", "criteria") || frame.Version != 1 || !evidenceID(frame.Task) || !evidenceID(frame.Case) || strings.TrimSpace(frame.Answer) == "" || len(frame.Answer) > 32<<10 || len(frame.Criteria) != 4 {
+		return evidenceFrame{}, ErrGraderEvidence
+	}
+	seen := make(map[string]bool)
+	raw := evidenceCriteria(body)
+	for i, criterion := range frame.Criteria {
+		if !evidenceFields(raw[i], "id", "requirement") || !evidenceCriterionID(criterion.ID) || seen[criterion.ID] || strings.TrimSpace(criterion.Requirement) == "" || len(criterion.Requirement) > 1024 {
+			return evidenceFrame{}, ErrGraderEvidence
+		}
+		seen[criterion.ID] = true
+	}
+	return frame, nil
+}
+
+func checkEvidenceSpans(answer string, spans []evidenceSpan, raw []json.RawMessage) (int, error) {
+	if len(spans) > 4 || len(spans) != len(raw) {
+		return 0, ErrGraderEvidence
+	}
+	ranges := make(map[[2]int]bool)
+	for i, span := range spans {
+		if !evidenceFields(raw[i], "start", "end", "quote") || span.Start < 0 || span.End <= span.Start || span.End > len(answer) || len(span.Quote) > 2048 || !utf8.ValidString(answer[span.Start:span.End]) || span.Quote != answer[span.Start:span.End] || ranges[[2]int{span.Start, span.End}] {
+			return 0, ErrGraderEvidence
+		}
+		ranges[[2]int{span.Start, span.End}] = true
+	}
+	return len(spans), nil
+}
+
+func deriveEvidenceCompletion(unmet, unresolved int, critical *bool) *bool {
+	if unmet > 0 || (critical != nil && *critical) {
+		v := false
+		return &v
+	}
+	if unresolved == 0 && critical != nil {
+		v := true
+		return &v
+	}
+	return nil
+}
+
 func checkGraderEvidence(frameBody, responseBody []byte) (report GraderEvidenceReport, resultErr error) {
 	defer func() {
 		if resultErr != nil {
@@ -103,18 +149,17 @@ func checkGraderEvidence(frameBody, responseBody []byte) (report GraderEvidenceR
 	if len(frameBody) > evidenceFileLimit || len(responseBody) > evidenceFileLimit || !utf8.Valid(frameBody) || !utf8.Valid(responseBody) {
 		return report, ErrGraderEvidence
 	}
-	var frame evidenceFrame
-	if decodeStudy(frameBody, &frame) != nil || !evidenceFields(frameBody, "schema_version", "task_id", "case_id", "answer", "criteria") || frame.Version != 1 || !evidenceID(frame.Task) || !evidenceID(frame.Case) || strings.TrimSpace(frame.Answer) == "" || len(frame.Answer) > 32<<10 || !utf8.ValidString(frame.Answer) || len(frame.Criteria) != 4 {
+	frame, err := decodeEvidenceFrame(frameBody)
+	if err != nil {
 		return report, ErrGraderEvidence
 	}
-	allowed := map[string]bool{"C1": true, "C2": true, "C3": true, "C4": true}
-	seen := make(map[string]bool)
-	rawFrameCriteria := evidenceCriteria(frameBody)
-	for i, criterion := range frame.Criteria {
-		if !evidenceFields(rawFrameCriteria[i], "id", "requirement") || !allowed[criterion.ID] || seen[criterion.ID] || strings.TrimSpace(criterion.Requirement) == "" || len(criterion.Requirement) > 1024 {
-			return report, ErrGraderEvidence
-		}
-		seen[criterion.ID] = true
+	// This peek chooses a decoder only. Its complete strict decode below must
+	// still reject duplicate, aliased, unknown, missing and malformed fields.
+	var header struct {
+		Version int `json:"schema_version"`
+	}
+	if json.Unmarshal(responseBody, &header) == nil && header.Version == 3 {
+		return checkGraderObservations(frameBody, frame, responseBody)
 	}
 	var response evidenceResponse
 	if decodeStudy(responseBody, &response) != nil || !evidenceFields(responseBody, "schema_version", "task_id", "case_id", "answer_frame_sha256", "criteria", "notes") || response.Task != frame.Task || response.Case != frame.Case || response.Frame != devinDigest(frameBody) || len(response.Criteria) != 4 || len(response.Notes) > 4096 {
@@ -142,10 +187,10 @@ func checkGraderEvidence(frameBody, responseBody []byte) (report GraderEvidenceR
 	default:
 		return report, ErrGraderEvidence
 	}
-	seen = make(map[string]bool)
+	seen := make(map[string]bool)
 	rawCriteria := evidenceCriteria(responseBody)
 	for i, criterion := range response.Criteria {
-		if !evidenceFields(rawCriteria[i], "id", "status", "spans", "explanation") || !allowed[criterion.ID] || seen[criterion.ID] || len(criterion.Explanation) > 1024 || len(criterion.Spans) > 4 {
+		if !evidenceFields(rawCriteria[i], "id", "status", "spans", "explanation") || !evidenceCriterionID(criterion.ID) || seen[criterion.ID] || len(criterion.Explanation) > 1024 || len(criterion.Spans) > 4 {
 			return report, ErrGraderEvidence
 		}
 		seen[criterion.ID] = true
@@ -173,23 +218,13 @@ func checkGraderEvidence(frameBody, responseBody []byte) (report GraderEvidenceR
 		if json.Unmarshal(rawCriteria[i], &raw) != nil {
 			return report, ErrGraderEvidence
 		}
-		ranges := make(map[[2]int]bool)
-		for j, span := range criterion.Spans {
-			if !evidenceFields(raw.Spans[j], "start", "end", "quote") || span.Start < 0 || span.End <= span.Start || span.End > len(frame.Answer) || len(span.Quote) > 2048 || !utf8.ValidString(frame.Answer[span.Start:span.End]) || span.Quote != frame.Answer[span.Start:span.End] || ranges[[2]int{span.Start, span.End}] {
-				return report, ErrGraderEvidence
-			}
-			ranges[[2]int{span.Start, span.End}] = true
-			report.VerifiedSpans++
+		count, err := checkEvidenceSpans(frame.Answer, criterion.Spans, raw.Spans)
+		if err != nil {
+			return report, ErrGraderEvidence
 		}
+		report.VerifiedSpans += count
 	}
-	var derived *bool
-	if report.Unmet > 0 || (response.Critical != nil && *response.Critical) {
-		v := false
-		derived = &v
-	} else if report.Unresolved == 0 && response.Critical != nil {
-		v := true
-		derived = &v
-	}
+	derived := deriveEvidenceCompletion(report.Unmet, report.Unresolved, response.Critical)
 	if response.Version == 1 && ((derived == nil) != (response.Completion == nil) || (derived != nil && *derived != *response.Completion)) {
 		return report, ErrGraderEvidence
 	}
