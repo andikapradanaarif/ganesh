@@ -33,6 +33,8 @@ On 2026-11-13 the owner selected `deepseek-v4.1-flash`, `glm-5.3-flash` and Clau
 
 **Subsequent batch approval:** the owner approved the bounded comparison and confirmed Extra Usage off. [#126](https://github.com/andikapradanaarif/ganesh/issues/126) records its fresh 192-request maximum; the separate generator is pinned to `gpt-6-luna` through Go. The [execution record](s0-grading-strategy.md#approved-execution-under-126) preserves the limits, native profile differences, data permissions and pending results. This authorizes that calibration comparison only; the original held-out S0 run remains blocked.
 
+**Pre-dispatch authorization stop:** automatic approval review rejected the first generation command because the exact GPT-6 Luna/processor/payload disclosure was not explicit in that approval. No provider request was sent or attempt reserved. Exact request files and destination manifests have been prepared and checked; the explicit disclosure question is pending. The general batch grant does not override this stop, qualify a grader or release the original S0 run.
+
 ## Filled run-input status
 
 | Execution-sheet input | Recorded state | Still needed |

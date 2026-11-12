@@ -65,6 +65,10 @@ The private thin Go driver freezes compact question/rubric/context/answer inputs
 
 Offline tests/vet cover native usage/combined reasoning, missing/nonzero cost, known usage retained on model rejection, trailing-criterion/exact-quote validation, hidden references, repeated payload identity, model-position balance and no network retry/redirect/foreign-host disclosure. These are driver checks, not grader-quality or production evidence. Execution results and source-based comparison remain pending at this preparation commit; 0/108 S0 answers and four task-history gaps are unchanged.
 
+**Dispatch was subsequently blocked before execution.** Automatic approval review rejected the proposed GPT-6 Luna generation because the earlier whole-batch approval did not explicitly cover that exact generator, its processor disclosure and payload-to-destination authorization. No process/run directory was created, no attempt reserved, no inference clock started and no provider request sent. The assistant's routine generator binding was insufficient authorization; the broad preparation record cannot establish exact disclosure permission. Preserve the rejection rather than bypass it.
+
+The exact twelve generation payloads and 54 unique existing-control grading payloads are now exported privately and tested byte-for-byte against the frozen driver. The generation disclosure covers six scrubbed excerpts / 7,390 unique source-text bytes; the grading disclosure also covers only the bounded generated answers once available, with hashes/references frozen before candidate scoring. An explicit destination/data/retention decision is pending for GPT-6 Luna generation and the selected grader data flow, within the already proposed 192-request ceiling. No additional per-case approval is proposed; broader stage inputs and the four task gaps remain separate.
+
 ## Owner decision and next work
 
 | Option | Assessment and disposition |
