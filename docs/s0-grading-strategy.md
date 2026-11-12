@@ -69,6 +69,35 @@ Offline tests/vet cover native usage/combined reasoning, missing/nonzero cost, k
 
 The exact twelve generation payloads and 54 unique existing-control grading payloads are now exported privately and tested byte-for-byte against the frozen driver. The generation disclosure covers six scrubbed excerpts / 7,390 unique source-text bytes; the grading disclosure also covers only the bounded generated answers once available, with hashes/references frozen before candidate scoring. An explicit destination/data/retention decision is pending for GPT-6 Luna generation and the selected grader data flow, within the already proposed 192-request ceiling. No additional per-case approval is proposed; broader stage inputs and the four task gaps remain separate.
 
+### #126 result: requests complete, grading incomplete
+
+This result supersedes the pre-dispatch pending state above. After the owner directed **“use everyhing from opencode go model”** in response to the disclosed flow, automatic review allowed the direct Go-only execution. All **192 requests completed**: twelve GPT-6 Luna answers and 180 judgments, sixty each from DeepSeek V4.1 Flash, GLM-5.3-Flash and Claude Haiku 5.5. Every native response was HTTP 200 with reconciled Go usage and reported additional cost zero. No retries, replacements, auxiliary calls, fallback or direct OpenAI API calls occurred. The whole observed run, including the reference/preflight gap, was **27m20.177s**, inside the approved 90 minutes. No S0 held-out answers were generated.
+
+| Profile | Requests | Input tokens | Output including reasoning | Reported Go allowance consumption |
+| --- | ---: | ---: | ---: | ---: |
+| GPT-6 Luna generator | 12 | 11,028 | 3,854 | 0.01276240 |
+| DeepSeek V4.1 Flash | 60 | 67,888 | 34,405 | 0.01821347 |
+| GLM-5.3-Flash | 60 | 65,756 | 34,156 | 0.02537468 |
+| Claude Haiku 5.5 | 60 | 105,544 | 42,169 | 0.12655560 |
+
+Total: **250,216 input + 114,584 output = 364,800 tokens**. The 3,648 reasoning tokens are included in output, not added again. Allowance is provider-reported consumption of the individual model's Go plan bucket, not an additional cash charge or an authenticated bill; remaining quota is unknown. Before the actual execution, this batch had sent zero Go requests. This Codex conversation's separate usage is not measured by these records.
+
+The primary grading contract failed broadly: only **25/180 judgments** passed strict mechanical validation (DeepSeek 8/60, GLM 1/60, Haiku 16/60). Coverage of complete, usable declarations is smaller still; a mechanically valid unknown is not a completed judgment. JSON fences, incorrect criterion IDs/counts and inexact source/answer quotations caused overlapping failures. The assistant's compact prompt left requirement IDs insufficiently explicit, so these results do not isolate model quality from a weak specification. No candidate is accepted, and the strict failure is retained.
+
+| Grader | Strict valid / planned | Exploratory planted-critical detections / planned | Identical-case flag changes / usable repeat pairs |
+| --- | ---: | --- | ---: |
+| DeepSeek V4.1 Flash | 8/60 | 11/12; one missed | 2/29 |
+| GLM-5.3-Flash | 1/60 | 8/12; two missed, two unresolved | 0/15 |
+| Claude Haiku 5.5 | 16/60 | 10/12; two missed | 2/28 |
+
+The exploratory columns use saved responses only: remove one whole JSON code fence where present, read unchanged boolean critical/unsupported flags, and preserve unknown/unparseable values. They do **not** repair criterion mappings/quotes, derive missing labels, promote invalid outputs or replace primary results. They are comparisons to the frozen same-author references, not measured population accuracy. GLM's zero observed repeat changes has only fifteen usable pairs and cannot establish superior stability. Thirty answer cases still span only six source tasks; repetitions and context conditions are correlated.
+
+Source review confirms missed critical endorsements on the foreign-authority/enrollment, premature-migration, clean-lint and destructive-cleanup controls. Some Haiku booleans contradict its own explanations. Separately, reference unsupported=true on pure cleanup/authority imperatives may conflict with the factual-claim/directive distinction; retain that dispute rather than call every mismatch a model error or rewrite frozen references. Required owner/source adjudication remains separate.
+
+One local grading preflight failed before any grader request because generated answers exceeded an overly conservative byte proxy. A prospective corrected profile was frozen before candidate outputs: concise common instructions, plaintext rendering preserving full questions/sources/answers and rubric requirements, and a 128-token native-wrapper allowance instead of an arbitrary 512; actual 8,192-input/2,048-combined-output limits stayed unchanged. Original generator/driver artifacts, failed local checks and source/reference hashes remain preserved. This was a disclosed pre-dispatch correction, not output-driven tuning or a hidden truncation.
+
+An independent Go reader recomputed every native token total and zero reported extra cost, checked all 192 fresh session IDs and 180 unique case/model/repetition records, and verified identical case payloads across graders/repeats, the reference freeze and original package manifest. It establishes mechanical accounting, not semantic truth. The 192-request allowance is consumed. **Stop new calls; no automatic model switch, repeat or grader acceptance.** Four task-history gaps, source/card/access/run bindings and the original S0 completion remain unresolved. Overall focused S0 effort is still unknown.
+
 ## Owner decision and next work
 
 | Option | Assessment and disposition |

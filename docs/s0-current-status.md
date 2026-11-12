@@ -1,10 +1,12 @@
 # Current S0 status and next work
 
-Updated during [#124's readiness follow-up](https://github.com/andikapradanaarif/ganesh/issues/124), 2026-11-12. The #122 package was completed and merged in [PR #123](https://github.com/andikapradanaarif/ganesh/pull/123); its hold-execution finding remains. [Issue #109](https://github.com/andikapradanaarif/ganesh/issues/109) records the owner's project-review decision. This is a filled companion to the preserved [execution sheet](s0-execution-sheet.md), not a replacement protocol or run approval.
+Updated after [#126's repeated-grader comparison](https://github.com/andikapradanaarif/ganesh/issues/126), 2026-11-13. The #122 package was completed and merged in [PR #123](https://github.com/andikapradanaarif/ganesh/pull/123); its hold-execution finding remains. [Issue #109](https://github.com/andikapradanaarif/ganesh/issues/109) records the owner's project-review decision. This is a filled companion to the preserved [execution sheet](s0-execution-sheet.md), not a replacement protocol or held-out-run approval.
 
 **Owner decision: “Keep original 108-answer S0.”** Retain 30 primary tasks, 20 within-project/ten cross-project, the 12-task diagnostic subset and all 0/A/B/C/D/F controls; preserve the conditional 24-answer eligible-origin rerun. No smaller pilot or human-only replacement for the grading protocol is selected.
 
 **Current result: incomplete, 0/108 recorded held-out answers.** There is no accepted grader or qualified installed capture profile. The sequencing problem is real: capture and verifier development continued without producing the primary memory-value comparison. Further infrastructure and grader-format work should not be the default next issue.
+
+**Latest bounded comparison:** #126 completed all 192 approved Go requests (12 generated answers + 180 repeated judgments) using 364,800 tokens and reported $0 additional cost. Only 25/180 judgments passed the strict format/evidence contract. The [separate exploratory flag analysis](s0-grading-strategy.md#126-result-requests-complete-grading-incomplete) retains missing outcomes and finds missed/unresolved planted critical controls in every candidate. Prompt/criterion ambiguity and disputed reference labels also remain. No grader is accepted; the allowance is exhausted and no further calls or schema-tuning loop is authorized. This is calibration evidence, not an S0 memory-benefit result; the four task-history gaps remain.
 
 ## Readiness decision
 
