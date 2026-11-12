@@ -1,10 +1,23 @@
 # Current S0 status and next work
 
-Updated after #119 current-work review, 2026-11-12. [Issue #109](https://github.com/andikapradanaarif/ganesh/issues/109) records the owner's project-review decision. This is a filled companion to the preserved [execution sheet](s0-execution-sheet.md), not a replacement protocol or run approval.
+Updated after #122 readiness review, 2026-11-12. [Issue #109](https://github.com/andikapradanaarif/ganesh/issues/109) records the owner's project-review decision. This is a filled companion to the preserved [execution sheet](s0-execution-sheet.md), not a replacement protocol or run approval.
 
 **Owner decision: “Keep original 108-answer S0.”** Retain 30 primary tasks, 20 within-project/ten cross-project, the 12-task diagnostic subset and all 0/A/B/C/D/F controls; preserve the conditional 24-answer eligible-origin rerun. No smaller pilot or human-only replacement for the grading protocol is selected.
 
 **Current result: incomplete, 0/108 recorded held-out answers.** There is no accepted grader or qualified installed capture profile. The sequencing problem is real: capture and verifier development continued without producing the primary memory-value comparison. Further infrastructure and grader-format work should not be the default next issue.
+
+## Readiness decision
+
+[The #122 offline package](https://github.com/andikapradanaarif/ganesh/issues/122) recommends **hold execution**. Filling 30 definition slots did not establish a runnable sample:
+
+| Finding | Consequence / next evidence |
+| --- | --- |
+| Author review finds relevant historical support for 26 candidates, three missing foreign lessons and one partially supported lifecycle premise. | The four concrete code-based transfers cannot be treated as established memory cases. Require real permitted historical support or report the original sample incomplete; do not manufacture history from their oracles. |
+| No verified typed fields were admitted from the supplied observations. Proposed A/B are empty. | Empty bundles are valid and add no information; this introduces no nonempty-card gate. Freeze honest field selection/absence and exact source/rule bindings before interpreting a primary comparison. |
+| Saved grader calibration remains unaccepted; only two of 18 owner cases are complete. | A prepared source/answer/rubric comparison preserves real owner labels separately from assistant references and model labels. Adjudication is still needed; no automatic rerun or switch. |
+| Own-source baseline/tool inventories, processor disclosure, exact models/context fit and approved limits remain unfilled. | The proposed schedules and numeric ceilings are preparation, not execution authority. Overall focused-effort compliance remains unknown. |
+
+The package supplies all six arm plans, source-linked oracle/access proposals, a complete D/F corpus proposal, hand-authored C references, counterbalanced 108/24-answer schedules and the prescribed owner-sample proposal. None is a run freeze. The next evidence concerns the four task gaps and genuine typed-source coverage, followed by grading adjudication and the complete profile/allowance decision. Neither more infrastructure nor a favorable repeat of a stopped diagnostic resolves these findings.
 
 ## Filled run-input status
 
@@ -16,8 +29,8 @@ Updated after #119 current-work review, 2026-11-12. [Issue #109](https://github.
 | SessionEnd/competing hooks | Existing CLI uses 750 ms from OS process start and a one-second configured hook timeout; pinned runner grace can extend observed return. | Actual installed hook set and complete joint behavior remain unqualified. |
 | Models | OpenAI answering family selected, exact answering profile unfilled. Flash through Go is an unaccepted grader candidate; Haiku did not improve the comparison. | Exact answering ID/client/access and an acceptable calibrated grading arrangement. Future inference authority is zero. |
 | Limits | Additional paid API spend stays $0; Go Extra Usage stays off. Past diagnostic allowances consumed or expired. | One complete experiment-level request/token/time/retry/allowance record before calls; subscription quota/reset unknown. |
-| Corpus | Recorded candidate fields: 21 Crush digests, 7,892 bytes; 27 Devin excerpts, 43,724 bytes. Total 51,616 text bytes. | Reviewed, permitted, source-linked frozen summary set; overlap/redaction fidelity and whole-request fit. Candidate bytes are not measured tokens or the complete prompt. |
-| Tasks/rubrics and arms | Six calibration tasks × three answer variants (18 cases) remain reserved. [Task preparation](s0-task-sufficiency.md) has 30 candidate definitions / 120 author-reviewed criteria in the required role/stratum mix, plus a proposed 12-task diagnostic subset. Three concrete coding contracts replace the generic draft and fill the two empty slots; a replacement reviewer removes the flagged same-endpoint pair. No accepted/frozen sample or operational arm inputs. | Adjudicate task quality, calibration overlap and remaining source correlations; resolve open policy/fixture decisions, full oracles, whole-task access maps, diagnostic admission, corpus and arm inputs. Author review and filled slots do not establish task sufficiency or grader acceptance. |
+| Corpus | #122 proposes 36 previously reviewed records / 38,926 source-text bytes: 15 Devin summaries and 21 Crush digests. All Crush checkpoints remain empty. The original 51,616-byte candidate set is preserved. | Final permitted source set, semantic separation/redaction fidelity and whole-request fit. The selected corpus retains unknown origins; source bytes are not tokens or full request size. |
+| Tasks/rubrics and arms | Six calibration tasks × three answer variants remain reserved. [Task preparation](s0-task-sufficiency.md) has 30 definitions / 120 author-reviewed criteria, oracle/access proposals and the required role/diagnostic mix. All six arms and 108/24 schedules have private proposals; four transfers lack complete historical support. | Resolve those four gaps, task quality/overlap, actual baseline access, prospective oracle adoption and arm/corpus freeze. No task is accepted; author judgments and complete proposal files do not establish sufficiency. |
 | Calibration/owner review | Two actual owner judgments in the 18-case packet; assistant references stay separate. [Flash/Haiku review](s0-grading-strategy.md) remains failed/incomplete. | Required source-based owner adjudication and an accepted grader. No new format loop is proposed. |
 | Origin/A2.3 | Frozen screen H=17, M=3, U=12, E=1: 17.65% mixed, 70.59% unknown, 88.24% combined, 5.88% eligible. One declared eligible lesson/project. | Early mixed threshold is not triggered. Final S0b-2 recheck remains pending; no six-lesson/two-project pass or funded A2.3 record. Preserve the denominator and unknowns. |
 | Effort | Overall focused effort unknown; the 42m20s preparation overrun and closed study ceilings stand. | Prospective limits and reconciliation supported by records. Touched commit hours establish neither focused-time compliance nor a focused-time upper bound. |
