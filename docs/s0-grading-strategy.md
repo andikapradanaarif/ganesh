@@ -20,9 +20,7 @@ The saved-run review checked all 35 span entries and retained every response, re
 
 Runtime was 89.337 seconds; saved usage reconciled to 17,545 input plus 4,732 output tokens, with no unknown usage and zero reasoning/additional cost reported. All six calls are consumed; no inference authority remains. Provider-reported allowance is not an authenticated bill or a forecast of remaining quota. See the [published saved-run report](https://github.com/andikapradanaarif/ganesh/issues/60#issuecomment-6799324692). Private evidence remains outside git; this public summary does not make its bytes independently reproducible.
 
-## Owner decision and next work
-
-### Owner-review bias and proposed correction
+## Owner-review bias and proposed correction
 
 During [#124](https://github.com/andikapradanaarif/ganesh/issues/124), the assistant presented a calibration answer alongside proposed completion/critical/unsupported labels and asked the owner to confirm. The owner confirmed one case, then objected that this was inefficient, biased and potentially wrong without measurement. The objection is accepted: stop those confirmation questions. Preserve the actual declaration as guided feedback and record exposure; agreement following disclosure of a proposed answer is not independent grader-accuracy evidence. Two further unanswered cases had also exposed proposed labels. A new display order cannot restore blindness for already exposed cases. The independence of older guided labels is not established here.
 
@@ -35,6 +33,29 @@ The following is a **prospective proposal**, not an adopted amendment or a new r
 5. **Keep the protocol's owner checks explicit.** The existing critical/unsupported/disagreement/unknown review and six primary-pair/three diagnostic-set samples remain required. Batch their review and preserve uncertainty. Automation or model agreement does not waive them. Removing those checks or substituting a human-only grading protocol would require an explicit prospective decision; neither is selected here.
 
 This proposal reduces leading prompts and distinguishes measurable checks from unverified semantics; it does not promise that another model or blinded review will solve #60. No new grading calls, references, owner decisions or acceptance follow from documenting it.
+
+### Proposed repeated comparison through OpenCode Go
+
+The owner subsequently requested supplying fixed context/question/case inputs to several OpenCode Go models and comparing their judgments with expected values, including repeated trials of the same model. This selects a comparative direction; exact candidate, disclosure and request allowances below remain proposals. Apply it first to grader validation under #60, preserving the original 108-answer S0 design. Comparing answering models across all S0 arms would be a different, larger experiment.
+
+| Input | Bounded proposal |
+| --- | --- |
+| Cases | 18 existing synthetic development controls plus 12 fresh answer outputs: two source conditions for each of the six reserved calibration tasks. Fresh answers are not fresh source tasks or additional independent natural tasks. No held-out S0 task enters calibration. |
+| Case payload | Fixed context, question, rubric and full answer; expected criterion/flag values remain hidden from every candidate. Freeze source/rubric/answer/reference bytes and author/verification status before any candidate judgments; unknown references stay unknown. |
+| Candidate graders | `deepseek-v4.1-flash`, `glm-5.3-flash`, `kimi-k2.7-code`: three proposed families through Go's documented Chat Completions route. Flash remains the selected S0 candidate until a separate adoption decision. |
+| Fresh-answer generator | Proposed `claude-haiku-5-5` through its native Messages route, outside the candidate panel. Generate six answers with applicable sources only and six with the same sources plus a frozen irrelevant excerpt. No labels or candidate feedback enter generation. This is a new answer-generation role, not a repeat of the stopped Haiku grading comparison. |
+| Repetitions | Two fresh-session judgments per case per model, with fixed payloads and declared sampling settings. Freeze and counterbalance model/repetition order before calls. Report within-model inconsistency separately from disagreement between models. Repetitions do not increase the independent task count. |
+| Total ceiling | 180 judgments (30 × 3 × 2), plus 12 answer-generation calls: **192 total requests**, including initial access checks, with no extra probes, retries, auxiliaries, replacements or fallback. One request in flight. |
+| Token/time ceiling | Proposed 8,192 input and 2,048 combined output/reasoning tokens per request; at most 1,572,864 input and 393,216 output/reasoning tokens overall; 120 seconds per request, 90 minutes whole inference wall time and 60 minutes comparison review. Any tighter global limit takes precedence. Stop/report incomplete when reached; no claim that existing quota or S0 effort can accommodate this. |
+| Spending | $0 additional paid spend, Extra Usage off. Actual account access, quota/reset, native request controls, full-input fit and settings remain unverified. No inference is authorized by this proposal. |
+
+Model IDs/routes and published privacy terms were checked on 2026-11-12 against the [official Go documentation](https://opencode.ai/docs/console/go/). It lists the three candidate graders and Haiku, reports no training use, zero-day retention for the candidate models and 30-day retention for Haiku; DeepSeek's monthly ZDR agreement currently ends November 30. These are provider declarations, not verified processing location or account entitlement. Existing permission for one processor/packet does not automatically authorize all six excerpts and generated outputs to the others. No settings are changed.
+
+The private proposal binds the 18 existing case payloads/references and 12 generator input slots. Generated answers and their source-based reference decisions do not exist yet; the proposed single-budget protocol freezes them after generation and **before** candidate scoring. It does not acquire references from candidate majority votes. Exact wire bodies, native sampling/accounting controls, order seed, disclosure and quota/settings checks remain required before execution. Existing Go transport/accounting code should be reused where compatible; no service or new framework is selected.
+
+Report criterion and declaration mismatches, missed planted critical/unsupported errors, false alarms, unresolved references, missing responses, per-model repeat inconsistency, inter-model disagreement, latency and all usage. Distinguish agreement with proposed reference values from verified oracle outcomes. A missed planted critical control blocks that candidate's promotion from this diagnostic. Passing the controls or unanimous voting cannot automatically accept an S0 grader; prospective adoption still needs justified source-based adjudication and a frozen acceptance decision. Keep the earlier failures and required owner checks. This comparison may reduce dependence on owner labels; replacing the existing exhaustive calibration-label arrangement needs an explicit prospective amendment, not a silent removal of review.
+
+## Owner decision and next work
 
 | Option | Assessment and disposition |
 | --- | --- |
