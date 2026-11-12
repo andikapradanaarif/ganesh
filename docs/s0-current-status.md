@@ -31,6 +31,8 @@ The owner next selected comparing fixed case/context/question inputs across seve
 
 On 2026-11-13 the owner selected `deepseek-v4.1-flash`, `glm-5.3-flash` and Claude Haiku 5.5 (`claude-haiku-5-5`) for that panel. Haiku replaces the proposed Kimi grader and is removed from answer generation; a separate OpenAI-family generator's exact profile remains pending. Two independent fresh-session judgments per case per grader remain proposed: six judgments per case, with one eventual whole-batch approval rather than per-case approval requests. Model selection supplies no dispatch/disclosure allowance or accepted calibration.
 
+**Subsequent batch approval:** the owner approved the bounded comparison and confirmed Extra Usage off. [#126](https://github.com/andikapradanaarif/ganesh/issues/126) records its fresh 192-request maximum; the separate generator is pinned to `gpt-6-luna` through Go. The [execution record](s0-grading-strategy.md#approved-execution-under-126) preserves the limits, native profile differences, data permissions and pending results. This authorizes that calibration comparison only; the original held-out S0 run remains blocked.
+
 ## Filled run-input status
 
 | Execution-sheet input | Recorded state | Still needed |
