@@ -29,6 +29,8 @@ The owner explicitly confirmed completion=false, critical=true and unsupported=t
 
 The owner next selected comparing fixed case/context/question inputs across several OpenCode Go models and repeated same-model trials. The [bounded comparison proposal](s0-grading-strategy.md#proposed-repeated-comparison-through-opencode-go) prepares 18 existing control cases and 12 fresh-answer slots, with three candidate graders and two repetitions: 180 judgments plus 12 generation requests. It keeps reference values hidden, measures inconsistency/errors/unknowns and preserves source/reference uncertainty. No call allowance, new provider disclosure, grader adoption, replacement of required owner checks or change to the 108-answer S0 design is inferred. The four task-history gaps remain separate.
 
+On 2026-11-13 the owner selected `deepseek-v4.1-flash`, `glm-5.3-flash` and Claude Haiku 5.5 (`claude-haiku-5-5`) for that panel. Haiku replaces the proposed Kimi grader and is removed from answer generation; a separate OpenAI-family generator's exact profile remains pending. Two independent fresh-session judgments per case per grader remain proposed: six judgments per case, with one eventual whole-batch approval rather than per-case approval requests. Model selection supplies no dispatch/disclosure allowance or accepted calibration.
+
 ## Filled run-input status
 
 | Execution-sheet input | Recorded state | Still needed |
