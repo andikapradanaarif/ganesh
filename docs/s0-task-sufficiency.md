@@ -62,3 +62,26 @@ Two within-project annotations incorrectly treated Kiosk guidance as evidence ab
 The count remains **28 drafts**, with two empty coder slots. The existing generic cross-project coder draft is additionally **blocked for lack of a concrete target endpoint**. A pair of drafts sharing one endpoint also needs a non-paraphrase admission decision; it must not be counted twice solely to fill roles. Other shared-source families retain explicit correlation and applicability limits. No tasks were promoted into an accepted sample.
 
 The separate revision contains **88 private files / 334,879 bytes**: 84 task artifacts plus inventory, source index, admission review and manifest. Parent packets remain unchanged. Manifest SHA-256: `8b8747ba26ce6dc9642c4b7cfce07824a717d4b7381aa0d948d40892611ba0ce`. A separate Go check verifies parent/revision hashes, criterion joins, project attribution, access-component separation and private modes; it cannot independently validate the author's semantic judgments. No new source inspection, model request, scoring, baseline edit or execution allowance occurred. Effort is recorded in the issue; S0 remains incomplete.
+
+## Current-work coding definitions
+
+For [#119](https://github.com/andikapradanaarif/ganesh/issues/119), the owner approved one **45-minute / 128 KiB** review by this Codex session of current open issues and relevant tracked code in the two selected project roots. The newest-updated query, capped at 20 open issues per repository, returned six Valo issues and zero Kiosk issues. Four issue bodies were inspected. Zero selected issues is not evidence that the project has no work, and an open request is not proof of a current defect or implemented behavior.
+
+The source ledger charges **115,570/131,072 bytes**, including titles/bodies, code, repeated function text and conservatively counted tracked-path/revision metadata. This is a budget charge, not unique new source bytes. Thirteen code sections cover 12 unique files: eight whole files and five complete functions. Source inspection stopped at 12:54:59 UTC on 2026-11-12; the review began at 12:44:10 UTC. Finalization counts toward the same 45-minute ceiling and is recorded in the issue. The source reader used an isolated Go build cache after a local helper build failed; no target application, build or test was executed. Raw Nexus sources, credentials and log payloads were excluded; neither source project was changed or messaged.
+
+Three concrete cross-project coding definitions replace the generic coding draft and fill its two missing peers: method-specific role admission, stored-file/caller ownership binding and server-derived actor propagation. These contracts have different inputs and outcomes, but two share one issue and some handler context. Two inspected middleware functions are byte-identical, not independent corroboration. The donor ownership check concerns a narrower upload lifecycle; the actor example does not prove end-to-end audit persistence. Global admin/legacy-owner policy, actor storage and uninspected enforcement remain open rather than invented.
+
+A replacement cross-project reviewer uses a different project and endpoint, removing the specifically flagged same-endpoint pair. This does not establish independence across the entire sample. The revised **30 candidate definitions** have the required mix:
+
+| Role | Within-project candidates | Cross-project candidates | Proposed diagnostics within / cross |
+| --- | ---: | ---: | ---: |
+| Coder | 7 | 3 | 2 / 2 |
+| Planner | 7 | 3 | 2 / 2 |
+| Reviewer | 6 | 4 | 2 / 2 |
+| Total | 20 | 10 | 6 / 6 |
+
+The 12 diagnostics are a coverage-based proposal selected before any held-out answers; they are not frozen. All **120 criteria** have author-reviewed source relations and satisfying/defeating/unknown conditions. The same assistant authored and reviewed the new definitions. There are **94 private packet files / 346,030 bytes**: 90 task artifacts plus inventory, source index, admission review and manifest. Twenty-six retained packets are byte-identical to #117; both retired drafts and the entire parent set remain preserved separately. Source snapshots, producer/checker inputs and reports are outside this output count and outside git.
+
+Manifest SHA-256: `eb7efc00979290796aca173eaf718a18f73d383c68ceeab343ae926563900d64`. The separate Go check verifies the parent and output hashes, disclosure ledger and byte ceiling, 14 new quoted references, criterion/source joins, role/diagnostic counts and private packet modes. These checks establish mechanical consistency, not semantic quality, production security or independent origin. Private bytes are not reproducible from this public report.
+
+**Task sufficiency remains unestablished: zero tasks are accepted or frozen.** Filling definition slots does not settle applicability/calibration overlap, open policy and fixture decisions, full oracles, whole-task access, the permitted memory corpus, arm inputs, exact model limits or grading. Current issue/code material is preparation context, not automatically enrolled memory or authorized disclosure to another provider. No model request, held-out answer, paid spend, calibration acceptance or stage-gate claim occurred; the original **108-answer** plan remains selected and at **0/108**. Cumulative focused S0 effort stays unknown.
