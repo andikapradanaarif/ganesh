@@ -2,7 +2,7 @@
 
 [Issue #111](https://github.com/andikapradanaarif/ganesh/issues/111) follows the owner's decision to retain the original [S0 execution sheet](s0-execution-sheet.md). **Result: task sufficiency remains unestablished; no held-out task or answer is frozen.**
 
-The owner approved this Codex session to review a prepared packet for at most 30 minutes: 42 existing pattern-reduced records, 44,226 text bytes, excluding all six calibration excerpts. No raw transcripts, new repository content, separate model/API requests or paid work were authorized. The old artifacts and their local-only/unknown-origin flags remain unchanged; approval is a separate record, not a retrospective flag edit.
+The owner approved this Codex session to review a prepared packet for at most 30 minutes: 42 existing pattern-reduced records, 44,226 text bytes, excluding all six calibration excerpts. Source review, drafting and initial validation ran from 08:02:55 to the 08:19:35 UTC observation on 2026-11-12 (16m40s); publication finalization is recorded separately in the issue and counts toward the same ceiling. Cumulative S0 focused effort remains unknown. No raw transcripts, new repository content, separate model/API requests or paid work were authorized. The old artifacts and their local-only/unknown-origin flags remain unchanged; approval is a separate record, not a retrospective flag edit.
 
 | Reviewed input | Records | Text bytes |
 | --- | ---: | ---: |
