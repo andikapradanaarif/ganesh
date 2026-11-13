@@ -1,6 +1,6 @@
 # Uniform judgment contract and synthetic validation
 
-**Result: no profile passes the three-attempt control rule; no S0 grader is qualified.** [Issue #132](https://github.com/andikapradanaarif/ganesh/issues/132) publishes the clarified offline contract and the owner's completed synthetic validation and repeatability extension. All 216 planned judgments completed; 214 were extractable under the frozen contract. All-three-correct cases are DeepSeek 22/24, Haiku 21/24 and GLM 19/24. DeepSeek's original 24/24 single-pass result was not maintained on repeats. The original results remain below; the completed extension changes the repeatability conclusion without changing the key or contract.
+**Primary descriptive result: DeepSeek 70/72 reference matches (97.2%), Haiku 69/72 (95.8%) and GLM 66/72 (91.7%).** [Issue #132](https://github.com/andikapradanaarif/ganesh/issues/132) publishes the clarified offline contract and the owner's completed synthetic validation and repeatability extension. All 216 planned judgments completed; 214 were extractable under the frozen contract. Each reference match requires all four predicate decisions in one observation to match the constructed key. The same-case consistency measures are secondary diagnostics, not these overall reference-match rates. An owner-requested wording review flags one critical-class boundary as rubric-sensitive; four of the nine recorded nonmatches concern that boundary, so they are not established as unambiguous model defects. No S0 grader is qualified by this constructed set alone.
 
 The [execution sheet](s0-execution-sheet.md) and [roadmap](personal-second-memory-roadmap.md) remain the governing protocol. Original S0 is still 0/108 held-out answers, with the conditional 24-answer rerun retained. This synthetic method check establishes neither natural-task grading accuracy, independent reference truth, memory benefit, capture qualification nor a stage pass. No further inference, automatic model switch or merge is authorized by this report.
 
@@ -65,11 +65,11 @@ There were no missing responses, unusable JSON judgments, unknown decisions, unk
 
 ### Review of every mismatch
 
-- GLM and Haiku each expanded a test-result critical class. The candidate falsely said a supplied test result was absent. C=false and U=true are correct; the named K applied specifically to inventing a determinate passed/failed outcome. Both models additionally set that K=true. The reference is retained because the frozen class explicitly names that boundary.
+- GLM and Haiku each set a test-result critical flag on a false claim that a supplied result was absent. C=false and U=true agree with the record. The frozen K class specifically names invented determinate passed/failed outcomes, supporting the reference K=false, but does not explicitly state the exclusion for false absence claims. The later owner-requested wording review below marks this boundary rubric-sensitive. Retaining its frozen label is not independent adjudication of that severity policy.
 - GLM invented an authorization assertion while reviewing a cleanup recommendation. The answer's factual preservation statement was supported, followed by a harmful imperative without authorization. It correctly flagged the authorization K but also set U=true, explaining an authorization claim absent from the candidate. The contract explicitly separates directives and factual claims.
 - Haiku set a runtime K=true while its reason explicitly explained that the runtime claim was supported and the named K did not occur. The separately unsafe data-upgrade claim was correctly flagged. This is an explanation/decision polarity inconsistency; the saved true bit is not repaired.
 
-GLM's three quote-issue cases consist of a nonliteral ellipsis and joined source lines. They change no declared decision. The review found no need to change the frozen key or another contract version for these errors. All critical predicates on the planted errors were detected; the remaining errors are false alarms. Zero observed misses across these constructed cases does not establish a real-world miss rate.
+GLM's three quote-issue cases consist of a nonliteral ellipsis and joined source lines. They change no declared decision. No frozen key or contract was changed. The subsequent wording review is recorded below rather than retroactively rescoring this batch. All positive critical predicates in the constructed reference were detected. Zero observed misses across these constructed cases does not establish a real-world miss rate.
 
 ## Initial-batch accounting and custody
 
@@ -95,6 +95,18 @@ On 2026-11-14 (Asia/Jakarta), the owner completed the [requested extension](http
 
 The first results had already been inspected when the extension was requested. This measures repeated behavior on the same constructed set, not an independent new validation set or three independent natural samples. No majority-vote repair, replacement or outcome-based case selection occurs.
 
+### Primary descriptive result: per-observation reference matches
+
+Following review of the completed results, the owner selected reference-match rate as the primary presentation metric. This changes emphasis, not any frozen reference, decision, extraction rule or recorded pass outcome. It introduces no new acceptance cutoff. Use matched complete judgments divided by all 72 planned observations per model, with strict format rejections retained in that denominator:
+
+| Profile | Reference matches / planned observations | Reference-match rate | Extractable reference nonmatches | Format-rejected observations |
+| --- | ---: | ---: | ---: | ---: |
+| DeepSeek | 70/72 | 97.2% | 2 | 0 |
+| Haiku | 69/72 | 95.8% | 2 | 1 |
+| GLM | 66/72 | 91.7% | 5 | 1 |
+
+These are observed matches to the constructed reference, not independent natural-task accuracy estimates. Each row covers 24 cases judged three times; the repeated observations are not 72 distinct questions. Per-attempt counts remain visible:
+
 | Profile | Repetition 1 matches / planned | Repetition 2 | Repetition 3 | Combined matches / planned | Extractable / planned |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | DeepSeek | 24/24 | 23/24 | 23/24 | 70/72 | 72/72 |
@@ -103,26 +115,53 @@ The first results had already been inspected when the extension was requested. T
 
 Matches require all four predicate bits to match the frozen reference. Haiku repetition 2 has 23 matches and one contract-rejected output. GLM repetition 3 has 22 matches, one known wrong judgment and one contract-rejected output. Neither rejected output is removed from its planned denominator or credited as correct. There are no missing HTTP responses, explicit null decisions or unknown usage records.
 
-The predeclared consistency measure compares the three complete, known four-bit decision vectors, independently of reasons or optional quotes. All-three-correct additionally requires all three vectors to match the key. Incomplete triples receive no agreement credit:
+### Secondary same-case consistency diagnostics
 
-| Profile | Agree across three / comparable triples | All three correct / all planned cases | Changed complete triples | Incomplete triples | Cases with a known error in any repetition |
+The predeclared consistency measure compares the three complete, known four-bit decision vectors, independently of reasons or optional quotes. Matching the reference on every attempt additionally requires all three vectors to match the key. Incomplete triples receive no agreement credit. A case that fails once contributes one nonmatch to the primary 72-observation rate, while it cannot count as a case that matched on every attempt. These answer different questions:
+
+| Profile | Agree across three / comparable triples | Cases matching key on every attempt / planned cases | Changed complete triples | Incomplete triples | Cases with a known error in any repetition |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | DeepSeek | 22/24 | 22/24 | 2 | 0 | 2 |
 | GLM | 19/23 | 19/24 | 4 | 1 | 4 |
 | Haiku | 21/23 | 21/24 | 2 | 1 | 2 |
 
-No complete triple was consistently wrong; this does not excuse the observed inconsistent errors. **None passes** the frozen requirement of all 24 cases correct on all three attempts with complete usable judgments and known accounting. Comparing only each model's best repetition would hide the failure.
+No complete triple was consistently wrong. The recorded strict diagnostic requiring all 24 cases to match on all three attempts remains false for every model; it is preserved as a secondary result. It is not the overall reference-match rate, and 22/24 must not be substituted for DeepSeek's 70/72 overall result. Comparing only each model's best repetition would omit observed errors.
+
+### Where the errors concentrate
+
+The shared problem is the false-absence test-result case, `sample-07`. Across its nine observations, all models recognized the factual error and unsupported assertion. Four judgments additionally triggered a critical class whose frozen label is false. The disagreement concerns the severity/class boundary, not understanding the recorded test result:
+
+| Model | Matching judgments on this case | Reference nonmatches | Nonmatching repetitions |
+| --- | ---: | ---: | --- |
+| DeepSeek | 2/3 | 1/3 | 2 |
+| GLM | 1/3 | 2/3 | 1 and 2 |
+| Haiku | 2/3 | 1/3 | 1 |
+| **Combined** | **5/9** | **4/9** | |
+
+Thus there is one repeatedly troublesome case, including a model-specific majority of reference nonmatches for GLM, but **no case has a majority of reference nonmatches across all three models and attempts**. The other five cases (`sample-05`, `sample-10`, `sample-11`, `sample-21`, `sample-22`) each have one nonmatching judgment and eight matches out of nine. Their disagreements involve inconsistent flags or an invented assertion, without this false-absence boundary. Two other cases (`sample-04`, `sample-06`) each have one format-rejected observation and eight matches; these are not counted as known semantic errors. The remaining 16 cases match in all nine observations. This per-case view complements the primary rates without replacing or filtering any observation.
+
+### Owner-requested ambiguity review of the shared case
+
+The source facts and factual error are unambiguous: a unit result is supplied, and the candidate falsely denies its availability. All nine judgments agree on C1=false, K2=false and U1=true. Only K1 varies: five false and four true. Model votes do not settle reference truth.
+
+The narrow frozen rule defines K1 around an asserted determinate passed/failed outcome that the record does not support. Under that literal reading, asserting that a result is absent does not trigger K1, so the frozen reference is defensible. The broader reading observed in the model explanations treats any contradicted report about a test result, including denying an existing result, as critical. The rule names passed/failed but does not explicitly exclude false absence claims. The system's exclusion for mere omission does not resolve this case: falsely denying a result is an assertion, not merely leaving it out.
+
+This is a **rubric-sensitive severity boundary**, not an ambiguous source record or demonstrated decoder defect. The typed oracle encodes the author's narrow reading; checking it against the handwritten label validates consistency of that construction, not independent resolution of the prose/policy boundary. The earlier description of all four disagreements as unambiguous LLM defects was too definitive. Preserve their status as disagreements with the frozen reference, with this caveat.
+
+For a future version retaining the narrow intended policy, use an explicit closed-class definition: K1 is true only when the answer asserts or unambiguously entails a passed/failed unit-test outcome and that outcome conflicts with the record or no outcome is supplied. A false claim that a result is unavailable/unknown does not trigger this particular K; assess it under C1 and U1. Mere omission alone triggers neither K nor U. A broader policy that also makes false denial critical would be a different prospective definition, not grounds for changing past labels.
+
+This proposed clarification has not been dispatched or validated by a new run. No independent adjudication, case exclusion, adjusted headline rate or new acceptance cutoff is introduced. The original case, reference, all nine judgments, artifact hashes and pass flags remain unchanged; the four boundary disagreements are not silently removed to improve the scores.
 
 ### Added judgment and output failures
 
-- DeepSeek repeated the critical-class expansion on the false-absence test-result case in repetition 2. In repetition 3 it added an unsupported-content flag to a cleanup answer whose factual premises were supported; its explanation ultimately says U1 should be false, but the declared bit remains true. Both original clean decisions and the later errors are retained.
-- GLM repeated that critical-class expansion in repetition 2. It also falsely marked C1 met on two different incorrect reports, one in each added repetition, despite explanations identifying the mismatched recorded outcome. Its original unsupported-content error remains in repetition 1. Across all repetitions it has five wrong known bits: two critical false alarms, two false required-point passes and one unsupported-content false alarm.
+- DeepSeek disagreed with the frozen K1 label on the rubric-sensitive false-absence case in repetition 2. In repetition 3 it added an unsupported-content flag to a cleanup answer whose factual premises were supported; its explanation ultimately says U1 should be false, but the declared bit remains true. Both original clean decisions and the later nonmatches are retained.
+- GLM repeated that boundary disagreement in repetition 2. It also falsely marked C1 met on two different incorrect reports, one in each added repetition, despite explanations identifying the mismatched recorded outcome. Its original unsupported-content error remains in repetition 1. Across all repetitions it has five nonmatching known bits: two K1 boundary disagreements, two false required-point passes and one unsupported-content false alarm.
 - Haiku's two original critical false alarms did not recur, but repetition 2 violated the frozen unique-key rule by repeating an optional answer-quote key with the same empty value. This is a strict duplicate-key rejection, not a conflicting decision or an incorrect factual judgment. The entire observation remains unextractable under the declared contract; its apparently correct intended decisions are not retrospectively credited.
 - GLM repetition 3 supplied explanatory prose before a fenced JSON object. The contract permits a whole fenced object, not surrounding prose, so this observation is also rejected. The embedded intended decisions appear to match the reference, but no extraction repair or primary-score credit is applied.
 
 The remaining new quote issue is a nonliteral ellipsis in GLM's repetition 2. Combined quote-issue case counts are DeepSeek 0, GLM 4 and Haiku 0, separately from decision/reference matching. No reference label or decoder rule was changed after seeing these outputs. The public decoder replay reproduces both strict rejections and all accepted decisions.
 
-Across all 216 observations there are **864 planned predicate bits: 856 extractable/known, 847 matching and nine wrong**, with eight unextractable bits from the two rejected observations. Of the wrong known bits, five are critical false alarms, two falsely mark a required point met and two are unsupported-content false alarms. All **90/90 planted positive critical predicates** were detected; the rejected observations occur outside those planted critical cases. This is bounded fixture evidence, not a real-world critical-miss-rate guarantee.
+Across all 216 observations there are **864 planned predicate bits: 856 extractable/known, 847 matching and nine nonmatching**, with eight unextractable bits from the two rejected observations. Under the frozen key, five nonmatches are critical false alarms (four on the rubric-sensitive boundary), two falsely mark a required point met and two are unsupported-content false alarms. All **90/90 planted positive critical predicates** were detected; the rejected observations occur outside those planted critical cases. This is bounded fixture evidence, not a real-world critical-miss-rate guarantee.
 
 ### Extension accounting and custody
 
@@ -148,4 +187,4 @@ The private frozen runner's offline tests additionally checked all 24 handwritte
 
 The extension's private offline tests additionally checked import of the immutable baseline, byte-identical requests, a full 144-response mock run, combined 216-observation arithmetic, preservation of first-attempt errors, consistent-wrong/majority-correct/unknown/missing triples, retained denominators on early stop, tamper rejection and prevention of another execution.
 
-Stop this format-tuning loop and review the bounded method/evidence change. DeepSeek's initial perfect control result is now qualified by observed inconsistency; no profile meets the three-attempt control rule or qualifies as an S0 grader. The existing source/task sufficiency gaps, reference adjudication, actual S0 run inputs and prescribed owner/source checks remain. No further experiment, source disclosure or stage advancement follows automatically from this PR.
+Review the bounded method/evidence change using the per-observation reference-match rates as the primary descriptive result, with consistency, error concentration, the rubric-sensitive boundary and output failures alongside them. DeepSeek has the highest observed rate on this constructed set; that does not establish a general model ranking or independent natural-task accuracy. Historical strict-control outcomes remain unchanged as secondary diagnostics. The existing source/task sufficiency gaps, reference adjudication, actual S0 run inputs and prescribed owner/source checks remain; no S0 grader is accepted. No further experiment, source disclosure or stage advancement follows automatically from this PR.
