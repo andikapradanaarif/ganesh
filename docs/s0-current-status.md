@@ -6,6 +6,8 @@ Updated after #122 readiness review, 2026-11-12. [Issue #109](https://github.com
 
 **Current result: incomplete, 0/108 recorded held-out answers.** There is no accepted grader or qualified installed capture profile. The sequencing problem is real: capture and verifier development continued without producing the primary memory-value comparison. Further infrastructure and grader-format work should not be the default next issue.
 
+**2026-11-13 method update:** the owner completed the [fresh synthetic judge-contract validation](s0-judge-contract-validation.md), after requesting test clarification before a PR. All 72 judgments were extractable; DeepSeek matched 24/24 constructed references, GLM and Haiku 22/24 each. Remaining mismatches are false alarms under the explicit rules; no frozen label was revised. This supports a bounded method/evidence review, not natural-task grader acceptance or an S0 pass. The 72-call allowance is consumed, no further calls are queued, and the original run/source gates below remain.
+
 ## Readiness decision
 
 [The #122 offline package](https://github.com/andikapradanaarif/ganesh/issues/122) recommends **hold execution**. Filling 30 definition slots did not establish a runnable sample:
