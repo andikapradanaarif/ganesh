@@ -10,6 +10,8 @@ Updated after [#126's repeated-grader comparison](https://github.com/andikaprada
 
 The owner subsequently requested fixing the test before another run. [Issue #128](https://github.com/andikapradanaarif/ganesh/issues/128) provides a [prospective offline contract](s0-grader-contract.md) with explicit criteria/critical rules, restored whole-answer instructions, separate failure dimensions and visible disputed references. This bounded correction creates no new inference allowance, independent reference labels, accepted grader or held-out answers; #126's failures remain unchanged.
 
+The owner's later “okay, let's fresh run” requests the [#130 owner-run comparison](s0-grader-rerun.md): reuse the same 30 answers across the same three graders twice, with a separately frozen 180-request / $0-extra batch. Preparation itself makes no model calls; execution and results remain pending the owner's local command. No old allowance is reused or grader accepted.
+
 ## Readiness decision
 
 [The #122 offline package](https://github.com/andikapradanaarif/ganesh/issues/122) recommends **hold execution**. Filling 30 definition slots did not establish a runnable sample:

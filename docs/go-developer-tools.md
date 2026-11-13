@@ -2,6 +2,8 @@
 
 Prepare and check prospective grader development packets with the [grader contract commands](s0-grader-contract.md#offline-commands). These offline tools separate format, criterion structure, exact evidence and reference agreement; they make no model requests and do not reinterpret old trials.
 
+For the separately requested fresh comparison, [the owner-run batch](s0-grader-rerun.md) adds offline `grader-trial-prepare`/`grader-trial-report` and an explicit `grader-trial-run --execute` network path. The latter sends the frozen 180 requests only when the owner executes it.
+
 Active developer tooling uses Go. `cmd/ganesh-dev` is separate from the general CLI and the experimental capture-only binary; it is never installed as a hook.
 
 Run the native Crush fixtures from this repository:

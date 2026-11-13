@@ -177,54 +177,73 @@ func CheckGraderContract(directory, manifestPin, caseID, responsePin string) (Gr
 	if !evidenceDigest(manifestPin) || !evidenceDigest(responsePin) || !evidenceID(caseID) {
 		return empty, ErrGraderContract
 	}
-	r, err := contractPrivateRoot(directory)
+	packet, refs, err := loadContractPacket(directory, manifestPin)
 	if err != nil {
 		return empty, err
 	}
-	defer r.Close()
-	m, err := privateFile(r, "manifest.json", 2<<20)
-	if err != nil || corpusHash(string(m)) != manifestPin {
-		return empty, ErrGraderContract
-	}
-	var manifest contractManifest
-	if decodeStudy(m, &manifest) != nil || manifest.Version != 1 || manifest.ModelDispatch || len(manifest.Files) != 2 {
-		return empty, ErrGraderContract
-	}
-	bodies := map[string][]byte{}
-	for _, name := range []string{"packet.json", "references.json"} {
-		b, e := privateFile(r, name, 2<<20)
-		if e != nil || corpusHash(string(b)) != manifest.Files[name] {
-			return empty, ErrGraderContract
-		}
-		bodies[name] = b
-	}
-	var packet contractPacket
-	var refs map[string]contractReference
-	if decodeStudy(bodies["packet.json"], &packet) != nil || packet.Version != 1 || len(packet.Cases) == 0 || len(packet.Cases) > 30 || decodeStudy(bodies["references.json"], &refs) != nil || len(packet.Requests) != len(packet.Cases) || len(refs) != len(packet.Cases) {
-		return empty, ErrGraderContract
-	}
 	var selected *contractCase
-	seen := map[string]bool{}
-	for i, c := range packet.Cases {
-		if !contractCaseValid(c) || seen[c.Case] || packet.Requests[i] != contractPrompt(c) {
-			return empty, ErrGraderContract
-		}
-		seen[c.Case] = true
-		if _, ok := refs[c.Case]; !ok {
-			return empty, ErrGraderContract
-		}
-		if c.Case == caseID {
+	for i := range packet.Cases {
+		if packet.Cases[i].Case == caseID {
 			selected = &packet.Cases[i]
 		}
 	}
 	if selected == nil {
 		return empty, ErrGraderContract
 	}
+	r, err := contractPrivateRoot(directory)
+	if err != nil {
+		return empty, err
+	}
+	defer r.Close()
 	response, err := privateFile(r, "response.txt", 64<<10)
 	if err != nil || corpusHash(string(response)) != responsePin {
 		return empty, ErrGraderContract
 	}
 	return checkContractResponse(*selected, refs[caseID], response), nil
+}
+
+func loadContractPacket(directory, manifestPin string) (contractPacket, map[string]contractReference, error) {
+	var empty contractPacket
+	if !evidenceDigest(manifestPin) {
+		return empty, nil, ErrGraderContract
+	}
+	r, err := contractPrivateRoot(directory)
+	if err != nil {
+		return empty, nil, err
+	}
+	defer r.Close()
+	m, err := privateFile(r, "manifest.json", 2<<20)
+	if err != nil || corpusHash(string(m)) != manifestPin {
+		return empty, nil, ErrGraderContract
+	}
+	var manifest contractManifest
+	if decodeStudy(m, &manifest) != nil || manifest.Version != 1 || manifest.ModelDispatch || len(manifest.Files) != 2 {
+		return empty, nil, ErrGraderContract
+	}
+	bodies := map[string][]byte{}
+	for _, name := range []string{"packet.json", "references.json"} {
+		b, e := privateFile(r, name, 2<<20)
+		if e != nil || corpusHash(string(b)) != manifest.Files[name] {
+			return empty, nil, ErrGraderContract
+		}
+		bodies[name] = b
+	}
+	var packet contractPacket
+	var refs map[string]contractReference
+	if decodeStudy(bodies["packet.json"], &packet) != nil || packet.Version != 1 || len(packet.Cases) == 0 || len(packet.Cases) > 30 || decodeStudy(bodies["references.json"], &refs) != nil || len(packet.Requests) != len(packet.Cases) || len(refs) != len(packet.Cases) {
+		return empty, nil, ErrGraderContract
+	}
+	seen := map[string]bool{}
+	for i, c := range packet.Cases {
+		if !contractCaseValid(c) || seen[c.Case] || packet.Requests[i] != contractPrompt(c) {
+			return empty, nil, ErrGraderContract
+		}
+		seen[c.Case] = true
+		if _, ok := refs[c.Case]; !ok {
+			return empty, nil, ErrGraderContract
+		}
+	}
+	return packet, refs, nil
 }
 
 func checkContractResponse(c contractCase, ref contractReference, body []byte) GraderContractCheck {

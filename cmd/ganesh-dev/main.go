@@ -15,7 +15,10 @@ import (
 	"github.com/andikapradanaarif/ganesh/internal/safetyprobe"
 )
 
-type options struct{ command, source, profile, directory, study, raw, transcriptRoot, sessionsRoot, grantMapDirectory, expectedManifest, outputDirectory, expectedFrame, expectedResponse, expectedUsage, caseID string }
+type options struct {
+	command, source, profile, directory, study, raw, transcriptRoot, sessionsRoot, grantMapDirectory, expectedManifest, outputDirectory, expectedFrame, expectedResponse, expectedUsage, caseID string
+	execute                                                                                                                                                                                     bool
+}
 
 func parse(args []string) (options, error) {
 	var opts options
@@ -26,6 +29,16 @@ func parse(args []string) (options, error) {
 	flags := flag.NewFlagSet(opts.command, flag.ContinueOnError)
 	flags.SetOutput(io.Discard)
 	switch opts.command {
+	case "grader-trial-prepare":
+		flags.StringVar(&opts.directory, "dir", "", "private corrected contract packet")
+		flags.StringVar(&opts.expectedManifest, "manifest-sha256", "", "pinned contract manifest")
+		flags.StringVar(&opts.outputDirectory, "output-dir", "", "new private owner-run directory")
+	case "grader-trial-run", "grader-trial-report":
+		flags.StringVar(&opts.directory, "dir", "", "private frozen trial directory")
+		flags.StringVar(&opts.expectedManifest, "plan-sha256", "", "pinned trial plan")
+		if opts.command == "grader-trial-run" {
+			flags.BoolVar(&opts.execute, "execute", false, "send the frozen 180-request Go batch")
+		}
 	case "grader-contract-prepare":
 		flags.StringVar(&opts.directory, "dir", "", "private completed #126 panel directory")
 		flags.StringVar(&opts.outputDirectory, "output-dir", "", "new private development packet directory")
@@ -71,6 +84,9 @@ func parse(args []string) (options, error) {
 		return options{}, devtools.ErrCommand
 	}
 	if flags.Parse(args[1:]) != nil || flags.NArg() != 0 {
+		return options{}, devtools.ErrCommand
+	}
+	if strings.HasPrefix(opts.command, "grader-trial-") && (strings.TrimSpace(opts.directory) == "" || len(opts.expectedManifest) != 64 || strings.Trim(opts.expectedManifest, "0123456789abcdef") != "" || (opts.command == "grader-trial-prepare" && strings.TrimSpace(opts.outputDirectory) == "") || (opts.command == "grader-trial-run" && !opts.execute)) {
 		return options{}, devtools.ErrCommand
 	}
 	if opts.command == "grader-contract-prepare" && (strings.TrimSpace(opts.directory) == "" || strings.TrimSpace(opts.outputDirectory) == "") {
@@ -135,6 +151,26 @@ func run(args []string, stdout, stderr io.Writer) error {
 	opts, err := parse(args)
 	if err != nil {
 		return err
+	}
+	if strings.HasPrefix(opts.command, "grader-trial-") {
+		var report any
+		switch opts.command {
+		case "grader-trial-prepare":
+			report, err = devtools.PrepareGraderTrial(opts.directory, opts.expectedManifest, opts.outputDirectory)
+		case "grader-trial-run":
+			report, err = devtools.RunGraderTrial(opts.directory, opts.expectedManifest, stdout)
+		case "grader-trial-report":
+			report, err = devtools.ReportGraderTrial(opts.directory, opts.expectedManifest)
+		}
+		if err != nil {
+			return err
+		}
+		encoder := json.NewEncoder(stdout)
+		encoder.SetIndent("", "  ")
+		if encoder.Encode(report) != nil {
+			return devtools.ErrGraderTrial
+		}
+		return nil
 	}
 	if opts.command == "grader-contract-prepare" || opts.command == "grader-contract-check" {
 		var report any
