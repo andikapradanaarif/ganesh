@@ -49,4 +49,14 @@ Even a passing development operability result cannot qualify an S0 grader, estab
 
 ## Validation and owner command
 
-Pending the offline runner checks and final immutable packet. No fresh inference result is claimed.
+The full tests and vet for `internal/devtools` and `cmd/ganesh-dev` pass, including complete and malformed 180-call mocked batches. Those mocks make no provider requests. The actual private preparation contains 180 frozen jobs, 90 unique native bodies and all 30 development cases, with maximum full prompt bytes + 512 = 11,283. No actual request has been reserved or sent.
+
+The frozen plan is `a5bb5d1e0a3d13f7ee9a0c7b204d246d7ca8f1e9dbe121eb74abc478dd11dd76`. Its executable, built from source commit `ee08d9f`, is bound by SHA-256 `cf48b6b92ce617efea0b4b89f96a801fc6c3ae127abd3e5d659fb8f42c672dc6`. The local wrapper uses exactly that executable and plan; it does not build or prepare again.
+
+The owner's command, from the repository root, is:
+
+```sh
+./.local/s0/grader-rerun-130/run.sh
+```
+
+The command sends up to the 180 requests described above. Its report is saved at `.local/s0/grader-rerun-130/report.json`. The owner can report completion or the terminal's stop message; raw responses, sources and keys do not need to be pasted into chat. Inference results remain pending until that command runs.
