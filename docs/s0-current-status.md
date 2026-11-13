@@ -1,12 +1,12 @@
 # Current S0 status and next work
 
-Updated after #122 readiness review, 2026-11-12. [Issue #109](https://github.com/andikapradanaarif/ganesh/issues/109) records the owner's project-review decision. This is a filled companion to the preserved [execution sheet](s0-execution-sheet.md), not a replacement protocol or run approval.
+Updated after #132's synthetic method and repeatability review, 2026-11-14; #122's readiness hold remains. [Issue #109](https://github.com/andikapradanaarif/ganesh/issues/109) records the owner's project-review decision. This is a filled companion to the preserved [execution sheet](s0-execution-sheet.md), not a replacement protocol or run approval.
 
 **Owner decision: “Keep original 108-answer S0.”** Retain 30 primary tasks, 20 within-project/ten cross-project, the 12-task diagnostic subset and all 0/A/B/C/D/F controls; preserve the conditional 24-answer eligible-origin rerun. No smaller pilot or human-only replacement for the grading protocol is selected.
 
 **Current result: incomplete, 0/108 recorded held-out answers.** There is no accepted grader or qualified installed capture profile. The sequencing problem is real: capture and verifier development continued without producing the primary memory-value comparison. Further infrastructure and grader-format work should not be the default next issue.
 
-**2026-11-13 method update:** the owner completed the [fresh synthetic judge-contract validation](s0-judge-contract-validation.md), after requesting test clarification before a PR. All 72 judgments were extractable; DeepSeek matched 24/24 constructed references, GLM and Haiku 22/24 each. Remaining mismatches are false alarms under the explicit rules; no frozen label was revised. This supports a bounded method/evidence review, not natural-task grader acceptance or an S0 pass. The 72-call allowance is consumed, no further calls are queued, and the original run/source gates below remain.
+**2026-11-14 method update:** the owner completed the [synthetic judge-contract validation and three-attempt extension](s0-judge-contract-validation.md). The first 72 calls plus 144 additional calls give 216 observations over the same 24 cases and three profiles; 214 are extractable. All-three-correct cases are DeepSeek 22/24, Haiku 21/24 and GLM 19/24. No profile passes the three-attempt control rule: DeepSeek's initial 24/24 did not persist. No key/rule/output was repaired. Combined usage is 297,215 tokens, zero extra cost reported. Both allowances are consumed, no further calls are queued, and the original run/source gates below remain. This supports method/evidence review, not natural-task grader acceptance or an S0 pass.
 
 ## Readiness decision
 
