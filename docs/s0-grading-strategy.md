@@ -1,5 +1,7 @@
 # S0 grading strategy after the criterion-scope diagnostic
 
+Latest result: the owner completed the [#130 corrected-contract run](s0-grader-rerun.md#completed-run-and-remaining-failures). It retains 72/180 exact-evidence-valid responses, residual schema defects and semantic errors; no grader qualified. All 180 calls are consumed. The historical runs and decisions below remain unchanged.
+
 [Issue #100](https://github.com/andikapradanaarif/ganesh/issues/100) continues [calibration #60](https://github.com/andikapradanaarif/ganesh/issues/60) after the [#99 diagnostic](https://github.com/andikapradanaarif/ganesh/issues/99). **DeepSeek V4.1 Flash through OpenCode Go remains the selected candidate; calibration is unaccepted.** After a rejected translated request and a successful native availability check, the owner-approved [#104 comparison](https://github.com/andikapradanaarif/ganesh/issues/104) returned five Haiku judgments and one transport failure. On the same five cases Haiku matched the reference less often than Flash, including missed critical flags. Do not switch graders or rerun the stopped comparison.
 
 ## What the saved run establishes
