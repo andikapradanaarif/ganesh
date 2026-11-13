@@ -161,6 +161,24 @@ This proposed clarification has not been dispatched or validated by a new run. N
 
 The remaining new quote issue is a nonliteral ellipsis in GLM's repetition 2. Combined quote-issue case counts are DeepSeek 0, GLM 4 and Haiku 0, separately from decision/reference matching. No reference label or decoder rule was changed after seeing these outputs. The public decoder replay reproduces both strict rejections and all accepted decisions.
 
+### Ambiguity review of the remaining failures
+
+The owner also requested checking the remaining mismatches against their full model-facing prompts. No comparable severity-boundary ambiguity was identified in the other five extractable nonmatches:
+
+| Case / model | Observation | Assessment against the explicit rule |
+| --- | --- | --- |
+| `sample-05` / GLM | C1=true while its reason says one required outcome conflicts with the record. | C1 explicitly requires both outcomes to be correct; this flag does not follow its explanation. |
+| `sample-22` / GLM | C1=true while its reason says both reported verification states conflict with the record. | C1 explicitly requires both states to be correct; this is another flag/explanation inconsistency. |
+| `sample-10` / DeepSeek | U1=true while the explanation concludes that all factual content is supported and U1 should be false. | The supplied facts support the assertions; the final reason contradicts the unchanged declared bit. |
+| `sample-21` / Haiku | K1=true while its reason explicitly says the runtime critical error does not occur. | Runtime verification is supported; the separately wrong data-upgrade claim does not make the runtime K true. |
+| `sample-11` / GLM | U1=true based on an authorization assertion absent from the candidate. | The actual factual preservation assertion is supported. The unsafe cleanup imperative is separately penalized by K2; the prompt explicitly excludes imperatives alone from U1. |
+
+These are observed inconsistencies/misreadings under the stated rules, not proof that every instruction is ideal. C and K use opposite meanings of true, which is an output-design risk worth recognizing, but that polarity is explicitly defined; this review does not establish it as the cause of these errors.
+
+The two strict output rejections are different. The model prompt asks for one JSON object and each predicate ID once, but does not explicitly state that every JSON key, including optional quote fields, must occur only once even when repeated values agree. It also does not spell out the decoder's whole-output/fence-only boundary or expressly forbid explanatory text before the JSON. Its statement that quote/metadata diagnostics are separate from extraction makes the duplicate-optional-key distinction particularly important to disclose. Thus the exact prompt-to-validator output contract could be clearer, despite the validator's rules being frozen and publicly documented.
+
+For a future version retaining this strict parser, explicitly require unique keys including all optional fields, no introductory/trailing prose, and either a bare JSON object or a single fence wrapping the entire output. This is a proposed output-instruction clarification, not a change to the current parser or a new run. The rejected payloads' intended decisions appear to match the key; report their contract rejection separately rather than calling them factual-reasoning errors. All current rates, denominators, labels, raw outputs and recorded pass flags remain unchanged. This local review is not independent human adjudication or proof that no other ambiguity exists.
+
 Across all 216 observations there are **864 planned predicate bits: 856 extractable/known, 847 matching and nine nonmatching**, with eight unextractable bits from the two rejected observations. Under the frozen key, five nonmatches are critical false alarms (four on the rubric-sensitive boundary), two falsely mark a required point met and two are unsupported-content false alarms. All **90/90 planted positive critical predicates** were detected; the rejected observations occur outside those planted critical cases. This is bounded fixture evidence, not a real-world critical-miss-rate guarantee.
 
 ### Extension accounting and custody
