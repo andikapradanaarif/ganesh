@@ -15,7 +15,7 @@ import (
 	"github.com/andikapradanaarif/ganesh/internal/safetyprobe"
 )
 
-type options struct{ command, source, profile, directory, study, raw, transcriptRoot, sessionsRoot, grantMapDirectory, expectedManifest, outputDirectory, expectedFrame, expectedResponse, expectedUsage string }
+type options struct{ command, source, profile, directory, study, raw, transcriptRoot, sessionsRoot, grantMapDirectory, expectedManifest, outputDirectory, expectedFrame, expectedResponse, expectedUsage, caseID string }
 
 func parse(args []string) (options, error) {
 	var opts options
@@ -26,6 +26,14 @@ func parse(args []string) (options, error) {
 	flags := flag.NewFlagSet(opts.command, flag.ContinueOnError)
 	flags.SetOutput(io.Discard)
 	switch opts.command {
+	case "grader-contract-prepare":
+		flags.StringVar(&opts.directory, "dir", "", "private completed #126 panel directory")
+		flags.StringVar(&opts.outputDirectory, "output-dir", "", "new private development packet directory")
+	case "grader-contract-check":
+		flags.StringVar(&opts.directory, "dir", "", "private prospective development packet directory")
+		flags.StringVar(&opts.expectedManifest, "manifest-sha256", "", "pinned packet manifest SHA-256")
+		flags.StringVar(&opts.caseID, "case", "", "neutral packet case ID")
+		flags.StringVar(&opts.expectedResponse, "response-sha256", "", "pinned raw response.txt SHA-256")
 	case "issue-state-probe", "repository-head-probe", "ci-result-probe", "decision-authority-probe", "echo-origin-probe":
 		// Fixed embedded synthetic fixtures only; no external paths or endpoints.
 	case "crush-test":
@@ -63,6 +71,12 @@ func parse(args []string) (options, error) {
 		return options{}, devtools.ErrCommand
 	}
 	if flags.Parse(args[1:]) != nil || flags.NArg() != 0 {
+		return options{}, devtools.ErrCommand
+	}
+	if opts.command == "grader-contract-prepare" && (strings.TrimSpace(opts.directory) == "" || strings.TrimSpace(opts.outputDirectory) == "") {
+		return options{}, devtools.ErrCommand
+	}
+	if opts.command == "grader-contract-check" && (strings.TrimSpace(opts.directory) == "" || strings.TrimSpace(opts.caseID) == "" || len(opts.expectedManifest) != 64 || strings.Trim(opts.expectedManifest, "0123456789abcdef") != "" || len(opts.expectedResponse) != 64 || strings.Trim(opts.expectedResponse, "0123456789abcdef") != "") {
 		return options{}, devtools.ErrCommand
 	}
 	if opts.command == "crush-test" && (strings.TrimSpace(opts.source) == "" || (opts.profile != "development" && opts.profile != "stripped" && opts.profile != "collector")) {
@@ -121,6 +135,23 @@ func run(args []string, stdout, stderr io.Writer) error {
 	opts, err := parse(args)
 	if err != nil {
 		return err
+	}
+	if opts.command == "grader-contract-prepare" || opts.command == "grader-contract-check" {
+		var report any
+		if opts.command == "grader-contract-prepare" {
+			report, err = devtools.PrepareGraderContract(opts.directory, opts.outputDirectory)
+		} else {
+			report, err = devtools.CheckGraderContract(opts.directory, opts.expectedManifest, opts.caseID, opts.expectedResponse)
+		}
+		if err != nil {
+			return err
+		}
+		encoder := json.NewEncoder(stdout)
+		encoder.SetIndent("", "  ")
+		if encoder.Encode(report) != nil {
+			return devtools.ErrGraderContract
+		}
+		return nil
 	}
 	if opts.command == "issue-state-probe" {
 		report, err := safetyprobe.RunIssueState()

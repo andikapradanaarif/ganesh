@@ -8,6 +8,8 @@ Updated after [#126's repeated-grader comparison](https://github.com/andikaprada
 
 **Latest bounded comparison:** #126 completed all 192 approved Go requests (12 generated answers + 180 repeated judgments) using 364,800 tokens and reported $0 additional cost. Only 25/180 judgments passed the strict format/evidence contract. The [separate exploratory flag analysis](s0-grading-strategy.md#126-result-requests-complete-grading-incomplete) retains missing outcomes and finds missed/unresolved planted critical controls in every candidate. Prompt/criterion ambiguity and disputed reference labels also remain. No grader is accepted; the allowance is exhausted and no further calls or schema-tuning loop is authorized. This is calibration evidence, not an S0 memory-benefit result; the four task-history gaps remain.
 
+The owner subsequently requested fixing the test before another run. [Issue #128](https://github.com/andikapradanaarif/ganesh/issues/128) provides a [prospective offline contract](s0-grader-contract.md) with explicit criteria/critical rules, restored whole-answer instructions, separate failure dimensions and visible disputed references. This bounded correction creates no new inference allowance, independent reference labels, accepted grader or held-out answers; #126's failures remain unchanged.
+
 ## Readiness decision
 
 [The #122 offline package](https://github.com/andikapradanaarif/ganesh/issues/122) recommends **hold execution**. Filling 30 definition slots did not establish a runnable sample:

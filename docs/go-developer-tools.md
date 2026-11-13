@@ -1,5 +1,7 @@
 # Go developer tools
 
+Prepare and check prospective grader development packets with the [grader contract commands](s0-grader-contract.md#offline-commands). These offline tools separate format, criterion structure, exact evidence and reference agreement; they make no model requests and do not reinterpret old trials.
+
 Active developer tooling uses Go. `cmd/ganesh-dev` is separate from the general CLI and the experimental capture-only binary; it is never installed as a hook.
 
 Run the native Crush fixtures from this repository:
