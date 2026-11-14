@@ -1,6 +1,6 @@
 # S0 task-support handoff after PR #133
 
-**Next issue: [#124](https://github.com/andikapradanaarif/ganesh/issues/124), readiness evidence. Current reviewed material is insufficient for the original S0 sample.** [PR #133](https://github.com/andikapradanaarif/ganesh/pull/133) completed the synthetic judgment-contract work; it did not supply the missing task history or qualify natural-task grading. This handoff uses cached #122/#124 assessments only. No new source search or model call occurred.
+**Issue [#124](https://github.com/andikapradanaarif/ganesh/issues/124): the additional owner-authorized history review is complete; current reviewed material remains insufficient for the original S0 sample.** [PR #133](https://github.com/andikapradanaarif/ganesh/pull/133) completed the synthetic judgment-contract work; it did not supply the missing task history or qualify natural-task grading. The original cache-only handoff and its artifacts remain unchanged. The subsequent bounded search below resolves zero gaps and makes no inference API calls.
 
 ## What the existing evidence supports
 
@@ -30,9 +30,26 @@ Use pre-existing ordinary work records that retain the discovery, its conditions
 
 The private handoff checklist binds each row to the unchanged #122 admission and #124 disposition, with source-locator fields left empty. No new task, oracle, label or corpus record is created. Public topics above were already reported in the [task-preparation record](s0-task-sufficiency.md); private source text and expected answers remain outside git.
 
-**Next owner input: point to existing saved sessions/export paths that may supply this evidence. No script needs running now, and no owner-written answer or confirmation of assistant labels is requested.** Once locators are known, prepare a finite inspection scope against the existing permissions before reading additional source text. A proposed ceiling for that future pass is 30 minutes and 64 KiB disclosed to this Codex session, on specifically identified local records, with no other model/provider requests. This is a proposal, not a renewed search grant or evidence of remaining capacity under S0's overall effort cap. Existing permission does not enroll a record in an evaluation packet or authorize another processor.
+The source locations were already recorded; the owner did not need to find the same files again. After the concrete proposal for an additional 30-minute / 64-KiB review, the owner's **“continue”** authorized that pass. It is completed below. This grant covers inspection by the current Codex session, not source enrollment, disclosure to another processor, another search or an original-S0 run. Overall focused S0 effort remains unknown.
 
 If suitable records are unavailable, retain the explicit insufficient-sample result. Different natural candidates may be considered prospectively from permitted history before answers, with the exact role/stratum mix, applicability and calibration separation checked again. Do not pad the sample, relabel calibration material or infer a reduced pilot.
+
+## Completed additional history review, 2026-11-15
+
+The pass conservatively ran **2026-11-14 17:19:53–17:26:43.223 UTC (6m50.223s)**, including preparation and source-fidelity checking. Publication afterward used only inspected/cached material. It stayed within the 30-minute limit. Source disclosure was **22,129 reduced-text bytes**, conservatively charged as **22,739 bytes** using the greater of original-window and reduced-text lengths, against the **65,536-byte** cap. There was no follow-up disclosure or separate inference request, credential access, target-repository access, additional spend or capture measurement. Codex conversation usage is separate and unmeasured.
+
+Local selection parsed **14 pinned transcript snapshots / 6,346,953 serialized bytes**. A separate fidelity replay read the same 6,346,953 bytes; these repeated local reads are distinct from text disclosed to this session. Ten in-scope reserved/quarantined sessions were excluded before reading their bodies; two files were skipped as unavailable or changed. No snapshot was refreshed. The search considered user/agent text, including explanatory messages accompanying tool calls and fenced examples; raw tool-call payloads and system text were excluded. Fixed keyword families and bounded windows selected **48 windows from 46 messages**, all reviewed. All matches were agent text; 36 windows accompanied tool calls, and 36 distinct messages were outside the earlier 14-message selection. These are search counts, not accepted lessons.
+
+| Gap | Finding in the additional review | Disposition |
+| --- | --- | --- |
+| Method-specific route permissions | One message proposes inspecting route mounting; it reports no method/role-gate conclusion. | Missing historical lesson remains. |
+| Actor propagation | The audit passage describes database-owned audit/security controls, not context-derived caller propagation through handlers/application code. | Missing historical lesson remains. |
+| File/caller ownership | Upload sync mentions and payment-transaction ownership guards do not establish the required file/upload-intent caller binding. | Missing historical lesson remains. |
+| Generated credential lifecycle | Bruno output, environment/manual-token setup and generator fixes retain the earlier partial context; no reviewed passage establishes destructive regeneration plus separate environment/credential persistence. | Partial historical support remains. |
+
+**Result: zero newly resolved gaps; support remains 20 within / six cross candidates, with zero tasks admitted.** All original task definitions, oracles, corpus records, labels and manifests remain unchanged. This broader message search still excludes raw tool payloads, reserved/quarantined sessions and unavailable snapshots, and uses keyword-selected windows. It does not prove that suitable history is absent everywhere. The same assistant interpreted the passages; source joins do not independently validate semantics or origin eligibility.
+
+**No script needs running. The current sample must remain incomplete.** Another pass over the same material is not queued. Continuing the original plan needs different permitted historical evidence or a prospective rework of the four task candidates with the required role/stratum mix; a smaller run requires an explicit owner decision. The completed bounded review supplies neither change automatically.
 
 ## What follows source sufficiency
 
@@ -49,3 +66,5 @@ Only after task sufficiency, natural-task calibration and the remaining inputs a
 The private cache-only check joins all four gaps by task ID and support state, recomputes role/diagnostic counts and the three owner declarations, and binds the admissions, dispositions and successor-label files by SHA-256. It checks the original package manifest still has digest `c9bb4af0521f9ef0e7bedcc1fe0f7a7ff44fc573280fd3aa0892b6686a996677`. These checks establish custody and arithmetic, not independent semantics. Public relative links and unchanged baseline documents are checked separately. The handoff leaves #124 open with its readiness blockers intact; S0 completion, grading acceptance, capture qualification and the next-stage gate remain unproven.
 
 Private checklist SHA-256: `58ad50cbf5dacaf67d1d535ad7b12037e23c3a65c9666063c1673081c56cd6fd`. All 22 relative document targets across the three changed documents resolve; the roadmap/execution sheet are byte-identical to merged main, and the diff check passes. This documentation change requires no runtime test run.
+
+The additional review's private checker verifies every one of the 48 source/message/range joins, retained non-redacted text, all source hashes/exclusions, both disclosure records and their byte totals, the four unchanged gap states and the original handoff's input pins. New artifacts are separate from the old checklist. Private packet SHA-256: `09d823928e9c94652b71d44b3642ffa2f5c88b15bd5b9a3814f6a0d3074a7a6d`; review SHA-256: `0981f329b377867cf3a8fbf26103212e44dd9f013253b22f684bef275405a27d`. Source excerpts and detailed dispositions remain outside git. The documentation and bounded-review reporting are complete and ready for review; #124 stays open because S0 readiness remains unresolved.
