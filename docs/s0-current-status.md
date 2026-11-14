@@ -1,10 +1,12 @@
 # Current S0 status and next work
 
-Updated after #122 readiness review, 2026-11-12. [Issue #109](https://github.com/andikapradanaarif/ganesh/issues/109) records the owner's project-review decision. This is a filled companion to the preserved [execution sheet](s0-execution-sheet.md), not a replacement protocol or run approval.
+Updated after #132's synthetic method and repeatability review, 2026-11-14; #122's readiness hold remains. [Issue #109](https://github.com/andikapradanaarif/ganesh/issues/109) records the owner's project-review decision. This is a filled companion to the preserved [execution sheet](s0-execution-sheet.md), not a replacement protocol or run approval.
 
 **Owner decision: “Keep original 108-answer S0.”** Retain 30 primary tasks, 20 within-project/ten cross-project, the 12-task diagnostic subset and all 0/A/B/C/D/F controls; preserve the conditional 24-answer eligible-origin rerun. No smaller pilot or human-only replacement for the grading protocol is selected.
 
 **Current result: incomplete, 0/108 recorded held-out answers.** There is no accepted grader or qualified installed capture profile. The sequencing problem is real: capture and verifier development continued without producing the primary memory-value comparison. Further infrastructure and grader-format work should not be the default next issue.
+
+**2026-11-14 latest method result:** the owner completed a [clarified-instruction rerun](s0-judge-contract-validation.md), 216 new observations on the same 24 seen synthetic cases and three profiles, with three attempts per case/model. All 216 are extractable. Primary reference-match rates are **DeepSeek 72/72 (100.0%), GLM 70/72 (97.2%), Haiku 66/72 (91.7%)**. The earlier shared critical-boundary case now matches in all nine observations and format rejections are zero; the eight remaining nonmatches are inconsistent C1 flags on three cases. Haiku consistently differs on two cases across all attempts. The previous instruction version's 216 observations and rates remain separate and unchanged; no old attempt is mixed into this rerun. New usage is 344,601 tokens, zero extra cost reported. The allowance is consumed, no further calls are queued, and the original run/source gates below remain. This is instruction development on shared-author controls, not fresh held-out accuracy, accepted S0 grading or a stage pass.
 
 ## Readiness decision
 
