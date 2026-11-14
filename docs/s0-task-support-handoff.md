@@ -15,7 +15,7 @@ The [readiness package](s0-task-sufficiency.md#readiness-package-and-stop-decisi
 
 Three of those four candidates are in the proposed diagnostic subset. Its historically supported coverage is six within / three cross, against the required six / six. Keeping only the 26 candidates would change the approved role mix and answer schedule. The owner retains the original 30 tasks, 108 base answers and conditional 24; a smaller pilot has not been selected.
 
-The completed #124 search reviewed 14 selected messages / 27,941 reduced-text bytes from existing Kiosk/Valo-backend history and resolved **zero** gaps. Keyword selection, omitted code fences, agent-message filtering, excluded calibration scenarios and three skipped files limit that finding. It establishes insufficiency of the reviewed material, not absence from all saved history. Its source-search allowance is exhausted.
+The earlier #124 search (2026-11-12) reviewed 14 selected messages / 27,941 reduced-text bytes from existing Kiosk/Valo-backend history and resolved **zero** gaps. Keyword selection, omitted code fences, agent-message filtering, excluded calibration scenarios and three skipped files limit that finding. It establishes insufficiency of the reviewed material, not absence from all saved history. Its source-search allowance is exhausted.
 
 ## Evidence needed for the four candidates
 
@@ -34,9 +34,9 @@ The source locations were already recorded; the owner did not need to find the s
 
 If suitable records are unavailable, retain the explicit insufficient-sample result. Different natural candidates may be considered prospectively from permitted history before answers, with the exact role/stratum mix, applicability and calibration separation checked again. Do not pad the sample, relabel calibration material or infer a reduced pilot.
 
-## Completed additional history review, 2026-11-15
+## Completed additional history review, 2026-11-15 (Asia/Jakarta)
 
-The pass conservatively ran **2026-11-14 17:19:53–17:26:43.223 UTC (6m50.223s)**, including preparation and source-fidelity checking. Publication afterward used only inspected/cached material. It stayed within the 30-minute limit. Source disclosure was **22,129 reduced-text bytes**, conservatively charged as **22,739 bytes** using the greater of original-window and reduced-text lengths, against the **65,536-byte** cap. There was no follow-up disclosure or separate inference request, credential access, target-repository access, additional spend or capture measurement. Codex conversation usage is separate and unmeasured.
+The pass conservatively ran **2026-11-14 17:19:53–17:26:43.223 UTC (6m50.223s)**, equivalent to **2026-11-15 00:19:53–00:26:43.223 Asia/Jakarta (UTC+07:00)**, including preparation and source-fidelity checking. Publication afterward used only inspected/cached material. It stayed within the 30-minute limit. Source disclosure was **22,129 reduced-text bytes**, conservatively charged as **22,739 bytes** using the greater of original-window and reduced-text lengths, against the **65,536-byte** cap. There was no follow-up disclosure or separate inference request, credential access, target-repository access, additional spend or capture measurement. Codex conversation usage is separate and unmeasured.
 
 Local selection parsed **14 pinned transcript snapshots / 6,346,953 serialized bytes**. A separate fidelity replay read the same 6,346,953 bytes; these repeated local reads are distinct from text disclosed to this session. Ten in-scope reserved/quarantined sessions were excluded before reading their bodies; two files were skipped as unavailable or changed. No snapshot was refreshed. The search considered user/agent text, including explanatory messages accompanying tool calls and fenced examples; raw tool-call payloads and system text were excluded. Fixed keyword families and bounded windows selected **48 windows from 46 messages**, all reviewed. All matches were agent text; 36 windows accompanied tool calls, and 36 distinct messages were outside the earlier 14-message selection. These are search counts, not accepted lessons.
 
