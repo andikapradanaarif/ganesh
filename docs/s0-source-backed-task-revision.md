@@ -46,8 +46,33 @@ Private source-binding SHA-256: `646e3811052a2bdda9c6c062daf54bc6b5a2e60e11f9ee2
 
 Private task text, source excerpts, expected conditions and tools stay outside git. Public hashes bind custody; readers without the private cache cannot independently reproduce the checks. No inference API call, model selection, grading acceptance, new allowance, capture measurement or runtime change occurred.
 
-## Remaining work in the same issue
+## Bound run-packet proposal after PR #135
 
-Admit or reject the revised task scopes on semantic applicability, calibration separation and distinctness before treating them as held out. Bind the new IDs to full source-keyed scoring oracles, access inventories, arm plans/reference prose and the counterbalanced schedules. The old #122 schedule still names old tasks; only its required 108-base/24-conditional shape is preserved here, not a runnable rebind. Retain honest empty typed-card proposals until actual field admission; a nonempty-card requirement has not been added.
+The revised IDs and current target projects are now joined through a separate prospective run packet. The old #122 packet is preserved. This completes mechanical integration of the revised definitions, not an experiment freeze or authorization.
 
-Then resolve acceptable natural-task grading under the named answering/grading family rule and preserve the prescribed owner checks without restarting leading label confirmations. Freeze exact profiles, whole-request fit, permissions and the total execution limits before requests. These remain readiness work in **#124**, not reasons to create another preparation issue. The original overall focused-effort compliance remains unknown; no historical cap or call allowance is renewed.
+| Binding | Checked result |
+| --- | --- |
+| Task prompts, rubrics, access and scoring proposals | 30 tasks / 120 criteria, with current roles/projects and no retired task IDs in active slots. |
+| Base schedule | 108 slots, preserving the old pre-answer arm positions: 0 precedes A on ten within/five cross tasks, A precedes 0 on the other ten/five. Each diagnostic arm occupies every position once per stratum. |
+| Conditional schedule | 24 new-session D/F slots over the identical eligible-origin subset; that subset remains empty and cannot fall back to full history. |
+| Owner sample | Six primary pairs, one within/cross pair per role and three pairs per project; three complete diagnostic sets, one per role, spanning both projects. Re-selected deterministically before answers because target-project bindings changed. |
+| Answer inputs | 132 slot-specific file/hash allowlists. Task scoring references, rubrics, source frames and labels are excluded. Actual own-project tool/permission inventories and complete native wires are still unfrozen. |
+| Grading proposals | 30 input proposals linked through 72 source-reference joins to 39 reusable source-reference frames; candidate answers and model IDs remain absent. |
+
+The six revised tasks now have explicit prospective critical conditions. Retained criteria and critical conditions are unchanged. Uniform whole-answer/unsupported semantics are explicit for the new prospective packet: contradicted factual assertions count as unsupported, directives alone are not factual assertions, rejected/withdrawn material is distinguished, and bit/explanation conflicts cannot repair a declared bit. The packet has 26 named critical predicates; four retained tasks have no named critical class. Ordinary incompleteness, source uncertainty and wrong factual claims do not automatically become critical errors. These rules have not been tested on new model judgments or independently semantically adjudicated.
+
+All **36 corpus records**, D/F full-context data, the empty eligible subset, six native-instruction snapshots, and empty A/B proposals remain byte-identical. Existing C prose covers the new source families, but one summary omitted source endpoint values needed to distinguish source/target configuration. That summary is prospectively expanded with facts already in its same history record, with exact source spans. The other **22 of 23 summaries** remain unchanged. Every C diagnostic receives the same complete fixed bundle; there is no per-task answer-shaped prose selection, new history record or source enrollment. The hand-authored/seen-task limitation still applies.
+
+A separate Go checker verifies **261 private packet files**, the complete task/access/arm/schedule joins, source hashes, both stratified owner samples and answer-file restrictions. It rejects four deliberately invalid bindings: an oracle file appended with a valid hash, full-history access added to a conditional D input, a wrong target project, and dispatch enabled. This validates the offline proposal boundary, not a deployed agent or runtime tool sandbox. The largest sum of grading source text for one task is **33,477 bytes before task/wrapper/answer overhead**; bytes are not tokens or exact-profile context-fit evidence.
+
+Bound packet manifest SHA-256: `c22dbd8d04e5ac5ff8b60014b03d1f3cce9f5a6254dc3915dcf5587a53131d15`.
+
+Bound packet check SHA-256: `4828d2935384d0c91fb71969fe4fa141aa5460d755fb6b3eeb519ff75fc2b997`.
+
+The old readiness/task manifests and all prior answers, labels and failures remain unchanged. The new private packet stays ignored with 0700/0600 modes; sources and expected conditions are not published. No inference API, provider/account/credential inspection, new source search, capture measurement or runtime change occurred. Exact-profile/native-wire fit and independent semantic correctness are not established by these mechanical checks.
+
+## Remaining execution inputs in the same issue
+
+The packet is a **hold-execution proposal**. Actual baseline/client/tool access, final task/oracle adoption, an accepted natural-task grader under the named family rule, exact answering/grading profiles, complete request fit, processor permissions and a whole-run allowance still need freezing. The old numeric ceilings are retained as unapproved proposals, not renewed permission. The prior DeepSeek candidate is recorded historically; no active grader is silently assigned or switched. Keep the prescribed source-based owner checks and the stopped leading-confirmation flow.
+
+These fields remain in **#124**. No new preparation issue, inference batch or automatic smaller pilot follows from binding the packet. Overall focused-effort compliance, account quota/reset and current Extra Usage state remain unverified; no historical cap or call allowance is renewed. Original S0 remains 0/108 with the conditional 24 retained.
