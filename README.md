@@ -4,7 +4,7 @@ Ganesh is a planned personal memory service for agents working across authorized
 
 **Current stage: S0, incomplete. Recorded held-out answers: 0/108.** Capture components exist, but installed capture profiles remain disabled. The synthetic judgment-contract comparison is complete; no grader is accepted for natural-task S0 scoring. No usable service or memory-value result is claimed.
 
-The owner has reaffirmed the original **30-task, 108-answer S0**, with all required arms and controls. [The revised packet inside #124](docs/s0-source-backed-task-revision.md#bound-run-packet-proposal-after-pr-135) now binds task, access, scoring and arm inputs to all 108 base + 24 conditional slots. Offline checks pass; this is a proposal, not a test score or accepted run. Actual client/tool access, grading, exact profiles/fit, processor permissions and the approved allowance remain pending. Further worker/IPC development and grader-format iterations are off the critical path; no smaller pilot is selected.
+The owner has reaffirmed the original **30-task, 108-answer S0**, with all required arms and controls. [The revised packet](docs/s0-source-backed-task-revision.md#bound-run-packet-proposal-after-pr-135) binds all 108 base + 24 conditional slots. The [execution-profile check](docs/s0-execution-profile.md) restores the already approved DeepSeek/Go grading choice and finds that the tested answering-client configuration repeats failed requests. Request/accounting controls, grading acceptance and the remaining run inputs are unfinished. Further worker/IPC and grader-format work are off the critical path; no smaller pilot is selected.
 
 Start here:
 
