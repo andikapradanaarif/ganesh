@@ -103,6 +103,12 @@ func TestChangedSourceIsReportedWithoutAcceptingNewBaseline(t *testing.T) {
 }
 
 func TestTamperedScopeAndUnsafePathsFailBeforeProjectReads(t *testing.T) {
+	t.Run("empty-scope", func(t *testing.T) {
+		dir, hash := fixture(t, func(p *InspectionPlan) { p.Files = nil })
+		if _, err := Inspect(t.Context(), dir, hash, filepath.Join(t.TempDir(), "report")); err == nil {
+			t.Fatal("empty inspection passed")
+		}
+	})
 	t.Run("hash", func(t *testing.T) {
 		dir, hash := fixture(t, nil)
 		if os.WriteFile(filepath.Join(dir, "inspection-plan.json"), []byte(`{"roots":{"kiosk":"/private"}}`), 0600) != nil {

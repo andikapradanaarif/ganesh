@@ -92,7 +92,7 @@ func Inspect(ctx context.Context, dir, expected, out string) (Inspection, error)
 		return result, ErrInput
 	}
 	var m manifest
-	if json.Unmarshal(b, &m) != nil || m.Dispatch || m.Issue != 124 || m.Status != "OWNER_PREFLIGHT_PROPOSAL_HOLD_EXECUTION" {
+	if json.Unmarshal(b, &m) != nil || m.Dispatch || m.Issue != 124 || m.PacketSHA != BoundSHA || m.GuardSHA != GuardReportSHA || m.Status != "OWNER_PREFLIGHT_PROPOSAL_HOLD_EXECUTION" {
 		return result, ErrInput
 	}
 	for name, hash := range m.Files {
@@ -102,7 +102,7 @@ func Inspect(ctx context.Context, dir, expected, out string) (Inspection, error)
 		}
 	}
 	var plan InspectionPlan
-	if m.Files["inspection-plan.json"] == "" || decode(root, "inspection-plan.json", &plan) != nil || len(plan.Roots) != 2 || len(plan.Files) > 128 {
+	if m.Files["inspection-plan.json"] == "" || decode(root, "inspection-plan.json", &plan) != nil || len(plan.Roots) != 2 || len(plan.Files) == 0 || len(plan.Files) > 128 {
 		return result, ErrInput
 	}
 	for _, project := range []string{"kiosk", "valo-backend"} {

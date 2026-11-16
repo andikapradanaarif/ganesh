@@ -362,6 +362,7 @@ func Prepare(o Options) (string, error) {
 	if len(slots) != ProposedBudget().Slots {
 		return "", ErrInput
 	}
+	sort.Slice(calPins, func(i, j int) bool { return calPins[i].File < calPins[j].File })
 	rank := map[string]int{"calibration_proposal": 0, "base": 1, "conditional": 2}
 	sort.SliceStable(slots, func(i, j int) bool {
 		if rank[slots[i].Phase] != rank[slots[j].Phase] {
