@@ -1,0 +1,51 @@
+package agent
+
+import (
+ "encoding/json"
+ "io"
+ "net/http"
+ "os"
+ "sync"
+
+ requestguard "github.com/charmbracelet/crush/internal/ganeshrequestguard"
+)
+
+var ganeshOnce sync.Once
+var ganeshGuard *requestguard.Guard
+
+type ganeshDenied struct{}
+func (ganeshDenied) RoundTrip(r *http.Request) (*http.Response,error) {
+ if r.Body!=nil { r.Body.Close() }
+ os.Exit(78)
+ return nil,requestguard.ErrStopped
+}
+
+type ganeshFatalTransport struct { next http.RoundTripper }
+func (t ganeshFatalTransport) RoundTrip(r *http.Request) (*http.Response,error) {
+ response,err:=t.next.RoundTrip(r)
+ // This private profile runs exactly one isolated session per process. The
+ // guard has synced its evidence before returning an error. Exit prevents SDK
+ // backoff/retries, fallback or an unaccounted partial answer after failure.
+ if err!=nil { os.Exit(78) }
+ return response,err
+}
+
+// Mandatory in this experimental build. Missing/invalid configuration disables
+// provider dispatch; it never falls back to the unguarded transport.
+func ganeshGuardTransport(base http.RoundTripper) http.RoundTripper {
+ ganeshOnce.Do(func(){
+  path:=os.Getenv("GANESH_S0_GUARD_CONFIG")
+  f,err:=os.Open(path);if err!=nil{return};defer f.Close()
+  info,err:=f.Stat();if err!=nil||!info.Mode().IsRegular()||info.Mode().Perm()&0077!=0||info.Size()>8192{return}
+  var c struct { Limits requestguard.Config `json:"limits"`; Journal string `json:"journal"` }
+  decoder:=json.NewDecoder(io.LimitReader(f,8193));decoder.DisallowUnknownFields()
+  if decoder.Decode(&c)!=nil{return};var extra any;if decoder.Decode(&extra)!=io.EOF{return}
+  journal,err:=requestguard.OpenJournal(c.Journal);if err!=nil{return}
+  ganeshGuard,err=requestguard.New(c.Limits,journal)
+  if err!=nil{journal.Close();ganeshGuard=nil}
+ })
+ if ganeshGuard==nil{return ganeshDenied{}}
+ tr,err:=ganeshGuard.Transport(base)
+ if err!=nil{ganeshGuard.Close();return ganeshDenied{}}
+ return ganeshFatalTransport{next:tr}
+}

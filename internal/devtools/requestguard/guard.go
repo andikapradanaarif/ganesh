@@ -104,6 +104,7 @@ type Guard struct {
 	mu        sync.Mutex
 	journalMu sync.Mutex
 	s         Snapshot
+	seen      map[[32]byte]bool
 }
 
 func New(c Config, j Journal) (*Guard, error) {
@@ -118,7 +119,7 @@ func New(c Config, j Journal) (*Guard, error) {
 		return nil, ErrStopped
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
-	g := &Guard{c: c, journal: j, ctx: ctx, cancel: cancel, gate: make(chan struct{}, 1)}
+	g := &Guard{c: c, journal: j, ctx: ctx, cancel: cancel, gate: make(chan struct{}, 1), seen: make(map[[32]byte]bool)}
 	g.gate <- struct{}{}
 	return g, nil
 }
@@ -207,7 +208,15 @@ func (t *transport) RoundTrip(req *http.Request) (*http.Response, error) {
 		input.MaxOutput == nil || *input.MaxOutput <= 0 || *input.MaxOutput > g.c.MaxOutputPerRequest {
 		return nil, g.stop("request_profile")
 	}
+	h := sha256.Sum256(body)
 	g.mu.Lock()
+	if g.seen[h] {
+		g.mu.Unlock()
+		if g.event(Event{Kind: "blocked", Reason: "request_repeat"}) != nil {
+			return nil, ErrStopped
+		}
+		return nil, g.stop("request_repeat")
+	}
 	if g.s.Attempts >= g.c.MaxRequests || *input.MaxOutput > g.c.MaxOutputTotal-g.s.KnownOutput {
 		g.mu.Unlock()
 		if g.event(Event{Kind: "blocked", Reason: "request_or_output_limit"}) != nil {
@@ -218,9 +227,9 @@ func (t *transport) RoundTrip(req *http.Request) (*http.Response, error) {
 	// Charge before dispatch. A failed journal/transport remains conservatively unknown.
 	g.s.Attempts++
 	g.s.UnknownUsage++
+	g.seen[h] = true
 	attempt := g.s.Attempts
 	g.mu.Unlock()
-	h := sha256.Sum256(body)
 	if g.event(Event{Kind: "start", Attempt: attempt, RequestSHA256: hex.EncodeToString(h[:]), RequestBytes: len(body)}) != nil {
 		return nil, ErrStopped
 	}

@@ -68,6 +68,10 @@ func call(c *http.Client, endpoint, body string) error {
 
 const request = `{"model":"fixture","max_output_tokens":8,"input":"synthetic-private-body"}`
 
+func variant(n int) string {
+	return strings.Replace(request, "synthetic-private-body", fmt.Sprintf("synthetic-private-body-%d", n), 1)
+}
+
 func TestFailurePoisonsEveryClientAndPreservesUnknownUsage(t *testing.T) {
 	for _, status := range []int{http.StatusServiceUnavailable, http.StatusTooManyRequests, http.StatusTemporaryRedirect} {
 		t.Run(fmt.Sprint(status), func(t *testing.T) {
@@ -109,11 +113,11 @@ func TestOutputReservationAndAuxiliaryAccounting(t *testing.T) {
 		fmt.Fprint(w, complete)
 	})
 	for i := 0; i < 3; i++ {
-		if err := call(c, url, request); err != nil {
+		if err := call(c, url, variant(i)); err != nil {
 			t.Fatal(err)
 		}
 	}
-	if call(c, url, request) == nil {
+	if call(c, url, variant(3)) == nil {
 		t.Fatal("request limit ignored")
 	}
 	s := g.Snapshot()
@@ -125,10 +129,10 @@ func TestOutputReservationAndAuxiliaryAccounting(t *testing.T) {
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprint(w, `{"status":"completed","usage":{"input_tokens":1,"output_tokens":8}}`)
 	})
-	if call(c2, url2, request) != nil || call(c2, url2, request) != nil {
+	if call(c2, url2, variant(0)) != nil || call(c2, url2, variant(1)) != nil {
 		t.Fatal("at-cap requests rejected")
 	}
-	if call(c2, url2, request) == nil || g2.Snapshot().Attempts != 2 {
+	if call(c2, url2, variant(2)) == nil || g2.Snapshot().Attempts != 2 {
 		t.Fatal("total output not reserved before dispatch")
 	}
 }
@@ -213,9 +217,9 @@ func TestSerializesAuxiliaryRequests(t *testing.T) {
 		fmt.Fprint(w, complete)
 	})
 	var wg sync.WaitGroup
-	for range 3 {
+	for i := range 3 {
 		wg.Go(func() {
-			if err := call(c, url, request); err != nil {
+			if err := call(c, url, variant(i)); err != nil {
 				t.Error(err)
 			}
 		})
@@ -223,6 +227,18 @@ func TestSerializesAuxiliaryRequests(t *testing.T) {
 	wg.Wait()
 	if peak.Load() != 1 || g.Snapshot().Attempts != 3 {
 		t.Fatal("requests overlapped or disappeared")
+	}
+}
+
+func TestIdenticalSuccessfulRequestCannotBeReplayed(t *testing.T) {
+	var sent atomic.Int32
+	g, _, c, url := setup(t, func(w http.ResponseWriter, r *http.Request) {
+		sent.Add(1)
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, complete)
+	})
+	if call(c, url, request) != nil || call(c, url, request) == nil || sent.Load() != 1 || g.Snapshot().Stopped != "request_repeat" || g.Snapshot().UnknownUsage != 0 {
+		t.Fatal("successful request replay escaped")
 	}
 }
 

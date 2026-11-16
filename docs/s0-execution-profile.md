@@ -29,7 +29,7 @@ Pinned client source exposes eval step/token stop controls, but its timeout test
 
 ## Concrete next requirement
 
-Provide and verify an answering-client profile that enforces the final request/retry/output limits and accounts for auxiliary and failed attempts. A supported configuration, minimal client fix or a different explicitly bounded proposal can be evaluated in #124; no installed binary, external client repository or budget was changed here. Do not send the main S0 packet through the tested configuration while describing it as no-retry.
+A [subsequent private-build guard and five actual-client fixtures](s0-request-controls.md) now establish bounded synthetic request/retry/output/accounting behavior for one native Responses process. The installed binary and this original failed profile remain unchanged. Cross-process whole-run accounting, actual access/fit and final limits still need verification; do not send the main S0 packet through the original tested configuration while describing it as no-retry.
 
 Then complete source-keyed grading acceptance for the already selected DeepSeek candidate, actual client/tool/processor permissions, exact profiles and context fit, and one whole-run allowance. Preserve the required owner checks and stopped leading-confirmation flow. Another model-family selection question or Anthropic-only requirement would repeat the corrected mistake. No model run is queued.
 
