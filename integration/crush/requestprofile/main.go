@@ -139,6 +139,17 @@ func run(source, out string) error {
 	if err = writeBytes(filepath.Join(snapshot, "internal/ganeshrequestguard/guard.go"), guard); err != nil {
 		return err
 	}
+	guardSources := obj{"guard.go": digest(guard)}
+	for _, name := range []string{"run.go", "runlock_unix.go", "runlock_other.go"} {
+		b, err := os.ReadFile(filepath.Join("internal/devtools/requestguard", name))
+		if err != nil {
+			return err
+		}
+		if err = writeBytes(filepath.Join(snapshot, "internal/ganeshrequestguard", name), b); err != nil {
+			return err
+		}
+		guardSources[name] = digest(b)
+	}
 	if err = writeBytes(filepath.Join(snapshot, "internal/agent/ganesh_requestguard.go"), adapter); err != nil {
 		return err
 	}
@@ -170,7 +181,7 @@ func run(source, out string) error {
 		return err
 	}
 	results := []obj{}
-	for _, mode := range []string{"503", "success", "missing-usage", "request-cap", "missing-config"} {
+	for _, mode := range []string{"503", "success", "missing-usage", "request-cap", "missing-config", "missing-run", "shared-request-cap", "shared-output-cap", "shared-input-stop", "shared-unknown", "shared-deadline", "shared-reused-slot", "shared-crash"} {
 		fmt.Println("Running synthetic loopback client fixture:", mode)
 		result, err := exercise(ctx, out, binary, mode)
 		if err != nil {
@@ -186,7 +197,7 @@ func run(source, out string) error {
 	if err != nil {
 		return err
 	}
-	report := obj{"source_revision": pin, "original_telemetry_sha256": digest(original), "patched_telemetry_sha256": digest(patched), "guard_sha256": digest(guard), "adapter_sha256": digest(adapter), "binary_sha256": digest(bin), "build_go_version": info.GoVersion, "network_policy": policy, "real_inference_requests": 0, "fixtures": results, "passed": passed, "installed_client_modified": false, "run_approved": false, "scope": "Single process native Responses transport only; no natural grading, tool isolation, context/tokenizer fit, account or cross-process whole-run qualification."}
+	report := obj{"source_revision": pin, "original_telemetry_sha256": digest(original), "patched_telemetry_sha256": digest(patched), "guard_sha256": digest(guard), "guard_sources_sha256": guardSources, "adapter_sha256": digest(adapter), "binary_sha256": digest(bin), "build_go_version": info.GoVersion, "network_policy": policy, "real_inference_requests": 0, "fixtures": results, "passed": passed, "installed_client_modified": false, "run_approved": false, "scope": "Synthetic shared accounting across native Responses client processes; no natural grading, tool isolation, tokenizer/context fit, provider billing or live run approval."}
 	if err = write(filepath.Join(out, "report.json"), report); err != nil {
 		return err
 	}
@@ -272,6 +283,7 @@ func exercise(parent context.Context, out, binary, mode string) (obj, error) {
 	var mu sync.Mutex
 	requests := []obj{}
 	active, peak := 0, 0
+	hit := make(chan struct{}, 1)
 	server := &http.Server{Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		b, err := io.ReadAll(io.LimitReader(r.Body, 1<<20))
 		if err != nil || len(b) >= 1<<20 {
@@ -291,7 +303,18 @@ func exercise(parent context.Context, out, binary, mode string) (obj, error) {
 		requests = append(requests, obj{"body_sha256": digest(b), "body_bytes": len(b), "path": r.URL.Path, "method": r.Method, "dummy_auth_matches": r.Header.Get("Authorization") == "Bearer fixture-only-not-a-secret", "model": payload.Model, "max_output_tokens": payload.MaxOutput, "stream": payload.Stream})
 		mu.Unlock()
 		defer func() { mu.Lock(); active--; mu.Unlock() }()
-		if mode == "503" {
+		if mode == "shared-crash" {
+			select {
+			case hit <- struct{}{}:
+			default:
+			}
+			select {
+			case <-r.Context().Done():
+			case <-ctx.Done():
+			}
+			return
+		}
+		if mode == "503" || mode == "shared-unknown" {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(503)
 			fmt.Fprint(w, `{"error":{"message":"synthetic fixture failure","type":"server_error"}}`)
@@ -329,8 +352,29 @@ func exercise(parent context.Context, out, binary, mode string) (obj, error) {
 		maxRequests = 1
 	}
 	limits := requestguard.Config{Endpoint: base + "/responses", Model: "gpt-6-luna", MaxRequests: maxRequests, MaxOutputPerRequest: 256, MaxOutputTotal: 1536, StopAfterInputTokens: 10000, Timeout: 25 * time.Second, MaxBodyBytes: 1 << 20}
+	runLimits := requestguard.RunLimits{ID: "fixture-" + mode, MaxRequests: 12, MaxOutputTotal: 4096, InputStop: 10000, Deadline: time.Now().Add(2 * time.Minute).UTC(), Profiles: map[string]requestguard.Config{"answer": limits}, Slots: map[string]string{"one": "answer", "two": "answer", "three": "answer"}}
+	switch mode {
+	case "shared-request-cap":
+		runLimits.MaxRequests = 4
+	case "shared-output-cap":
+		runLimits.MaxOutputTotal = 259
+	case "shared-input-stop":
+		runLimits.InputStop = 33
+	case "shared-deadline":
+		runLimits.Deadline = time.Now().Add(-time.Second).UTC()
+	}
+	runPath := filepath.Join(dir, "run.jsonl")
+	runHash, err := requestguard.CreateRun(runPath, runLimits)
+	if err != nil {
+		return nil, err
+	}
+	runOpts := requestguard.RunOptions{Path: runPath, SHA256: runHash, Slot: "one"}
 	journalPath := filepath.Join(dir, "requests.jsonl")
-	if err = write(filepath.Join(dir, "guard.json"), obj{"limits": limits, "journal": journalPath}); err != nil {
+	guardConfig := obj{"limits": limits, "journal": journalPath, "run": runOpts}
+	if mode == "missing-run" {
+		delete(guardConfig, "run")
+	}
+	if err = write(filepath.Join(dir, "guard.json"), guardConfig); err != nil {
 		return nil, err
 	}
 	model := obj{"id": "gpt-6-luna", "name": "Synthetic fixture only", "context_window": 131072, "default_max_tokens": 256}
@@ -346,6 +390,9 @@ func exercise(parent context.Context, out, binary, mode string) (obj, error) {
 		if err = writeBytes(filepath.Join(dir, p), []byte("Synthetic fixture. Do not use tools.\n")); err != nil {
 			return nil, err
 		}
+	}
+	if strings.HasPrefix(mode, "shared-") {
+		return exerciseShared(ctx, dir, binary, mode, limits, runOpts, server, hit, func() ([]obj, int) { mu.Lock(); defer mu.Unlock(); return append([]obj(nil), requests...), peak })
 	}
 	cmd := exec.CommandContext(ctx, "/usr/bin/sandbox-exec", "-p", policy, binary, "--cwd", filepath.Join(dir, "work"), "--data-dir", filepath.Join(dir, "state"), "run", "--quiet", "Return a short synthetic fixture answer without tools.")
 	cmd.Dir = filepath.Join(dir, "work")
@@ -436,6 +483,8 @@ func exercise(parent context.Context, out, binary, mode string) (obj, error) {
 		passed = passed && starts == 1 && known == 1 && blocked > 0 && exitCode == 78 && ctx.Err() == nil
 	case "missing-config":
 		passed = len(observed) == 0 && len(events) == 0 && exitCode == 78 && ctx.Err() == nil && !strings.Contains(stdout.b.String(), "Synthetic fixture answer.")
+	case "missing-run":
+		passed = len(observed) == 0 && len(events) == 0 && exitCode == 78 && ctx.Err() == nil
 	case "success":
 		passed = passed && runErr == nil && starts >= 2 && known == starts && inputTokens == int64(starts)*11 && outputTokens == int64(starts)*3 && strings.Contains(stdout.b.String(), "Synthetic fixture answer.")
 	}

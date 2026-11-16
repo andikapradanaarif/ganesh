@@ -37,11 +37,11 @@ func ganeshGuardTransport(base http.RoundTripper) http.RoundTripper {
   path:=os.Getenv("GANESH_S0_GUARD_CONFIG")
   f,err:=os.Open(path);if err!=nil{return};defer f.Close()
   info,err:=f.Stat();if err!=nil||!info.Mode().IsRegular()||info.Mode().Perm()&0077!=0||info.Size()>8192{return}
-  var c struct { Limits requestguard.Config `json:"limits"`; Journal string `json:"journal"` }
+  var c struct { Limits requestguard.Config `json:"limits"`; Journal string `json:"journal"`; Run requestguard.RunOptions `json:"run"` }
   decoder:=json.NewDecoder(io.LimitReader(f,8193));decoder.DisallowUnknownFields()
   if decoder.Decode(&c)!=nil{return};var extra any;if decoder.Decode(&extra)!=io.EOF{return}
   journal,err:=requestguard.OpenJournal(c.Journal);if err!=nil{return}
-  ganeshGuard,err=requestguard.New(c.Limits,journal)
+  ganeshGuard,err=requestguard.NewShared(c.Limits,journal,c.Run)
   if err!=nil{journal.Close();ganeshGuard=nil}
  })
  if ganeshGuard==nil{return ganeshDenied{}}

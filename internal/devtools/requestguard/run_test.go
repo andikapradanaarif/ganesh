@@ -1,0 +1,532 @@
+package requestguard
+
+import (
+	"bufio"
+	"context"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"strings"
+	"testing"
+	"time"
+)
+
+func runFixture(t *testing.T) (Config, RunLimits, RunOptions) {
+	t.Helper()
+	dir := t.TempDir()
+	if err := os.Chmod(dir, 0700); err != nil {
+		t.Fatal(err)
+	}
+	c := Config{Endpoint: "http://127.0.0.1:1/v1/responses", Model: "fixture", MaxRequests: 6, MaxOutputPerRequest: 8, MaxOutputTotal: 48, StopAfterInputTokens: 1000, Timeout: time.Minute, MaxBodyBytes: 4096}
+	l := RunLimits{ID: "synthetic-run", MaxRequests: 3, MaxOutputTotal: 24, InputStop: 1000, Deadline: time.Now().Add(time.Minute).UTC(), Profiles: map[string]Config{"answer": c}, Slots: map[string]string{"one": "answer", "two": "answer", "three": "answer", "four": "answer"}}
+	return c, l, RunOptions{Path: filepath.Join(dir, "run.jsonl"), Slot: "one"}
+}
+func initRun(t *testing.T, l RunLimits, o RunOptions) RunOptions {
+	t.Helper()
+	hash, err := CreateRun(o.Path, l)
+	if err != nil {
+		t.Fatal(err)
+	}
+	o.SHA256 = hash
+	return o
+}
+func syntheticStart() Event {
+	return Event{Kind: "start", Attempt: 1, At: time.Now().UTC(), RequestSHA256: hashLine([]byte("synthetic-request")), RequestBytes: 50, RequestedOutput: 8}
+}
+func syntheticFinish() Event {
+	return Event{Kind: "finish", Attempt: 1, At: time.Now().UTC(), Status: 200, Usage: &Usage{Input: 11, Output: 3}}
+}
+
+// Child processes use the same library as the client adapter. They never make
+// network calls; their synthetic start is fsynced before signalling readiness.
+func TestRunProcessHelper(t *testing.T) {
+	if os.Getenv("GANESH_RUN_HELPER") == "" {
+		return
+	}
+	var input struct {
+		C    Config
+		O    RunOptions
+		Hold bool
+		Wire bool
+	}
+	if json.Unmarshal([]byte(os.Getenv("GANESH_RUN_INPUT")), &input) != nil {
+		os.Exit(79)
+	}
+	g, err := NewShared(input.C, &journal{}, input.O)
+	if err != nil {
+		os.Exit(78)
+	}
+	if input.Wire {
+		tr, err := g.Transport(nil)
+		if err != nil {
+			os.Exit(78)
+		}
+		body := request
+		if input.C.Protocol == "chat-completions" {
+			body = fmt.Sprintf(`{"model":%q,"max_tokens":8,"stream":false,"messages":[{"role":"user","content":"synthetic grade"}]}`, input.C.Model)
+		}
+		if call(&http.Client{Transport: tr}, input.C.Endpoint, body) != nil {
+			os.Exit(78)
+		}
+		g.Close()
+		os.Exit(0)
+	}
+	if g.shared.Append(syntheticStart()) != nil {
+		os.Exit(78)
+	}
+	if input.Hold {
+		fmt.Fprintln(os.Stdout, "reserved")
+		if _, err := bufio.NewReader(os.Stdin).ReadString('\n'); err != nil {
+			os.Exit(79)
+		}
+	}
+	if g.shared.Append(syntheticFinish()) != nil {
+		os.Exit(78)
+	}
+	g.Close()
+	os.Exit(0)
+}
+
+type workerOptions struct{ Hold, Wire bool }
+
+func worker(t *testing.T, c Config, o RunOptions, options workerOptions) *exec.Cmd {
+	t.Helper()
+	bin, err := os.Executable()
+	if err != nil {
+		t.Fatal(err)
+	}
+	b, err := json.Marshal(struct {
+		C    Config
+		O    RunOptions
+		Hold bool
+		Wire bool
+	}{c, o, options.Hold, options.Wire})
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx, cancel := context.WithTimeout(t.Context(), 10*time.Second)
+	t.Cleanup(cancel)
+	cmd := exec.CommandContext(ctx, bin, "-test.run=^TestRunProcessHelper$")
+	cmd.Env = []string{"GANESH_RUN_HELPER=1", "GANESH_RUN_INPUT=" + string(b)}
+	return cmd
+}
+
+func TestAnswerAndGraderShareOneRunAcrossProcesses(t *testing.T) {
+	_, _, _, url := setup(t, func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		if strings.HasSuffix(r.URL.Path, "/chat/completions") {
+			fmt.Fprint(w, chatComplete)
+		} else {
+			fmt.Fprint(w, complete)
+		}
+	})
+	c, l, o := runFixture(t)
+	c.Endpoint = url
+	grade := c
+	grade.Protocol = "chat-completions"
+	grade.Endpoint = strings.TrimSuffix(url, "responses") + "chat/completions"
+	grade.Model = "fixture-grader"
+	l.MaxRequests = 2
+	l.Profiles = map[string]Config{"answer": c, "grade": grade}
+	l.Slots["two"] = "grade"
+	l.Slots["three"] = "grade"
+	o = initRun(t, l, o)
+	expectWorker(t, worker(t, c, o, workerOptions{Wire: true}), 0)
+	o.Slot = "two"
+	expectWorker(t, worker(t, grade, o, workerOptions{Wire: true}), 0)
+	o.Slot = "three"
+	expectWorker(t, worker(t, grade, o, workerOptions{Wire: true}), 78)
+	s, err := InspectRun(o.Path, o.SHA256)
+	if err != nil || s.Requests != 2 || s.KnownInput != 18 || s.KnownOutput != 5 || s.UnknownUsage != 0 || s.Stopped != "run_request_or_output_limit" {
+		t.Fatalf("grading escaped shared totals: %+v %v", s, err)
+	}
+}
+
+const chatComplete = `{"choices":[{"finish_reason":"stop","message":{"content":"synthetic grade"}}],"usage":{"prompt_tokens":7,"completion_tokens":2}}`
+
+func TestChatGradingProfileRejectsAmbiguousRequestsAndUsage(t *testing.T) {
+	for _, body := range []string{
+		`{"model":"fixture","max_tokens":9}`, `{"model":"fixture","max_output_tokens":8}`,
+		`{"model":"fixture","max_tokens":8,"stream":true}`, `{"model":"fixture","max_tokens":8,"n":2}`,
+		`{"model":"fixture","max_tokens":8,"max_completion_tokens":8}`, `{"model":"fixture"}`,
+	} {
+		c, _, _ := runFixture(t)
+		c.Protocol = "chat-completions"
+		c.Endpoint = "http://127.0.0.1:1/v1/chat/completions"
+		g, err := New(c, &journal{})
+		if err != nil {
+			t.Fatal(err)
+		}
+		tr, err := g.Transport(nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if call(&http.Client{Transport: tr}, c.Endpoint, body) == nil || g.Snapshot().Attempts != 0 {
+			t.Fatal("invalid chat profile dispatched")
+		}
+		g.Close()
+	}
+	if u := chatUsage([]byte(chatComplete), "application/json"); u == nil || u.Input != 7 || u.Output != 2 {
+		t.Fatal("native grading usage lost")
+	}
+	for _, bad := range []string{`{}`, strings.Replace(chatComplete, `"stop"`, `"length"`, 1), strings.Replace(chatComplete, `"prompt_tokens":7`, `"prompt_tokens":-1`, 1)} {
+		if chatUsage([]byte(bad), "application/json") != nil {
+			t.Fatal("unaccounted grade accepted")
+		}
+	}
+}
+func expectWorker(t *testing.T, cmd *exec.Cmd, code int) {
+	t.Helper()
+	err := cmd.Run()
+	got := 0
+	if err != nil {
+		e, ok := err.(*exec.ExitError)
+		if !ok {
+			t.Fatal(err)
+		}
+		got = e.ExitCode()
+	}
+	if got != code {
+		t.Fatalf("child exit %d, want %d", got, code)
+	}
+}
+
+func TestRunTotalsAndCapsSurviveProcesses(t *testing.T) {
+	c, l, o := runFixture(t)
+	l.MaxRequests = 2
+	o = initRun(t, l, o)
+	expectWorker(t, worker(t, c, o, workerOptions{}), 0)
+	o.Slot = "two"
+	expectWorker(t, worker(t, c, o, workerOptions{}), 0)
+	s, err := InspectRun(o.Path, o.SHA256)
+	if err != nil || s.Requests != 2 || s.KnownInput != 22 || s.KnownOutput != 6 || s.UnknownUsage != 0 || s.SlotsUsed != 2 {
+		t.Fatalf("lost cross-process usage: %+v %v", s, err)
+	}
+	o.Slot = "three"
+	expectWorker(t, worker(t, c, o, workerOptions{}), 78)
+	s, err = InspectRun(o.Path, o.SHA256)
+	if err != nil || s.Requests != 2 || s.KnownOutput != 6 || s.UnknownUsage != 0 || s.Stopped != "run_request_or_output_limit" {
+		t.Fatalf("fresh process reset cap: %+v %v", s, err)
+	}
+	if _, err = CreateRun(o.Path, l); err == nil {
+		t.Fatal("existing run overwritten")
+	}
+}
+
+func TestRunOutputReservationAndInputStop(t *testing.T) {
+	for _, kind := range []string{"output", "input"} {
+		t.Run(kind, func(t *testing.T) {
+			c, l, o := runFixture(t)
+			if kind == "output" {
+				l.MaxOutputTotal = 8
+			} else {
+				l.InputStop = 21
+			}
+			o = initRun(t, l, o)
+			expectWorker(t, worker(t, c, o, workerOptions{}), 0)
+			o.Slot = "two"
+			expectWorker(t, worker(t, c, o, workerOptions{}), 78)
+			s, err := InspectRun(o.Path, o.SHA256)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if kind == "output" && (s.Requests != 1 || s.KnownOutput != 3 || s.Stopped != "run_request_or_output_limit") {
+				t.Fatalf("output reservation reset: %+v", s)
+			}
+			if kind == "input" && (s.Requests != 2 || s.KnownInput != 22 || s.UnknownUsage != 0 || s.Stopped != "run_input_stop") {
+				t.Fatalf("input stop reset: %+v", s)
+			}
+			o.Slot = "three"
+			expectWorker(t, worker(t, c, o, workerOptions{}), 78)
+		})
+	}
+}
+
+func TestRunInterprocessExclusionAndCrash(t *testing.T) {
+	for _, crash := range []bool{false, true} {
+		t.Run(fmt.Sprint(crash), func(t *testing.T) {
+			c, l, o := runFixture(t)
+			o = initRun(t, l, o)
+			holder := worker(t, c, o, workerOptions{Hold: true})
+			input, err := holder.StdinPipe()
+			if err != nil {
+				t.Fatal(err)
+			}
+			output, err := holder.StdoutPipe()
+			if err != nil {
+				t.Fatal(err)
+			}
+			if err = holder.Start(); err != nil {
+				t.Fatal(err)
+			}
+			t.Cleanup(func() { _ = holder.Process.Kill() })
+			line, err := bufio.NewReader(output).ReadString('\n')
+			if err != nil || line != "reserved\n" {
+				t.Fatalf("missing synced reservation: %q %v", line, err)
+			}
+			o.Slot = "two"
+			expectWorker(t, worker(t, c, o, workerOptions{}), 78)
+			if crash {
+				_ = holder.Process.Kill()
+			} else {
+				_, _ = io.WriteString(input, "finish\n")
+			}
+			err = holder.Wait()
+			_ = input.Close()
+			if !crash && err != nil {
+				t.Fatal(err)
+			}
+			s, err := InspectRun(o.Path, o.SHA256)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if crash {
+				if s.Requests != 1 || s.UnknownUsage != 1 || !s.Pending || s.Stopped != "unfinished_request" {
+					t.Fatalf("crash reservation refunded: %+v", s)
+				}
+				expectWorker(t, worker(t, c, o, workerOptions{}), 78)
+			} else {
+				if s.Requests != 1 || s.KnownInput != 11 || s.Pending {
+					t.Fatalf("contender corrupted holder: %+v", s)
+				}
+				expectWorker(t, worker(t, c, o, workerOptions{}), 0)
+			}
+		})
+	}
+}
+
+func TestSharedContentionHasDistinctReason(t *testing.T) {
+	c, l, o := runFixture(t)
+	o = initRun(t, l, o)
+	holder, err := NewShared(c, &journal{}, o)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer holder.Close()
+	o.Slot = "two"
+	contender, err := NewShared(c, &journal{}, o)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer contender.Close()
+	if err = holder.shared.Append(syntheticStart()); err != nil {
+		t.Fatal(err)
+	}
+	o.Slot = "three"
+	if other, err := NewShared(c, &journal{}, o); !errors.Is(err, ErrRunBusy) {
+		if other != nil {
+			other.Close()
+		}
+		t.Fatalf("busy initialization mislabeled: %v", err)
+	}
+	tr, err := contender.Transport(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	tr.(*transport).next = deadlineProbe(func(*http.Request) (*http.Response, error) {
+		t.Fatal("contender forwarded a request")
+		return nil, ErrStopped
+	})
+	if call(&http.Client{Transport: tr}, c.Endpoint, request) == nil || contender.Snapshot().Stopped != "shared_run_busy" {
+		t.Fatalf("contention mislabeled: %+v", contender.Snapshot())
+	}
+	if err = holder.shared.Append(syntheticFinish()); err != nil {
+		t.Fatal(err)
+	}
+	s, err := InspectRun(o.Path, o.SHA256)
+	if err != nil || s.Requests != 1 || s.KnownInput != 11 || s.UnknownUsage != 0 || s.Pending || s.Stopped != "" {
+		t.Fatalf("contender changed admitted work: %+v %v", s, err)
+	}
+}
+
+func TestClosedRunDescriptorIsNotContention(t *testing.T) {
+	f, err := os.CreateTemp(t.TempDir(), "closed-run-")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = f.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if err = runLock(f); !errors.Is(err, ErrStopped) || errors.Is(err, ErrRunBusy) {
+		t.Fatalf("storage fault mislabeled: %v", err)
+	}
+}
+
+func TestRunBindingsAndCorruptionFailClosed(t *testing.T) {
+	for _, kind := range []string{"profile", "slot", "digest", "truncated", "malformed", "unknown-field", "symlink", "hardlink", "permissions", "reused-slot"} {
+		t.Run(kind, func(t *testing.T) {
+			c, l, o := runFixture(t)
+			o = initRun(t, l, o)
+			switch kind {
+			case "profile":
+				c.MaxRequests++
+			case "slot":
+				o.Slot = "unfrozen"
+			case "digest":
+				o.SHA256 = strings.Repeat("0", 64)
+			case "truncated", "malformed", "unknown-field":
+				f, err := os.OpenFile(o.Path, os.O_APPEND|os.O_WRONLY, 0600)
+				if err != nil {
+					t.Fatal(err)
+				}
+				bad := map[string]string{"truncated": "{", "malformed": "{}\n", "unknown-field": "{\"kind\":\"start\",\"unexpected\":true}\n"}[kind]
+				_, err = io.WriteString(f, bad)
+				_ = f.Close()
+				if err != nil {
+					t.Fatal(err)
+				}
+			case "symlink", "hardlink":
+				alias := o.Path + ".alias"
+				var err error
+				if kind == "symlink" {
+					err = os.Symlink(o.Path, alias)
+				} else {
+					err = os.Link(o.Path, alias)
+				}
+				if err != nil {
+					t.Fatal(err)
+				}
+				o.Path = alias
+			case "permissions":
+				if err := os.Chmod(o.Path, 0644); err != nil {
+					t.Fatal(err)
+				}
+			case "reused-slot":
+				expectWorker(t, worker(t, c, o, workerOptions{}), 0)
+			}
+			if g, err := NewShared(c, &journal{}, o); err == nil {
+				g.Close()
+				t.Fatal("unsafe run/profile accepted")
+			}
+		})
+	}
+}
+
+func TestRunUnknownAndJournalFailurePersist(t *testing.T) {
+	for _, kind := range []string{"unknown", "local-start", "local-finish", "global-finish"} {
+		t.Run(kind, func(t *testing.T) {
+			c, l, o := runFixture(t)
+			o = initRun(t, l, o)
+			local := &journal{}
+			if kind == "local-start" {
+				local.failAt = 1
+			}
+			if kind == "local-finish" {
+				local.failAt = 2
+			}
+			g, err := NewShared(c, local, o)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer g.Close()
+			err = g.shared.Append(syntheticStart())
+			if kind == "local-start" {
+				if err == nil {
+					t.Fatal("start failure ignored")
+				}
+			} else {
+				if err != nil {
+					t.Fatal(err)
+				}
+				finish := syntheticFinish()
+				if kind == "unknown" {
+					finish.Usage = nil
+					finish.Reason = "http_failed"
+					finish.Status = 503
+				}
+				if kind == "global-finish" {
+					_ = g.shared.r.f.Close()
+				}
+				if g.shared.Append(finish) == nil {
+					t.Fatal("failed accounting accepted")
+				}
+			}
+			s, err := InspectRun(o.Path, o.SHA256)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if s.Requests != 1 || s.UnknownUsage != 1 || s.KnownInput != 0 || s.Stopped == "" {
+				t.Fatalf("unknown usage lost: %+v", s)
+			}
+			o.Slot = "two"
+			expectWorker(t, worker(t, c, o, workerOptions{}), 78)
+		})
+	}
+}
+
+func TestSharedDeadlineCannotReset(t *testing.T) {
+	c, l, o := runFixture(t)
+	l.Deadline = time.Now().Add(-time.Second).UTC()
+	o = initRun(t, l, o)
+	expectWorker(t, worker(t, c, o, workerOptions{}), 78)
+	s, err := InspectRun(o.Path, o.SHA256)
+	if err != nil || s.Requests != 0 || s.Stopped != "deadline" {
+		t.Fatalf("deadline reset: %+v %v", s, err)
+	}
+}
+
+func TestSharedGuardAccountsWireRequests(t *testing.T) {
+	_, _, _, url := setup(t, func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, complete)
+	})
+	c, l, o := runFixture(t)
+	c.Endpoint = url
+	l.Profiles["answer"] = c
+	o = initRun(t, l, o)
+	for _, slot := range []string{"one", "two"} {
+		o.Slot = slot
+		g, err := NewShared(c, &journal{}, o)
+		if err != nil {
+			t.Fatal(err)
+		}
+		tr, err := g.Transport(nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if call(&http.Client{Transport: tr}, url, request) != nil {
+			t.Fatal("guarded request failed")
+		}
+		g.Close()
+	}
+	s, err := InspectRun(o.Path, o.SHA256)
+	if err != nil || s.Requests != 2 || s.KnownInput != 22 || s.KnownOutput != 6 {
+		t.Fatalf("guard not bound to run: %+v %v", s, err)
+	}
+}
+
+type deadlineProbe func(*http.Request) (*http.Response, error)
+
+func (p deadlineProbe) RoundTrip(r *http.Request) (*http.Response, error) { return p(r) }
+
+func TestSharedDeadlineBoundsForwardedContext(t *testing.T) {
+	c, l, o := runFixture(t)
+	l.Deadline = time.Now().Add(30 * time.Second).UTC()
+	o = initRun(t, l, o)
+	g, err := NewShared(c, &journal{}, o)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer g.Close()
+	tr, err := g.Transport(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	forwarded := false
+	tr.(*transport).next = deadlineProbe(func(r *http.Request) (*http.Response, error) {
+		forwarded = true
+		deadline, ok := r.Context().Deadline()
+		if !ok || !deadline.Equal(l.Deadline) {
+			t.Errorf("shared deadline lost: %v", deadline)
+		}
+		return &http.Response{StatusCode: 200, Header: http.Header{"Content-Type": []string{"application/json"}}, Body: io.NopCloser(strings.NewReader(complete))}, nil
+	})
+	if call(&http.Client{Transport: tr}, c.Endpoint, request) != nil || !forwarded {
+		t.Fatal("request did not reach deadline probe")
+	}
+}

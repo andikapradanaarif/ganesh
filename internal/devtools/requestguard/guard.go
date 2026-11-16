@@ -1,4 +1,4 @@
-// Package requestguard bounds one experimental native Responses client process.
+// Package requestguard bounds experimental model requests and shared run usage.
 // It is developer tooling, not a production gateway or an execution grant.
 package requestguard
 
@@ -23,6 +23,7 @@ import (
 var ErrStopped = errors.New("experimental request guard stopped")
 
 type Config struct {
+	Protocol             string        `json:"protocol,omitempty"`
 	Endpoint             string        `json:"endpoint"`
 	Model                string        `json:"model"`
 	MaxRequests          int64         `json:"max_requests"`
@@ -41,14 +42,15 @@ type Usage struct {
 // A start without a finish means potentially dispatched, usage unknown.
 // A failed request's nil Usage never means zero billed tokens.
 type Event struct {
-	Kind          string    `json:"kind"`
-	Attempt       int64     `json:"attempt"`
-	At            time.Time `json:"at"`
-	Reason        string    `json:"reason,omitempty"`
-	Status        int       `json:"status,omitempty"`
-	RequestSHA256 string    `json:"request_sha256,omitempty"`
-	RequestBytes  int       `json:"request_bytes,omitempty"`
-	Usage         *Usage    `json:"usage"`
+	Kind            string    `json:"kind"`
+	Attempt         int64     `json:"attempt"`
+	At              time.Time `json:"at"`
+	Reason          string    `json:"reason,omitempty"`
+	Status          int       `json:"status,omitempty"`
+	RequestSHA256   string    `json:"request_sha256,omitempty"`
+	RequestBytes    int       `json:"request_bytes,omitempty"`
+	RequestedOutput int64     `json:"requested_output,omitempty"`
+	Usage           *Usage    `json:"usage"`
 }
 
 type Journal interface{ Append(Event) error }
@@ -105,13 +107,15 @@ type Guard struct {
 	journalMu sync.Mutex
 	s         Snapshot
 	seen      map[[32]byte]bool
+	shared    *RunJournal
 }
 
 func New(c Config, j Journal) (*Guard, error) {
 	u, err := url.Parse(c.Endpoint)
+	routeOK := err == nil && u != nil && ((c.Protocol == "" || c.Protocol == "responses") && strings.HasSuffix(u.Path, "/responses") || c.Protocol == "chat-completions" && strings.HasSuffix(u.Path, "/chat/completions"))
 	if err != nil || u.Host == "" || u.User != nil || u.RawQuery != "" || u.Fragment != "" ||
 		(u.Scheme != "https" && !(u.Scheme == "http" && strings.HasPrefix(u.Host, "127.0.0.1:"))) ||
-		!strings.HasSuffix(u.Path, "/responses") || c.Model == "" || j == nil ||
+		!routeOK || c.Model == "" || j == nil ||
 		c.MaxRequests <= 0 || c.MaxRequests > 10000 || c.MaxOutputPerRequest <= 0 ||
 		c.MaxOutputTotal < c.MaxOutputPerRequest || c.MaxOutputTotal > 1e9 ||
 		c.StopAfterInputTokens <= 0 || c.StopAfterInputTokens > 1e9 ||
@@ -124,7 +128,12 @@ func New(c Config, j Journal) (*Guard, error) {
 	return g, nil
 }
 
-func (g *Guard) Close()             { g.cancel() }
+func (g *Guard) Close() {
+	g.cancel()
+	if g.shared != nil {
+		_ = g.shared.Close()
+	}
+}
 func (g *Guard) Snapshot() Snapshot { g.mu.Lock(); defer g.mu.Unlock(); return g.s }
 
 // Transport accepts only a plain transport. A custom OAuth/debug transport could
@@ -167,6 +176,12 @@ func (g *Guard) event(e Event) error {
 	err := g.journal.Append(e)
 	g.journalMu.Unlock()
 	if err != nil {
+		if errors.Is(err, ErrRunBusy) {
+			return g.stop("shared_run_busy")
+		}
+		if errors.Is(err, ErrRunStopped) {
+			return g.stop("shared_run_stopped")
+		}
 		return g.stop("journal_failed")
 	}
 	return nil
@@ -200,11 +215,26 @@ func (t *transport) RoundTrip(req *http.Request) (*http.Response, error) {
 		return nil, g.stop("request_body")
 	}
 	var input struct {
-		Model      string `json:"model"`
-		MaxOutput  *int64 `json:"max_output_tokens"`
-		Background bool   `json:"background"`
+		Model         string `json:"model"`
+		MaxOutput     *int64 `json:"max_output_tokens"`
+		MaxTokens     *int64 `json:"max_tokens"`
+		MaxCompletion *int64 `json:"max_completion_tokens"`
+		Stream        bool   `json:"stream"`
+		N             *int64 `json:"n"`
+		Background    bool   `json:"background"`
 	}
-	if json.Unmarshal(body, &input) != nil || input.Model != g.c.Model || input.Background ||
+	if json.Unmarshal(body, &input) != nil {
+		return nil, g.stop("request_profile")
+	}
+	if g.c.Protocol == "chat-completions" {
+		if input.MaxOutput != nil || input.Stream || input.N != nil && *input.N != 1 {
+			return nil, g.stop("request_profile")
+		}
+		input.MaxOutput = input.MaxTokens
+	} else if input.MaxTokens != nil {
+		return nil, g.stop("request_profile")
+	}
+	if input.Model != g.c.Model || input.Background || input.MaxCompletion != nil ||
 		input.MaxOutput == nil || *input.MaxOutput <= 0 || *input.MaxOutput > g.c.MaxOutputPerRequest {
 		return nil, g.stop("request_profile")
 	}
@@ -230,10 +260,11 @@ func (t *transport) RoundTrip(req *http.Request) (*http.Response, error) {
 	g.seen[h] = true
 	attempt := g.s.Attempts
 	g.mu.Unlock()
-	if g.event(Event{Kind: "start", Attempt: attempt, RequestSHA256: hex.EncodeToString(h[:]), RequestBytes: len(body)}) != nil {
+	if g.event(Event{Kind: "start", Attempt: attempt, RequestSHA256: hex.EncodeToString(h[:]), RequestBytes: len(body), RequestedOutput: *input.MaxOutput}) != nil {
 		return nil, ErrStopped
 	}
-	ctx, cancel := context.WithCancel(req.Context())
+	deadline, _ := g.ctx.Deadline()
+	ctx, cancel := context.WithDeadline(req.Context(), deadline)
 	stop := context.AfterFunc(g.ctx, cancel)
 	defer func() { stop(); cancel() }()
 	forward := req.Clone(ctx)
@@ -269,7 +300,11 @@ func (t *transport) RoundTrip(req *http.Request) (*http.Response, error) {
 		case status != http.StatusOK:
 			finish.Reason = "http_failed"
 		default:
-			finish.Usage = responseUsage(data, resp.Header.Get("Content-Type"))
+			if g.c.Protocol == "chat-completions" {
+				finish.Usage = chatUsage(data, resp.Header.Get("Content-Type"))
+			} else {
+				finish.Usage = responseUsage(data, resp.Header.Get("Content-Type"))
+			}
 			if finish.Usage == nil {
 				finish.Reason = "usage_unknown"
 			}
@@ -297,6 +332,30 @@ func (t *transport) RoundTrip(req *http.Request) (*http.Response, error) {
 	}
 	resp.Body = io.NopCloser(bytes.NewReader(data))
 	return resp, nil
+}
+
+// The grading profile deliberately supports non-streaming, single-choice Chat
+// Completions only. Truncation/missing usage never becomes a successful finish.
+func chatUsage(data []byte, contentType string) *Usage {
+	if !strings.HasPrefix(contentType, "application/json") {
+		return nil
+	}
+	var result struct {
+		Choices []struct {
+			Finish  string `json:"finish_reason"`
+			Message struct {
+				Content *string `json:"content"`
+			} `json:"message"`
+		} `json:"choices"`
+		Usage *struct {
+			Input  *int64 `json:"prompt_tokens"`
+			Output *int64 `json:"completion_tokens"`
+		} `json:"usage"`
+	}
+	if json.Unmarshal(data, &result) != nil || len(result.Choices) != 1 || result.Choices[0].Finish != "stop" || result.Choices[0].Message.Content == nil || result.Usage == nil || result.Usage.Input == nil || result.Usage.Output == nil || *result.Usage.Input < 0 || *result.Usage.Output < 0 || *result.Usage.Input > 1e9 || *result.Usage.Output > 1e9 {
+		return nil
+	}
+	return &Usage{Input: *result.Usage.Input, Output: *result.Usage.Output}
 }
 
 func (g *Guard) block() error {
