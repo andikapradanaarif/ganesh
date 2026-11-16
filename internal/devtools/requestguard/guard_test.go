@@ -283,6 +283,32 @@ func TestDeadlineAndCallerCancellation(t *testing.T) {
 	}
 }
 
+func TestDeadlineBeforeFirstRequestHasJournalReason(t *testing.T) {
+	j := &journal{}
+	g, err := New(Config{Endpoint: "http://127.0.0.1:1/v1/responses", Model: "fixture",
+		MaxRequests: 1, MaxOutputPerRequest: 8, MaxOutputTotal: 8,
+		StopAfterInputTokens: 100, Timeout: time.Nanosecond, MaxBodyBytes: 4096}, j)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(g.Close)
+	<-g.ctx.Done()
+	tr, err := g.Transport(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if call(&http.Client{Transport: tr}, g.c.Endpoint, request) == nil {
+		t.Fatal("expired guard accepted request")
+	}
+	s := g.Snapshot()
+	if s.Attempts != 0 || s.UnknownUsage != 0 || s.Blocked != 1 || s.Stopped != "deadline_or_stopped" {
+		t.Fatalf("unexpected expired accounting: %+v", s)
+	}
+	if len(j.events) != 1 || j.events[0].Kind != "blocked" || j.events[0].Reason != s.Stopped || j.events[0].Usage != nil {
+		t.Fatalf("deadline reason missing or inconsistent: %+v", j.events)
+	}
+}
+
 func TestFileJournalIsPrivateExclusiveAndDurable(t *testing.T) {
 	dir := t.TempDir()
 	if err := os.Chmod(dir, 0700); err != nil {

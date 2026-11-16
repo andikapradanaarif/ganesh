@@ -305,6 +305,9 @@ func (g *Guard) block() error {
 	first := g.s.Blocked == 1
 	reason := g.s.Stopped
 	g.mu.Unlock()
+	if reason == "" {
+		reason = "deadline_or_stopped"
+	}
 	if first {
 		if g.event(Event{Kind: "blocked", Reason: reason}) != nil {
 			return ErrStopped
