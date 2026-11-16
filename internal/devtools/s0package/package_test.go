@@ -57,7 +57,9 @@ func fixture(t *testing.T, mutate func(*InspectionPlan)) (string, string) {
 }
 
 func TestInspectReturnsOnlyMetadataAndCannotApprove(t *testing.T) {
-	dir, hash := fixture(t, nil)
+	dir, hash := fixture(t, func(p *InspectionPlan) {
+		p.Files[0], p.Files[1] = p.Files[1], p.Files[0]
+	})
 	out := filepath.Join(t.TempDir(), "report")
 	r, err := Inspect(t.Context(), dir, hash, out)
 	if err != nil {
@@ -65,6 +67,9 @@ func TestInspectReturnsOnlyMetadataAndCannotApprove(t *testing.T) {
 	}
 	if !r.AllSelectedMatch || len(r.Files) != 2 || r.CompleteNotes || r.CompleteTools || r.Dispatch || r.Calls != 0 || r.ReturnedSourceBytes != 0 {
 		t.Fatalf("incorrect readiness promotion: %+v", r)
+	}
+	if r.Files[0].Project != "kiosk" || r.Files[1].Project != "valo-backend" {
+		t.Fatalf("unstable project report order: %+v", r.Files)
 	}
 	b, err := os.ReadFile(filepath.Join(out, "inspection.json"))
 	if err != nil {

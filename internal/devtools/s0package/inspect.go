@@ -89,6 +89,7 @@ func Inspect(ctx context.Context, dir, expected, out string) (Inspection, error)
 	}
 	// Reserve output before reading projects. Repeated/invalid output paths must
 	// never trigger another source scan or overwrite an earlier attempt.
+	// Retain the reservation after later failures; an explicit retry needs a new path.
 	if err = os.Mkdir(out, 0700); err != nil {
 		if errors.Is(err, os.ErrExist) {
 			return result, Failed("output_already_exists")
@@ -99,7 +100,10 @@ func Inspect(ctx context.Context, dir, expected, out string) (Inspection, error)
 		_, err := exec.LookPath(name)
 		result.Tools[name] = err == nil
 	}
-	for project, path := range plan.Roots {
+	// loadInspectionPlan requires exactly these roots. Keep read/report order
+	// stable, including which project reaches the shared byte limit first.
+	for _, project := range []string{"kiosk", "valo-backend"} {
+		path := plan.Roots[project]
 		pr := ProjectResult{Root: path, HeadBefore: head(ctx, path)}
 		projectRoot, err := os.OpenRoot(path)
 		for _, file := range plan.Files {
