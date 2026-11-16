@@ -16,6 +16,21 @@ The owner then authorized a single changed-file diff review, capped at 32 KiB, i
 
 The owner's PATH check did not find `rg`. The pinned client's grep and glob implementations have non-ripgrep fallbacks, so absence alone does not require an installation or another preflight. Actual runtime tool behavior and complete tool/notes/access inventories still need qualification. No owner rerun is requested for this result. Next preparation is to bind those inventories/permissions and the remaining task/reference, request-fit, processor and allowance inputs; execution remains on hold.
 
+## Filename inventory, 2026-11-17 (Asia/Jakarta)
+
+The owner authorized local instruction/notes filenames and available-tool names, adding Nexus and Borneo to Kiosk and Valo-backend. A private directory-entry scan completed at 2026-11-16 17:09:12 UTC, with no project file contents read or hashed, no discovered commands/tools executed and no model calls. It found 205 candidate paths: 31 instruction/skill files, 135 documentation/notes files and 39 build manifests. The private report SHA-256 is `d66cd64578b6379ac86977e5475481cdfdd76c0292c84484bd7a58bfeae43758`; detailed paths remain private.
+
+| Project | Instruction/skill candidates | Documentation/notes candidates | Build manifests |
+| --- | ---: | ---: | ---: |
+| Kiosk | 8 | 29 | 9 |
+| Valo-backend | 7 | 49 | 12 |
+| Borneo | 8 | 29 | 9 |
+| Nexus | 8 | 28 | 9 |
+
+The declared traversal completed without listing gaps or reaching its bounds. Dependency/build/cache/private-state directories were excluded and symlinks were not followed. Filename classification can miss arbitrary notes, excluded locations and external/global guidance; these results do not verify a complete notes inventory or loaded instruction set. PATH-name resolution describes this assistant process, not the owner's shell or an adopted answering profile. In particular, `rg` resolves here; that does not change the earlier owner report or establish any installation. No configuration bodies, registered MCP tools, executable versions or effective permissions were inspected.
+
+A private access-settings proposal preserves Kiosk/Valo as task targets, identical adopted native/notes inputs across arms and normal authorized own-project tools. Borneo is additional inventory only; Nexus remains an architectural reference outside the evaluation corpus. No new source content or evaluation-disclosure grant, baseline adoption or project/task expansion follows. No owner script or inventory rerun is requested. Remaining work is to bind the exact loaded inputs and runtime permissions, together with the previously unresolved task/reference, request-fit, processor/account and allowance decisions.
+
 ## What is prepared
 
 The preparer verifies the original packet's manifest and every pinned file, the #139 post-review report, and the reserved six calibration task/rubric/oracle hashes. It derives 276 prospective process slots: 132 possible S0 answers and 132 matching grades, plus six proposed calibration answers and six grades. The base/conditional task IDs, arm positions, answer-file allowlists and grading references are preserved. Calibration is ordered first; each phase keeps its frozen sequence and answer/grade pairs. Conditional work still requires the original D/F trigger.
