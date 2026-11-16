@@ -15,6 +15,7 @@ import (
 )
 
 var ErrRunStopped = errors.New("shared experiment run stopped")
+var ErrRunBusy = errors.New("shared experiment request already in flight")
 
 // RunLimits freeze accounting inputs, not execution/disclosure authority.
 // InputStop is checked after actual usage returns; it is not a tokenizer bound.
@@ -346,9 +347,9 @@ func NewShared(c Config, local Journal, o RunOptions) (*Guard, error) {
 	if err != nil {
 		return nil, err
 	}
-	if runLock(r.f) != nil {
+	if err := runLock(r.f); err != nil {
 		r.close()
-		return nil, ErrStopped
+		return nil, err
 	}
 	s, err := r.replay(o.SHA256)
 	profile, ok := s.limits.Slots[o.Slot]
@@ -384,8 +385,11 @@ func (j *RunJournal) Append(e Event) error {
 		return j.local.Append(e)
 	}
 	if e.Kind == "start" {
-		if j.locked || runLock(j.r.f) != nil {
+		if j.locked {
 			return ErrStopped
+		}
+		if err := runLock(j.r.f); err != nil {
+			return err
 		}
 		j.locked = true
 		s, err := j.r.replay(j.opts.SHA256)

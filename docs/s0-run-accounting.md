@@ -8,6 +8,8 @@ The [#138 guard](s0-request-controls.md) now has a shared run ledger. New client
 
 A nonblocking OS file lock spans each request's synced start through its finish. Admission reserves one provider request and enough remaining output allowance for its full requested cap. A completed reply charges its actual native input/output usage; unused output reservation becomes available to later requests. Auxiliary calls and failed attempts use the same ledger. One request in flight is enforced across bound processes; a competing process is refused before forwarding and does not interrupt the admitted request.
 
+Contention during client admission is reported as `ErrRunBusy` / `shared_run_busy`, separately from a journal/storage failure. Slots identify processes, not provider requests: any admitted start permanently consumes its slot, including one that fails or is interrupted. Adoption must enumerate answer/grading processes and any explicitly authorized repeats within the 1,000-slot bound. Spare capacity does not authorize retries or create failure headroom automatically.
+
 An unfinished start remains potentially dispatched with unknown usage, even after a killed process releases its lock. Unknown usage or a failed request stops continuation. There is no automatic repair, refund or restart that guesses consumption. Per-process journals remain separate; a local accounting failure before a shared finish conservatively leaves the shared request unfinished. A completed slot is not an accepted answer: slots, provider requests, token usage and S0 scores are separate quantities.
 
 Responses and bounded non-streaming, single-choice Chat Completions can share the ledger. Chat grading requires `max_tokens`, a final `stop` choice and native `prompt_tokens`/`completion_tokens`; streaming, conflicting output-cap fields, multiple choices, truncation and missing usage are rejected. These are protocol/accounting checks, not acceptance of a grader's judgments. The exact future DeepSeek request/profile still needs adoption with the complete run inputs.
@@ -30,9 +32,9 @@ The [Go fixture command](../integration/crush/requestprofile/README.md) runs 13 
 
 The usage values are stub declarations, not real inference measurements. Mixed-protocol Go process tests additionally send one Responses answer and one Chat grade through the same two-request run: known totals are **18 input / 5 output**, with the next grading process denied. Tests cover header/profile/slot binding, corruption, private file permissions, symlinks/hardlinks, exclusive initialization, accounting faults and the shared deadline on the forwarded context.
 
-Private final report SHA-256: `1b38bad6cb3c5ee3c3d1c35d1826d05abb20665ead7fa7f71be95122c3d92a3f`.
+Private post-review report SHA-256: `e225346696c4c1dd7a71bdeb7ab6f0ab33a53e75b4584e789e440b6155ea23d8`.
 
-Private candidate binary SHA-256: `4bf5848e6dcd5e4809789c4a1e367ec920f9977a868425984e07b2bfda785ee0`. Source pin remains `86897c56a304bac133650a6055ab1d091e6b8f83`, built with Go 1.27.4. The report binds all four guard source files, adapter/client-source changes, observed requests, local journals and shared ledgers. Earlier private fixtures and #138's evidence are unchanged. Real inference requests: **zero**.
+Private candidate binary SHA-256: `feca4b941545cd83f4e727109352ffa087f62524effd6cabee8bed9947e050fb`. Source pin remains `86897c56a304bac133650a6055ab1d091e6b8f83`, built with Go 1.27.4. The report binds all four guard source files, adapter/client-source changes, observed requests, local journals and shared ledgers. The contention-reason fix is included; regression tests distinguish it from storage faults and verify that the admitted request remains intact. Earlier private fixtures and #138's evidence are unchanged. Real inference requests: **zero**.
 
 ## Remaining limits
 

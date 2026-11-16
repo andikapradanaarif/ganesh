@@ -176,6 +176,9 @@ func (g *Guard) event(e Event) error {
 	err := g.journal.Append(e)
 	g.journalMu.Unlock()
 	if err != nil {
+		if errors.Is(err, ErrRunBusy) {
+			return g.stop("shared_run_busy")
+		}
 		if errors.Is(err, ErrRunStopped) {
 			return g.stop("shared_run_stopped")
 		}

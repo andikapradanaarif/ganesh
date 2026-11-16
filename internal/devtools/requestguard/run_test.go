@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -91,7 +92,9 @@ func TestRunProcessHelper(t *testing.T) {
 	os.Exit(0)
 }
 
-func worker(t *testing.T, c Config, o RunOptions, hold bool, wire ...bool) *exec.Cmd {
+type workerOptions struct{ Hold, Wire bool }
+
+func worker(t *testing.T, c Config, o RunOptions, options workerOptions) *exec.Cmd {
 	t.Helper()
 	bin, err := os.Executable()
 	if err != nil {
@@ -102,7 +105,7 @@ func worker(t *testing.T, c Config, o RunOptions, hold bool, wire ...bool) *exec
 		O    RunOptions
 		Hold bool
 		Wire bool
-	}{c, o, hold, len(wire) > 0 && wire[0]})
+	}{c, o, options.Hold, options.Wire})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -133,11 +136,11 @@ func TestAnswerAndGraderShareOneRunAcrossProcesses(t *testing.T) {
 	l.Slots["two"] = "grade"
 	l.Slots["three"] = "grade"
 	o = initRun(t, l, o)
-	expectWorker(t, worker(t, c, o, false, true), 0)
+	expectWorker(t, worker(t, c, o, workerOptions{Wire: true}), 0)
 	o.Slot = "two"
-	expectWorker(t, worker(t, grade, o, false, true), 0)
+	expectWorker(t, worker(t, grade, o, workerOptions{Wire: true}), 0)
 	o.Slot = "three"
-	expectWorker(t, worker(t, grade, o, false, true), 78)
+	expectWorker(t, worker(t, grade, o, workerOptions{Wire: true}), 78)
 	s, err := InspectRun(o.Path, o.SHA256)
 	if err != nil || s.Requests != 2 || s.KnownInput != 18 || s.KnownOutput != 5 || s.UnknownUsage != 0 || s.Stopped != "run_request_or_output_limit" {
 		t.Fatalf("grading escaped shared totals: %+v %v", s, err)
@@ -197,15 +200,15 @@ func TestRunTotalsAndCapsSurviveProcesses(t *testing.T) {
 	c, l, o := runFixture(t)
 	l.MaxRequests = 2
 	o = initRun(t, l, o)
-	expectWorker(t, worker(t, c, o, false), 0)
+	expectWorker(t, worker(t, c, o, workerOptions{}), 0)
 	o.Slot = "two"
-	expectWorker(t, worker(t, c, o, false), 0)
+	expectWorker(t, worker(t, c, o, workerOptions{}), 0)
 	s, err := InspectRun(o.Path, o.SHA256)
 	if err != nil || s.Requests != 2 || s.KnownInput != 22 || s.KnownOutput != 6 || s.UnknownUsage != 0 || s.SlotsUsed != 2 {
 		t.Fatalf("lost cross-process usage: %+v %v", s, err)
 	}
 	o.Slot = "three"
-	expectWorker(t, worker(t, c, o, false), 78)
+	expectWorker(t, worker(t, c, o, workerOptions{}), 78)
 	s, err = InspectRun(o.Path, o.SHA256)
 	if err != nil || s.Requests != 2 || s.KnownOutput != 6 || s.UnknownUsage != 0 || s.Stopped != "run_request_or_output_limit" {
 		t.Fatalf("fresh process reset cap: %+v %v", s, err)
@@ -225,9 +228,9 @@ func TestRunOutputReservationAndInputStop(t *testing.T) {
 				l.InputStop = 21
 			}
 			o = initRun(t, l, o)
-			expectWorker(t, worker(t, c, o, false), 0)
+			expectWorker(t, worker(t, c, o, workerOptions{}), 0)
 			o.Slot = "two"
-			expectWorker(t, worker(t, c, o, false), 78)
+			expectWorker(t, worker(t, c, o, workerOptions{}), 78)
 			s, err := InspectRun(o.Path, o.SHA256)
 			if err != nil {
 				t.Fatal(err)
@@ -239,7 +242,7 @@ func TestRunOutputReservationAndInputStop(t *testing.T) {
 				t.Fatalf("input stop reset: %+v", s)
 			}
 			o.Slot = "three"
-			expectWorker(t, worker(t, c, o, false), 78)
+			expectWorker(t, worker(t, c, o, workerOptions{}), 78)
 		})
 	}
 }
@@ -249,7 +252,7 @@ func TestRunInterprocessExclusionAndCrash(t *testing.T) {
 		t.Run(fmt.Sprint(crash), func(t *testing.T) {
 			c, l, o := runFixture(t)
 			o = initRun(t, l, o)
-			holder := worker(t, c, o, true)
+			holder := worker(t, c, o, workerOptions{Hold: true})
 			input, err := holder.StdinPipe()
 			if err != nil {
 				t.Fatal(err)
@@ -267,7 +270,7 @@ func TestRunInterprocessExclusionAndCrash(t *testing.T) {
 				t.Fatalf("missing synced reservation: %q %v", line, err)
 			}
 			o.Slot = "two"
-			expectWorker(t, worker(t, c, o, false), 78)
+			expectWorker(t, worker(t, c, o, workerOptions{}), 78)
 			if crash {
 				_ = holder.Process.Kill()
 			} else {
@@ -286,14 +289,71 @@ func TestRunInterprocessExclusionAndCrash(t *testing.T) {
 				if s.Requests != 1 || s.UnknownUsage != 1 || !s.Pending || s.Stopped != "unfinished_request" {
 					t.Fatalf("crash reservation refunded: %+v", s)
 				}
-				expectWorker(t, worker(t, c, o, false), 78)
+				expectWorker(t, worker(t, c, o, workerOptions{}), 78)
 			} else {
 				if s.Requests != 1 || s.KnownInput != 11 || s.Pending {
 					t.Fatalf("contender corrupted holder: %+v", s)
 				}
-				expectWorker(t, worker(t, c, o, false), 0)
+				expectWorker(t, worker(t, c, o, workerOptions{}), 0)
 			}
 		})
+	}
+}
+
+func TestSharedContentionHasDistinctReason(t *testing.T) {
+	c, l, o := runFixture(t)
+	o = initRun(t, l, o)
+	holder, err := NewShared(c, &journal{}, o)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer holder.Close()
+	o.Slot = "two"
+	contender, err := NewShared(c, &journal{}, o)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer contender.Close()
+	if err = holder.shared.Append(syntheticStart()); err != nil {
+		t.Fatal(err)
+	}
+	o.Slot = "three"
+	if other, err := NewShared(c, &journal{}, o); !errors.Is(err, ErrRunBusy) {
+		if other != nil {
+			other.Close()
+		}
+		t.Fatalf("busy initialization mislabeled: %v", err)
+	}
+	tr, err := contender.Transport(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	tr.(*transport).next = deadlineProbe(func(*http.Request) (*http.Response, error) {
+		t.Fatal("contender forwarded a request")
+		return nil, ErrStopped
+	})
+	if call(&http.Client{Transport: tr}, c.Endpoint, request) == nil || contender.Snapshot().Stopped != "shared_run_busy" {
+		t.Fatalf("contention mislabeled: %+v", contender.Snapshot())
+	}
+	if err = holder.shared.Append(syntheticFinish()); err != nil {
+		t.Fatal(err)
+	}
+	s, err := InspectRun(o.Path, o.SHA256)
+	if err != nil || s.Requests != 1 || s.KnownInput != 11 || s.UnknownUsage != 0 || s.Pending || s.Stopped != "" {
+		t.Fatalf("contender changed admitted work: %+v %v", s, err)
+	}
+}
+
+func TestClosedRunDescriptorIsNotContention(t *testing.T) {
+	f, err := os.CreateTemp(t.TempDir(), "closed-run-")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = f.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if err = runLock(f); !errors.Is(err, ErrStopped) || errors.Is(err, ErrRunBusy) {
+		t.Fatalf("storage fault mislabeled: %v", err)
 	}
 }
 
@@ -337,7 +397,7 @@ func TestRunBindingsAndCorruptionFailClosed(t *testing.T) {
 					t.Fatal(err)
 				}
 			case "reused-slot":
-				expectWorker(t, worker(t, c, o, false), 0)
+				expectWorker(t, worker(t, c, o, workerOptions{}), 0)
 			}
 			if g, err := NewShared(c, &journal{}, o); err == nil {
 				g.Close()
@@ -394,7 +454,7 @@ func TestRunUnknownAndJournalFailurePersist(t *testing.T) {
 				t.Fatalf("unknown usage lost: %+v", s)
 			}
 			o.Slot = "two"
-			expectWorker(t, worker(t, c, o, false), 78)
+			expectWorker(t, worker(t, c, o, workerOptions{}), 78)
 		})
 	}
 }
@@ -403,7 +463,7 @@ func TestSharedDeadlineCannotReset(t *testing.T) {
 	c, l, o := runFixture(t)
 	l.Deadline = time.Now().Add(-time.Second).UTC()
 	o = initRun(t, l, o)
-	expectWorker(t, worker(t, c, o, false), 78)
+	expectWorker(t, worker(t, c, o, workerOptions{}), 78)
 	s, err := InspectRun(o.Path, o.SHA256)
 	if err != nil || s.Requests != 0 || s.Stopped != "deadline" {
 		t.Fatalf("deadline reset: %+v %v", s, err)
