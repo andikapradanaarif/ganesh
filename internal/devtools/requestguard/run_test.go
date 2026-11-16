@@ -51,6 +51,7 @@ func TestRunProcessHelper(t *testing.T) {
 		C    Config
 		O    RunOptions
 		Hold bool
+		Wire bool
 	}
 	if json.Unmarshal([]byte(os.Getenv("GANESH_RUN_INPUT")), &input) != nil {
 		os.Exit(79)
@@ -58,6 +59,21 @@ func TestRunProcessHelper(t *testing.T) {
 	g, err := NewShared(input.C, &journal{}, input.O)
 	if err != nil {
 		os.Exit(78)
+	}
+	if input.Wire {
+		tr, err := g.Transport(nil)
+		if err != nil {
+			os.Exit(78)
+		}
+		body := request
+		if input.C.Protocol == "chat-completions" {
+			body = fmt.Sprintf(`{"model":%q,"max_tokens":8,"stream":false,"messages":[{"role":"user","content":"synthetic grade"}]}`, input.C.Model)
+		}
+		if call(&http.Client{Transport: tr}, input.C.Endpoint, body) != nil {
+			os.Exit(78)
+		}
+		g.Close()
+		os.Exit(0)
 	}
 	if g.shared.Append(syntheticStart()) != nil {
 		os.Exit(78)
@@ -75,7 +91,7 @@ func TestRunProcessHelper(t *testing.T) {
 	os.Exit(0)
 }
 
-func worker(t *testing.T, c Config, o RunOptions, hold bool) *exec.Cmd {
+func worker(t *testing.T, c Config, o RunOptions, hold bool, wire ...bool) *exec.Cmd {
 	t.Helper()
 	bin, err := os.Executable()
 	if err != nil {
@@ -85,7 +101,8 @@ func worker(t *testing.T, c Config, o RunOptions, hold bool) *exec.Cmd {
 		C    Config
 		O    RunOptions
 		Hold bool
-	}{c, o, hold})
+		Wire bool
+	}{c, o, hold, len(wire) > 0 && wire[0]})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -94,6 +111,71 @@ func worker(t *testing.T, c Config, o RunOptions, hold bool) *exec.Cmd {
 	cmd := exec.CommandContext(ctx, bin, "-test.run=^TestRunProcessHelper$")
 	cmd.Env = []string{"GANESH_RUN_HELPER=1", "GANESH_RUN_INPUT=" + string(b)}
 	return cmd
+}
+
+func TestAnswerAndGraderShareOneRunAcrossProcesses(t *testing.T) {
+	_, _, _, url := setup(t, func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		if strings.HasSuffix(r.URL.Path, "/chat/completions") {
+			fmt.Fprint(w, chatComplete)
+		} else {
+			fmt.Fprint(w, complete)
+		}
+	})
+	c, l, o := runFixture(t)
+	c.Endpoint = url
+	grade := c
+	grade.Protocol = "chat-completions"
+	grade.Endpoint = strings.TrimSuffix(url, "responses") + "chat/completions"
+	grade.Model = "fixture-grader"
+	l.MaxRequests = 2
+	l.Profiles = map[string]Config{"answer": c, "grade": grade}
+	l.Slots["two"] = "grade"
+	l.Slots["three"] = "grade"
+	o = initRun(t, l, o)
+	expectWorker(t, worker(t, c, o, false, true), 0)
+	o.Slot = "two"
+	expectWorker(t, worker(t, grade, o, false, true), 0)
+	o.Slot = "three"
+	expectWorker(t, worker(t, grade, o, false, true), 78)
+	s, err := InspectRun(o.Path, o.SHA256)
+	if err != nil || s.Requests != 2 || s.KnownInput != 18 || s.KnownOutput != 5 || s.UnknownUsage != 0 || s.Stopped != "run_request_or_output_limit" {
+		t.Fatalf("grading escaped shared totals: %+v %v", s, err)
+	}
+}
+
+const chatComplete = `{"choices":[{"finish_reason":"stop","message":{"content":"synthetic grade"}}],"usage":{"prompt_tokens":7,"completion_tokens":2}}`
+
+func TestChatGradingProfileRejectsAmbiguousRequestsAndUsage(t *testing.T) {
+	for _, body := range []string{
+		`{"model":"fixture","max_tokens":9}`, `{"model":"fixture","max_output_tokens":8}`,
+		`{"model":"fixture","max_tokens":8,"stream":true}`, `{"model":"fixture","max_tokens":8,"n":2}`,
+		`{"model":"fixture","max_tokens":8,"max_completion_tokens":8}`, `{"model":"fixture"}`,
+	} {
+		c, _, _ := runFixture(t)
+		c.Protocol = "chat-completions"
+		c.Endpoint = "http://127.0.0.1:1/v1/chat/completions"
+		g, err := New(c, &journal{})
+		if err != nil {
+			t.Fatal(err)
+		}
+		tr, err := g.Transport(nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if call(&http.Client{Transport: tr}, c.Endpoint, body) == nil || g.Snapshot().Attempts != 0 {
+			t.Fatal("invalid chat profile dispatched")
+		}
+		g.Close()
+	}
+	if u := chatUsage([]byte(chatComplete), "application/json"); u == nil || u.Input != 7 || u.Output != 2 {
+		t.Fatal("native grading usage lost")
+	}
+	for _, bad := range []string{`{}`, strings.Replace(chatComplete, `"stop"`, `"length"`, 1), strings.Replace(chatComplete, `"prompt_tokens":7`, `"prompt_tokens":-1`, 1)} {
+		if chatUsage([]byte(bad), "application/json") != nil {
+			t.Fatal("unaccounted grade accepted")
+		}
+	}
 }
 func expectWorker(t *testing.T, cmd *exec.Cmd, code int) {
 	t.Helper()
@@ -329,11 +411,10 @@ func TestSharedDeadlineCannotReset(t *testing.T) {
 }
 
 func TestSharedGuardAccountsWireRequests(t *testing.T) {
-	_, _, client, url := setup(t, func(w http.ResponseWriter, r *http.Request) {
+	_, _, _, url := setup(t, func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprint(w, complete)
 	})
-	_ = client
 	c, l, o := runFixture(t)
 	c.Endpoint = url
 	l.Profiles["answer"] = c
@@ -356,5 +437,36 @@ func TestSharedGuardAccountsWireRequests(t *testing.T) {
 	s, err := InspectRun(o.Path, o.SHA256)
 	if err != nil || s.Requests != 2 || s.KnownInput != 22 || s.KnownOutput != 6 {
 		t.Fatalf("guard not bound to run: %+v %v", s, err)
+	}
+}
+
+type deadlineProbe func(*http.Request) (*http.Response, error)
+
+func (p deadlineProbe) RoundTrip(r *http.Request) (*http.Response, error) { return p(r) }
+
+func TestSharedDeadlineBoundsForwardedContext(t *testing.T) {
+	c, l, o := runFixture(t)
+	l.Deadline = time.Now().Add(30 * time.Second).UTC()
+	o = initRun(t, l, o)
+	g, err := NewShared(c, &journal{}, o)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer g.Close()
+	tr, err := g.Transport(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	forwarded := false
+	tr.(*transport).next = deadlineProbe(func(r *http.Request) (*http.Response, error) {
+		forwarded = true
+		deadline, ok := r.Context().Deadline()
+		if !ok || !deadline.Equal(l.Deadline) {
+			t.Errorf("shared deadline lost: %v", deadline)
+		}
+		return &http.Response{StatusCode: 200, Header: http.Header{"Content-Type": []string{"application/json"}}, Body: io.NopCloser(strings.NewReader(complete))}, nil
+	})
+	if call(&http.Client{Transport: tr}, c.Endpoint, request) != nil || !forwarded {
+		t.Fatal("request did not reach deadline probe")
 	}
 }

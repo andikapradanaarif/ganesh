@@ -1,4 +1,4 @@
-// Package requestguard bounds one experimental native Responses client process.
+// Package requestguard bounds experimental model requests and shared run usage.
 // It is developer tooling, not a production gateway or an execution grant.
 package requestguard
 
@@ -23,6 +23,7 @@ import (
 var ErrStopped = errors.New("experimental request guard stopped")
 
 type Config struct {
+	Protocol             string        `json:"protocol,omitempty"`
 	Endpoint             string        `json:"endpoint"`
 	Model                string        `json:"model"`
 	MaxRequests          int64         `json:"max_requests"`
@@ -111,9 +112,10 @@ type Guard struct {
 
 func New(c Config, j Journal) (*Guard, error) {
 	u, err := url.Parse(c.Endpoint)
+	routeOK := err == nil && u != nil && ((c.Protocol == "" || c.Protocol == "responses") && strings.HasSuffix(u.Path, "/responses") || c.Protocol == "chat-completions" && strings.HasSuffix(u.Path, "/chat/completions"))
 	if err != nil || u.Host == "" || u.User != nil || u.RawQuery != "" || u.Fragment != "" ||
 		(u.Scheme != "https" && !(u.Scheme == "http" && strings.HasPrefix(u.Host, "127.0.0.1:"))) ||
-		!strings.HasSuffix(u.Path, "/responses") || c.Model == "" || j == nil ||
+		!routeOK || c.Model == "" || j == nil ||
 		c.MaxRequests <= 0 || c.MaxRequests > 10000 || c.MaxOutputPerRequest <= 0 ||
 		c.MaxOutputTotal < c.MaxOutputPerRequest || c.MaxOutputTotal > 1e9 ||
 		c.StopAfterInputTokens <= 0 || c.StopAfterInputTokens > 1e9 ||
@@ -210,11 +212,26 @@ func (t *transport) RoundTrip(req *http.Request) (*http.Response, error) {
 		return nil, g.stop("request_body")
 	}
 	var input struct {
-		Model      string `json:"model"`
-		MaxOutput  *int64 `json:"max_output_tokens"`
-		Background bool   `json:"background"`
+		Model         string `json:"model"`
+		MaxOutput     *int64 `json:"max_output_tokens"`
+		MaxTokens     *int64 `json:"max_tokens"`
+		MaxCompletion *int64 `json:"max_completion_tokens"`
+		Stream        bool   `json:"stream"`
+		N             *int64 `json:"n"`
+		Background    bool   `json:"background"`
 	}
-	if json.Unmarshal(body, &input) != nil || input.Model != g.c.Model || input.Background ||
+	if json.Unmarshal(body, &input) != nil {
+		return nil, g.stop("request_profile")
+	}
+	if g.c.Protocol == "chat-completions" {
+		if input.MaxOutput != nil || input.Stream || input.N != nil && *input.N != 1 {
+			return nil, g.stop("request_profile")
+		}
+		input.MaxOutput = input.MaxTokens
+	} else if input.MaxTokens != nil {
+		return nil, g.stop("request_profile")
+	}
+	if input.Model != g.c.Model || input.Background || input.MaxCompletion != nil ||
 		input.MaxOutput == nil || *input.MaxOutput <= 0 || *input.MaxOutput > g.c.MaxOutputPerRequest {
 		return nil, g.stop("request_profile")
 	}
@@ -280,7 +297,11 @@ func (t *transport) RoundTrip(req *http.Request) (*http.Response, error) {
 		case status != http.StatusOK:
 			finish.Reason = "http_failed"
 		default:
-			finish.Usage = responseUsage(data, resp.Header.Get("Content-Type"))
+			if g.c.Protocol == "chat-completions" {
+				finish.Usage = chatUsage(data, resp.Header.Get("Content-Type"))
+			} else {
+				finish.Usage = responseUsage(data, resp.Header.Get("Content-Type"))
+			}
 			if finish.Usage == nil {
 				finish.Reason = "usage_unknown"
 			}
@@ -308,6 +329,30 @@ func (t *transport) RoundTrip(req *http.Request) (*http.Response, error) {
 	}
 	resp.Body = io.NopCloser(bytes.NewReader(data))
 	return resp, nil
+}
+
+// The grading profile deliberately supports non-streaming, single-choice Chat
+// Completions only. Truncation/missing usage never becomes a successful finish.
+func chatUsage(data []byte, contentType string) *Usage {
+	if !strings.HasPrefix(contentType, "application/json") {
+		return nil
+	}
+	var result struct {
+		Choices []struct {
+			Finish  string `json:"finish_reason"`
+			Message struct {
+				Content *string `json:"content"`
+			} `json:"message"`
+		} `json:"choices"`
+		Usage *struct {
+			Input  *int64 `json:"prompt_tokens"`
+			Output *int64 `json:"completion_tokens"`
+		} `json:"usage"`
+	}
+	if json.Unmarshal(data, &result) != nil || len(result.Choices) != 1 || result.Choices[0].Finish != "stop" || result.Choices[0].Message.Content == nil || result.Usage == nil || result.Usage.Input == nil || result.Usage.Output == nil || *result.Usage.Input < 0 || *result.Usage.Output < 0 || *result.Usage.Input > 1e9 || *result.Usage.Output > 1e9 {
+		return nil
+	}
+	return &Usage{Input: *result.Usage.Input, Output: *result.Usage.Output}
 }
 
 func (g *Guard) block() error {
