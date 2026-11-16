@@ -41,14 +41,15 @@ type Usage struct {
 // A start without a finish means potentially dispatched, usage unknown.
 // A failed request's nil Usage never means zero billed tokens.
 type Event struct {
-	Kind          string    `json:"kind"`
-	Attempt       int64     `json:"attempt"`
-	At            time.Time `json:"at"`
-	Reason        string    `json:"reason,omitempty"`
-	Status        int       `json:"status,omitempty"`
-	RequestSHA256 string    `json:"request_sha256,omitempty"`
-	RequestBytes  int       `json:"request_bytes,omitempty"`
-	Usage         *Usage    `json:"usage"`
+	Kind            string    `json:"kind"`
+	Attempt         int64     `json:"attempt"`
+	At              time.Time `json:"at"`
+	Reason          string    `json:"reason,omitempty"`
+	Status          int       `json:"status,omitempty"`
+	RequestSHA256   string    `json:"request_sha256,omitempty"`
+	RequestBytes    int       `json:"request_bytes,omitempty"`
+	RequestedOutput int64     `json:"requested_output,omitempty"`
+	Usage           *Usage    `json:"usage"`
 }
 
 type Journal interface{ Append(Event) error }
@@ -105,6 +106,7 @@ type Guard struct {
 	journalMu sync.Mutex
 	s         Snapshot
 	seen      map[[32]byte]bool
+	shared    *RunJournal
 }
 
 func New(c Config, j Journal) (*Guard, error) {
@@ -124,7 +126,12 @@ func New(c Config, j Journal) (*Guard, error) {
 	return g, nil
 }
 
-func (g *Guard) Close()             { g.cancel() }
+func (g *Guard) Close() {
+	g.cancel()
+	if g.shared != nil {
+		_ = g.shared.Close()
+	}
+}
 func (g *Guard) Snapshot() Snapshot { g.mu.Lock(); defer g.mu.Unlock(); return g.s }
 
 // Transport accepts only a plain transport. A custom OAuth/debug transport could
@@ -167,6 +174,9 @@ func (g *Guard) event(e Event) error {
 	err := g.journal.Append(e)
 	g.journalMu.Unlock()
 	if err != nil {
+		if errors.Is(err, ErrRunStopped) {
+			return g.stop("shared_run_stopped")
+		}
 		return g.stop("journal_failed")
 	}
 	return nil
@@ -230,10 +240,11 @@ func (t *transport) RoundTrip(req *http.Request) (*http.Response, error) {
 	g.seen[h] = true
 	attempt := g.s.Attempts
 	g.mu.Unlock()
-	if g.event(Event{Kind: "start", Attempt: attempt, RequestSHA256: hex.EncodeToString(h[:]), RequestBytes: len(body)}) != nil {
+	if g.event(Event{Kind: "start", Attempt: attempt, RequestSHA256: hex.EncodeToString(h[:]), RequestBytes: len(body), RequestedOutput: *input.MaxOutput}) != nil {
 		return nil, ErrStopped
 	}
-	ctx, cancel := context.WithCancel(req.Context())
+	deadline, _ := g.ctx.Deadline()
+	ctx, cancel := context.WithDeadline(req.Context(), deadline)
 	stop := context.AfterFunc(g.ctx, cancel)
 	defer func() { stop(); cancel() }()
 	forward := req.Clone(ctx)
