@@ -5,6 +5,7 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -82,38 +83,17 @@ func (b *boundedHead) Write(p []byte) (int, error) {
 // and neither resolves a full tool grant nor changes any execution approval.
 func Inspect(ctx context.Context, dir, expected, out string) (Inspection, error) {
 	result := Inspection{PackageSHA: expected, Started: time.Now().UTC(), Projects: map[string]ProjectResult{}, Tools: map[string]bool{}, AllSelectedMatch: true}
-	root, err := os.OpenRoot(dir)
+	plan, err := loadInspectionPlan(dir, expected)
 	if err != nil {
-		return result, ErrInput
+		return result, err
 	}
-	defer root.Close()
-	b, err := read(root, "manifest.json")
-	if err != nil || sum(b) != expected {
-		return result, ErrInput
-	}
-	var m manifest
-	if json.Unmarshal(b, &m) != nil || m.Dispatch || m.Issue != 124 || m.PacketSHA != BoundSHA || m.GuardSHA != GuardReportSHA || m.Status != "OWNER_PREFLIGHT_PROPOSAL_HOLD_EXECUTION" {
-		return result, ErrInput
-	}
-	for name, hash := range m.Files {
-		data, err := read(root, name)
-		if err != nil || sum(data) != hash {
-			return result, ErrInput
+	// Reserve output before reading projects. Repeated/invalid output paths must
+	// never trigger another source scan or overwrite an earlier attempt.
+	if err = os.Mkdir(out, 0700); err != nil {
+		if errors.Is(err, os.ErrExist) {
+			return result, Failed("output_already_exists")
 		}
-	}
-	var plan InspectionPlan
-	if m.Files["inspection-plan.json"] == "" || decode(root, "inspection-plan.json", &plan) != nil || len(plan.Roots) != 2 || len(plan.Files) == 0 || len(plan.Files) > 128 {
-		return result, ErrInput
-	}
-	for _, project := range []string{"kiosk", "valo-backend"} {
-		if !filepath.IsAbs(plan.Roots[project]) {
-			return result, ErrInput
-		}
-	}
-	for _, f := range plan.Files {
-		if !safePath(f.Path) || (f.Project != "kiosk" && f.Project != "valo-backend") {
-			return result, ErrInput
-		}
+		return result, Failed("output_create")
 	}
 	for _, name := range []string{"git", "rg", "go", "node", "bun"} {
 		_, err := exec.LookPath(name)
@@ -166,11 +146,64 @@ func Inspect(ctx context.Context, dir, expected, out string) (Inspection, error)
 		result.Projects[project] = pr
 	}
 	result.Finished = time.Now().UTC()
-	if os.Mkdir(out, 0700) != nil {
-		return result, ErrInput
-	}
 	if writeJSON(filepath.Join(out, "inspection.json"), result) != nil {
-		return result, ErrInput
+		return result, Failed("report_write")
 	}
 	return result, nil
+}
+
+// CheckPackage validates the exact same handoff as Inspect, but never opens a
+// project root, invokes Git, checks project files or creates output directories.
+func CheckPackage(dir, expected string) (int, int, error) {
+	p, err := loadInspectionPlan(dir, expected)
+	return len(p.Roots), len(p.Files), err
+}
+
+func loadInspectionPlan(dir, expected string) (InspectionPlan, error) {
+	var plan InspectionPlan
+	root, err := os.OpenRoot(dir)
+	if err != nil {
+		return plan, Failed("package_open")
+	}
+	defer root.Close()
+	b, err := read(root, "manifest.json")
+	if err != nil {
+		return plan, Failed("manifest_read")
+	}
+	if sum(b) != expected {
+		return plan, Failed("manifest_hash")
+	}
+	var m manifest
+	if json.Unmarshal(b, &m) != nil {
+		return plan, Failed("manifest_json")
+	}
+	if m.Dispatch || m.Issue != 124 || m.PacketSHA != BoundSHA || m.GuardSHA != GuardReportSHA || m.Status != "OWNER_PREFLIGHT_PROPOSAL_HOLD_EXECUTION" {
+		return plan, Failed("manifest_policy")
+	}
+	for name, hash := range m.Files {
+		data, err := read(root, name)
+		if err != nil {
+			return plan, Failed("package_artifact_read")
+		}
+		if sum(data) != hash {
+			return plan, Failed("package_artifact_hash")
+		}
+	}
+	if m.Files["inspection-plan.json"] == "" || decode(root, "inspection-plan.json", &plan) != nil {
+		return plan, Failed("plan_read")
+	}
+	if len(plan.Roots) != 2 || len(plan.Files) == 0 || len(plan.Files) > 128 {
+		return plan, Failed("plan_counts")
+	}
+	for _, project := range []string{"kiosk", "valo-backend"} {
+		if !filepath.IsAbs(plan.Roots[project]) {
+			return plan, Failed("plan_roots")
+		}
+	}
+	for _, f := range plan.Files {
+		if !safePath(f.Path) || (f.Project != "kiosk" && f.Project != "valo-backend") {
+			return plan, Failed("plan_paths")
+		}
+	}
+	return plan, nil
 }

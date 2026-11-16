@@ -22,6 +22,22 @@ const GuardReportSHA = "e225346696c4c1dd7a71bdeb7ab6f0ab33a53e75b4584e789e440b61
 
 var ErrInput = errors.New("S0 package input or local inspection failed; no model call made")
 
+type Failure struct{ Stage string }
+
+func (e *Failure) Error() string { return ErrInput.Error() + " [" + e.Stage + "]" }
+func (e *Failure) Unwrap() error { return ErrInput }
+func Failed(stage string) error  { return &Failure{Stage: stage} }
+
+// UserError exposes only fixed stage codes, never paths, source text or raw
+// filesystem/JSON/subprocess error strings.
+func UserError(err error) string {
+	var failure *Failure
+	if errors.As(err, &failure) {
+		return failure.Error()
+	}
+	return ErrInput.Error()
+}
+
 type object = map[string]any
 type Pin struct {
 	File   string `json:"file"`

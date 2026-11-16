@@ -1,4 +1,4 @@
-// ganesh-s0-preflight has only offline prepare/inspect operations. It cannot run
+// ganesh-s0-preflight has only offline preparation/verification/inspection. It cannot run
 // inference, initialize an experiment ledger, install clients or approve a run.
 package main
 
@@ -14,7 +14,7 @@ import (
 
 func run(args []string, out io.Writer) error {
 	if len(args) == 0 {
-		return s0package.ErrInput
+		return s0package.Failed("arguments_command")
 	}
 	f := flag.NewFlagSet(args[0], flag.ContinueOnError)
 	f.SetOutput(io.Discard)
@@ -27,15 +27,20 @@ func run(args []string, out io.Writer) error {
 		f.StringVar(&options.Roots, "roots-map", "", "recorded project roots metadata")
 		f.StringVar(&options.GuardReport, "guard-report", "", "frozen post-review guard report")
 		f.StringVar(&options.Output, "out", "", "new private output directory")
-	case "inspect":
+	case "inspect", "check-package":
 		f.StringVar(&dir, "package", "", "prepared private package")
 		f.StringVar(&hash, "sha256", "", "expected package manifest hash")
-		f.StringVar(&options.Output, "out", "", "new private metadata report directory")
+		if args[0] == "inspect" {
+			f.StringVar(&options.Output, "out", "", "new private metadata report directory")
+		}
 	default:
-		return s0package.ErrInput
+		return s0package.Failed("arguments_command")
 	}
-	if f.Parse(args[1:]) != nil || f.NArg() != 0 || options.Output == "" {
-		return s0package.ErrInput
+	if f.Parse(args[1:]) != nil || f.NArg() != 0 {
+		return s0package.Failed("arguments")
+	}
+	if args[0] != "check-package" && options.Output == "" {
+		return s0package.Failed("arguments_output")
 	}
 	if args[0] == "prepare" {
 		if options.Packet == "" || options.Calibration == "" || options.Roots == "" || options.GuardReport == "" {
@@ -49,7 +54,15 @@ func run(args []string, out io.Writer) error {
 		return err
 	}
 	if dir == "" || len(hash) != 64 {
-		return s0package.ErrInput
+		return s0package.Failed("arguments_package_or_hash")
+	}
+	if args[0] == "check-package" {
+		projects, files, err := s0package.CheckPackage(dir, hash)
+		if err != nil {
+			return err
+		}
+		_, err = fmt.Fprintf(out, "Package verified: %d project roots / %d selected files. Project roots not opened; model calls: 0.\n", projects, files)
+		return err
 	}
 	r, err := s0package.Inspect(context.Background(), dir, hash, options.Output)
 	if err != nil {
@@ -60,7 +73,7 @@ func run(args []string, out io.Writer) error {
 }
 func main() {
 	if err := run(os.Args[1:], os.Stdout); err != nil {
-		fmt.Fprintln(os.Stderr, s0package.ErrInput)
+		fmt.Fprintln(os.Stderr, s0package.UserError(err))
 		os.Exit(1)
 	}
 }

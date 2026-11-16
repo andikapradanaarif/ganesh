@@ -77,8 +77,33 @@ func TestInspectReturnsOnlyMetadataAndCannotApprove(t *testing.T) {
 	if info.Mode().Perm() != 0600 {
 		t.Fatal("report not private")
 	}
-	if _, err = Inspect(t.Context(), dir, hash, out); err == nil {
+	if repeated, err := Inspect(t.Context(), dir, hash, out); err == nil || len(repeated.Files) != 0 || repeated.HashedBytes != 0 || !strings.Contains(UserError(err), "output_already_exists") {
 		t.Fatal("existing report overwritten")
+	}
+}
+
+func TestCheckPackageNeedsNoProjectAccessAndReportsSafeStage(t *testing.T) {
+	dir, hash := fixture(t, func(p *InspectionPlan) {
+		p.Roots["kiosk"] = "/nonexistent-synthetic-project/kiosk"
+		p.Roots["valo-backend"] = "/nonexistent-synthetic-project/valo"
+	})
+	projects, files, err := CheckPackage(dir, hash)
+	if err != nil || projects != 2 || files != 2 {
+		t.Fatalf("package-only verification opened projects: %v", err)
+	}
+	if _, _, err = CheckPackage(dir, strings.Repeat("0", 64)); err == nil || !strings.Contains(UserError(err), "manifest_hash") || strings.Contains(UserError(err), dir) {
+		t.Fatalf("unsafe/absent stage diagnostic: %v", err)
+	}
+	if _, _, err = CheckPackage(filepath.Join(dir, "missing"), hash); err == nil || !strings.Contains(UserError(err), "package_open") {
+		t.Fatal("missing package stage absent")
+	}
+}
+
+func TestOutputFailurePrecedesAnySourceInspection(t *testing.T) {
+	dir, hash := fixture(t, nil)
+	r, err := Inspect(t.Context(), dir, hash, filepath.Join(t.TempDir(), "missing-parent", "out"))
+	if err == nil || len(r.Files) != 0 || r.HashedBytes != 0 || len(r.Projects) != 0 || !strings.Contains(UserError(err), "output_create") {
+		t.Fatalf("output failure scanned projects: %+v %v", r, err)
 	}
 }
 
