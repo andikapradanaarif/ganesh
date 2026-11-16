@@ -35,12 +35,13 @@ type obj = map[string]any
 func main() {
 	source := flag.String("source", "", "local repository containing the exact pinned Crush commit")
 	out := flag.String("out", "", "new private output directory (never overwritten)")
+	suite := flag.String("suite", "accounting", "accounting (13 cases) or context-tools (one synthetic wire probe)")
 	flag.Parse()
-	if flag.NArg() != 0 || *source == "" || *out == "" {
-		fmt.Fprintln(os.Stderr, "require -source and -out")
+	if flag.NArg() != 0 || *source == "" || *out == "" || (*suite != "accounting" && *suite != "context-tools") {
+		fmt.Fprintln(os.Stderr, "require -source, -out and a supported -suite")
 		os.Exit(2)
 	}
-	if err := run(*source, *out); err != nil {
+	if err := run(*source, *out, *suite); err != nil {
 		fmt.Fprintln(os.Stderr, "Offline client fixture failed; inspect private evidence. No real inference requested.")
 		os.Exit(1)
 	}
@@ -89,7 +90,7 @@ func (o *output) Write(p []byte) (int, error) {
 	return n, nil
 }
 
-func run(source, out string) error {
+func run(source, out, suite string) error {
 	if runtime.GOOS != "darwin" {
 		return errors.New("OS sandbox unavailable")
 	}
@@ -181,7 +182,11 @@ func run(source, out string) error {
 		return err
 	}
 	results := []obj{}
-	for _, mode := range []string{"503", "success", "missing-usage", "request-cap", "missing-config", "missing-run", "shared-request-cap", "shared-output-cap", "shared-input-stop", "shared-unknown", "shared-deadline", "shared-reused-slot", "shared-crash"} {
+	modes := []string{"503", "success", "missing-usage", "request-cap", "missing-config", "missing-run", "shared-request-cap", "shared-output-cap", "shared-input-stop", "shared-unknown", "shared-deadline", "shared-reused-slot", "shared-crash"}
+	if suite == "context-tools" {
+		modes = []string{"context-tools"}
+	}
+	for _, mode := range modes {
 		fmt.Println("Running synthetic loopback client fixture:", mode)
 		result, err := exercise(ctx, out, binary, mode)
 		if err != nil {
@@ -198,6 +203,9 @@ func run(source, out string) error {
 		return err
 	}
 	report := obj{"source_revision": pin, "original_telemetry_sha256": digest(original), "patched_telemetry_sha256": digest(patched), "guard_sha256": digest(guard), "guard_sources_sha256": guardSources, "adapter_sha256": digest(adapter), "binary_sha256": digest(bin), "build_go_version": info.GoVersion, "network_policy": policy, "real_inference_requests": 0, "fixtures": results, "passed": passed, "installed_client_modified": false, "run_approved": false, "scope": "Synthetic shared accounting across native Responses client processes; no natural grading, tool isolation, tokenizer/context fit, provider billing or live run approval."}
+	if suite == "context-tools" {
+		report["scope"] = "Synthetic outgoing Responses context markers and exact four-tool palette only; no tool execution, filesystem permission boundary, actual owner configuration/source inventory, tokenizer/context fit, provider access, natural grading or run approval."
+	}
 	if err = write(filepath.Join(out, "report.json"), report); err != nil {
 		return err
 	}
@@ -300,7 +308,11 @@ func exercise(parent context.Context, out, binary, mode string) (obj, error) {
 		active++
 		peak = max(peak, active)
 		n := len(requests) + 1
-		requests = append(requests, obj{"body_sha256": digest(b), "body_bytes": len(b), "path": r.URL.Path, "method": r.Method, "dummy_auth_matches": r.Header.Get("Authorization") == "Bearer fixture-only-not-a-secret", "model": payload.Model, "max_output_tokens": payload.MaxOutput, "stream": payload.Stream})
+		observed := obj{"body_sha256": digest(b), "body_bytes": len(b), "path": r.URL.Path, "method": r.Method, "dummy_auth_matches": r.Header.Get("Authorization") == "Bearer fixture-only-not-a-secret", "model": payload.Model, "max_output_tokens": payload.MaxOutput, "stream": payload.Stream}
+		if mode == "context-tools" {
+			observed["profile"] = observeProfile(b)
+		}
+		requests = append(requests, observed)
 		mu.Unlock()
 		defer func() { mu.Lock(); active--; mu.Unlock() }()
 		if mode == "shared-crash" {
@@ -380,14 +392,35 @@ func exercise(parent context.Context, out, binary, mode string) (obj, error) {
 	model := obj{"id": "gpt-6-luna", "name": "Synthetic fixture only", "context_window": 131072, "default_max_tokens": 256}
 	selected := obj{"provider": "opencode-go", "model": "gpt-6-luna", "max_tokens": 256}
 	config := obj{"providers": obj{"opencode-go": obj{"id": "opencode-go", "name": "Offline fixture", "type": "openai", "base_url": base, "api_key": "fixture-only-not-a-secret", "discover_models": false, "models": []obj{model}, "extra_headers": obj{"x-opencode-session": "ganesh-request-profile-fixture"}}}, "models": obj{"large": selected, "small": selected, "summary": selected}, "options": obj{"disable_default_providers": true, "disable_provider_auto_update": true, "disable_metrics": true, "disable_auto_summarize": true, "context_paths": []string{"fixture.md"}, "global_context_paths": []string{filepath.Join(dir, "global.md")}, "disabled_tools": []string{"bash", "write", "edit", "multiedit", "agent", "fetch", "web_search", "sourcegraph", "lsp", "diagnostics", "python"}}, "mcp": obj{}}
+	if mode == "context-tools" {
+		options := config["options"].(obj)
+		delete(options, "disabled_tools")
+		options["context_paths"] = []string{"fixture.md", "backend/AGENTS.md"}
+		options["notebook_enabled"] = false
+		options["auto_lsp"] = false
+		config["agents"] = obj{"coder": obj{"allowed_tools": probeTools}}
+		if err = os.Mkdir(filepath.Join(dir, "skills"), 0700); err != nil {
+			return nil, err
+		}
+		// A real synthetic Git root prevents ancestor project discovery.
+		init := exec.CommandContext(ctx, "git", "-c", "init.defaultBranch=fixture", "init", "-q", "--template=", filepath.Join(dir, "work"))
+		init.Env = []string{"PATH=" + os.Getenv("PATH"), "GIT_CONFIG_NOSYSTEM=1", "GIT_CONFIG_GLOBAL=/dev/null", "GIT_TERMINAL_PROMPT=0"}
+		if err = init.Run(); err != nil {
+			return nil, err
+		}
+	}
 	if err = write(filepath.Join(dir, "work/crush.json"), config); err != nil {
 		return nil, err
 	}
 	if err = write(filepath.Join(dir, "work/.crush.json"), config); err != nil {
 		return nil, err
 	}
-	for _, p := range []string{"work/fixture.md", "global.md"} {
-		if err = writeBytes(filepath.Join(dir, p), []byte("Synthetic fixture. Do not use tools.\n")); err != nil {
+	contextFiles := map[string]string{"work/fixture.md": "Synthetic fixture. Do not use tools.", "global.md": "Synthetic fixture. Do not use tools."}
+	if mode == "context-tools" {
+		contextFiles = map[string]string{"work/fixture.md": probeContexts["explicit"], "work/AGENTS.md": probeContexts["native_default"], "work/backend/AGENTS.md": probeContexts["nested_explicit"], "global.md": probeContexts["global_explicit"], "work/unlisted.md": unlistedContext}
+	}
+	for p, text := range contextFiles {
+		if err = writeBytes(filepath.Join(dir, p), []byte(text+"\n")); err != nil {
 			return nil, err
 		}
 	}
@@ -397,6 +430,9 @@ func exercise(parent context.Context, out, binary, mode string) (obj, error) {
 	cmd := exec.CommandContext(ctx, "/usr/bin/sandbox-exec", "-p", policy, binary, "--cwd", filepath.Join(dir, "work"), "--data-dir", filepath.Join(dir, "state"), "run", "--quiet", "Return a short synthetic fixture answer without tools.")
 	cmd.Dir = filepath.Join(dir, "work")
 	cmd.Env = []string{"PATH=/usr/bin:/bin:/usr/local/bin", "TERM=dumb", "TMPDIR=" + filepath.Join(dir, "tmp"), "CRUSH_GLOBAL_CONFIG=" + filepath.Join(dir, "config"), "CRUSH_GLOBAL_DATA=" + filepath.Join(dir, "data"), "CRUSH_DATA_DIR=" + filepath.Join(dir, "state"), "CRUSH_DISABLE_PROVIDER_AUTO_UPDATE=1", "CRUSH_DISABLE_METRICS=1", "CRUSH_CLIENT_SERVER=false", "CRUSH_EVAL_MAX_STEPS=1", "CRUSH_EVAL_MAX_TOKENS=2048", "GANESH_S0_GUARD_CONFIG=" + filepath.Join(dir, "guard.json")}
+	if mode == "context-tools" {
+		cmd.Env = append(cmd.Env, "CRUSH_SKILLS_DIR="+filepath.Join(dir, "skills"), "GIT_CONFIG_NOSYSTEM=1", "GIT_CONFIG_GLOBAL=/dev/null")
+	}
 	if mode == "missing-config" {
 		cmd.Env = cmd.Env[:len(cmd.Env)-1]
 	}
@@ -487,6 +523,12 @@ func exercise(parent context.Context, out, binary, mode string) (obj, error) {
 		passed = len(observed) == 0 && len(events) == 0 && exitCode == 78 && ctx.Err() == nil
 	case "success":
 		passed = passed && runErr == nil && starts >= 2 && known == starts && inputTokens == int64(starts)*11 && outputTokens == int64(starts)*3 && strings.Contains(stdout.b.String(), "Synthetic fixture answer.")
+	case "context-tools":
+		observations := []profileObservation{}
+		for _, request := range observed {
+			observations = append(observations, request["profile"].(profileObservation))
+		}
+		passed = passed && runErr == nil && known == starts && strings.Contains(stdout.b.String(), "Synthetic fixture answer.") && profilePassed(observations)
 	}
 	return obj{"mode": mode, "started_at_utc": started, "elapsed_ms": elapsed.Milliseconds(), "child_success": runErr == nil, "exit_code": exitCode, "child_deadline": ctx.Err() != nil, "requests": observed, "peak_in_flight": peakSnapshot, "journal_starts": starts, "journal_finishes": finishes, "blocked_events": blocked, "known_usage_requests": known, "unknown_usage_requests": starts - known, "known_input_tokens": inputTokens, "known_output_tokens": outputTokens, "journal_sha256": digest(ledger), "passed": passed}, nil
 }

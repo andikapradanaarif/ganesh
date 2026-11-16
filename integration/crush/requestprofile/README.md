@@ -26,3 +26,22 @@ go vet ./internal/devtools/requestguard ./integration/crush/requestprofile
 ```
 
 This qualifies synthetic shared accounting across the bound processes. It does not establish real-provider compatibility, provider billing, project/tool isolation, model accuracy, complete context fit or approval of the 108/132-answer experiment. It depends on a trusted local filesystem; deliberate ledger rollback or clients bypassing this transport are outside the guarantee. Existing S0 permissions, model/grader acceptance and one whole-run approval remain required. See the [S0 execution profile](../../../docs/s0-execution-profile.md).
+
+## Context and tool probe
+
+The accounting fixture's disabled-tool list does not qualify an exact tool palette. At this pin, the client uses concrete names such as `lsp_rename`; broad names such as `lsp` are not a wildcard. The client also appends default context paths, discovers skills and can expose notebook tools. File inventory and a clean-looking configuration therefore do not prove what reaches the model.
+
+Select one separate synthetic probe without rerunning the 13 accounting cases:
+
+```sh
+GOTOOLCHAIN=local GOPROXY=off GOSUMDB=off go run ./integration/crush/requestprofile \
+  -suite context-tools \
+  -source /path/to/cached/crush \
+  -out /absolute/path/to/new-private-context-probe
+```
+
+The probe uses the same pinned/guarded build and loopback-only synthetic server. Its disposable Git repository prevents ancestor project discovery. Global configuration/data/state and global skill discovery use isolated directories; notebook and automatic LSP are explicitly disabled. A coder-agent allowlist selects exactly `glob`, `grep`, `ls`, `view`. The final answering tool policy is **not** selected by this fixture: the real experiment still requires normal authorized own-project repository/CI/issue/source access matched across arms.
+
+The observer checks the actual outgoing Responses input and tool definitions. Every tool-bearing request must include all four synthetic markers: an explicitly configured file, root `AGENTS.md` added by defaults, an explicitly configured nested instruction file and the configured global context. A separate unlisted file's marker must be absent from every request. The palette must contain exactly the four allowed function names, with no duplicates, unknown tool forms or extra mutation/delegation/memory tools. Auxiliary requests without tools are recorded separately and cannot qualify the probe alone; malformed or forbidden content in a later request still fails the result. Reports contain names and marker booleans, never request/context bodies.
+
+Unit checks cover missing context, extra mutation/memory tools, missing/duplicate/unknown tools, markers hidden in unrelated metadata, auxiliary-only observations and later invalid requests. These check the observer's refusal behavior; they do not establish runtime success. The owner-run actual-client probe remains pending until its report is reviewed. A passing probe would establish only this synthetic context/palette wiring: it executes no tools and cannot qualify filesystem/network permissions, actual owner notes/configuration, provider access/accuracy, request fit or the full S0 profile. All earlier reports and allowances remain unchanged.
