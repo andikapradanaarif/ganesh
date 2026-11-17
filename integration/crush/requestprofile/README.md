@@ -26,3 +26,30 @@ go vet ./internal/devtools/requestguard ./integration/crush/requestprofile
 ```
 
 This qualifies synthetic shared accounting across the bound processes. It does not establish real-provider compatibility, provider billing, project/tool isolation, model accuracy, complete context fit or approval of the 108/132-answer experiment. It depends on a trusted local filesystem; deliberate ledger rollback or clients bypassing this transport are outside the guarantee. Existing S0 permissions, model/grader acceptance and one whole-run approval remain required. See the [S0 execution profile](../../../docs/s0-execution-profile.md).
+
+## Context and tool probe
+
+The accounting fixture's disabled-tool list does not qualify an exact tool palette. At this pin, the client uses concrete names such as `lsp_rename`; broad names such as `lsp` are not a wildcard. The client also appends default context paths, discovers skills and can expose notebook tools. File inventory and a clean-looking configuration therefore do not prove what reaches the model.
+
+Select one separate synthetic probe without rerunning the 13 accounting cases:
+
+```sh
+GOTOOLCHAIN=local GOPROXY=off GOSUMDB=off go run ./integration/crush/requestprofile \
+  -suite context-tools \
+  -source /path/to/cached/crush \
+  -out /absolute/path/to/new-private-context-probe
+```
+
+The probe uses the same pinned/guarded build and loopback-only synthetic server. Its disposable Git repository prevents ancestor project discovery. Global configuration/data/state and global skill discovery use isolated directories; notebook and automatic LSP are explicitly disabled. A coder-agent allowlist selects exactly `glob`, `grep`, `ls`, `view`. The final answering tool policy is **not** selected by this fixture: the real experiment still requires normal authorized own-project repository/CI/issue/source access matched across arms.
+
+The observer checks the actual outgoing Responses input and tool definitions. Every tool-bearing request must include all four synthetic markers: an explicitly configured file, root `AGENTS.md` added by defaults, an explicitly configured nested instruction file and the configured global context. A separate unlisted file's marker must be absent from every request. The palette must contain exactly the four allowed function names, with no duplicates, unknown tool forms or extra mutation/delegation/memory tools. Auxiliary requests without tools are recorded separately and cannot qualify the probe alone; malformed or forbidden content in a later request still fails the result. Reports contain names and marker booleans, never request/context bodies.
+
+Unit checks cover missing context, extra mutation/memory tools, missing/duplicate/unknown tools, markers hidden in unrelated metadata, auxiliary-only observations and later invalid requests. These check the observer's refusal behavior separately from the actual-client result. The probe establishes only synthetic context/palette wiring: it executes no tools and cannot qualify filesystem/network permissions, actual owner notes/configuration, provider access/accuracy, request fit or the full S0 profile. All earlier reports and allowances remain unchanged.
+
+### Completed owner probe, 2026-11-17 (Asia/Jakarta)
+
+The owner ran the separate suite at 2026-11-16 18:17:40 UTC. It passed with exit 0, no deadline and a 2,091 ms client-fixture interval (excluding build time). Two synthetic requests were forwarded: one without tools and one with exactly `glob`, `grep`, `ls`, `view`. The tool-bearing request carried all four required context markers; the unlisted marker was absent from both requests and observer errors were empty. Both requests have matching durable starts/finishes, known mock usage and peak in-flight count one. The mock server supplied 22 input / six output tokens in total; these are synthetic accounting values, not measured tokenization or provider consumption. Real model calls were zero and the installed client was unchanged.
+
+The private report SHA-256 is `db9fdb9c5298a4938a7213ec18817a5742b65e500d095891c87db6ad1ab583b5`. The candidate binary is `d6187783969b539473d1e55cfc498f7fd95f01b15937e678b36b3da4e5685acf`, built under Go 1.27.4 from the pinned revision above. The retained binary, adapter, all four guard-source hashes and request-journal hash match the report. Source, synthetic configuration, logs, binary and journals remain private. No rerun is requested. This completes the bounded probe; the permissions, real-input and S0 acceptance limitations above remain.
+
+Request-body and journal hashes identify the recorded run: session content, timestamps and elapsed time can vary between runs. Reproduction checks the required context/tool assertions; it does not require identical request/report bytes.
