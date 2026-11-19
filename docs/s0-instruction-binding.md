@@ -33,7 +33,7 @@ flat packet (273 files + manifest). Exactly two files were regenerated:
 | `tasks/<affected>/oracle-proposal.json` | The api source-evidence entry: section hash, end byte, blob and working-tree flag rebound. Four designated fields only. |
 
 All **271 other files are byte-identical** to the independently re-resolved
-input set; zero files were added, dropped or repinned. The chosen version is
+input set; no other files were added, dropped or repinned. The chosen version is
 the owner-inspected current snapshot (10,585 bytes); the superseded cached
 snapshot (10,482 bytes) is recorded only as `previous` lineage in the
 manifest's `version_binding` choice record. The candidate records
@@ -59,10 +59,11 @@ A private Go checker (`check.go`, offline, zero model calls) verifies:
 
 ## Mixed-version rejection
 
-Fourteen synthetic mutations are all rejected — eleven at manifest-integrity
-level (stale pins) and three manifest-consistent mixes caught only by the
-version-uniformity layer (oracle end-byte drift, a binding pin to the
-superseded hash, a source-record body swapped to superseded text). A control
+Fourteen synthetic mutations are all rejected — eleven at the manifest layer
+(pin/byte mismatches or a missing version-choice record) and three
+manifest-consistent mixes caught only by the version-uniformity layer
+(oracle end-byte drift, a binding pin to the superseded hash, a
+source-record body swapped to superseded text). A control
 candidate uniformly bound to the *superseded* version with a matching
 declared choice **passes**, confirming the checks enforce declared
 uniformity rather than a hidden preferred version.
