@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/sha256"
+	"crypto/tls"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
@@ -152,6 +153,15 @@ func (g *Guard) Transport(base http.RoundTripper) (http.RoundTripper, error) {
 	t.Protocols = new(http.Protocols)
 	t.Protocols.SetHTTP1(true)
 	t.Proxy = nil // no environment-selected destination or credentials
+	// The clone can carry a non-nil empty TLSNextProto/TLSClientConfig that
+	// suppresses ALPN entirely — an empty offer lets the peer default to
+	// h2, which the H1 parser then rejects as malformed. Pin the offer.
+	if t.TLSClientConfig == nil {
+		t.TLSClientConfig = &tls.Config{NextProtos: []string{"http/1.1"}}
+	} else {
+		t.TLSClientConfig = t.TLSClientConfig.Clone()
+		t.TLSClientConfig.NextProtos = []string{"http/1.1"}
+	}
 	return &transport{g: g, next: t}, nil
 }
 
@@ -406,10 +416,10 @@ func responseUsage(data []byte, contentType string) *Usage {
 			}
 			if json.Unmarshal([]byte(payload), &event) != nil || event.Type == "" ||
 				(eventName != "" && eventName != event.Type) || event.Type == "error" ||
-				event.Type == "response.failed" || event.Type == "response.incomplete" {
+				event.Type == "response.failed" {
 				return false
 			}
-			if event.Type == "response.completed" {
+			if event.Type == "response.completed" || event.Type == "response.incomplete" {
 				terminal = event.Response
 			}
 			payload, eventName = "", ""
@@ -448,7 +458,7 @@ func responseUsage(data []byte, contentType string) *Usage {
 			Output *int64 `json:"output_tokens"`
 		} `json:"usage"`
 	}
-	if json.Unmarshal(data, &result) != nil || result.Status != "completed" || result.Usage == nil ||
+	if json.Unmarshal(data, &result) != nil || (result.Status != "completed" && result.Status != "incomplete") || result.Usage == nil ||
 		result.Usage.Input == nil || result.Usage.Output == nil || *result.Usage.Input < 0 ||
 		*result.Usage.Output < 0 || *result.Usage.Input > 1e9 || *result.Usage.Output > 1e9 {
 		return nil
