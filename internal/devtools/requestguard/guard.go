@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/sha256"
+	"crypto/tls"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
@@ -152,6 +153,14 @@ func (g *Guard) Transport(base http.RoundTripper) (http.RoundTripper, error) {
 	t.Protocols = new(http.Protocols)
 	t.Protocols.SetHTTP1(true)
 	t.Proxy = nil // no environment-selected destination or credentials
+	// The clone can carry an explicit NextProtos list offering h2 while
+	// ForceAttemptHTTP2/Protocols above were cleared — ALPN would then
+	// negotiate h2, which the H1 parser rejects as malformed. Pin the
+	// offer. Transport.Clone already deep-copies TLSClientConfig.
+	if t.TLSClientConfig == nil {
+		t.TLSClientConfig = new(tls.Config)
+	}
+	t.TLSClientConfig.NextProtos = []string{"http/1.1"}
 	return &transport{g: g, next: t}, nil
 }
 
@@ -383,7 +392,7 @@ func responseUsage(data []byte, contentType string) *Usage {
 		scanner.Buffer(make([]byte, 4096), len(data)+1)
 		var terminal []byte
 		var payload, eventName string
-		done := false
+		done, seenTerminal := false, false
 		dispatch := func() bool {
 			if payload == "" {
 				eventName = ""
@@ -397,7 +406,7 @@ func responseUsage(data []byte, contentType string) *Usage {
 				payload, eventName = "", ""
 				return true
 			}
-			if terminal != nil || done {
+			if seenTerminal || done {
 				return false
 			}
 			var event struct {
@@ -406,10 +415,11 @@ func responseUsage(data []byte, contentType string) *Usage {
 			}
 			if json.Unmarshal([]byte(payload), &event) != nil || event.Type == "" ||
 				(eventName != "" && eventName != event.Type) || event.Type == "error" ||
-				event.Type == "response.failed" || event.Type == "response.incomplete" {
+				event.Type == "response.failed" {
 				return false
 			}
-			if event.Type == "response.completed" {
+			if event.Type == "response.completed" || event.Type == "response.incomplete" {
+				seenTerminal = true
 				terminal = event.Response
 			}
 			payload, eventName = "", ""
@@ -448,7 +458,7 @@ func responseUsage(data []byte, contentType string) *Usage {
 			Output *int64 `json:"output_tokens"`
 		} `json:"usage"`
 	}
-	if json.Unmarshal(data, &result) != nil || result.Status != "completed" || result.Usage == nil ||
+	if json.Unmarshal(data, &result) != nil || (result.Status != "completed" && result.Status != "incomplete") || result.Usage == nil ||
 		result.Usage.Input == nil || result.Usage.Output == nil || *result.Usage.Input < 0 ||
 		*result.Usage.Output < 0 || *result.Usage.Input > 1e9 || *result.Usage.Output > 1e9 {
 		return nil

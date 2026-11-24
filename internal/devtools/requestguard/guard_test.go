@@ -165,7 +165,11 @@ func TestUsageValidationAndStops(t *testing.T) {
 		{"negative", `{"status":"completed","usage":{"input_tokens":-1,"output_tokens":3}}`, "application/json", "usage_unknown"},
 		{"partial", `{"status":"completed","usage":{"input_tokens":1}}`, "application/json", "usage_unknown"},
 		{"fraction", `{"status":"completed","usage":{"input_tokens":1.1,"output_tokens":1}}`, "application/json", "usage_unknown"},
-		{"incomplete", `{"status":"incomplete","usage":{"input_tokens":1,"output_tokens":3}}`, "application/json", "usage_unknown"},
+		{"incomplete_over", `{"status":"incomplete","usage":{"input_tokens":1,"output_tokens":9}}`, "application/json", "provider_output_exceeded"},
+		{"incomplete_nousage", `{"status":"incomplete"}`, "application/json", "usage_unknown"},
+		{"incomplete_neg", `{"status":"incomplete","usage":{"input_tokens":-1,"output_tokens":3}}`, "application/json", "usage_unknown"},
+		{"incomplete_sse_nousage", `data: {"type":"response.incomplete","response":{"status":"incomplete"}}` + "\n\n" + `data: [DONE]` + "\n\n", "text/event-stream", "usage_unknown"},
+		{"terminal_null_then_real", `data: {"type":"response.completed"}` + "\n\n" + `data: {"type":"response.completed","response":{"status":"completed","usage":{"input_tokens":1,"output_tokens":3}}}` + "\n\n" + `data: [DONE]` + "\n\n", "text/event-stream", "usage_unknown"},
 		{"overflow", `{"status":"completed","usage":{"input_tokens":1,"output_tokens":9}}`, "application/json", "provider_output_exceeded"},
 		{"inputstop", `{"status":"completed","usage":{"input_tokens":100,"output_tokens":3}}`, "application/json", "input_stop"},
 		{"truncated", `data: {"type":"response.created"}` + "\n\n", "text/event-stream", "usage_unknown"},
@@ -180,6 +184,39 @@ func TestUsageValidationAndStops(t *testing.T) {
 			})
 			if call(c, url, request) == nil || call(c, url, request) == nil || sent.Load() != 1 || g.Snapshot().Stopped != test.reason {
 				t.Fatalf("usage continuation accepted: %+v", g.Snapshot())
+			}
+		})
+	}
+}
+
+// A provider can terminate a response as incomplete (e.g. the
+// max_output_tokens ceiling) while still reporting authoritative usage.
+// The guard charges that usage like a completed response and passes the
+// body back — the run-level stop comes from the client exiting on the
+// incomplete payload, not from the guard. Only ordinary cap checks may
+// still stop the request.
+func TestIncompleteResponseChargesUsageWithoutStopping(t *testing.T) {
+	for _, tc := range []struct {
+		name, body, contentType string
+	}{
+		{"json", `{"status":"incomplete","usage":{"input_tokens":1,"output_tokens":3}}`, "application/json"},
+		{"sse", "event: response.incomplete\ndata: {\"type\":\"response.incomplete\",\"response\":{\"status\":\"incomplete\",\"usage\":{\"input_tokens\":1,\"output_tokens\":3}}}\n\ndata: [DONE]\n\n", "text/event-stream"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			var sent atomic.Int32
+			g, _, c, url := setup(t, func(w http.ResponseWriter, r *http.Request) {
+				sent.Add(1)
+				w.Header().Set("Content-Type", tc.contentType)
+				fmt.Fprint(w, tc.body)
+			})
+			for i := 0; i < 2; i++ {
+				if err := call(c, url, variant(i)); err != nil {
+					t.Fatalf("call %d after incomplete rejected: %v", i, err)
+				}
+			}
+			s := g.Snapshot()
+			if s.KnownInput != 2 || s.KnownOutput != 6 || s.UnknownUsage != 0 || s.Stopped != "" || sent.Load() != 2 {
+				t.Fatalf("incomplete usage not charged: %+v sent=%d", s, sent.Load())
 			}
 		})
 	}
