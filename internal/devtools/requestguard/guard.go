@@ -153,15 +153,14 @@ func (g *Guard) Transport(base http.RoundTripper) (http.RoundTripper, error) {
 	t.Protocols = new(http.Protocols)
 	t.Protocols.SetHTTP1(true)
 	t.Proxy = nil // no environment-selected destination or credentials
-	// The clone can carry a non-nil empty TLSNextProto/TLSClientConfig that
-	// suppresses ALPN entirely — an empty offer lets the peer default to
-	// h2, which the H1 parser then rejects as malformed. Pin the offer.
+	// The clone can carry an explicit NextProtos list offering h2 while
+	// ForceAttemptHTTP2/Protocols above were cleared — ALPN would then
+	// negotiate h2, which the H1 parser rejects as malformed. Pin the
+	// offer. Transport.Clone already deep-copies TLSClientConfig.
 	if t.TLSClientConfig == nil {
-		t.TLSClientConfig = &tls.Config{NextProtos: []string{"http/1.1"}}
-	} else {
-		t.TLSClientConfig = t.TLSClientConfig.Clone()
-		t.TLSClientConfig.NextProtos = []string{"http/1.1"}
+		t.TLSClientConfig = new(tls.Config)
 	}
+	t.TLSClientConfig.NextProtos = []string{"http/1.1"}
 	return &transport{g: g, next: t}, nil
 }
 
@@ -393,7 +392,7 @@ func responseUsage(data []byte, contentType string) *Usage {
 		scanner.Buffer(make([]byte, 4096), len(data)+1)
 		var terminal []byte
 		var payload, eventName string
-		done := false
+		done, seenTerminal := false, false
 		dispatch := func() bool {
 			if payload == "" {
 				eventName = ""
@@ -407,7 +406,7 @@ func responseUsage(data []byte, contentType string) *Usage {
 				payload, eventName = "", ""
 				return true
 			}
-			if terminal != nil || done {
+			if seenTerminal || done {
 				return false
 			}
 			var event struct {
@@ -420,6 +419,7 @@ func responseUsage(data []byte, contentType string) *Usage {
 				return false
 			}
 			if event.Type == "response.completed" || event.Type == "response.incomplete" {
+				seenTerminal = true
 				terminal = event.Response
 			}
 			payload, eventName = "", ""
