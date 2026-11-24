@@ -78,12 +78,12 @@ The five-field local capture record, an IPC receipt and a PID/UID match supply n
 
 ## Current status: held
 
-**S0 is held at 0/108 recorded held-out answers.** The readiness effort closed in [#124](https://github.com/andikapradanaarif/ganesh/issues/124) (authoritative decision record) after the v5 qualification failed — `deepseek-v4.1-flash` is retired as the S0 grader, the 930-request ceiling is unspent and moot for it, and the owner declined funding the blinded v4-vs-r2 comparison. The bound run packet, instruction baseline, execution record, accounting implementation and all private evidence are preserved unchanged; nothing here reopens the roadmap, the execution sheet or the original 108-answer experiment.
+**S0 is held at 0/108 recorded held-out answers.** The readiness effort closed in [#124](https://github.com/andikapradanaarif/ganesh/issues/124) — the authoritative decision record — with the calibration effort ended and no accepted grader; the owner also declined funding for the proposed scoring-method comparison. The bound run packet, instruction baseline, execution record, accounting implementation and all preserved evidence are unchanged; nothing here reopens the roadmap, the execution sheet or the original 108-answer experiment.
 
-A fresh evaluation may be proposed only with all of the following, fixed before the first call and before any case authoring:
+Per the closure record, S0 may be reconsidered only as a separately proposed evaluation that fixes all of the following before the first call and before any case authoring:
 
-1. **An available independent reference reader** — named, qualified and confirmed available to produce the frozen judgments the semantic criteria need. The record names no candidate; the r2 author is ineligible, and the owner's own blind-read role in v5 does not transfer to a new set.
-2. **A different grader candidate** — not `deepseek-v4.1-flash`. The owner directive requires fresh qualification cases that test the distinction between what a source shows and what an answer claims it proves.
-3. **An approved budget and stop rule** — a concrete, costed allowance covering fresh-case authoring/commissioning plus repeat scoring, fixed before authoring. No genuinely fresh answer set exists in the records (all 14 authored answers were consumed by calibration), so the allowance must cover producing one.
+1. **Fresh qualification cases** — a grader must be accepted on cases that did not shape the evaluated methods; none is currently accepted.
+2. **An available independent reference reader** — named, qualified and confirmed available to produce the frozen judgments the semantic criteria need; the record names no candidate.
+3. **An approved budget and stop rule** — a concrete allowance covering fresh-case production and repeat scoring, fixed before the first call.
 
 Until those three are filled, the next deliverable is nothing — S0 stays held. Preparation of source text beyond an existing grant still needs its explicit scope; nothing is enrolled by this document. Full-context token counting with a provider also discloses data and would be covered by any future packet permission. The assistant prepares candidate material and comparisons; it cannot invent the owner labels the approved protocol reserves. The historical larger-model cost proposal is not a current price quote or execution authority.
