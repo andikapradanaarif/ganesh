@@ -8,7 +8,9 @@ Ganesh gives the owner's agents a shared view of work across laptops, servers an
 
 **Recommendation for review.** Start with a server that can answer a question by returning an exact passage from a frozen public article. Add source revisions and permissions, then connect the laptop and server. This order lets us locate a failure in retrieval, upkeep, delivery or agent use. A hosted memory product that passes the same workflow with less operational work would also satisfy the goal. The proposed first investment is M1. M2 and M3 each have their own demonstration before expansion.
 
-Sections 1–3 define what an agent and the owner should experience. Section 4 defines how to score it. Section 5 sets the delivery gates and records the research and repository reuse decisions. Sections 6–8 specify the proposed implementation, initial benchmark and handoff to the implementing agent.
+**Implementation language.** The owner selected Rust for Ganesh. Use Rust and Cargo for the service core, REST and MCP adapters, local capture, importer, developer tools and offline benchmark harness. This decision supersedes the earlier language choice in the historical roadmap and working instructions.
+
+**Start here in a fresh session.** Sections 1–3 describe the workflows, evidence contract and owner controls. Section 4 gives the research and retrieval evaluation method. Sections 5–7 cover milestones, component reuse, implementation and benchmark targets. [Section 8](#8-instruction-for-the-implementing-agent) gives the first implementation task and required report. The targets are proposed, and the current milestone is planned.
 
 ## 1. The information an agent needs
 
@@ -21,7 +23,7 @@ Capture a checkpoint locally when work reaches a meaningful boundary. Give it a 
 
 ## 2. One evidence contract for REST and MCP
 
-Use a small server-hosted Go core with shared retrieval, revision and access logic. REST clients call it directly. Initially, an MCP-capable agent can use a thin local MCP bridge to the same REST service. Add a hosted remote MCP adapter when a selected client needs it. Local capture is a separate adapter at the source installation.
+Use a small server-hosted Rust core with shared retrieval, revision and access logic. REST clients call it directly. Initially, an MCP-capable agent can use a thin local MCP bridge to the same REST service. Add a hosted remote MCP adapter when a selected client needs it. Local capture is a separate adapter at the source installation.
 
 A read supplies the authenticated installation identity, active project, question and optional effective time. The service derives the permitted audience from the credential and policy. Choosing a different project in a request cannot expand access.
 
@@ -31,7 +33,7 @@ Return an explicit **insufficient context** result when the permitted evidence c
 
 ## 3. How current and historical reads work
 
-**Episodes and semantic facts.** An episode records a particular event, who observed it, when it happened (if known) and its evidence. A semantic fact records what currently applies to a user or project, its scope, effective interval and supporting episode or source revisions. Record ingestion time separately for both. For example, on June 3 the owner says “Starting July 1, use Go for new internal tools.” The episode occurred June 3 even if a laptop uploads it June 5. The preference takes effect July 1 and applies to new internal tools only. A later exception for one project gets its own scoped revision. One observed coding choice alone cannot establish a general preference.
+**Episodes and semantic facts.** An episode records a particular event, who observed it, when it happened (if known) and its evidence. A semantic fact records what currently applies to a user or project, its scope, effective interval and supporting episode or source revisions. Record ingestion time separately for both. For example, on June 3 the owner says “Starting July 1, use ISO dates in new internal reports.” The episode occurred June 3 even if a laptop uploads it June 5. The preference takes effect July 1 and applies to new internal reports only. A later exception for one project gets its own scoped revision. One observed formatting choice alone cannot establish a general preference.
 
 - **Identity and time.** Give each fact, decision or lesson a stable identity. Record immutable revision identities, source anchors, effective dates when supplied, and observation and ingestion times. Default reads ask what applies now. An as-of read asks what applied on the requested date according to evidence currently available and currently permitted. Unknown effective dates stay unknown.
 - **Corrections.** Add a revision linked to the one it supersedes. Publish it and retire the old current view together. Supersession follows evidence, authority and scope. The last item downloaded does not automatically win.
@@ -84,7 +86,7 @@ The [earlier research catalog](https://github.com/andikapradanaarif/ganesh/blob/
 
 The owner chooses the two installations, client, permitted projects, sharing rule and processor permissions before real enrollment. M1 can start with frozen public material. Record retrieval latency, storage and model use where applicable. Adopt richer ranking, extraction or storage only after a measured failure justifies the change.
 
-**Reuse decision.** EverOS already extracts episodes, atomic facts and user profiles. Letta offers persistent agent memory and blocks that multiple agents can share. Try a pinned candidate against the same public fixtures before writing equivalent extraction or retrieval code. Evaluate direct use first, then the smallest adapter needed for the Go service. Record passage-level citations, current and as-of answers, behavior after an owner correction, scoped sharing and revocation across installations. Report deployment and processor requirements alongside gaps. If a candidate satisfies the workflow directly, adopt it. [EverOS memory pipeline](https://github.com/EverMind-AI/EverOS/blob/main/docs/how-memory-works.md) · [Letta shared blocks](https://docs.letta.com/tutorials/attaching-detaching-blocks/)
+**Reuse decision.** EverOS already extracts episodes, atomic facts and user profiles. Letta offers persistent agent memory and blocks that multiple agents can share. Try a pinned candidate against the same public fixtures before writing equivalent extraction or retrieval code. Evaluate direct use first, then the smallest adapter needed for the Rust service. Record passage-level citations, current and as-of answers, behavior after an owner correction, scoped sharing and revocation across installations. Report deployment and processor requirements alongside gaps. If a candidate satisfies the workflow directly, adopt it. [EverOS memory pipeline](https://github.com/EverMind-AI/EverOS/blob/main/docs/how-memory-works.md) · [Letta shared blocks](https://docs.letta.com/tutorials/attaching-detaching-blocks/)
 
 **What the repository implementations contribute.** These observations come from source inspection at the linked commits. Adapter compatibility and retrieval quality still require local fixtures.
 
@@ -96,7 +98,7 @@ The owner chooses the two installations, client, permitted projects, sharing rul
 
 ### First bounded implementation issue
 
-**Implement a reproducible passage lookup from a frozen public corpus (M1).** The deliverable is a Go importer and retrieval core with a REST read, a thin MCP read over the same core, and an offline evaluation command. Use a small corpus with overlapping subjects, at least one paraphrased lookup and one question the sources cannot answer. Version the corpus manifest and safe fixtures. Document the question split, top-three evidence criterion, numerical pass bar and validation command before running the held-out check.
+**Implement a reproducible passage lookup from a frozen public corpus (M1).** The deliverable is a Rust importer and retrieval core with a REST read, a thin MCP read over the same core, and an offline evaluation command. Use a small corpus with overlapping subjects, at least one paraphrased lookup and one question the sources cannot answer. Version the corpus manifest and safe fixtures. Document the question split, top-three evidence criterion, numerical pass bar and validation command before running the held-out check.
 
 Acceptance requires (1) a clean offline replay from pinned inputs, (2) the expected passage and revision through both adapters for the known lookup, (3) an explicit insufficient-context result for the missing fact, and (4) a held-out report that meets the frozen pass bar and exposes every miss. Product enrollment, live model grading and a hosted MCP service fall outside this issue. A failed retrieval check gives the next change a concrete target.
 
@@ -104,7 +106,7 @@ Acceptance requires (1) a clean offline replay from pinned inputs, (2) the expec
 
 ### A read that can be explained
 
-Use one small Go service with SQLite as the proposed first store. Store source revisions, passage locators and their text together. Start with paragraph or section boundaries, preserve headings and qualifiers, and rank permitted passages with lexical search such as SQLite FTS5/BM25. Use a stable passage ID to break ties. Keep the search index rebuildable from the accepted revisions. These choices give M1 an offline baseline that a contributor can inspect and rerun.
+Use one small Rust service with SQLite as the proposed first store. Store source revisions, passage locators and their text together. Start with paragraph or section boundaries, preserve headings and qualifiers, and rank permitted passages with lexical search such as SQLite FTS5/BM25. Use a stable passage ID to break ties. Keep the search index rebuildable from the accepted revisions. These choices give M1 an offline baseline that a contributor can inspect and rerun.
 
 | Operation | Proposed behavior |
 | --- | --- |
@@ -164,6 +166,6 @@ These numbers are an engineering decision for a small fixture. Report counts wit
 
 ## 8. Instruction for the implementing agent
 
-Once the owner accepts the roadmap, open one M1 implementation issue against the evidence-retrieval milestone. Put the corpus permissions, sampling method, development split, proposed pass counts and exact replay command in the issue before the held-out run. Implement the Go importer, passage search, citation resolver and thin REST/MCP reads on an issue branch. Include a known lookup and an insufficient-context case that another developer can replay from a clean checkout.
+Once the owner accepts the roadmap, open one M1 implementation issue against the evidence-retrieval milestone. Put the corpus permissions, sampling method, development split, proposed pass counts and exact replay command in the issue before the held-out run. Use Cargo to build the Rust importer, passage search, citation resolver, REST/MCP adapters and offline evaluation command on an issue branch. Keep retrieval, revision selection and access decisions in a shared library so the benchmark exercises the same behavior as the service. Include a known lookup and an insufficient-context case that another developer can replay from a clean checkout.
 
 Open a draft PR with the command, manifest digest, per-question outcomes, adapter comparison and measured costs. If the baseline misses, bring back one concrete failing question, the passage that would have satisfied it, what the service returned and the smallest change worth testing. A passing report earns the M2 fixture. Select the real installations, client and processing permissions with the owner before M3 enrollment.
