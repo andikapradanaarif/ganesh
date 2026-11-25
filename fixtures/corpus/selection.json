@@ -1,0 +1,57 @@
+{
+  "frame": [
+    "C (programming language)",
+    "C++",
+    "C Sharp (programming language)",
+    "Go (programming language)",
+    "Haskell",
+    "Java (programming language)",
+    "JavaScript",
+    "Kotlin (programming language)",
+    "PHP",
+    "Python (programming language)",
+    "Ruby (programming language)",
+    "Rust (programming language)",
+    "Swift (programming language)",
+    "TypeScript"
+  ],
+  "seed": 20261126,
+  "shuffled_order": [
+    "Go (programming language)",
+    "PHP",
+    "JavaScript",
+    "Rust (programming language)",
+    "C Sharp (programming language)",
+    "Ruby (programming language)",
+    "Swift (programming language)",
+    "Java (programming language)",
+    "Haskell",
+    "C++",
+    "Python (programming language)",
+    "C (programming language)",
+    "TypeScript",
+    "Kotlin (programming language)"
+  ],
+  "selected": [
+    "Go (programming language)",
+    "PHP",
+    "JavaScript",
+    "Rust (programming language)",
+    "C Sharp (programming language)",
+    "Ruby (programming language)",
+    "Swift (programming language)",
+    "Java (programming language)"
+  ],
+  "dev_family": [
+    "Java (programming language)",
+    "PHP",
+    "Rust (programming language)",
+    "Swift (programming language)"
+  ],
+  "heldout_family": [
+    "C Sharp (programming language)",
+    "Go (programming language)",
+    "JavaScript",
+    "Ruby (programming language)"
+  ]
+}
