@@ -1,0 +1,666 @@
+{
+  "outcomes": [
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": false,
+      "id": "h01",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 9.57512,
+      "latency_rest_ms": 13.2241,
+      "mcp_ids": [
+        "1386442349#p8",
+        "1386442349#p41",
+        "1387553929#p12"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1386442349#p8",
+        "1386442349#p41",
+        "1387553929#p12"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "h02",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 7.483661,
+      "latency_rest_ms": 7.76842,
+      "mcp_ids": [
+        "1386442349#p7",
+        "1386442349#p20",
+        "1386442349#p21"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1386442349#p7",
+        "1386442349#p20",
+        "1386442349#p21"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "h03",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 7.535549,
+      "latency_rest_ms": 7.251966,
+      "mcp_ids": [
+        "1386442349#p25",
+        "1386442349#p24",
+        "1386442349#p23"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1386442349#p25",
+        "1386442349#p24",
+        "1386442349#p23"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "h04",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 7.700918000000001,
+      "latency_rest_ms": 7.278039,
+      "mcp_ids": [
+        "1386442349#p8",
+        "1387553929#p10",
+        "1386442349#p19"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1386442349#p8",
+        "1387553929#p10",
+        "1386442349#p19"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "h05",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 7.449503,
+      "latency_rest_ms": 7.37089,
+      "mcp_ids": [
+        "1386442349#p6",
+        "1386442349#p46",
+        "1386442349#p45"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1386442349#p6",
+        "1386442349#p46",
+        "1386442349#p45"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "h06",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 7.62017,
+      "latency_rest_ms": 7.370062,
+      "mcp_ids": [
+        "1386442349#p41",
+        "1386442349#p45",
+        "1386182972#p64"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1386442349#p41",
+        "1386442349#p45",
+        "1386182972#p64"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "h07",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 7.359100000000001,
+      "latency_rest_ms": 7.255596,
+      "mcp_ids": [
+        "1387609285#p7",
+        "1387609285#p11",
+        "1387609285#p6"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387609285#p7",
+        "1387609285#p11",
+        "1387609285#p6"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "h08",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 7.241736,
+      "latency_rest_ms": 7.000442,
+      "mcp_ids": [
+        "1387609285#p10",
+        "1387609285#p8",
+        "1387609285#p9"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387609285#p10",
+        "1387609285#p8",
+        "1387609285#p9"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "h09",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 7.7512989999999995,
+      "latency_rest_ms": 7.486751,
+      "mcp_ids": [
+        "1387609285#p43",
+        "1387609285#p44",
+        "1387609285#p47"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387609285#p43",
+        "1387609285#p44",
+        "1387609285#p47"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "h10",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 7.550079,
+      "latency_rest_ms": 7.313523,
+      "mcp_ids": [
+        "1387609285#p19",
+        "1386442349#p15",
+        "1386182972#p30"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387609285#p19",
+        "1386442349#p15",
+        "1386182972#p30"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "h11",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 7.410909999999999,
+      "latency_rest_ms": 7.273507,
+      "mcp_ids": [
+        "1387609285#p41",
+        "1387609285#p24",
+        "1387609285#p6"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387609285#p41",
+        "1387609285#p24",
+        "1387609285#p6"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": false,
+      "id": "h12",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 7.48652,
+      "latency_rest_ms": 7.28801,
+      "mcp_ids": [
+        "1387609285#p6",
+        "1387609285#p4",
+        "1387609285#p5"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387609285#p6",
+        "1387609285#p4",
+        "1387609285#p5"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "expected": "ok",
+      "hit": false,
+      "id": "h13",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 7.411301,
+      "latency_rest_ms": 7.298258000000001,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "h14",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 7.631684,
+      "latency_rest_ms": 7.4821599999999995,
+      "mcp_ids": [
+        "1387643334#p18",
+        "1385265998#p30",
+        "1386054413#p11"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387643334#p18",
+        "1385265998#p30",
+        "1386054413#p11"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": false,
+      "id": "h15",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 7.341625,
+      "latency_rest_ms": 7.169649,
+      "mcp_ids": [
+        "1387609285#p24",
+        "1386054413#p12",
+        "1387629546#p16"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387609285#p24",
+        "1386054413#p12",
+        "1387629546#p16"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "h16",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 7.784635,
+      "latency_rest_ms": 7.438686,
+      "mcp_ids": [
+        "1387643334#p18",
+        "1386442349#p14",
+        "1386182972#p54"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387643334#p18",
+        "1386442349#p14",
+        "1386182972#p54"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "h17",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 7.277361000000001,
+      "latency_rest_ms": 7.023772999999999,
+      "mcp_ids": [
+        "1387643334#p20",
+        "1386182972#p62",
+        "1386054413#p21"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387643334#p20",
+        "1386182972#p62",
+        "1386054413#p21"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "h18",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 7.6154530000000005,
+      "latency_rest_ms": 7.555456,
+      "mcp_ids": [
+        "1387643334#p21",
+        "1387643334#p25",
+        "1386182972#p42"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387643334#p21",
+        "1387643334#p25",
+        "1386182972#p42"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": false,
+      "id": "h19",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 7.836098999999999,
+      "latency_rest_ms": 7.554896,
+      "mcp_ids": [
+        "1387629546#p3",
+        "1387629546#p5",
+        "1387629546#p4"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387629546#p3",
+        "1387629546#p5",
+        "1387629546#p4"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "h20",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 7.453685,
+      "latency_rest_ms": 7.164007,
+      "mcp_ids": [
+        "1387629546#p4",
+        "1386442349#p4",
+        "1385265998#p2"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387629546#p4",
+        "1386442349#p4",
+        "1385265998#p2"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "h21",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 7.480334,
+      "latency_rest_ms": 7.302105,
+      "mcp_ids": [
+        "1387629546#p10",
+        "1387629546#p23",
+        "1387629546#p8"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387629546#p10",
+        "1387629546#p23",
+        "1387629546#p8"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "h22",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 7.371221,
+      "latency_rest_ms": 7.2051,
+      "mcp_ids": [
+        "1387629546#p16",
+        "1387629546#p24",
+        "1387629546#p1"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387629546#p16",
+        "1387629546#p24",
+        "1387629546#p1"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "h23",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 7.771791,
+      "latency_rest_ms": 7.464487,
+      "mcp_ids": [
+        "1387629546#p19",
+        "1387629546#p21",
+        "1387553929#p27"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387629546#p19",
+        "1387629546#p21",
+        "1387553929#p27"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "h24",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 7.736064,
+      "latency_rest_ms": 7.496403,
+      "mcp_ids": [
+        "1387629546#p6",
+        "1387629546#p11",
+        "1387643334#p24"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387629546#p6",
+        "1387629546#p11",
+        "1387643334#p24"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "h25",
+      "insufficient_correct": false,
+      "latency_mcp_ms": 7.417328,
+      "latency_rest_ms": 7.296118,
+      "mcp_ids": [
+        "1387609285#p13",
+        "1386182972#p34",
+        "1387609285#p41"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387609285#p13",
+        "1386182972#p34",
+        "1387609285#p41"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "h26",
+      "insufficient_correct": false,
+      "latency_mcp_ms": 7.490208,
+      "latency_rest_ms": 7.293283000000001,
+      "mcp_ids": [
+        "1386182972#p45",
+        "1386442349#p23",
+        "1386442349#p14"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1386182972#p45",
+        "1386442349#p23",
+        "1386442349#p14"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "h27",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 7.4779729999999995,
+      "latency_rest_ms": 7.3921280000000005,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "h28",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 7.250051,
+      "latency_rest_ms": 7.177651999999999,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "h29",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 7.485935,
+      "latency_rest_ms": 7.41484,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "h30",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 7.499315,
+      "latency_rest_ms": 7.408587000000001,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    }
+  ],
+  "questions": "fixtures/questions/heldout.v1.json",
+  "summary": {
+    "adapter_agree": 30,
+    "answerable": 24,
+    "citations_checked": 150,
+    "citations_ok": 150,
+    "hits": 19,
+    "incomplete": false,
+    "insufficient": 6,
+    "insufficient_correct": 4,
+    "total": 30
+  }
+}
