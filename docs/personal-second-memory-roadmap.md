@@ -43,6 +43,19 @@ Return an explicit **insufficient context** result when the permitted evidence c
 
 **Then exercise the agent.** In one smoke test the agent calls the real tool, receives a permitted passage and cites the returned revision. Record tool delivery and the agent's use separately. The primary retrieval test requires neither a model-generated answer nor an LLM grader.
 
+**Make citations replayable.** For each public corpus revision, keep the publisher, original URL, retrieval date, storage permission and snapshot digest in the manifest. Give each expected passage a locator within that snapshot. During replay, resolve the returned citation to its revision and passage, then check whether the passage supports the requested fact. For example, a link to the correct deployment guide still misses if the cited paragraph describes production and the question asks about staging. For a shared lesson, perform this check against the recipient-visible publication and test source resolution separately under the source owner's permissions.
+
+### Research behind the benchmark
+
+| Research observation | Choice for Ganesh |
+| --- | --- |
+| KILT grounds tasks in a common Wikipedia snapshot and evaluates the provenance models return alongside downstream performance. [Petroni et al., KILT](https://aclanthology.org/2021.naacl-main.200/) | In M1, pin the corpus and score whether the retrieved passages supply the required evidence. The top-three cutoff is a Ganesh design choice. |
+| LongMemEval treats temporal reasoning, knowledge updates and abstention as distinct memory abilities. [Wu et al., LongMemEval](https://arxiv.org/abs/2410.10813v2) | Give the same fact a current question, an as-of question and a question the sources cannot settle. Report the outcomes separately so a good average cannot hide stale responses. |
+| TransMem makes transitions between user preferences retrievable. [Chen et al., TransMem](https://arxiv.org/abs/2611.10683v1) | Adapt that question to project evidence in M2: after a partial correction, can the caller find which part changed, when it changed and which part still applies? The Ganesh fixture supplies the expected revisions. |
+| MemDev-Bench observed failures when code agents applied earlier experience without checking whether it fit the current task. [Chen et al., MemDev-Bench](https://arxiv.org/abs/2610.27524v1) | In the M3 handoff, check that the published lesson carries the condition the receiving agent needs to verify locally. Record delivery and actual use as separate observations. |
+
+The [earlier research catalog](https://github.com/andikapradanaarif/ganesh/blob/2fddc9d2abfe288e85b9f5f5dceedc20d89ef27f/docs/personal-second-memory-roadmap.md#appendix-f-research-basis-and-implementation-commitments) preserves the broader readings and their limitations. Ganesh's permission and revocation requirements come from the owner's sharing boundary and require direct local tests.
+
 ## 5. Delivery milestones
 
 | Milestone | Build | Evidence required to finish |
