@@ -1,10 +1,14 @@
-# Ganesh roadmap
+# Ganesh roadmap and implementation proposal
 
 Ganesh gives the owner's agents a shared view of work across laptops, servers and authorized projects. A fresh agent should be able to answer two questions from a short, source-linked brief: **“Where did we leave this work?”** and **“How did we handle a similar problem elsewhere?”** The owner chooses which installations and projects may contribute and receive information. Ordinary handoffs should require neither a new summary from the owner nor credentials for another project's repository.
 
 **First product demonstration.** An agent on a laptop leaves a checkpoint in Project A. A fresh agent on a server, working on A, retrieves the last verified action, blocker and next step. Later, while working on Project B, an agent receives one permitted lesson from A, including its applicability limits. The source repository stays private. When A corrects the lesson or the owner revokes sharing, the next server read reflects the change.
 
 **Current stage.** Planned. First measure whether Ganesh returns sufficient, current, authorized evidence through its normal read path. The earlier S0 evaluation ended incomplete at 0/108 formal held-out answers. Its protocol, research and conditional engineering designs are preserved in the [historical roadmap](https://github.com/andikapradanaarif/ganesh/blob/2fddc9d2abfe288e85b9f5f5dceedc20d89ef27f/docs/personal-second-memory-roadmap.md).
+
+**Recommendation for review.** Start with a server that can answer a question by returning an exact passage from a frozen public article. Add source revisions and permissions, then connect the laptop and server. This order lets us locate a failure in retrieval, upkeep, delivery or agent use. A hosted memory product that passes the same workflow with less operational work would also satisfy the goal. The proposed first investment is M1. M2 and M3 each have their own demonstration before expansion.
+
+Sections 1–3 define what an agent and the owner should experience. Section 4 defines how to score it. Section 5 sets the delivery gates and records the research and repository reuse decisions. Sections 6–8 specify the proposed implementation, initial benchmark and handoff to the implementing agent.
 
 ## 1. The information an agent needs
 
@@ -95,3 +99,71 @@ The owner chooses the two installations, client, permitted projects, sharing rul
 **Implement a reproducible passage lookup from a frozen public corpus (M1).** The deliverable is a Go importer and retrieval core with a REST read, a thin MCP read over the same core, and an offline evaluation command. Use a small corpus with overlapping subjects, at least one paraphrased lookup and one question the sources cannot answer. Version the corpus manifest and safe fixtures. Document the question split, top-three evidence criterion, numerical pass bar and validation command before running the held-out check.
 
 Acceptance requires (1) a clean offline replay from pinned inputs, (2) the expected passage and revision through both adapters for the known lookup, (3) an explicit insufficient-context result for the missing fact, and (4) a held-out report that meets the frozen pass bar and exposes every miss. Product enrollment, live model grading and a hosted MCP service fall outside this issue. A failed retrieval check gives the next change a concrete target.
+
+## 6. Proposed implementation
+
+### A read that can be explained
+
+Use one small Go service with SQLite as the proposed first store. Store source revisions, passage locators and their text together. Start with paragraph or section boundaries, preserve headings and qualifiers, and rank permitted passages with lexical search such as SQLite FTS5/BM25. Use a stable passage ID to break ties. Keep the search index rebuildable from the accepted revisions. These choices give M1 an offline baseline that a contributor can inspect and rerun.
+
+| Operation | Proposed behavior |
+| --- | --- |
+| Import a source revision | Verify the snapshot digest. In one transaction, record the revision and its passages and make them searchable. Reimporting the same source revision and digest is idempotent. A reused revision identifier with different bytes is an error. |
+| Search | REST `POST /v1/search` and MCP `search_context` invoke the same function. Resolve the caller and allowed project, select eligible revisions for the effective time, rank the passages and return up to three. Calibrate any minimum relevance threshold on development questions. |
+| Open a citation | REST and MCP can resolve the opaque citation to the same revision and passage. Check current permission again when opening it. The returned locator still identifies the frozen passage after the search index is rebuilt. |
+| Change or withdraw a claim | Write a linked revision, its support changes and an audit event in one transaction. Use the revision the editor opened as the precondition for an edit. Exclude ineligible revisions immediately on reads, even when rebuilding a derived index takes longer. |
+
+For example, take the fixture question “Did staging still need manual approval on June 10?” The expected hit is the **staging** paragraph of the revision effective June 1. It must include the environment, the rule and the date, or provide permitted passages that establish all three together. A newer article about production may match every keyword and still fail. The API returns the passages and citations so the calling agent can construct its own answer.
+
+### What Ganesh stores and who can see it
+
+| Record | Contents and purpose |
+| --- | --- |
+| Source revision and passage | Source identity, publisher or producing installation, digest, locator, scope and provenance. Public fixtures can retain permitted source bytes. A private source can remain at its installation with only the authorized excerpt or verifiable reference accepted by the server. Record whether the original can be resolved. |
+| Episode | A dated observation, such as a test run or an owner's stated decision, linked to its evidence. Preserve occurrence, observation and ingestion time when known. |
+| Fact, checkpoint or lesson revision | A stable item with one or more revisions. Record the claim, project or user scope, applicability, effective interval, supporting revisions, and links to revisions it corrects. A reusable lesson also records what was tried, what happened and the condition the receiving agent must check. |
+| Publication and audit event | A recipient-visible revision with its own permitted wording and citation. Keep private support links on the source side. Record who or what published, corrected, withdrew or revoked the revision and why. Enforce the same access rules when displaying audit history. |
+
+**Sharing example.** A private report in A says a generated client had to be regenerated after a schema change. A standing rule allows B to receive a lesson about generated clients. Publish the procedure, the observed result and the condition “only if this client is generated from that schema.” B opens the published passage. A's file path, repository URL and transcript stay on A's side. If A later corrects the condition, the maintained publication must either cite the corrected support or disappear from current reads. This also applies to a brief prepared before the change.
+
+**Automatic capture and upkeep.** In M3, use one selected client's permitted event to trigger capture of a checkpoint or lesson candidate. Persist its event ID locally before attempting delivery and acknowledge it only after durable service acceptance. Check source support and the standing publication rule before making it visible to another project. On a new source revision, find dependent claims and re-evaluate their support. A missing or changed anchor can justify withdrawal. A read or network error leaves the cause unresolved and triggers a later check. Record verification status so callers can distinguish the last verified observation from a new assertion. Replay an offline event and restart the service during the demonstration.
+
+### Which existing components earn an integration
+
+The first comparison uses the same inputs, eligible passages, questions and citation resolver for each candidate. Grant a processor access only to material approved for that processor. Record the exact version, dependencies, external calls, storage, latency and any custom adapter code. Select the smallest deployment that meets the tested workflow.
+
+| Observed need | First comparison | Decision |
+| --- | --- | --- |
+| A paraphrase misses the right passage | Compare lexical retrieval with a semantic or hybrid retriever on the same passages. If compact facts could recover the qualifier, also try the pinned Mem0 extractor. | Adopt the change only if fresh questions show better evidence coverage and citations still resolve. |
+| Ordinary work produces useful discoveries but no stable lesson | Try the EverOS episode and atomic-fact extraction path on permitted, scrubbed events. Keep a mapping from each candidate to a source revision. EverOS documents separate source and rebuildable search storage. [EverOS implementation guide](https://github.com/EverMind-AI/EverOS/blob/d2b74780a443c6d7304ca9aa1bfdf36fdc6d7c9b/docs/how-memory-works.md) | Compare qualification, upkeep and operating cost with the simplest source-linked checkpoint. Import additional EverOS components only for a measured need. |
+| A receiving agent needs a persistent shared brief | Try a Letta shared block as a delivery surface. Change or revoke its supporting publication and exercise both installations against the same fixture. [Letta shared blocks](https://docs.letta.com/tutorials/attaching-detaching-blocks/) | Reuse the delivery surface if refresh and revocation meet the read contract. |
+| Multiple supports and late corrections make historical selection unreliable | Compare the SQLite revision model with pinned Graphiti on the M2 fixture. Use the Zep search-then-open interaction as a client reference. | Adopt a graph adapter only if it fixes the observed failure and passes the same scoped reads, removals and restart checks. |
+
+## 7. Proposed first benchmark and decision rules
+
+**Corpus and questions.** For a first engineering gate, propose 24 answerable held-out questions and six with insufficient evidence, in addition to a separate development set. Sample articles from a recorded list of sources permitting snapshot storage and replay. Record the seed, exclusions, license or permission, bytes and digest. Include near neighbours deliberately. Hold all versions of one article family on one side of the split. Freeze questions, required facts, acceptable passage IDs or equivalents, scopes and revisions before evaluating the held-out set. Keep the key outside the search index and agent inputs. The counts below are proposed acceptance targets for the implementation issue.
+
+| Check | Proposed decision rule |
+| --- | --- |
+| Sufficient evidence at three results | At least 20 of 24 answerable questions have every required fact supported by their returned top three. A hit on the right article with the wrong paragraph receives zero for that question. Publish each miss and the counts for paraphrases, distractors and multi-passage questions. |
+| Insufficient evidence | All six missing-evidence cases return explicit insufficient context. An answerable question that abstains also counts as a miss in the first row. |
+| Citation and adapter integrity | Every returned citation resolves to the returned passage and revision for that caller. REST and MCP agree on status and ordered passage IDs for all 30 questions. An unresolved citation or adapter mismatch blocks promotion. |
+| Reproducibility and cost | Replay from a clean store, verify snapshot digests, rebuild the index and compare outcomes. Record import and query time with hardware and corpus size, response bytes, storage and provider calls. The proposed lexical baseline runs offline with zero provider calls. |
+
+These numbers are an engineering decision for a small fixture. Report counts with denominators. A pass supports building M2; broader claims about retrieval quality need new sources and questions. On failure, use the missed cases for diagnosis, record which inputs became exposed, and freeze a fresh held-out set before claiming improvement. A partial run is incomplete.
+
+**M2 lifecycle replay.** Run the following in order using an owner in A and a receiving installation in B. Check searches and citation opening after each step, including reads through both adapters after a restart.
+
+1. Import an original rule and publish a permitted lesson. Both callers can cite what they are entitled to see. B can search and open the publication without access to A's repository.
+2. Apply a correction effective June 1 for staging only. Ask about May staging, June staging and June production. Record the exact expected revision and scope for each. Upload the older snapshot after the correction and repeat all three reads.
+3. Add two equally authoritative, incompatible reports with overlapping scope and no supersession. Expect a conflict with permitted alternatives. Narrow the scope of one report and check the unaffected answers.
+4. Give one claim two independent sources. Remove one and check the remaining citation. Then withdraw the only support permitted to B while A retains private support. B gets insufficient context, including on a historical lookup or when opening its old citation. A can still resolve its own support. Check returned text, titles, IDs and cached briefs for leakage.
+5. Correct the claim from the owner web interface. Replay the old capture and confirm the correction survives. Verify the audit trail, then exercise source deletion and derived-copy removal under the configured retention policy. Record which references, if any, the policy allows the owner to retain.
+
+**M3 product decision.** A successful handoff needs evidence of automatic capture, a service receipt, the exact revision delivered on a second installation, and the observed next action. Repeat for a cross-project lesson under a standing permission. Change the supporting source with the owner signed out and inspect the next read. If the agent receives the right passage and ignores it, record delivery as successful and use as unobserved or declined according to the trace. Only describe owner time saved or better agent outcomes when separately measured. No historical S0 score or literature benchmark supplies that evidence.
+
+## 8. Instruction for the implementing agent
+
+Once the owner accepts the roadmap, open one M1 implementation issue against the evidence-retrieval milestone. Put the corpus permissions, sampling method, development split, proposed pass counts and exact replay command in the issue before the held-out run. Implement the Go importer, passage search, citation resolver and thin REST/MCP reads on an issue branch. Include a known lookup and an insufficient-context case that another developer can replay from a clean checkout.
+
+Open a draft PR with the command, manifest digest, per-question outcomes, adapter comparison and measured costs. If the baseline misses, bring back one concrete failing question, the passage that would have satisfied it, what the service returned and the smallest change worth testing. A passing report earns the M2 fixture. Select the real installations, client and processing permissions with the owner before M3 enrollment.
