@@ -1,0 +1,10 @@
+/Users/andikaarif/Documents/p/playground/ganesh/.local/wt/m1/target/debug/build/version_check/64b9c118c6a8f9ac/out/version_check-64b9c118c6a8f9ac.d: /Users/andikaarif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/version_check-0.9.5/src/lib.rs /Users/andikaarif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/version_check-0.9.5/src/version.rs /Users/andikaarif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/version_check-0.9.5/src/channel.rs /Users/andikaarif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/version_check-0.9.5/src/date.rs
+
+/Users/andikaarif/Documents/p/playground/ganesh/.local/wt/m1/target/debug/build/version_check/64b9c118c6a8f9ac/out/libversion_check-64b9c118c6a8f9ac.rlib: /Users/andikaarif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/version_check-0.9.5/src/lib.rs /Users/andikaarif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/version_check-0.9.5/src/version.rs /Users/andikaarif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/version_check-0.9.5/src/channel.rs /Users/andikaarif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/version_check-0.9.5/src/date.rs
+
+/Users/andikaarif/Documents/p/playground/ganesh/.local/wt/m1/target/debug/build/version_check/64b9c118c6a8f9ac/out/libversion_check-64b9c118c6a8f9ac.rmeta: /Users/andikaarif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/version_check-0.9.5/src/lib.rs /Users/andikaarif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/version_check-0.9.5/src/version.rs /Users/andikaarif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/version_check-0.9.5/src/channel.rs /Users/andikaarif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/version_check-0.9.5/src/date.rs
+
+/Users/andikaarif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/version_check-0.9.5/src/lib.rs:
+/Users/andikaarif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/version_check-0.9.5/src/version.rs:
+/Users/andikaarif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/version_check-0.9.5/src/channel.rs:
+/Users/andikaarif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/version_check-0.9.5/src/date.rs:

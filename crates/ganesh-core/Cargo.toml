@@ -1,0 +1,14 @@
+[package]
+name = "ganesh-core"
+version = "0.1.0"
+edition.workspace = true
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+rusqlite.workspace = true
+sha2.workspace = true
+rust-stemmers.workspace = true
+
+[dev-dependencies]
+serde_json.workspace = true
