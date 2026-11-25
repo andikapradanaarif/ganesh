@@ -33,6 +33,14 @@ Return an explicit **insufficient context** result when the permitted evidence c
 - **Related discoveries.** Give a lesson about *why* a rollout failed its own identity and link it to the deployment rule. Similar words or a later timestamp alone do not establish replacement. If an anchor changes, re-evaluate its dependants and withdraw unsupported guidance from current reads.
 - **Revocation and deletion.** If A withdraws B's permission, B's next current or historical read must exclude the affected passage and citation, including cached or derived results. Keep independent permitted material available. Deletion must also cover derived copies under the retention policy. The service can control future delivery; a recipient may already have read an earlier response.
 
+### Owner web interface
+
+Capture, publication under standing permissions, and upkeep run unattended. The owner can open the web interface whenever a brief looks wrong or they want to see whether Ganesh helped. Leaving it unopened must never delay eligible memory delivery or turn an unreviewed report into a verified fact.
+
+- **Inspect a memory.** Open the exact revision cited in a brief. Show its source passage where permitted, provenance, effective time, audience and status. A timeline shows who or what created, changed, shared or withdrew it, when, and why. Link each completed change to the affected revision. Apply current access and deletion rules to the timeline as well as the brief.
+- **Correct a memory.** From the revision being inspected, edit the claim, narrow its applicability or withdraw it. Commit an owner-attributed revision through the same service that serves REST and MCP. For example, the owner can correct “all deployments are automatic” to “staging only.” Keep the original source attribution distinct from the owner's correction. If the record changed while the page was open, show the newer revision before saving. Stale capture replay cannot silently undo the correction.
+- **Evaluate value.** For a selected project and time period, show how many handoffs received a memory, how many have evidence of use, and how many have an observed outcome. Let the owner open an example and follow the delivered revision to the agent action or optional feedback supporting that assessment. If a lesson was delivered ten times and cited twice, display both counts and label usefulness unknown wherever outcome evidence is missing. Feedback is optional.
+
 ## 4. How we will test retrieval
 
 **Build a reproducible corpus.** Choose sources permitted for storage and testing. Use a recorded sampling frame and seed for the public articles, and deliberately include near neighbours on the same topic. Freeze the bytes, source identifiers, dates, revisions, permissions and digests. Record genuine corrections where available. Mark synthetic change sequences as fixtures. Tests should replay offline when a live article changes or disappears.
@@ -67,6 +75,8 @@ The [earlier research catalog](https://github.com/andikapradanaarif/ganesh/blob/
 | M3 · Automatic handoff between installations | Connect one selected agent client on one local machine and one server. Capture permitted checkpoints and lessons during ordinary work and deliver a brief on resume or query. | Run the first product demonstration above. Record the source event, revision accepted, actual content served, receiving agent's next action, changes after correction or revocation, and any owner intervention. An owner-written summary cannot fill a capture gap. |
 
 The owner chooses the two installations, client, permitted projects, sharing rule and processor permissions before real enrollment. M1 can start with frozen public material. Record retrieval latency, storage and model use where applicable. Adopt richer ranking, extraction or storage only after a measured failure justifies the change.
+
+**Web acceptance.** In M2, open a delivered revision in the owner web interface, inspect its source, correct its scope and verify the next REST and MCP reads reflect that correction. Replay the older capture and check the audit timeline and current result. In M3, complete a handoff and an automatic source-driven update while the owner stays signed out. Then open the value view and trace one observed use to its revision and one delivery whose outcome is unknown.
 
 ### First bounded implementation issue
 
