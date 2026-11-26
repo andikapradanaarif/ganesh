@@ -1,0 +1,67 @@
+{
+  "articles": {
+    "greatwall": {
+      "title": "Great Wall of China",
+      "pageid": 5094570,
+      "revision": 1384301633,
+      "revision_url": "https://en.wikipedia.org/w/index.php?oldid=1384301633",
+      "license": "CC BY-SA 4.0",
+      "retrieved": "2025-11-27",
+      "sha256": "26b84104d1993476eb541a3e676f6b458c5290c4d1847993d9ad98c334fc5751"
+    },
+    "amazon": {
+      "title": "Amazon River",
+      "pageid": 1701,
+      "revision": 1385819361,
+      "revision_url": "https://en.wikipedia.org/w/index.php?oldid=1385819361",
+      "license": "CC BY-SA 4.0",
+      "retrieved": "2025-11-27",
+      "sha256": "94b22f1e55adb502d435405d38ca8a4e63a7e805934581057f34cb26afa2944e"
+    },
+    "jupiter": {
+      "title": "Jupiter",
+      "pageid": 38930,
+      "revision": 1384572050,
+      "revision_url": "https://en.wikipedia.org/w/index.php?oldid=1384572050",
+      "license": "CC BY-SA 4.0",
+      "retrieved": "2025-11-27",
+      "sha256": "c05397f9abb918a94d55435d643a92fe8f57431a6f7b26446776b1c2be6561fb"
+    },
+    "leonardo": {
+      "title": "Leonardo da Vinci",
+      "pageid": 18079,
+      "revision": 1387934727,
+      "revision_url": "https://en.wikipedia.org/w/index.php?oldid=1387934727",
+      "license": "CC BY-SA 4.0",
+      "retrieved": "2025-11-27",
+      "sha256": "fd81f10c6da910f217e1b8eddd2bc3342ffb41839d3d5ab6af90cbba322a0ce0"
+    },
+    "frenchrev": {
+      "title": "French Revolution",
+      "pageid": 11188,
+      "revision": 1387664406,
+      "revision_url": "https://en.wikipedia.org/w/index.php?oldid=1387664406",
+      "license": "CC BY-SA 4.0",
+      "retrieved": "2025-11-27",
+      "sha256": "35a75baf5d0c3f1e2c696e3bd5179970bd981b8374b425833b540d87a6f6959f"
+    },
+    "artemis": {
+      "title": "Artemis program",
+      "pageid": 60758751,
+      "revision": 1387852625,
+      "revision_url": "https://en.wikipedia.org/w/index.php?oldid=1387852625",
+      "license": "CC BY-SA 4.0",
+      "retrieved": "2025-11-27",
+      "sha256": "5dfc12b3b0be9ea869fb0ee410cb8c925fdc3b7609198ed95f8b370e277a0e23"
+    },
+    "cablelog": {
+      "title": "Keystone cableway maintenance log (synthetic)",
+      "pageid": 0,
+      "revision": 0,
+      "revision_url": "synthetic",
+      "license": "CC0",
+      "retrieved": "2025-11-27",
+      "sha256": "e7c02b07440c6e691747e06457c3a04b04ab7209b6835c613eb9f60f3aebc6c9"
+    }
+  }
+}

@@ -1,0 +1,137 @@
+{
+  "version": "acc-xfer-v3",
+  "notes": "16 matched-pair acceptance transfer cases; 6 unused Wikipedia articles + synthetic cableway log",
+  "questions": [
+    {
+      "id": "q01",
+      "question": "What is the average distance of the retrograde-orbiting moons from Jupiter in million km?",
+      "expect": "ok",
+      "article": "jupiter",
+      "facts": [
+        "21.3 million km"
+      ]
+    },
+    {
+      "id": "q02",
+      "question": "How many watchtowers are estimated to have been constructed along the Great Wall?",
+      "expect": "ok",
+      "article": "greatwall",
+      "facts": [
+        "25,000 watchtowers"
+      ]
+    },
+    {
+      "id": "q03",
+      "question": "How many bright flashes are regularly observed in the upper atmosphere of Jupiter?",
+      "expect": "insufficient_context",
+      "article": "jupiter",
+      "facts": []
+    },
+    {
+      "id": "q04",
+      "question": "What is the height of the Great Wall of China in meters?",
+      "expect": "insufficient_context",
+      "article": "greatwall",
+      "facts": []
+    },
+    {
+      "id": "q05",
+      "question": "On what exact date did Artemis I fly?",
+      "expect": "ok",
+      "article": "artemis",
+      "facts": [
+        "November 16, 2022"
+      ]
+    },
+    {
+      "id": "q06",
+      "question": "On what exact date did the French Revolution end with the Coup of 18 Brumaire?",
+      "expect": "ok",
+      "article": "frenchrev",
+      "facts": [
+        "9 November 1799"
+      ]
+    },
+    {
+      "id": "q07",
+      "question": "On what exact calendar date did construction of the Great Wall begin?",
+      "expect": "insufficient_context",
+      "article": "greatwall",
+      "facts": []
+    },
+    {
+      "id": "q08",
+      "question": "In what year did Artemis III land astronauts on the Moon?",
+      "expect": "insufficient_context",
+      "article": "artemis",
+      "facts": []
+    },
+    {
+      "id": "q09",
+      "question": "What kind of planet is Jupiter?",
+      "expect": "ok",
+      "article": "jupiter",
+      "facts": [
+        "gas giant"
+      ]
+    },
+    {
+      "id": "q10",
+      "question": "In which country is Manaus, the largest city on the Amazon?",
+      "expect": "ok",
+      "article": "amazon",
+      "facts": [
+        "Brazil"
+      ]
+    },
+    {
+      "id": "q11",
+      "question": "On what exact date did the Brazilian decree take effect, and about how many men did Orellana take with him?",
+      "expect": "ok",
+      "article": "amazon",
+      "facts": [
+        "7 September 1867",
+        "57 men"
+      ]
+    },
+    {
+      "id": "q12",
+      "question": "Which spacecraft is paired with the European Service Module?",
+      "expect": "ok",
+      "article": "artemis",
+      "facts": [
+        "Orion"
+      ]
+    },
+    {
+      "id": "q13",
+      "question": "Did the tension test of cable C7 finish on April 4?",
+      "expect": "ok",
+      "article": "cablelog",
+      "facts": [
+        "April 4"
+      ]
+    },
+    {
+      "id": "q14",
+      "question": "Did the tension test of cable C7 finish on April 3?",
+      "expect": "insufficient_context",
+      "article": "cablelog",
+      "facts": []
+    },
+    {
+      "id": "q15",
+      "question": "In what year did the Great Wall of China collapse?",
+      "expect": "insufficient_context",
+      "article": "greatwall",
+      "facts": []
+    },
+    {
+      "id": "q16",
+      "question": "In what year did the Coup of 18 Brumaire fail?",
+      "expect": "insufficient_context",
+      "article": "frenchrev",
+      "facts": []
+    }
+  ]
+}
