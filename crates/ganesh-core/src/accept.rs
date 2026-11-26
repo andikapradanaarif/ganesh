@@ -50,6 +50,7 @@ fn action_group(stem: &str) -> Option<&'static str> {
         "run" => "run",
         "perform" | "occur" | "take" => "activity",
         "cancel" | "skip" => "cancel",
+        "continu" | "underway" => "continue",
         "pass" => "pass",
         "fail" => "pass",
         "verifi" | "confirm" | "unverifi" | "unconfirm" => "verify",
@@ -59,6 +60,24 @@ fn action_group(stem: &str) -> Option<&'static str> {
         "live" => "run",
         _ => return None,
     })
+}
+
+/// Split a sentence into clauses on outcome-relevant boundaries. "While" and
+/// semicolons separate activities; a comma alone does not (it is often part
+/// of a single activity description).
+pub fn clauses(sentence: &str) -> Vec<String> {
+    let mut out = Vec::new();
+    let lowered = format!(" {}", sentence.replace("While ", "while "));
+    for part in lowered.split(';') {
+        for sub in part.split(" while ") {
+            for piece in sub.split(", ") {
+                let t = piece.trim();
+                if !t.is_empty() { out.push(t.to_string()); }
+            }
+        }
+    }
+    if out.is_empty() { out.push(sentence.to_string()); }
+    out
 }
 
 /// Positive support: same action, or the directional completion-implies-start
@@ -271,7 +290,7 @@ fn version_tokens(text: &str) -> std::collections::BTreeSet<String> {
 // Experiment B lexicons: epistemic cue classes, in stemmed form.
 // ---------------------------------------------------------------------------
 
-pub const VERIFY_CUES: &[&str] = &["verifi", "confirm", "deploy", "run", "pass", "succeed", "complet", "live", "start", "unverifi", "unconfirm", "finish", "fail", "begin", "began", "reach", "perform", "cancel", "skip", "take", "occur"];
+pub const VERIFY_CUES: &[&str] = &["verifi", "confirm", "deploy", "run", "pass", "succeed", "complet", "live", "start", "unverifi", "unconfirm", "finish", "fail", "begin", "began", "reach", "perform", "cancel", "skip", "take", "occur", "continu", "underway"];
 pub const PROPOSE_CUES: &[&str] = &["propos", "plan", "intend", "suggest", "consider"];
 pub const ATTEMPT_CUES: &[&str] = &["attempt", "tri", "effort"];
 pub const TRANSITION_CUES: &[&str] = &["becam", "becom", "option", "mandatori", "deprecat", "drop", "adopt"];
@@ -614,7 +633,34 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
                     // membership alone never suffices.
                     let action_ok = if input.action_check {
                         question_predicate(&input.terms.to_vec()).map(|qp| {
-                            own_stemmed.iter().any(|t| action_supports(&qp, t))
+                            // Clause-level event identity: when the sentence
+                            // separates activities into clauses, the queried
+                            // activity's object terms must share the clause
+                            // carrying the outcome cue. A competing clause
+                            // cannot donate its outcome. Single-clause and
+                            // chained continuation sentences are unaffected.
+                            let cls = clauses(sentence);
+                            let qobj: Vec<&String> = input.terms.iter()
+                                .filter(|t| !input.subject_terms.contains(*t)
+                                    && !t.chars().any(|c| c.is_ascii_digit())
+                                    && action_group(t).is_none()
+                                    && !ENV_STEMS.contains(&t.as_str()))
+                                .collect();
+                            let cue_in_own = own_stemmed.iter().any(|t| action_supports(&qp, t));
+                            if cls.len() <= 1 {
+                                cue_in_own
+                            } else {
+                                let stem_cls: Vec<Vec<String>> = cls.iter().map(|c| stemmed_query_like(c)).collect();
+                                let cue_clause_has_obj = stem_cls.iter().any(|sc| {
+                                    sc.iter().any(|t| action_supports(&qp, t))
+                                        && qobj.iter().any(|o| sc.contains(*o))
+                                });
+                                let obj_only_elsewhere = qobj.iter().any(|o| {
+                                    stem_cls.iter().any(|sc| sc.contains(*o))
+                                        && !stem_cls.iter().any(|sc2| sc2.iter().any(|t| action_supports(&qp, t)) && sc2.contains(*o))
+                                });
+                                cue_in_own && (cue_clause_has_obj || !obj_only_elsewhere)
+                            }
                         }).unwrap_or(false)
                     } else {
                         true

@@ -1,0 +1,244 @@
+{
+  "evidence_correct_answerable": 4,
+  "outcomes": [
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "a01",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.590128,
+      "latency_rest_ms": 2.568024,
+      "mcp_ids": [
+        "towerlog-a1#p2",
+        "towerlog-a1#p7",
+        "towerlog-a1#p8"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "towerlog-a1#p2",
+        "towerlog-a1#p7",
+        "towerlog-a1#p8"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "a02",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.37011,
+      "latency_rest_ms": 1.129494,
+      "mcp_ids": [
+        "towerlog-a1#p2",
+        "towerlog-a1#p6",
+        "towerlog-a1#p4"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "towerlog-a1#p2",
+        "towerlog-a1#p6",
+        "towerlog-a1#p4"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "ok",
+      "hit": false,
+      "id": "a03",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 0.953128,
+      "latency_rest_ms": 0.9665290000000001,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "a04",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 1.1788230000000002,
+      "latency_rest_ms": 1.125923,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "a05",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 1.350177,
+      "latency_rest_ms": 1.138517,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "ok",
+      "hit": false,
+      "id": "a06",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.5751350000000002,
+      "latency_rest_ms": 1.2899260000000001,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "a07",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 1.9617620000000002,
+      "latency_rest_ms": 1.248057,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "a08",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 1.888236,
+      "latency_rest_ms": 1.6404919999999998,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "a09",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.359605,
+      "latency_rest_ms": 1.409905,
+      "mcp_ids": [
+        "towerlog-a1#p7",
+        "towerlog-a1#p8",
+        "towerlog-a1#p2"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "towerlog-a1#p7",
+        "towerlog-a1#p8",
+        "towerlog-a1#p2"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "a10",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.039896,
+      "latency_rest_ms": 0.999259,
+      "mcp_ids": [
+        "towerlog-a1#p8",
+        "towerlog-a1#p7",
+        "towerlog-a1#p2"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "towerlog-a1#p8",
+        "towerlog-a1#p7",
+        "towerlog-a1#p2"
+      ],
+      "rest_status": "ok"
+    }
+  ],
+  "questions": "fixtures/activity-probe/key.json",
+  "result": {
+    "checks": {
+      "adapter_agreement": {
+        "agree": 10,
+        "pass": true,
+        "total": 10
+      },
+      "citation_integrity": {
+        "checked": 24,
+        "ok": 24,
+        "pass": true
+      },
+      "evidence_coverage": {
+        "answerable": 6,
+        "hits": 4,
+        "pass": true
+      },
+      "insufficient_evidence": {
+        "correct": 4,
+        "pass": true,
+        "total": 4
+      },
+      "provider_calls": {
+        "count": 0,
+        "pass": true
+      }
+    },
+    "corpus": "fixtures/activity-probe",
+    "incomplete": false,
+    "mode": "development",
+    "questions": "fixtures/activity-probe/key.json",
+    "reasons": [],
+    "verdict": "DEVELOPMENT",
+    "version": "bench-result.v1"
+  },
+  "summary": {
+    "adapter_agree": 10,
+    "answerable": 6,
+    "citations_checked": 24,
+    "citations_ok": 24,
+    "hits": 4,
+    "incomplete": false,
+    "insufficient": 4,
+    "insufficient_correct": 4,
+    "total": 10
+  }
+}
