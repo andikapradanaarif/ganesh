@@ -1,0 +1,693 @@
+{
+  "outcomes": [
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "v01",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 7.787263,
+      "latency_rest_ms": 8.815742,
+      "mcp_ids": [
+        "1386984050#p2",
+        "1387873129#p2",
+        "1386984050#p35"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1386984050#p2",
+        "1387873129#p2",
+        "1386984050#p35"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "v02",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 7.713865,
+      "latency_rest_ms": 7.485013,
+      "mcp_ids": [
+        "1386984050#p6",
+        "1386984050#p7",
+        "1387656235#p21"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1386984050#p6",
+        "1386984050#p7",
+        "1387656235#p21"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "expected": "ok",
+      "hit": false,
+      "id": "v03",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 7.452408,
+      "latency_rest_ms": 7.367618,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "v04",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 7.483376,
+      "latency_rest_ms": 7.5719899999999996,
+      "mcp_ids": [
+        "1387656235#p48",
+        "1386984050#p23",
+        "1386984050#p3"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387656235#p48",
+        "1386984050#p23",
+        "1386984050#p3"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": false,
+      "id": "v05",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 9.684180000000001,
+      "latency_rest_ms": 7.312197,
+      "mcp_ids": [
+        "1386984050#p29",
+        "1386984050#p26",
+        "1386984050#p28"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1386984050#p29",
+        "1386984050#p26",
+        "1386984050#p28"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "v06",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 7.71753,
+      "latency_rest_ms": 7.22364,
+      "mcp_ids": [
+        "1386984050#p20",
+        "1386984050#p4",
+        "1386984050#p23"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1386984050#p20",
+        "1386984050#p4",
+        "1386984050#p23"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "expected": "ok",
+      "hit": false,
+      "id": "v07",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 9.288945,
+      "latency_rest_ms": 6.610408,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "v08",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 8.034888,
+      "latency_rest_ms": 10.618945,
+      "mcp_ids": [
+        "1387610051#p2",
+        "1387610051#p3",
+        "1387610051#p10"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387610051#p2",
+        "1387610051#p3",
+        "1387610051#p10"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "v09",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 7.3773349999999995,
+      "latency_rest_ms": 9.536716,
+      "mcp_ids": [
+        "1387610051#p4",
+        "1386984050#p7",
+        "1386984050#p2"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387610051#p4",
+        "1386984050#p7",
+        "1386984050#p2"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "v10",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 9.174284,
+      "latency_rest_ms": 9.344662999999999,
+      "mcp_ids": [
+        "1387610051#p8",
+        "1387656235#p14",
+        "1387610051#p7"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387610051#p8",
+        "1387656235#p14",
+        "1387610051#p7"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "v11",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 8.552376,
+      "latency_rest_ms": 7.4636,
+      "mcp_ids": [
+        "1387610051#p10",
+        "1387656235#p5",
+        "1386984050#p3"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387610051#p10",
+        "1387656235#p5",
+        "1386984050#p3"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "v12",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 9.171376,
+      "latency_rest_ms": 10.055691,
+      "mcp_ids": [
+        "1387656235#p53",
+        "1386984050#p37",
+        "1387610051#p15"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387656235#p53",
+        "1386984050#p37",
+        "1387610051#p15"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "v13",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 9.060702000000001,
+      "latency_rest_ms": 7.6767069999999995,
+      "mcp_ids": [
+        "1387873129#p24",
+        "1387873129#p1",
+        "1387873129#p3"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387873129#p24",
+        "1387873129#p1",
+        "1387873129#p3"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "v14",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 8.291865000000001,
+      "latency_rest_ms": 7.149281,
+      "mcp_ids": [
+        "1387873129#p4",
+        "1387873129#p23",
+        "1386984050#p1"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387873129#p4",
+        "1387873129#p23",
+        "1386984050#p1"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "v15",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 8.206662,
+      "latency_rest_ms": 7.562983,
+      "mcp_ids": [
+        "1387873129#p7",
+        "1387656235#p10",
+        "1387610051#p3"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387873129#p7",
+        "1387656235#p10",
+        "1387610051#p3"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "v16",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 9.026637000000001,
+      "latency_rest_ms": 8.313872,
+      "mcp_ids": [
+        "1387873129#p8",
+        "1387873129#p6",
+        "1387873129#p22"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387873129#p8",
+        "1387873129#p6",
+        "1387873129#p22"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "v17",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 9.429556,
+      "latency_rest_ms": 8.800263,
+      "mcp_ids": [
+        "1387873129#p1",
+        "1387873129#p15",
+        "1387873129#p3"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387873129#p1",
+        "1387873129#p15",
+        "1387873129#p3"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": false,
+      "id": "v18",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 8.852636,
+      "latency_rest_ms": 7.562193,
+      "mcp_ids": [
+        "1387873129#p17",
+        "1387873129#p15",
+        "1386984050#p27"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387873129#p17",
+        "1387873129#p15",
+        "1386984050#p27"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": false,
+      "id": "v19",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 8.737925,
+      "latency_rest_ms": 7.021551,
+      "mcp_ids": [
+        "1387656235#p11",
+        "1387610051#p7",
+        "1387610051#p1"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387656235#p11",
+        "1387610051#p7",
+        "1387610051#p1"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "v20",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 8.268201,
+      "latency_rest_ms": 8.197443,
+      "mcp_ids": [
+        "1387656235#p10",
+        "1387610051#p3",
+        "1387610051#p7"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387656235#p10",
+        "1387610051#p3",
+        "1387610051#p7"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "v21",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 8.956781000000001,
+      "latency_rest_ms": 8.051777,
+      "mcp_ids": [
+        "1387656235#p17",
+        "1387656235#p18",
+        "1387610051#p3"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387656235#p17",
+        "1387656235#p18",
+        "1387610051#p3"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": false,
+      "id": "v22",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 7.829512,
+      "latency_rest_ms": 8.39105,
+      "mcp_ids": [
+        "1387656235#p28",
+        "1387656235#p27",
+        "1387656235#p25"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387656235#p28",
+        "1387656235#p27",
+        "1387656235#p25"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "v23",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 8.027412,
+      "latency_rest_ms": 7.249341,
+      "mcp_ids": [
+        "1386984050#p5",
+        "1387656235#p31",
+        "1387656235#p32"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1386984050#p5",
+        "1387656235#p31",
+        "1387656235#p32"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "ok",
+      "hit": true,
+      "id": "v24",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 8.856625,
+      "latency_rest_ms": 9.25344,
+      "mcp_ids": [
+        "1387656235#p37",
+        "1387656235#p51",
+        "1387656235#p36"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1387656235#p37",
+        "1387656235#p51",
+        "1387656235#p36"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "v25",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 7.341038999999999,
+      "latency_rest_ms": 7.877726,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "v26",
+      "insufficient_correct": false,
+      "latency_mcp_ms": 8.023779,
+      "latency_rest_ms": 7.295813,
+      "mcp_ids": [
+        "1386984050#p25",
+        "1387656235#p31",
+        "1386984050#p1"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1386984050#p25",
+        "1387656235#p31",
+        "1386984050#p1"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "v27",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 7.662619,
+      "latency_rest_ms": 7.541817999999999,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "v28",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 7.414007,
+      "latency_rest_ms": 7.412308,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "v29",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 7.574033,
+      "latency_rest_ms": 7.230632,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "v30",
+      "insufficient_correct": false,
+      "latency_mcp_ms": 7.925316,
+      "latency_rest_ms": 7.471582,
+      "mcp_ids": [
+        "1386984050#p13",
+        "1387656235#p2",
+        "1387656235#p16"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "1386984050#p13",
+        "1387656235#p2",
+        "1387656235#p16"
+      ],
+      "rest_status": "ok"
+    }
+  ],
+  "questions": "/Users/andikaarif/Documents/p/playground/ganesh/.local/wt/m1-retrieval/fixtures/questions-v2/heldout.v2.json",
+  "result": {
+    "checks": {
+      "adapter_agreement": {
+        "agree": 30,
+        "pass": true,
+        "total": 30
+      },
+      "citation_integrity": {
+        "checked": 144,
+        "ok": 144,
+        "pass": true
+      },
+      "evidence_coverage": {
+        "answerable": 24,
+        "hits": 18,
+        "pass": false
+      },
+      "insufficient_evidence": {
+        "correct": 4,
+        "pass": false,
+        "total": 6
+      },
+      "provider_calls": {
+        "count": 0,
+        "pass": true
+      }
+    },
+    "corpus": "/Users/andikaarif/Documents/p/playground/ganesh/.local/wt/m1-retrieval/fixtures/corpus-v2",
+    "incomplete": false,
+    "mode": "gate",
+    "questions": "/Users/andikaarif/Documents/p/playground/ganesh/.local/wt/m1-retrieval/fixtures/questions-v2/heldout.v2.json",
+    "reasons": [],
+    "verdict": "FAIL",
+    "version": "bench-result.v1"
+  },
+  "summary": {
+    "adapter_agree": 30,
+    "answerable": 24,
+    "citations_checked": 144,
+    "citations_ok": 144,
+    "hits": 18,
+    "incomplete": false,
+    "insufficient": 6,
+    "insufficient_correct": 4,
+    "total": 30
+  }
+}
