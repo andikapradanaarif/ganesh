@@ -241,6 +241,168 @@ fn title_subject_terms(title: &str) -> std::collections::BTreeSet<String> {
         .collect()
 }
 
+
+// ---- Graded date-selection signal, bug-fixed revision (M1 follow-up) ----
+// Fixes versus #186: (1) tie-breaking strictly prefers the better-bm25-ranked
+// candidate instead of the worst; (2) date tiers require adjacent month+day
+// pairs, so a stray digit near a month name no longer fakes a full date;
+// (3) subject binding is IDF-weighted so distinctive entity tokens outweigh
+// generic shared title words.
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum DatePrecision {
+    Exact,
+    YearOnly,
+    Open,
+}
+
+pub fn date_activation(query: &str) -> Option<DatePrecision> {
+    let q = query.to_lowercase();
+    let activated = q.contains("when")
+        || q.contains("what year")
+        || q.contains("which year")
+        || q.contains("what date")
+        || q.contains("which date")
+        || q.contains("what day")
+        || q.contains("which day")
+        || q.contains("on what");
+    if !activated {
+        return None;
+    }
+    if q.contains("exact") || q.contains("what date") || q.contains("which date") || q.contains("what day") || q.contains("which day") {
+        Some(DatePrecision::Exact)
+    } else if q.contains("what year") || q.contains("which year") {
+        Some(DatePrecision::YearOnly)
+    } else {
+        Some(DatePrecision::Open)
+    }
+}
+
+const MONTHS: [&str; 12] = [
+    "january", "february", "march", "april", "may", "june", "july", "august", "september",
+    "october", "november", "december",
+];
+
+fn is_day(tok: &str) -> bool {
+    (tok.len() == 1 || tok.len() == 2)
+        && tok.parse::<u32>().map(|d| (1..=31).contains(&d)).unwrap_or(false)
+}
+
+/// Month and day must be adjacent tokens (`Month DD` or `DD Month`, allowing a
+/// trailing comma/ordinal suffix on the day). Returns true when the sentence
+/// has a real calendar date shape rather than a stray digit near a month.
+fn has_adjacent_month_day(low: &str) -> bool {
+    let toks: Vec<&str> = low
+        .split(|c: char| !c.is_ascii_alphanumeric())
+        .filter(|w| !w.is_empty())
+        .collect();
+    for (i, t) in toks.iter().enumerate() {
+        let tcore = t.trim_end_matches(|c| c == 's' || c == 't' || c == 'r' || c == 'd' || c == 'h' || c == 'n');
+        let _ = tcore;
+        if MONTHS.contains(t) {
+            if i + 1 < toks.len() {
+                let nxt = toks[i + 1].trim_end_matches(|c: char| c.is_ascii_alphabetic());
+                if is_day(nxt) {
+                    return true;
+                }
+                // ordinal forms like 26th
+                let raw = toks[i + 1];
+                let digits: String = raw.chars().take_while(|c| c.is_ascii_digit()).collect();
+                if !digits.is_empty() && is_day(&digits) && raw.len() <= digits.len() + 2 {
+                    return true;
+                }
+            }
+            if i > 0 {
+                let prv = toks[i - 1].trim_end_matches(|c: char| c.is_ascii_alphabetic());
+                if is_day(prv) {
+                    return true;
+                }
+                let raw = toks[i - 1];
+                let digits: String = raw.chars().take_while(|c| c.is_ascii_digit()).collect();
+                if !digits.is_empty() && is_day(&digits) && raw.len() <= digits.len() + 2 {
+                    return true;
+                }
+            }
+        }
+    }
+    false
+}
+
+/// Date tier: 3 = full date (adjacent month+day with a 4-digit year present),
+/// 2.5 = adjacent month+day without year, 2 = month+year, 1 = bare year, 0 none.
+pub fn date_tier(sentence: &str) -> f64 {
+    let low = sentence.to_lowercase();
+    let has_year = low
+        .split(|c: char| !c.is_ascii_digit())
+        .any(|w| w.len() == 4 && w >= "1000" && w <= "2099");
+    let has_month = MONTHS.iter().any(|m| low.contains(m));
+    if has_adjacent_month_day(&low) {
+        if has_year {
+            3.0
+        } else {
+            2.5
+        }
+    } else if has_month && has_year {
+        2.0
+    } else if has_year {
+        1.0
+    } else {
+        0.0
+    }
+}
+
+pub fn sentence_date_score(
+    sentence: &str,
+    precision: DatePrecision,
+    event_terms: &[String],
+    subject_tokens: &[String],
+    weight_of: &dyn Fn(&str) -> f64,
+) -> f64 {
+    let tier = date_tier(sentence);
+    let tier_score = match precision {
+        DatePrecision::Exact => if tier >= 3.0 { 3.0 } else { 0.0 },
+        DatePrecision::YearOnly => match tier {
+            t if t >= 3.0 => 3.0,
+            t if t >= 1.0 => 2.0,
+            _ => 0.0,
+        },
+        DatePrecision::Open => tier,
+    };
+    if tier_score == 0.0 {
+        return 0.0;
+    }
+    let toks = stemmed_tokens(sentence);
+    let event_weight: f64 = event_terms
+        .iter()
+        .filter(|t| toks.iter().any(|x| x == *t))
+        .map(|t| weight_of(t))
+        .sum();
+    if event_weight <= 0.0 {
+        return 0.0;
+    }
+    // IDF-weighted subject binding: a distinctive entity token (high idf)
+    // outweighs generic shared title words many times over.
+    let low = sentence.to_lowercase();
+    let subj_weight: f64 = subject_tokens
+        .iter()
+        .filter(|t| low.split(|c: char| !c.is_ascii_alphanumeric()).any(|w| w == t.as_str()))
+        .map(|t| weight_of(t))
+        .sum();
+    tier_score * event_weight * (1.0 + subj_weight)
+}
+
+pub fn passage_date_score(
+    body: &str,
+    precision: DatePrecision,
+    event_terms: &[String],
+    subject_tokens: &[String],
+    weight_of: &dyn Fn(&str) -> f64,
+) -> f64 {
+    body.split(|c| c == '.' || c == '\n')
+        .map(|sent| sentence_date_score(sent, precision, event_terms, subject_tokens, weight_of))
+        .fold(0.0, f64::max)
+}
+
 pub fn search(store: &Store, query: &str, caller: &str, cfg: &RetrievalConfig) -> SearchResponse {
     search_debug(store, query, caller, cfg).0
 }
@@ -378,6 +540,71 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
     }
     let weight_of = |t: &str| term_weights.get(t).copied().unwrap_or(1.0);
 
+    // Graded date-aware selection. Ineligible queries execute the exact #178
+    // path untouched. When activated, the best positive-scoring candidate is
+    // promoted — strictly higher score wins, ties keep the better bm25 rank —
+    // taking slot 1 when the bm25 first pick carries no signal itself, slot 2
+    // otherwise. All selected passages update covered before the marginal
+    // walk, protecting compound questions. No positive score: pure fallback.
+    let mut promoted: Option<usize> = None;
+    let precision = date_activation(query);
+    let mut date_scores: Vec<f64> = vec![0.0; candidate_texts.len()];
+    if let Some(prec) = precision {
+        let mut subject_vocab: std::collections::BTreeSet<String> = std::collections::BTreeSet::new();
+        let mut all_title_tokens: std::collections::BTreeSet<String> = std::collections::BTreeSet::new();
+        if let Ok(mut stmt) = store.conn.prepare("SELECT article_id, title FROM sources") {
+            if let Ok(source_rows) = stmt.query_map([], |row| Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?))) {
+                for row in source_rows.flatten() {
+                    let (article_id, title) = row;
+                    for tok in title.to_lowercase().split(|c: char| !c.is_ascii_alphanumeric()) {
+                        if !tok.is_empty() {
+                            all_title_tokens.insert(tok.to_string());
+                        }
+                    }
+                    if mentioned_subjects.contains(&article_id) {
+                        for t in title_subject_terms(&title) {
+                            subject_vocab.insert(t);
+                        }
+                    }
+                }
+            }
+        }
+        let event_terms: Vec<String> = terms
+            .iter()
+            .filter(|t| !subject_vocab.contains(*t))
+            .cloned()
+            .collect();
+        // Subject tokens for binding: distinctive idf comes from weight_of at
+        // scoring time; here we collect query tokens that appear in titles.
+        let subject_tokens: Vec<String> = query
+            .to_lowercase()
+            .split(|c: char| !c.is_ascii_alphanumeric())
+            .filter(|w| !w.is_empty() && all_title_tokens.contains(*w))
+            .map(|w| w.to_string())
+            .collect();
+        for (idx, cand) in rows.iter().enumerate() {
+            let body: String = store
+                .conn
+                .query_row(
+                    "SELECT text FROM passages WHERE id = ?1",
+                    rusqlite::params![cand.passage_id],
+                    |row| row.get(0),
+                )
+                .unwrap_or_default();
+            date_scores[idx] = passage_date_score(&body, prec, &event_terms, &subject_tokens, &|t| weight_of(t));
+        }
+        // Strictly-higher wins; iteration order is eligible (bm25 rank order),
+        // so equal scores keep the better-ranked candidate.
+        let mut best: Option<(usize, f64)> = None;
+        for &i in &eligible {
+            let sc = date_scores[i];
+            if sc > 0.0 && best.map(|(_, b)| sc > b).unwrap_or(true) {
+                best = Some((i, sc));
+            }
+        }
+        promoted = best.map(|(i, _)| i);
+    }
+
     // Complementary selection: keep the best BM25 candidate, then add the
     // candidate with the largest weighted marginal coverage of query terms not
     // already covered. When no candidate adds a term, fill by original rank.
@@ -385,11 +612,27 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
     let want = cfg.top_k.min(eligible.len());
     let mut selected: Vec<usize> = Vec::new();
     if want > 0 {
-        selected.push(eligible[0]);
+        match promoted {
+            Some(idx) if date_scores[eligible[0]] <= 0.0 && idx != eligible[0] => {
+                selected.push(idx);
+                selected.push(eligible[0]);
+            }
+            Some(idx) if idx != eligible[0] => {
+                selected.push(eligible[0]);
+                if selected.len() < want && !selected.contains(&idx) {
+                    selected.push(idx);
+                }
+            }
+            _ => {
+                selected.push(eligible[0]);
+            }
+        }
         let mut covered = std::collections::BTreeSet::new();
-        for t in &terms {
-            if term_present(t, &candidate_texts[eligible[0]].1) {
-                covered.insert(t.clone());
+        for &sel_idx in &selected {
+            for t in &terms {
+                if term_present(t, &candidate_texts[sel_idx].1) {
+                    covered.insert(t.clone());
+                }
             }
         }
         while selected.len() < want {
@@ -668,5 +911,74 @@ mod quantity_unit_tests {
         assert!(stemmed_tokens("byte").contains(&"byte".to_string()));
         assert!(!stemmed_tokens("bytes").contains(&"byte".to_string()));
         assert!(!stemmed_tokens("byte").contains(&"bytes".to_string()));
+    }
+}
+
+#[cfg(test)]
+mod date_fix_tests {
+    use super::*;
+
+    fn w(t: &str) -> f64 {
+        match t {
+            "curiosity" | "voyager" | "hubl" => 8.0,
+            "rover" | "telescope" | "space" => 1.5,
+            _ => 1.0,
+        }
+    }
+
+    #[test]
+    fn adjacent_dates_tier3_stray_digit_not() {
+        assert_eq!(date_tier("Curiosity was launched on November 26, 2011."), 3.0);
+        assert_eq!(date_tier("It launched on 4 October 1957 as part of the program."), 3.0);
+        assert!(date_tier("Voyager 2 operated in April") < 3.0, "stray digit+month must not reach tier 3");
+        assert_eq!(date_tier("Voyager 2 operated in April"), 0.0);
+        assert_eq!(date_tier("The mission launched in April 1961"), 2.0);
+    }
+
+    #[test]
+    fn distinctive_subject_idf_beats_generic() {
+        let ev = vec!["launch".to_string()];
+        let subj_c = vec!["curiosity".to_string(), "rover".to_string()];
+        let sc = sentence_date_score("Curiosity was launched on November 26, 2011.", DatePrecision::Open, &ev, &subj_c, &w);
+        let sg = sentence_date_score("The rover was launched on November 26, 2011.", DatePrecision::Open, &ev, &subj_c, &w);
+        assert!(sc > sg, "distinctive {} should exceed generic {}", sc, sg);
+    }
+
+    #[test]
+    fn cross_article_sentence_mention_binds() {
+        let ev = vec!["launch".to_string()];
+        let subj = vec!["voyager".to_string(), "2".to_string()];
+        let bound = sentence_date_score("Voyager 2 was launched on August 20, 1977.", DatePrecision::Open, &ev, &subj, &w);
+        let unbound = sentence_date_score("Voyager 1 was launched on September 5, 1977.", DatePrecision::Open, &ev, &subj, &w);
+        assert!(bound > unbound, "explicit Voyager 2 mention {} should beat sibling {}", bound, unbound);
+    }
+
+    #[test]
+    fn tie_break_prefers_earlier_bm25_rank() {
+        // scanning in rank order with strict > keeps the first (best-ranked)
+        let scores = [(0usize, 4.0f64), (1usize, 4.0f64), (2, 4.0)];
+        let mut best: Option<(usize, f64)> = None;
+        for (i, sc) in scores {
+            if sc > 0.0 && best.map(|(_, b)| sc > b).unwrap_or(true) {
+                best = Some((i, sc));
+            }
+        }
+        assert_eq!(best.map(|(i, _)| i), Some(0));
+    }
+
+    #[test]
+    fn precision_activation_rules() {
+        assert_eq!(date_activation("Who commanded the mission?"), None);
+        assert_eq!(date_activation("When was the rover launched?"), Some(DatePrecision::Open));
+        assert_eq!(date_activation("In what year did it orbit?"), Some(DatePrecision::YearOnly));
+        assert_eq!(date_activation("On what exact date did it launch?"), Some(DatePrecision::Exact));
+    }
+
+    #[test]
+    fn multi_term_event_specificity() {
+        let ev = vec!["name".to_string(), "edwin".to_string(), "hubl".to_string()];
+        let all = sentence_date_score("The telescope was named after Edwin Hubble in 1946.", DatePrecision::Open, &ev, &[], &w);
+        let one = sentence_date_score("The telescope mirror was ground in 1946.", DatePrecision::Open, &ev, &[], &w);
+        assert!(all > one);
     }
 }
