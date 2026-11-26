@@ -292,10 +292,20 @@ dependencies = [
 ]
 
 [[package]]
-name = "ganesh-mcp"
+name = "ganesh-corpus-tool"
 version = "0.1.0"
 dependencies = [
  "ganesh-core",
+ "serde",
+ "serde_json",
+ "sha2",
+ "ureq",
+]
+
+[[package]]
+name = "ganesh-mcp"
+version = "0.1.0"
+dependencies = [
  "serde",
  "serde_json",
  "ureq",
