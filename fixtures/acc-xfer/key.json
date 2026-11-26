@@ -1,0 +1,203 @@
+{
+ "version": "acc-xfer-v1",
+ "scoring": "scoring.v2",
+ "questions": [
+  {
+   "id": "q01",
+   "question": "On what exact date was the Hoover Dam dedicated?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "exact-date"
+   ],
+   "required_facts": [
+    {
+     "fact": "September 30, 1935",
+     "acceptable": [
+      "dam-a1#p1"
+     ],
+     "spans": [
+      "September 30, 1935"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "q02",
+   "question": "What is the length of the Golden Gate Bridge main span?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "quantity"
+   ],
+   "required_facts": [
+    {
+     "fact": "4,200 ft",
+     "acceptable": [
+      "ggb-a1#p3"
+     ],
+     "spans": [
+      "4,200 ft"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "q03",
+   "question": "How many strands of wire make up each main cable of the Golden Gate Bridge?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "quantity"
+   ],
+   "required_facts": [
+    {
+     "fact": "27,572",
+     "acceptable": [
+      "ggb-a1#p46"
+     ],
+     "spans": [
+      "27,572"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "q04",
+   "question": "When did the Golden Gate Bridge open?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "open-when"
+   ],
+   "required_facts": [
+    {
+     "fact": "May 27, 1937",
+     "acceptable": [
+      "ggb-a1#p2"
+     ],
+     "spans": [
+      "May 27, 1937"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "q05",
+   "question": "On what exact date was the Hoover Dam dedicated, and which president dedicated it?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "compound"
+   ],
+   "required_facts": [
+    {
+     "fact": "September 30, 1935",
+     "acceptable": [
+      "dam-a1#p1"
+     ],
+     "spans": [
+      "September 30, 1935"
+     ],
+     "answer_polarity": "affirmative"
+    },
+    {
+     "fact": "Franklin D. Roosevelt",
+     "acceptable": [
+      "dam-a1#p1"
+     ],
+     "spans": [
+      "Franklin D. Roosevelt"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "q06",
+   "question": "What is the total length of wire in both main cables of the Golden Gate Bridge?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "quantity"
+   ],
+   "required_facts": [
+    {
+     "fact": "80,000 mi",
+     "acceptable": [
+      "ggb-a1#p46"
+     ],
+     "spans": [
+      "80,000 mi"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "q07",
+   "question": "In what year did construction of the Hoover Dam begin?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "year-only"
+   ],
+   "required_facts": [
+    {
+     "fact": "1931",
+     "acceptable": [
+      "dam-a1#p1"
+     ],
+     "spans": [
+      "1931"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "q08",
+   "question": "On what exact day was the first concrete of the Hoover Dam poured?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient"
+   ],
+   "required_facts": [],
+   "unresolved_detail": "first pour exact day not given in source"
+  },
+  {
+   "id": "q09",
+   "question": "How many strands of wire does the entire Golden Gate Bridge contain across all cables?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient"
+   ],
+   "required_facts": [],
+   "unresolved_detail": "source gives strands per cable, never a bridge-wide total"
+  },
+  {
+   "id": "q10",
+   "question": "On what exact date was the Golden Gate Bridge structurally completed?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient"
+   ],
+   "required_facts": [],
+   "unresolved_detail": "opening date present but exact structural completion day absent"
+  }
+ ]
+}

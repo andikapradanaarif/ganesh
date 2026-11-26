@@ -1,0 +1,45 @@
+{
+ "version": "acc-xfer",
+ "created": "2026-11-26",
+ "frame": "frozen acceptance transfer packet: Hoover Dam + Golden Gate Bridge; dates and quantities, matched missing-detail controls",
+ "seed": 0,
+ "exclusions": [],
+ "sampling": "hand-selected public documents",
+ "snapshot_format": "clean plaintext, templates stripped with convert quantities expanded",
+ "articles": [
+  {
+   "article_id": "dam",
+   "title": "Hoover Dam",
+   "pageid": 14308,
+   "revision": "dam-a1",
+   "revision_url": "https://en.wikipedia.org/w/index.php?title=Hoover_Dam&oldid=1377555785",
+   "publisher": "Wikipedia contributors",
+   "url": "https://en.wikipedia.org/wiki/Hoover_Dam",
+   "license": "CC BY-SA 4.0",
+   "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+   "permission": "CC BY-SA 4.0 permits storage and replay with attribution",
+   "retrieved": "2026-11-26",
+   "bytes": 49860,
+   "sha256": "03decfd12f2193096a36e51241d8b0561398de5636478e9cf67059acc9a9ec04",
+   "file": "snapshots/dam.txt",
+   "family": "dam"
+  },
+  {
+   "article_id": "ggb",
+   "title": "Golden Gate Bridge",
+   "pageid": 12103,
+   "revision": "ggb-a1",
+   "revision_url": "https://en.wikipedia.org/w/index.php?title=Golden_Gate_Bridge&oldid=1387129417",
+   "publisher": "Wikipedia contributors",
+   "url": "https://en.wikipedia.org/wiki/Golden_Gate_Bridge",
+   "license": "CC BY-SA 4.0",
+   "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+   "permission": "CC BY-SA 4.0 permits storage and replay with attribution",
+   "retrieved": "2026-11-26",
+   "bytes": 45776,
+   "sha256": "187e24f8369d5d91cde1f05d00b7a8f978b2f234004a322a0166555993d8401d",
+   "file": "snapshots/ggb.txt",
+   "family": "ggb"
+  }
+ ]
+}
