@@ -1,0 +1,404 @@
+{{Short description|Marble mausoleum in Agra, India}}
+{{Other uses}}
+{{Protection padlock|small=yes}}
+{{Pp-move}}
+{{Use Indian English|date=March 2024}}
+{{Use dmy dates|date=March 2024}}
+
+{{Infobox historic site
+| name = Taj Mahal
+| image = Taj Mahal (Edited).jpeg
+| image_size = 250px
+| caption = 
+| location = Agra, Uttar Pradesh, India
+| height = {{cvt|73|m|ft}}
+| built = 1631–{{Start date and age|1653|br=y}}{{sfn |DuTemple |2003 |p=32|}}
+| architect = Ustad Ahmad Lahori
+| architecture = Mughal architecture
+| coordinates = {{Coord|type:landmark_region:IN-UP|format=dms|display=inline,title}}
+| pushpin_map = India Uttar Pradesh#India
+| pushpin_caption = Location of Taj Mahal in Uttar Pradesh, India
+| visitors_num = 4.84 million
+| visitors_year = Apr '22 – Feb '23
+| embedded = {{Infobox UNESCO World Heritage Site
+ |child    = yes
+ |ID       = 252
+ |year     = 1983
+ |criteria = Cultural: i
+ |embedded = {{maplink|frame=yes|frame-width=220|frame-align=center|zoom=13|type=point|marker=landmark|stroke-width=2|plain=yes|coord={{Coord|27|10|30|N|78|2|31|E}}}} Location of the Taj Mahal in Agra
+}}
+| area = {{convert|17|ha}}
+| built_for = Mumtaz Mahal
+| governing_body = Ministry of Culture, Government of India{{small|(via Archaeological Survey of India)}}
+| website = {{URL|tajmahal.gov.in}}
+| designation2 = MANI
+| designation2_offname = Taj Mahal and grounds{{small|(including the Masjid on the west side, the pavilions on the east and west sides of the grounds)}}
+| designation2_type = 
+| designation2_criteria = 
+| designation2_date = 
+| delisted2_date = 
+| designation1_partof = 
+| designation2_number = N-UP-A28{{small|(and monuments a-p)}}
+| designation2_free1name = 
+| designation2_free1value = 
+| designation2_free2name = 
+| designation2_free2value = 
+| designation2_free3name = 
+| designation2_free3value =
+}}
+The Taj Mahal ({{IPAc-en|ˌ|t|ɑː|dʒ|_|m|ə|ˈ|h|ɑː|l|,_|ˌ|t|ɑː|ʒ|_|-}} {{respell|TAHJ|_|mə|HAHL|,_|TAHZH|_-}}; {{IPA|hns|t̪ɑːd͡ʒ ˈmɛɦ(ɛ)l|lang}}; {{lit|Crown of the Palace}}) is an ivory-white marble mausoleum on the right bank of the river Yamuna in Agra, Uttar Pradesh, India. It was commissioned in 1631 by the fifth Mughal emperor, Shah Jahan ({{reign|1628|1658}}), to house the tomb of his late wife, Mumtaz Mahal; it also houses the tomb of Shah Jahan himself. The tomb is the centrepiece of a {{convert|42|acre|ha|order=flip|adj=on}} complex, which includes a mosque and a guest house, and is set in formal gardens bounded on three sides by a crenellated wall.
+
+Construction of the mausoleum was completed in 1648, although work on other parts of the complex continued for another five years. The first ceremony held at the mausoleum was an observance by Shah Jahan, on 6 February 1643, of the 12th anniversary of the death of Mumtaz Mahal. The Taj Mahal complex is believed to have been completed in its entirety in 1653 at a cost estimated at the time to be around {{INR|link=yes}}32 million, which in 2015 would be approximately {{INR}}52.8 billion ({{USD}}827 million).
+
+The building complex incorporates the design traditions of Indo-Islamic and Mughal architecture. It employs symmetrical constructions with the usage of various shapes and symbols. While the mausoleum is constructed of white marble inlaid with semi-precious stones, red sandstone was used for other buildings in the complex similar to contemporary Mughal-era buildings. The construction project employed more than 20,000 workers and artisans under the guidance of a board of architects led by Ustad Ahmad Lahori, the emperor's court architect. The complex was designed and executed by a multinational board of artisans and supervisors, including Ottoman dome designer Ismail Afandi; Persian architects Ustad Isa, Isa Muhammad Effendi, and Puru; chief calligrapher Amanat Khan Shirazi; finial caster Qazim Khan; and masonry supervisors Muhammad Hanif, Mir Abdul Karim, and Mukkarimat.
+
+The Taj Mahal was designated as a UNESCO World Heritage Site in 1983 for being "the jewel of Muslim art in India and one of the universally admired masterpieces of the world's heritage". It is regarded as one of the best examples of Mughal architecture and a symbol of Indian history. The Taj Mahal is a major tourist attraction and attracts more than five million visitors a year. In 2007, it was declared a winner of the New 7 Wonders of the World initiative. The Taj Mahal and its setting, surrounding grounds, and structures are a Monument of National Importance, administered by the Archaeological Survey of India.
+
+== Etymology ==
+The name "Taj Mahal" is of Urdu origin, and believed to be derived from Arabic and Persian, with the words tāj mahall meaning "crown" (tāj) "palace" (mahall). An alternative derivation of "taj" is that it was a corruption of the second syllable of "Mumtaz".
+Abdul Hamid Lahori, in his 1636 book Padshahnama, refers to the Taj Mahal as rauza-i munawwara (Perso-Arabic: {{lang|fa|روضه منواره}}, rawdah-i munawwarah), meaning the illumined or illustrious tomb.{{sfn|Tillotson|2008|page=14}}
+
+== Inspiration ==
+{{Multiple image
+| align = left
+| total_width = 250
+| image1 = Shahjahan on globe, mid 17th century.jpg
+| caption1 = Shah Jahan, 17th century painting
+| image2 = Mumtaz Mahal.jpg
+| caption2 = Artistic depiction of Mumtaz Mahal
+| }}
+
+The Taj Mahal was commissioned by Shah Jahan in 1631, to be built in the memory of his wife Mumtaz Mahal, who died on 17 June that year while giving birth to their 14th child, Gauhara Begum.{{sfn|Asher|1992|p=210}} Construction started in 1632, and the mausoleum was completed in 1648, while the surrounding buildings and garden were finished five years later.{{sfn|Sarkar|1919|pages=30, 31}}
+
+The imperial court documenting Shah Jahan's grief after the death of Mumtaz Mahal illustrates the love story held as the inspiration for the Taj Mahal.{{sfn|Chaghtai|1938|p=46}} According to contemporary historians Muhammad Amin Qazvini, Abdul Hamid Lahori and Muhammad Saleh Kamboh, Shah Jahan did not show the same level of affection for others as he had shown Mumtaz while she was alive. After her death, he avoided royal affairs for a week due to his grief and gave up listening to music and lavish dressing for two years. Shah Jahan was enamoured by the beauty of the land at the south side of Agra on which a mansion belonging to Raja Jai Singh I stood. He chose the place for the construction of Mumtaz's tomb after which Jai Singh agreed to give it to emperor Shah Jahan in exchange for a large palace in the centre of Agra.{{sfn|Chaghtai|1938| p=54}}
+
+== Architecture and design ==
+{{Main|Origins and architecture of the Taj Mahal}}
+
+ River.]]
+
+The Taj Mahal incorporates and expands on design traditions of Indo-Islamic and Mughal architecture. Inspirations for the building came from Timurid and Mughal buildings including the Gur-e Amir in Samarkand (the tomb of Timur, progenitor of the Mughal dynasty) and Humayun's Tomb in Delhi which inspired the Charbagh gardens and hasht-behesht plan of the site.{{sfn|Chaghtai|1938|p=146}}{{sfn|Koch|2006|pp=85–88}} The building complex employs symmetrical constructions with the usage of various shapes and symbols. While the mausoleum is constructed of white marble inlaid with semi-precious stones, red sandstone was used for other buildings in the complex similar to the Mughal era buildings of the time.{{sfn|Copplestone|1963|p=166}} The entire complex sits on a platform measuring {{convert|300|m|ft}} in length and {{convert|28.5|ft|m|order=flip}} in height on the banks of the Yamuna river. The platform is built with varying patterns of dark and light colored sandstone.
+
+=== Exterior ===
+s on a square plinth]]
+The mausoleum building is the central structure of the entire complex. It is a white marble structure standing on a {{convert|6|m|ft|adj=on}} high square plinth with sides measuring {{convert|95.5|m|ft}} in length. The base structure is a large multi-chambered cube with chamfered corners forming an eight-sided structure that is approximately {{convert|57.3|m|ft}} long on each of the four long sides.
+
+The building has four identical sides with iwans (arch-shaped doorways), topped by a large dome and finial. Each side of the iwan is framed with a {{convert|33|m|ft|adj=on}} high pishtaq (vaulted archway) with two similarly shaped arched balconies stacked on either side. This motif of archways is replicated on a smaller scale on the chamfered corner areas, making the design completely symmetrical. At the southern side of the platform, facing the garden, there are two flights of stairs on either side which are partly covered and provide the only access from ground level up to the mausoleum building.
+
+{{Multiple image
+| align       = right
+| total_width = 350
+| image1      = Dome Chhatris Spires - Taj Mahal - Agra 2014-05-14 3805.JPG
+| caption1    = The large onion dome topped by a finial
+| image2      = Taj Mahal finial-1.jpg
+| caption2    = Finial, tamga of the Mughal Empire
+| }}
+
+The predominant feature of the mausoleum is the {{convert|23|m|ft|adj=on}} high marble dome that surmounts the tomb. The onion shaped dome sits on a {{convert|12|m|ft|adj=on}} high cylindrical drum with an inner diameter of {{convert|18.4|m|ft|}}. The dome is slightly asymmetrical and is topped by a {{convert|9.6|m|ft|adj=on}} high gilded finial.{{sfn|Ahuja|Rajani|2016|pp=996–997}} The intermediate zone between the drum and the dome is supplanted by an ornamental moulding with a twisted rope design.
+
+The main dome is surrounded by four smaller domes or chattris placed at its corners, which replicate the onion shape of the main dome. The smaller domes are supported by columns which stand on the top of the main structure and help bring light to the interior of the building. Tall spires called guldastas extend from edges of walls which serve as decorative elements. The main and the smaller domes are decorated with a design resembling a lotus flower. The domes are topped by decorative finials which uses Persian and Indian design elements.{{sfn|Bloom|Blair|2009|p=32}} The main finial was originally made of gold but was replaced by a copy made of gilded bronze in the early 19th century. The finial is topped by a moon, a typical Islamic motif, whose horns point heavenward.{{sfn| Tillotson|1990}}
+
+s on east side and their size compared to humans]]
+
+Four minarets flank the tomb building, one at each corner of the plinth facing the chamfered corners. The four minarets, which are each more than {{convert|130|ft|m|order=flip}} tall, are symmetrically arranged on the corners facing the chamfered corners of the main building. Each minaret is composed of three almost equal parts with balconies at the intersection of the portions. The towers are also surmounted by smaller chattris and incorporate the same design elements as the main dome with a finial. Steps lead to the top of the tower with rectangular openings below the domes providing light and air on the top. The minarets were designed similar to traditional elements of a mosque, which are used by the muezzin to call for prayer. The minarets were constructed slightly oriented towards the outside of the plinth so that in the event of collapse, the material from the towers would tend to fall away from the tomb.
+
+, jali windows and Arabic calligraphy]]
+
+The external surfaces of the building are decorated with a number of delicate relief art adorned with various precious and semi-precious stones. The decorative elements were created by applying paint, stucco, stone inlays or carvings. In line with the Islamic prohibition against the use of anthropomorphic forms, the decorative elements can be grouped into either calligraphy, abstract forms or vegetative motifs. The white marble dados consist of ornamental bas relief depictions of nature and plant based elements. The marble has been polished to emphasise the exquisite detailing of the carvings and the frames and archway spandrels are decorated with pietra dura inlays of stylised geometric pattern of vines, flowers and fruits.
+
+The domes and vaults of the sandstone buildings are worked with tracery of incised painting to create elaborate geometric forms. Herringbone inlays define the space between the adjoining elements. White inlays are used in sandstone buildings, and dark or black inlays on the white marbles. Contrasting colors have been used to create a complex array of different geometric patterns across the mortared areas of the buildings. The floors and walkways are laid with tiles or blocks with contrasting colors and consisting of various tessellation patterns. The plinth is differentiated from the paved surface of the main platform by an interlocking pattern of octagonal white marble pieces set into four pointed stars made of red sandstone, surrounded by a border. The building has many lattice windows or jalis with interlocking hexagonal patterns.
+
+The gateway arches are bordered by Arabic calligraphy with passages from the Qur'an. Much of the calligraphy is composed of florid thuluth script made of jasper or black marble inlaid in white marble panels. Higher panels are written with slightly larger script to reduce the skewing effect when viewed from below. The calligraphy on the southern gate roughly translates to "O Soul, thou art at rest. Return to the Lord at peace with Him, and He at peace with you."{{sfn|Koch|2006| p= 100}} The calligraphy on the buildings was created in 1609 by Abdul Haq, who was conferred the title of "Amanat Khan" by Shah Jahan. At the base of the interior dome is the inscription, "Written by the insignificant being, Amanat Khan Shirazi".
+
+=== Interior ===
+{{Multiple image
+| align       = right
+| total_width = 350
+| image1      = Interior4.jpg
+| caption1    = The central chamber with the cenotaphs
+| image2      = Interior of Taj, Agra (cropped).jpg
+| caption2    = A jali screen surrounding the cenotaphs
+| }}
+
+The main inner chamber is an octagon with {{convert|24|ft|m|adj=on|order=flip}} sides, with the design allowing for entry from each face with the main door facing the garden to the south. Two tiers of eight pishtaq arches are located along the walls, similar to the exterior.{{sfn|Khatri|2012|page=128}} The four central upper arches form balconies or viewing areas, and each balcony's exterior window has an intricate jali. The inner wall is open along the axes where jali screens are fitted which transmit light from the exterior to the interior of the main chamber. Except the south side, other three sides consist of an open elongated room flanked by two square cells covered with decorated ceilings set on the platform. The central room has arched openings on three sides fitted with jalis filled with panes of glass and a small rectangular window cut into the central jali. The square cells which are reached through separate doors were probably originally used for visitors and Qur'an reciters as a place to rest. Staircases lead from the ground floor to the roof level, where there are corridors between the central hall and the two corner rooms in the south with a system of ventilation shafts.
+
+The interior walls are about {{convert|25|m|ft|}} high and are topped by a "false" interior dome decorated with a sun motif. The inlay work is a lapidary of precious and semiprecious gemstones.{{sfn|Malaviya|2004}} Each chamber wall is highly decorated with dado bas-relief, intricate lapidary inlay and refined calligraphy panels similar to the design elements seen throughout the exterior of the complex.{{sfn|Alī Jāvīd|2008|page=309}} The main chamber houses the false sarcophagi of Mumtaz Mahal and Shah Jahan, while the real ones are in the basement. Perforated marble jalis (mahjar-i mushabbak) border the cenotaphs and are made from eight marble panels carved through with intricate pierce work inlaid in delicate detail with semi-precious stones. The cenotaphs were originally covered by a screen made of gold on the occasion of the second anniversary of Mumtaz Mahal's death in 1633, which was later replaced by the marble screen in 1643.
+
+{{Multiple image
+| align       = right
+| total_width = 350
+| image1      = Persian prince tomb taj mahal.jpg
+| caption1    = The false sarcophagi of Mumtaz Mahal (right) and Shah Jahan (left) in the main chamber
+| image2      = Tombs-in-crypt.jpg
+| caption2    = The actual sarcophagi of Mumtaz Mahal (right) and Shah Jahan (left) in the basement
+}}
+
+Situated within the screen in the upper main chamber are the likenesses of the tombs of Mumtaz Mahal and Shah Jahan with the actual burials done below in the lower tomb chamber. From the southern main entrance room, a stairway leads to the lower tomb chamber which is rectangular in shape with walls laid with marble and an undecorated coved ceiling. The cenotaph of Mumtaz is located in the exact center of the chamber on a marble base of {{convert|1.5|by|2.5|m|ftin}}. Shah Jahan's cenotaph is situated on a larger base on the western side in an asymmetrical arrangement. On the top is a traditional sculpture of a small pen box denoting it as a male tomb.{{sfn|Khatri|2012|page=128}}  The cenotaphs are aligned north–south, with the head towards the north and the bodies were laid in on their sides with the face turned towards the west, facing Mecca.
+
+{{Multiple image
+| align       = right
+| total_width = 350
+| image1      = Jali-inlay.jpg
+| caption1    = Motifs on the screen
+| image2      = Agra-Taj Mahal-38-Inkrustation-2018-gje.jpg
+| caption2    = Flower decoration
+| }}
+
+The calligraphy found on the marble cenotaphs in the tomb is particularly detailed and delicate. While the cenotaphs are similar to the ones from the Mughal era, no other tombs from the era were adorned with such an exquisite decoration. On Mumtaz's sarcophagus on the top, the decoration consists of natural plum fruits, buds and flower blossoms inlaid with Qur'anic inscriptions with the epitaph reading "The illumined grave of Arjumand Bano Begam, entided Mumtaz Mahal, who died in the year 1631". The original tomb in the lower level is largely undecorated, with Ninety Nine Names of God inscribed on the side. The false cenotaph of Shah Jahan has similar decorations and is covered with flowers and other scroll work without any inscriptions. The epitaph surrounded by red poppy flowers reads "This is the sacred grave of His Most Exalted Majesty, Dweller in Paradise (Firdaus Ashiyani), Second Lord of the Auspicious. Conjunction (Sahib-i Qiran-i Sani), Shah Jahan, Padshah; may it ever be fragrant! The year 1076 [AD 1666]". The original cenotaph of Shah Jahan is a more simply decorated version with similar red flowers and yellow plants with a more comprehensive epitaph reading "This is the illumined grave and sacred resting place of the emperor, dignified as Rizwan, residing in Eternity, His Majesty, having his abode in [the celestial realm of] Illiyun, Dweller in Paradise (Firdaus Ashiyani) [posthumous title of Shah Jahan], the Second Sahib-i Qiran, Shah Jahan, Padshah Ghazi [Warrior for the Faith]; may it be sanctified and may Paradise become his abode. He travelled from this world to the banquet hall of eternity on the night of the twenty-sixth of the month of Rajab, in the year one thousand and seventy-six Hijri [31 January AD 1666]".
+
+=== Garden ===
+
+The complex is set around a large charbagh or Mughal garden. The garden is divided by two main walkways (khiyaban) into four quadrants with further raised pathways that divide each of the four-quarters into 16 sunken parterres or flowerbeds. The garden is surrounded by a walkway connecting all the quadrants. Halfway between the tomb and gateway in the centre of the garden is a raised marble water tank with five fountains and a reflecting pool positioned on a north–south axis to reflect the image of the mausoleum. The elevated marble water tank is called al Hawd al-Kawthar in reference to the "Tank of Abundance" promised to Muhammad.{{sfn|Begley|1979|p=14}} Elsewhere, the garden is laid out with avenues of trees and fountains. In the north-western quadrant, is a place that marks the site where Mumtaz Mahal was first buried, before her body was moved to its final resting place inside the main chamber of the mausoleum.
+
+The charbagh garden, a design inspired by Persian gardens, was introduced to India by Babur, the first Mughal emperor and symbolises the Paradise garden (Jannah) with four rivers flowing from a central spring or mountain, separating the garden into north, west, south and east. While most gardens of the era are rectangular with a tomb or pavilion in the centre, the Taj gardens is unusual in that the main element, the tomb, is located at the end of the garden. With the discovery of Mahtab Bagh ("Moonlight Garden") on the other side of the Yamuna river, the Archaeological Survey of India has hypothesised that the Yamuna river itself was incorporated into the garden's design and was meant to be seen as one of the rivers of Paradise.{{sfn|Wright|2000}} Similarities in layout and architectural features with the Shalimar Gardens suggest that both gardens may have been designed by the same architect, Ali Mardan.{{sfn|Allan|1958|p=318}} Early accounts of the garden describe its profusion of vegetation, including abundant roses, daffodils, and fruit trees.{{sfn| Dunn |2007}} As the Mughal Empire declined, the gardens were not maintained, and when the British Raj assumed management of the gardens, they changed the landscaping to resemble the formal lawns of London in the 19th century.{{sfn|Koch|2006| p= 139}}{{sfn|Royals|1996|page=7}}
+
+The water supply for the gardens were derived from the Yamuna River, where a water channel transported the water into an underground reservoir along the eastern wall of a storage building containing multiple storage tanks. The water from the reservoir was lifted by means of a system of pulleys and wheels, turned by animals, to a tank that supplied an aqueduct which ran south carrying water up to the western wall before turning east. The water was later distributed throughout the garden through earthenware pipes embedded underground. The fountains in the central tank consisted of large vessels made of copper and inter-connected through copper pipes and the drop from the {{cvt|9.47|m|ft|adj=on}} high walls created the necessary water for the fountains.
+
+=== Outlying buildings ===
+{{Infobox religious building
+| name                     = Kali Mosque
+| image                    = Taj Mahal Mosque, Agra.jpg
+| image_upright            = 1.4
+| alt                      = 
+| caption                  = The western building, a mosque, faces the tomb
+| coordinates_footnotes    = 
+| religious_affiliation    = Islam
+| location                 = Agra, Uttar Pradesh
+| country                  = India
+| deity                    = 
+| rite                     = 
+| sect                     = 
+| tradition                = 
+| festival                 = 
+| cercle                   = 
+| sector                   = 
+| administration           = Archaeological Survey of India
+| consecration_year        = 
+| status    = Mosque
+| functional_status        = Active{{clarify|date=March 2025|reason=Is it functioning as a mosque; or is it a monument, only?}}
+| heritage_designation     = 
+| ownership                = 
+| governing_body           = 
+| leadership               = 
+| bhattaraka               = 
+| patron                   = 
+| religious_features_label = 
+| religious_features       = 
+| architect                = 
+| architecture_type        = {{nowrap|Mosque architecture}}
+| architecture_style       = Mughal
+| founded_by               = 
+| creator                  = 
+| funded_by                = 
+| general_contractor       = 
+| established              = 
+| groundbreaking           = 
+| construction_cost        = 
+| date_demolished          = 
+| facade_direction         = 
+| capacity                 = 
+| length                   = 
+| width                    = 
+| width_nave               = 
+| interior_area            = 
+| height_max               = 
+| dome_quantity            = Three
+| dome_height_outer        = 
+| dome_height_inner        = 
+| dome_dia_outer           = 
+| dome_dia_inner           = 
+| minaret_quantity         = 
+| minaret_height           = 
+| spire_quantity           = 
+| spire_height             = 
+| site_area                = 
+| temple_quantity          = 
+| monument_quantity        = 
+| shrine_quantity          = 
+| inscriptions             = 
+| materials                = Red sandstone
+| elevation_m              = 
+| elevation_footnotes      = 
+| nrhp                     = 
+| designated               = 
+| added                    = 
+| refnum                   = 
+| footnotes                = 
+| website                  = 
+| module                   = {{Infobox historic site
+ | embed = yes
+ | designation2 = MANI
+ | designation2_offname = Taj Mahal and grounds:Kali Masjid and enclosure wall
+ | designation2_type =
+ | designation2_criteria =
+ | designation2_date =
+ | delisted2_date =
+ | designation2_partof = Taj Mahal
+ | designation2_number = N-UP-A28-g
+ | designation2_free1name =
+ | designation2_free1value =
+ | designation2_free2name =
+ | designation2_free2value =
+ | designation2_free3name =
+ | designation2_free3value =
+}}
+}}
+
+The Taj Mahal complex is enclosed by crenellated red sandstone walls on three sides, with the side facing the Yamuna river left open. Outside the complex walls, there are other mausoleums dedicated to Shah Jahan's other wives, royals and favorite servants. The inner sides of the walls feature columned arcades, adorned with domed cuppola like chattris and smaller structures like the Music House interspersed between them. The main gateway, primarily built of marble, mirrors the tomb's architecture and incorporates intricate decorations like bas-relief and pietra dura inlays. At the far end of the complex stand two similar buildings built of red sandstone, one of which is designated as a mosque and the other as a jawab, a structure to provide architectural symmetry. The mosque's design resembles others built during the era and the jawab has floors with inlaid patterns while lacking a mihrab.
+
+== Construction ==
+
+The land on which the Taj Mahal is situated was present to the south of the walled city of Agra which was given to Shah Jahan by Raja Jai Singh I in exchange for a large palace in the centre of Agra.{{sfn|Chaghtai|1938| p=54}} The building was commissioned in 1631, and construction commenced in 1632. An area of roughly {{convert|3|acre|ha|order=flip}} was excavated, filled with dirt to reduce seepage, and levelled at {{convert|50|m|ft}} above the riverbank level. In the tomb area, piles were dug and filled with lime and stone to form the footings of the tomb. The platform above the ground was constructed of brick and mortar.
+
+The tomb complex was built mainly using brick and lime mortar. The external surface of the main tomb building and the interior of the main cenotaph chamber is veneered with white marble. The other interior surfaces and other accessory buildings are lined with red sandstone coated with a red octet for protection, excluding the exterior surfaces of domes. The white marble came from Makrana in Rajasthan, while the red sandstone was quarried from Fatehpur Sikri in Uttar Pradesh. Many precious and semi-precious stones, used for decoration, were imported from across the world, including jade and crystal from China, turquoise from Tibet, Lapis lazuli from Afghanistan, sapphire from Sri Lanka and carnelian from Arabia. In all, 28 types of precious and semi-precious stone were inlaid into the white marble.
+
+It is believed that more than 20,000 artisans, labourers, painters and others were involved in the construction of the building. Specialist sculptors from Bukhara, calligraphers from Syria and Persia, designers from southern India, stone cutters from Baluchistan and Italian artisans were employed. Workmen constructed a colossal brick scaffold that mirrored the tomb rather than wooden scaffolds.{{sfn|Koch|1997}} A {{cvt|15|km}} long earthern ramp was built to transport marble and materials to the construction site, hauled on specially constructed wagons by teams of oxen and elephants.{{sfn|Carroll |1973 |p=64 }} An elaborate post-and-beam pulley system was used to raise the blocks into the desired position. Water was drawn from the river by a series of an animal-powered devices.
+
+When the structure was partially completed, the first ceremony was held at the mausoleum by Shah Jahan on 6 February 1643, of the 12th anniversary of the death of Mumtaz Mahal.{{efn|Although her death was on 17 June 1631, the corresponding date on the Muslim calendar was 17 Dhu al-Qadah 1040 AH; the 12th anniversary on 17 Dhu al-Qadah 1052 AH was 6 February 1643 on the Gregorian calendar.}} Construction of the mausoleum was completed in 1648, but work continued on other phases of the project for another five years.{{sfn|Sarkar|1919|pages=30, 31}} The Taj Mahal complex is believed to have been completed in 1653 at a cost estimated at the time to be around {{INR|link=yes}}32 million, which in 2015 would be approximately {{INR}}52.8 billion ({{USD}}827 million).
+
+== Later years ==
+, 1860s]]
+
+In December 1652, Shah Jahan's son Aurangzeb wrote a letter to his father about the tomb, the mosque and the assembly hall of the complex developing extensive leaks during the previous rainy season. In 1658, Shah Jahan was deposed by Aurangzeb and put under house arrest at the nearby Agra Fort from where he could see the Taj Mahal. Upon Shah Jahan's death in 1666, Aurangzeb buried him in the mausoleum next to his wife.{{sfn|Gascoigne|1971|p=243}} In the 18th century, the Jat rulers of Bharatpur attacked the Taj Mahal while invading Agra and took away two chandeliers, one of agate and another of silver, which had hung over the main cenotaph and the gold and silver screen. Kanbo, a Mughal historian, said the gold shield which covered the {{convert|15|ft|m|adj=mid|-high|order=flip}} finial at the top of the main dome was also removed during the Jat despoliation.{{sfn|Swamy|2003}}
+
+By the late 19th century, parts of the buildings had fallen into disrepair. At the end of the century, British viceroy Lord Curzon ordered a restoration project, which was completed in 1908. He also commissioned the large lamp in the interior chamber and replaced the gardens with European-style lawns that are still in place today.
+
+ photo dated 1914.]]
+
+In 1942, the government erected scaffolding to disguise the building in anticipation of air attacks by the Japanese Air Force.{{sfn| DuTemple|2003|p=96}} Since Indian independence in 1947, the Archaeological Survey of India has been responsible for the maintenance of the monument. During the India-Pakistan wars of 1965 and 1971, scaffolding was again erected to mislead bomber pilots.
+
+In 1983, the Taj Mahal was designated as a UNESCO World Heritage Site for being "the jewel of Islamic art in India and one of the universally admired masterpieces of the world's heritage".
+
+Since the late 20th century, the monument has been affected by environmental pollution which has turned the Taj Mahal yellow-brown.{{sfn|Jayalakshmi|2014}} Acid rain and pollution affecting the Yamuna River including the presence of Mathura Oil Refinery, have contributed to the same.{{sfn|Dowdey|2007}} After directives by the Supreme Court of India pursuant to M. C. Mehta v. Union of India & Ors. case in 1997, the Indian government set up the "Taj Trapezium Zone (TTZ)", a {{convert|10400|km2|sqmi|adj=on}} area around the monument where strict emissions standards are in place.
+
+Concerns for the tomb's structural integrity have recently been raised because of a decline in the groundwater level in the Yamuna river basin, with cracks appearing in parts of the tomb in 2010 and the minarets surrounding the monument showing signs of tilting. Minor damage was reported due to storms on 11 April 2018 and 31 May 2020. In the 2020s, the Government of India has undertaken various restoration measures, including placing mud packs to restore the white color and replacing broken marble.
+
+== Symbolism ==
+{{Main|Origins and architecture of the Taj Mahal#Concepts, symbolism and interpretations}}
+
+Due to the global attention that it has received and the millions of visitors it attracts, the Taj Mahal has become a prominent image that is associated with India, and in this way has become a symbol of India itself.{{sfn|Tillotson|2008|page=32}}
+
+Along with being a renowned symbol of love, the Taj Mahal is also a symbol of Shah Jahan's wealth and power, and the fact that the empire had prospered under his rule.{{sfn|Kinra|2015|p=146}} Bilateral symmetry, dominated by a central axis, has historically been used by rulers as a symbol of a ruling force that brings balance and harmony, and Shah Jahan applied that concept in the making of the Taj Mahal.{{sfn|Koch|2005|p=140}} Additionally, the plan is aligned in the cardinal north–south direction and the corners have been placed so that when seen from the centre of the plan, the sun can be seen rising and setting on the north and south corners on the summer and winter solstices respectively. This makes the Taj a symbolic horizon.{{sfn|Sparavigna|2013|p=106}}
+
+The planning and structure of the Taj Mahal, from the building itself to the gardens and beyond, is symbolic of Mumtaz Mahal's mansion in the garden of Paradise.{{sfn|Koch|2005|p=140}} The concept of gardens of paradise is extended into the building of the mausoleum as well. The structure is decorated with colorful relief and semi-precious stones using a technique called parchin kari, symbolizing grandeur.{{sfn|Moinifar|2013|p=133}} The building appears to slightly change colour depending on the time of day and the weather. The white marble reflects varying hues—pinkish in the morning, milky white during the day, golden in the moonlight, and sometimes even a bluish hue under certain lighting conditions. This effect is due to the marble's surface reacting to light and moisture, creating a magical and ever-changing visual experience. The sky has not only been incorporated in the design through the reflecting pools but also through the surface of the building itself. This is another way to imply the presence of Allah at the site.
+
+According to Ebba Koch, art historian and international expert in the understanding and interpretation of Mughal architecture and the Taj Mahal, the planning of the entire compound symbolises earthly life and the afterlife, a subset of the symbolisation of the divine. The plan was split into two{{snd}}one half is the white marble mausoleum itself and the gardens, and the other half is the red sandstone side, meant for worldly markets. Only the mausoleum is white so as to represent the enlightenment, spirituality and faith of Mumtaz Mahal. Koch has deciphered that symbolic of Islamic teachings, the plan of the worldly side is a mirror image of the otherworldly side, and the grand gate in the middle represents the transition between the two worlds.{{sfn|Koch|2005|p=140}}
+
+== Tourism ==
+
+The Taj Mahal is a major tourist attraction and attracts a large number of domestic and foreign visitors. About five million visitors visited Taj Mahal in the financial year 2022–23. A three-tier pricing system is in place, with a significantly lower entrance fee for Indian citizens and more expensive ones for foreigners. {{As of|2024}}, the fee for Indian citizens was {{INR}}50, for citizens of SAARC and BIMSTEC countries, it was {{INR}}540 and for other foreign tourists, it was {{INR}}1,100. Visitors are allowed through three gates and, as polluting vehicles are not allowed near the complex, tourists must either walk or take electric buses from the designated parking areas. The complex is open on all days except on Fridays, from one hour before sunrise to 45 minutes before sunset. The complex is open for limited night viewing on the day of the full moon, excluding the month of Ramadan. In 2019, to address overtourism, the site instituted fines for visitors who stayed longer than three hours.{{sfn|Jaiswal|2019}} According to a 2025 government report, the Taj Mahal earned {{INRConvert|297|c}} over five years, making it the highest-earning ASI monument.
+
+The small town to the south of the Taj, known as Taj Ganji or Mumtazabad, was initially constructed with caravanserais, bazaars and markets to serve the needs of visitors and workers.{{sfn|Koch|2006|pp=201–208}} Lists of recommended travel destinations often feature the Taj Mahal, which also appears in several listings of seven wonders of the modern world, including the New Seven Wonders of the World, a poll conducted in 2007. Foreign dignitaries often visit the Taj Mahal on trips to India.
+
+== Myths ==
+
+, one of the first European writers about the Taj Mahal]]
+
+Ever since its construction, the building has been the source of an admiration transcending culture and geography, and so personal and emotional responses have consistently eclipsed scholastic appraisals of the monument.{{sfn|Koch|2006| p= 231}} A longstanding myth holds that Shah Jahan planned a mausoleum to be built in black marble as a Black Taj Mahal across the Yamuna river.{{sfn|Asher|1992|p=210}} The idea originates from fanciful writings of Jean-Baptiste Tavernier, a European traveler and gem merchant, who visited Agra in 1665. It was suggested that his son Aurangzeb overthrew Shah Jahan before it could be built. Ruins of blackened marble across the river in the Mehtab Bagh seeming to support the argument were, however, proven false after excavations carried out in the 1990s found that they were discolored white stones that had turned black.{{sfn|Koch|2006| p= 249}} A more credible theory for the origins of the black mausoleum was demonstrated in 2006 by archaeologists who reconstructed part of the pool in the Mehtab Bagh. A dark reflection of the white mausoleum could clearly be seen, befitting Shah Jahan's obsession with symmetry and the positioning of the pool itself.
+
+No concrete evidence exists for claims that describe, often in horrific detail, the deaths, dismemberment and mutilations which Shah Jahan supposedly inflicted on various architects and craftsmen associated with the tomb.{{sfn|Lahiri|2004 |p=85}} Some stories claim that those involved in construction signed contracts committing themselves to have no part in any similar design.{{sfn|Koch|2006| p=239}} No evidence exists for claims that Lord William Bentinck, governor-general of India in the 1830s, supposedly planned to demolish the Taj Mahal and auction off the marble. Bentinck's biographer John Rosselli says that the story arose from Bentinck's fund-raising sale of discarded marble from Agra Fort.{{sfn|Rosselli|1974| p=283}} Another myth suggests that beating the silhouette of the finial will cause water to come forth. To this day, officials find broken bangles surrounding the silhouette.{{sfn|Koch|2006| p= 240}}
+
+Several myths, none of which are supported by the archaeological record, have appeared asserting that people other than Shah Jahan and the original architects were responsible for the construction of the Taj Mahal. For instance, in 2000, India's Supreme Court dismissed P. N. Oak's petition to declare that a Hindu king built the Taj Mahal.{{sfn|Koch|2006|p=239}} In 2005, a similar petition brought by Amar Nath Mishra, a social worker and preacher claiming that the Taj Mahal was built by the Hindu king Paramardi in 1196, was dismissed by the Allahabad High Court.{{sfn|Ali|2014}} Several court cases and statements by right-wing politicians about Taj Mahal being a Hindu temple have been inspired by P. N. Oak's 1989 book Taj Mahal: The True Story, in which he claimed it was built in 1155 AD and not in the 17th century.{{sfn|Qureshi| 2017}} In November 2015, the Union Minister of Culture stated in the Indian Parliament that there was no evidence that it was ever a temple. In August 2017, the Archaeological Survey of India declared that there was no evidence to suggest the monument ever housed a temple.
+
+Another such unsupported theory, that the Taj Mahal was designed by an Italian, Geronimo Vereneo, held sway for a brief period after it was first promoted by Henry George Keene in 1879. Keene went by a translation of a Spanish work, Itinerario (The Travels of Fray Sebastian Manrique, 1629–1643). Another theory, that a Frenchman named Austin of Bordeaux designed the Taj, was promoted by William Henry Sleeman based on the work of Jean-Baptiste Tavernier. These ideas were revived by Father Hosten and discussed again by E. B. Havell and served as the basis for subsequent theories and controversies.{{sfn|Dixon|1987|p=170}}
+
+== See also ==
+{{Portal|India|Islam|Architecture}}
+{{columns-list|colwidth=35em|
+* Architecture of India
+* Indo-Islamic architecture
+* List of tallest domes
+* List of tallest structures built before the 20th century
+* Taj Mahal replicas and derivatives
+* Wonders of the World
+}}
+
+== Notes ==
+{{notelist}}
+
+== References ==
+=== Citations ===
+{{reflist}}
+
+=== General sources ===
+{{Refbegin|30em}}
+* {{Cite news |last=Ahluwalia |first=Ravneet |date=3 October 2017 |title=Taj Mahal dropped from tourism booklet by state government |work=The Independent |url=https://www.independent.co.uk/travel/news-and-advice/taj-mahal-india-dropped-tourism-booklet-utter-pradesh-government-a7981171.html |url-status=live |url-access=subscription |archive-url=https://ghostarchive.org/archive/20220526/https://www.independent.co.uk/travel/news-and-advice/taj-mahal-india-dropped-tourism-booklet-utter-pradesh-government-a7981171.html |archive-date=26 May 2022}}
+* {{Cite news |last=Ali |first=Mohammad |date=8 December 2014 |title=Taj Mahal part of an ancient temple: UP BJP chief |work=The Hindu |url=https://www.thehindu.com/news/taj-mahal-part-of-an-ancient-temple-uttar-pradesh-bjp-chief/article6672772.ece |url-status=live |access-date=7 February 2015 |archive-url=https://web.archive.org/web/20141208164541/http://www.thehindu.com/news/taj-mahal-part-of-an-ancient-temple-uttar-pradesh-bjp-chief/article6672772.ece |archive-date=8 December 2014}}
+* {{Cite book |last=Asher |first=Catherine B. |author-link=Catherine B. Asher |url=https://books.google.com/books?id=3ctLNvx68hIC |title=Architecture of Mughal India |publisher=Cambridge University Press |year=1992 |isbn=978-0-521-26728-1}}
+* {{Cite journal |last1=Ahuja |first1=Dilip R. |last2=Rajani |first2=M.B. |year=2016 |title=On the symmetry of the central dome of the Taj Mahal |url=http://www.currentscience.ac.in/Volumes/110/06/0996.pdf |url-status=live |journal=Current Science |volume=110 |issue=6 |pages=996–997 |doi=10.18520/cs/v110/i6/996-999 |doi-broken-date=1 July 2025 |archive-url=https://web.archive.org/web/20190611065617/https://www.currentscience.ac.in/Volumes/110/06/0996.pdf |archive-date=11 June 2019 |access-date=5 May 2016| issn=0011-3891}}
+* {{Cite book |last=Ahmed |first=Akbar S. |url=https://books.google.com/books?id=xu8BAwAAQBAJ |title=Islam Today: A Short Introduction to the Muslim World |publisher=I.B. Tauris |year=1998 |isbn=978-0-85771-380-3}}
+* {{Cite book |last=Allan |first=John |title=The Cambridge Shorter History of India |publisher=S. Chand, 288 pages |year=1958 |edition=First |location=Cambridge}}
+* {{Cite book |last=Alī Jāvīd |first=Tabassum Javeed |url=https://books.google.com/books?id=fg-lGID3WpQC&q=inlay+work+of+taj+mahal+semi+precious+stones&pg=PA272 |title=World Heritage Monuments and Related Edifices in India, Volume 1 |publisher=Algora Publishing |year=2008 |isbn=978-0-87586-483-9 |archive-url=https://web.archive.org/web/20180303132909/https://books.google.com/books?id=fg-lGID3WpQC&pg=PA272&dq=inlay+work+of+taj+mahal+semi+precious+stones&hl=en&sa=X&ei=anBIVa7JG9KXuAS1toDQCQ&ved=0CBwQ6AEwAA#v=onepage&q=inlay%20work%20of%20taj%20mahal%20semi%20precious%20stones&f=false |archive-date=3 March 2018 |url-status=live}}
+* {{Cite journal |last=Begley |first=Wayne E. |date=March 1979 |title=The Myth of the Taj Mahal and a New Theory of Its Symbolic Meaning |url=https://www.collegeart.org/pdf/artbulletin/Art%20Bulletin%20Vol%2061%20No%201%20Begley.pdf |url-status=live |journal=The Art Bulletin |volume=61 |issue=1 |pages=7–37 |doi=10.2307/3049862 |jstor=3049862 |archive-url=https://web.archive.org/web/20220307200504/https://www.collegeart.org/pdf/artbulletin/Art%20Bulletin%20Vol%2061%20No%201%20Begley.pdf |archive-date=7 March 2022 |access-date=1 March 2022}}
+* {{Cite book |last1=Bloom |first1=Jonathan M. |title=The Grove Encyclopedia of Islamic Art and Architecture |last2=Blair |first2=Sheila S. |date=1 January 2009 |isbn=978-0-19-530991-1 |doi=10.1093/acref/9780195309911.001.0001}}
+* {{Cite book |last=Carroll |first=David |url=https://archive.org/details/tajmahal00carr |title=The Taj Mahal |publisher=Newsweek |year=1973 |isbn=978-0-88225-024-3 |url-access=registration}}
+* {{Cite thesis |last=Chaghtai |first=Muhammad Abdulla |title=Le Tadj Mahal d'Agra (Inde), histoire et description comprenant en appendice le texte d'un ms. persan sur le Tadj provenant de la Bibliothèque nationale à Paris: thèse pour le doctorat d'Université présentée à la Faculté des lettres de l'Université de Paris, par Muhammad Abdulla Chaghtai |publisher=Éditions de la Connaissance |year=1938}}
+* {{Cite book |last=Copplestone |first=Trewin |url=https://books.google.com/books?id=mJVbDfLwZw4C |title=World architecture: an illustrated history from earliest times |publisher=Crescent Books |year=1963 |isbn=978-0-517-35148-2}}
+* {{Cite journal |last=Dixon |first=Jack S. |year=1987 |title=The Veroneo controversy |journal=The Journal of Imperial and Commonwealth History |volume=15 |issue=2 |pages=170–178 |doi=10.1080/03086538708582735}}
+* {{Cite web |last=Dowdey |first=Sarah |date=5 August 2007 |title=How Acid Rain Works |url=https://science.howstuffworks.com/nature/climate-weather/atmospheric/acid-rain.htm |url-status=live |archive-url=https://web.archive.org/web/20100306080945/http://science.howstuffworks.com/acid-rain2.htm |archive-date=6 March 2010 |access-date=16 January 2019 |website=HowStuffWorks}}
+* {{Cite web |last=Dunn |first=Jerry Camarillo Jr. |date=2007 |title=HowStuffWorks: The Taj Mahal |work=HowStuffWorks |url=https://adventure.howstuffworks.com/taj-mahal-landmark.htm |archive-url=https://web.archive.org/web/20070913084703/http://travel.howstuffworks.com/taj-mahal-landmark.htm |archive-date=13 September 2007}}
+* {{Cite book |last=DuTemple |first=Lesley A. |url=https://books.google.com/books?id=J--NBIJ55AMC&q=scaffolding+taj+mahal+world+war&pg=PA77 |title=The Taj Mahal |publisher=Twenty-First Century Books |year=2003 |isbn=978-0-8225-4694-8 |access-date=7 February 2015 |archive-url=https://web.archive.org/web/20180303132909/https://books.google.com/books?id=J--NBIJ55AMC&pg=PA77&lpg=PA77&dq=scaffolding+taj+mahal+world+war&source=bl&ots=QGPOpLQ1G_&sig=pKNLL7VHDa5ZJZIf2Ormrb1CY74&hl=en&sa=X&ei=vjHSVNy8JcGwuASg2oKoDg&ved=0CDkQ6AEwBTgK#v=onepage&q=scaffolding%20taj%20mahal%20world%20war&f=false |archive-date=3 March 2018 |url-status=live}}
+* {{Cite book |last=Gascoigne |first=Bamber |url=https://books.google.com/books?id=-ryFAAAAIAAJ |title=The great Moghuls |publisher=Cape |year=1971 |isbn=978-0-224-00580-7}}
+* Havell, E.B. (1913). Indian Architecture: Its Psychology, Structure and History, John Murray.
+* {{Cite book |last=Havell |first=E. B. |title=A Handbook to Agra and the Taj, Sikandra, Fatehpur-Sikri and the Neighbourhood |year=2004 |location=Calcutta}}
+* {{Cite web |last=Jaiswal |first=Anuja |date=12 June 2019 |title=Now, pay fine if you spend more than 3 hrs at Taj |url=https://timesofindia.indiatimes.com/india/now-pay-fine-if-you-spend-more-than-3-hrs-at-taj/articleshow/69748831.cms |url-status=live |archive-url=https://web.archive.org/web/20230308095054/https://timesofindia.indiatimes.com/india/now-pay-fine-if-you-spend-more-than-3-hrs-at-taj/articleshow/69748831.cms |archive-date=8 March 2023 |access-date=13 January 2020 |website=The Times of India}}
+* {{Cite web |last=Jayalakshmi |first=K. |date=11 December 2014 |title=India: Pollution turning the Taj Mahal brown |url=http://www.ibtimes.co.uk/pollution-carbon-soot-dust-discolouring-taj-mahal-1479036 |url-status=live |archive-url=https://web.archive.org/web/20150204182429/http://www.ibtimes.co.uk/pollution-carbon-soot-dust-discolouring-taj-mahal-1479036 |archive-date=4 February 2015 |access-date=7 February 2015 |website=International Business Times}}
+* {{Cite book |last=Khatri |first=Vikas |url=https://books.google.com/books?id=mVKcA0S3kqYC |title=Greatest Wonders of the World |publisher=V&S Publishers |year=2012 |isbn=978-93-81588-30-7}}
+* {{Cite book |last=Kinra |first=Rajeev |title=Writing Self, Writing Empire: Chandar Bhan Brahman and the Cultural World of the Indo-Persian State Secretary |publisher=University of California Press |year=2015 |location=Oakland}}
+* {{Cite journal |last=Koch |first=Ebba |year=1997 |title=Mughal Palace Gardens from Babur to Shah Jahan (1526–1648) |journal=Muqarnas |volume=14 |pages=143–165 |doi=10.2307/1523242 |jstor=1523242}}
+* {{Cite journal |last=Koch |first=Ebba |date=March 2005 |title=The Taj Mahal: Architecture, Symbolism, and Urban Significance |journal=Muqarnas |volume=22 |pages=128–149 |doi=10.1163/22118993_02201008 |jstor=25482427|doi-access=free }}
+* {{Cite book |last=Koch |first=Ebba |url=https://archive.org/details/completetajmahal0000koch |title=The Complete Taj Mahal: And the Riverfront Gardens of Agra |publisher=Thames & Hudson |year=2006 |isbn=978-0-500-34209-1 |edition=First |url-access=registration}}
+* {{Cite book |last=Lahiri |first=Jhumpa |title=The Namesake |date=2004 |publisher=Houghton Mifflin Harcourt |isbn=978-0-547-42931-1}}
+* {{Cite news |last=Malaviya |first=Nalini S. |date=19 March 2004 |title=Tables with inlay work enhance appeal of your interiors |work=The Economic Times |url=http://articles.economictimes.indiatimes.com/2004-03-19/news/27399169_1_coffee-tables-inlay-work-wood |url-status=unfit |access-date=5 May 2015 |archive-url=https://web.archive.org/web/20160529010941/http://articles.economictimes.indiatimes.com/2004-03-19/news/27399169_1_coffee-tables-inlay-work-wood |archive-date=29 May 2016}}
+* {{Cite journal |last=Moinifar |first=Heshmat H. |date=2013 |title=Taj Mahal as a Mirror of Multiculturalism and Architectural Diversity in India |journal=Journal of Subcontinent Researches}}
+* {{Cite web |last=Qureshi |first=Siraj |date=2017 |title=Another court petition challenges Taj Mahal's story as a symbol of love |url=https://www.indiatoday.in/india/story/taj-mahal-court-petition-shiva-temple-1029352-2017-08-12 |url-status=live |archive-url=https://web.archive.org/web/20190509133345/https://www.indiatoday.in/india/story/taj-mahal-court-petition-shiva-temple-1029352-2017-08-12 |archive-date=9 May 2019 |access-date=16 January 2019 |website=India Today}}
+* {{Cite book |last=Rosselli |first=John |author-link=John Rosselli (historian)|url=https://archive.org/details/lordwilliambenti0000ross |title=Lord William Bentinck: The Making of a Liberal Imperialist, 1774–1839 |publisher=University of California Press |year=1974 |isbn=978-0-520-02299-7 |url-access=registration}}
+* {{Cite book |last=Royals |first=Sue |url=https://books.google.com/books?id=NB4R6JBqkaQC |title=Our Global Village – India |publisher=Lorenz Educational Press |year=1996 |isbn=978-1-4291-1107-2 |location=India |archive-url=https://web.archive.org/web/20151013130440/https://books.google.com/books?id=NB4R6JBqkaQC&source=gbs_navlinks_s |archive-date=13 October 2015 |url-status=live}}
+* {{Cite book |last=Sarkar |first=Jadunath (Sir) |url=https://archive.org/stream/studiesinmughali00sarkuoft#page/30/mode/2up |title=Studies in Mughal India |date=1919 |publisher=Calcutta M.C. Sarkar |access-date=20 May 2015}}
+* {{Cite journal |last=Sparavigna |first=Amelia Carolina |date=November 2013 |title=The Gardens of Taj Mahal and the Sun |journal=International Journal of Sciences}}
+* {{Cite news |last=Swamy |first=K.R.N. |date=13 July 2003 |title=Perils the Taj has faced |work=The Tribune (Chandigarh) |url=https://www.tribuneindia.com/2003/20030713/spectrum/heritage.htm |url-status=live |access-date=7 February 2015 |archive-url=https://web.archive.org/web/20160117180841/http://www.tribuneindia.com/2003/20030713/spectrum/heritage.htm |archive-date=17 January 2016}}
+* {{Cite book |last=Tillotson |first=Giles Henry Rupert |url=https://books.google.com/books?id=vtnVAAAAMAAJ |title=Mughal India |publisher=Chronicle Books |year=1990 |isbn=978-0-87701-686-1}}
+* {{Cite book |last=Tillotson |first=G. H. R |url=https://books.google.com/books?id=Q4zYd848UJkC |title=Taj Mahal |publisher=Harvard University Press |year=2008 |isbn=978-0-674-03186-9}}
+* {{Cite book |last=Wells |first=John C. |title=Longman pronunciation dictionary |publisher=Longman |year=1990 |isbn=0-582-05383-8 |location=Harlow, England}}
+* {{Cite journal |last=Wright |first=Karen |date=1 July 2000 |title=Works in Progress |url=http://discovermagazine.com/2000/jul/featworks |url-status=live |journal=Discover |location=Waukesha, Wisconsin |publisher=Kalmbach Publishing |archive-url=https://web.archive.org/web/20150129183324/http://discovermagazine.com/2000/jul/featworks |archive-date=29 January 2015 |access-date=7 February 2015}}
+{{Refend}}
+
+== External links ==
+{{sister project links|d=Q9141|c=Category:Taj Mahal|n=no|b=no|v=no|voy=Taj Mahal|m=no|mw=no|s=no|wikt=no|species=no|q=Taj Mahal}}
+
+* {{Official website|http://www.tajmahal.gov.in/}} of the Taj Mahal
+* [https://web.archive.org/web/20150215034204/http://asi.nic.in/asi_monu_whs_agratajmahal.asp Description of the Taj Mahal] at the Archaeological Survey of India
+* [https://whc.unesco.org/en/list/252 Profile of the Taj Mahal] at UNESCO
+* {{Cite web |title=Outlying Buildings |url=http://thetajindia.weebly.com/outlying-buildings.html |url-status=live |archive-url=https://web.archive.org/web/20150204165442/http://thetajindia.weebly.com/outlying-buildings.html |archive-date=4 February 2015 |access-date=7 February 2015 |website=Taj Mahal}}
+
+{{Tourist attractions in Agra}}
+{{World Heritage Sites in India}}
+{{Agra district}}
+{{Mughal Empire|state=collapsed}}
+{{New7Wonders of the World}}
+{{Mosques in India}}
+{{Authority control}}
+
+ 
+Category:1650s establishments in India
+Category:1650s establishments in the Mughal Empire
+Category:1654 establishments in Asia
+Category:Articles containing video clips
+Category:Domes in India
+Category:Islamic mausoleums
+Category:Marble buildings
+Category:Mausoleums in Uttar Pradesh
+Category:Minarets in India
+Category:Mosques completed in the 1650s
+Category:Mosques in Agra
+Category:Monuments of National Importance in Uttar Pradesh
+Category:Mughal tombs
+Category:Mughal gardens in India
+Category:Mughal mosques
+Category:Persian gardens in India
+Category:Religious buildings and structures completed in 1654
+Category:Stone buildings in India
+Category:Tombs in Uttar Pradesh
+Category:Tourist attractions in Agra
+Category:World Heritage Sites in India
+Category:Terminating vistas in India

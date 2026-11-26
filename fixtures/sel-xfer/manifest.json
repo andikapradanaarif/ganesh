@@ -1,0 +1,45 @@
+{
+ "version": "sel-xfer",
+ "created": "2026-11-26",
+ "frame": "frozen transfer group 2: two public articles unused in any prior packet (Taj Mahal, Ada Lovelace)",
+ "seed": 0,
+ "exclusions": [],
+ "sampling": "hand-selected public documents",
+ "snapshot_format": "plaintext with wiki-style section headings",
+ "articles": [
+  {
+   "article_id": "taj",
+   "title": "Taj Mahal",
+   "pageid": 0,
+   "revision": "taj-a1",
+   "revision_url": "https://example.invalid/taj",
+   "publisher": "Wikipedia contributors",
+   "url": "https://en.wikipedia.org/wiki/Taj_Mahal",
+   "license": "CC BY-SA 4.0",
+   "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+   "permission": "CC BY-SA 4.0 permits storage and replay with attribution",
+   "retrieved": "2026-11-26",
+   "bytes": 55084,
+   "sha256": "10de392ca206d490d207535bbe7f4052e27179a34133b9c23cb78113196d4c26",
+   "file": "snapshots/taj.txt",
+   "family": "taj"
+  },
+  {
+   "article_id": "ada",
+   "title": "Ada Lovelace",
+   "pageid": 0,
+   "revision": "ada-a1",
+   "revision_url": "https://example.invalid/ada",
+   "publisher": "Wikipedia contributors",
+   "url": "https://en.wikipedia.org/wiki/Ada_Lovelace",
+   "license": "CC BY-SA 4.0",
+   "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+   "permission": "CC BY-SA 4.0 permits storage and replay with attribution",
+   "retrieved": "2026-11-26",
+   "bytes": 53572,
+   "sha256": "01c30dd86df8d5e6ae75a0040da7d8cccd958bf045e849da43b05209c6736e54",
+   "file": "snapshots/ada.txt",
+   "family": "ada"
+  }
+ ]
+}

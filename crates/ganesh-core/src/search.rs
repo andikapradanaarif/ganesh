@@ -405,27 +405,13 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
             .unwrap_or_default();
         body_tokens.push(stemmed_tokens(&body));
     }
-    let mut coverage_ranked: Vec<usize> = eligible.clone();
-    {
-        let cov_score = |idx: usize| -> f64 {
-            terms.iter()
-                .filter(|t| term_present(t, &body_tokens[idx]))
-                .map(|t| weight_of(t))
-                .sum()
-        };
-        coverage_ranked.sort_by(|a, b| {
-            cov_score(*b).partial_cmp(&cov_score(*a)).unwrap_or(std::cmp::Ordering::Equal)
-                .then(a.cmp(b))
-        });
-    }
-    let eligible: Vec<usize> = coverage_ranked;
     let want = cfg.top_k.min(eligible.len());
     let mut selected: Vec<usize> = Vec::new();
     if want > 0 {
         selected.push(eligible[0]);
         let mut covered = std::collections::BTreeSet::new();
         for t in &terms {
-            if term_present(t, &candidate_texts[eligible[0]].1) {
+            if term_present(t, &body_tokens[eligible[0]]) {
                 covered.insert(t.clone());
             }
         }
@@ -436,7 +422,7 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
                     continue;
                 }
                 let marginal: f64 = terms.iter()
-                    .filter(|t| !covered.contains(*t) && term_present(t, &candidate_texts[idx].1))
+                    .filter(|t| !covered.contains(*t) && term_present(t, &body_tokens[idx]))
                     .map(|t| weight_of(t))
                     .sum();
                 if marginal > 0.0 && best.map(|(_, b)| marginal > b).unwrap_or(true) {
@@ -448,7 +434,7 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
                 None => *eligible.iter().find(|idx| !selected.contains(idx)).unwrap(),
             };
             for t in &terms {
-                if term_present(t, &candidate_texts[next].1) {
+                if term_present(t, &body_tokens[next]) {
                     covered.insert(t.clone());
                 }
             }

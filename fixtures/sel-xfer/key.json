@@ -1,0 +1,200 @@
+{
+ "version": "sel-xfer-v1",
+ "scoring": "scoring.v2",
+ "questions": [
+  {
+   "id": "y01",
+   "question": "Who commissioned the Taj Mahal?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": " It was commissioned in 1631 by the fifth Mughal emperor, Shah Jahan ({{reign|1628|1658}}), to house the tomb ",
+     "acceptable": [
+      "taj-a1#p2"
+     ],
+     "spans": [
+      " It was commissioned in 1631 by the fifth Mughal emperor, Shah Jahan ({{reign|1628|1658}}), to house the tomb "
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "y02",
+   "question": "In what year was the Taj Mahal complex completed in its entirety?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "completed in its entirety in 1653",
+     "acceptable": [
+      "taj-a1#p3"
+     ],
+     "spans": [
+      "completed in its entirety in 1653"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "y03",
+   "question": "How many workers did the Taj Mahal construction project employ, and in what year was the complex completed in its entirety?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "compound"
+   ],
+   "required_facts": [
+    {
+     "fact": "more than 20,000 workers and artisans",
+     "acceptable": [
+      "taj-a1#p4"
+     ],
+     "spans": [
+      "more than 20,000 workers and artisans"
+     ],
+     "answer_polarity": "affirmative"
+    },
+    {
+     "fact": "completed in its entirety in 1653",
+     "acceptable": [
+      "taj-a1#p3"
+     ],
+     "spans": [
+      "completed in its entirety in 1653"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "y04",
+   "question": "How many visitors did the Taj Mahal receive in the financial year 2023?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": " About five million visitors visited Taj Mahal in the financial year 2022\u201323",
+     "acceptable": [
+      "taj-a1#p53"
+     ],
+     "spans": [
+      " About five million visitors visited Taj Mahal in the financial year 2022\u201323"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "y05",
+   "question": "When was Ada Lovelace born?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "10 December 1815",
+     "acceptable": [
+      "ada-a1#p2"
+     ],
+     "spans": [
+      "10 December 1815"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "y06",
+   "question": "When did Ada Lovelace die?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "27 November 1852",
+     "acceptable": [
+      "ada-a1#p2"
+     ],
+     "spans": [
+      "27 November 1852"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "y07",
+   "question": "Who invented the Analytical Engine that Ada Lovelace wrote notes on?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "Analytical Engine invented by Charles Babbage",
+     "acceptable": [
+      "ada-a1#p90"
+     ],
+     "spans": [
+      "Analytical Engine invented by Charles Babbage"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "y08",
+   "question": "On what exact day and month did construction of the Taj Mahal begin?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient"
+   ],
+   "required_facts": [],
+   "unresolved_detail": "source gives only the year (1632/1631), never day and month",
+   "most_plausible_misleading": "construction"
+  },
+  {
+   "id": "y09",
+   "question": "In which month of 1983 was the Taj Mahal designated a UNESCO World Heritage Site?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient"
+   ],
+   "required_facts": [],
+   "unresolved_detail": "source gives only the year for the UNESCO listing",
+   "most_plausible_misleading": "heritage"
+  },
+  {
+   "id": "y10",
+   "question": "How many copies did the first printing of Ada Lovelace\u2019s translation of the Analytical Engine memoir sell?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient"
+   ],
+   "required_facts": [],
+   "unresolved_detail": "sales figures never recorded in source",
+   "most_plausible_misleading": "translation"
+  }
+ ]
+}
