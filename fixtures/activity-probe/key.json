@@ -1,0 +1,202 @@
+{
+ "version": "activity-probe.v1",
+ "notes": "Frozen before implementing the negated-activity fix. Cancelled/skipped/never-took-place/no-result wording plus competing-activity control (e08 class).",
+ "questions": [
+  {
+   "id": "a01",
+   "question": "Did the inspection of tower T9 finish on August 3?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "affirmative"
+   ],
+   "required_facts": [
+    {
+     "fact": "inspection finished 11:20",
+     "acceptable": [
+      "towerlog-a1#p2"
+     ],
+     "spans": [
+      "inspection finished at 11:20"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "a02",
+   "question": "Did the safety assessment pass for the August 3 inspection of tower T9?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "affirmative"
+   ],
+   "required_facts": [
+    {
+     "fact": "assessment passed",
+     "acceptable": [
+      "towerlog-a1#p2"
+     ],
+     "spans": [
+      "safety assessment passed"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "a03",
+   "question": "Did the inspection of tower T9 take place on August 4?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "explicit-negative",
+    "neg"
+   ],
+   "required_facts": [
+    {
+     "fact": "cancelled before execution \u2014 explicit negative",
+     "acceptable": [
+      "towerlog-a1#p3"
+     ],
+     "spans": [
+      "cancelled before execution"
+     ],
+     "answer_polarity": "negative"
+    }
+   ]
+  },
+  {
+   "id": "a04",
+   "question": "Did the inspection of tower T9 finish on August 4?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "cancelled"
+   ],
+   "required_facts": [
+    {
+     "fact": "cancelled inspections do not finish \u2014 nor do they partially finish; outcome inapplicable",
+     "acceptable": [],
+     "spans": []
+    }
+   ]
+  },
+  {
+   "id": "a05",
+   "question": "Did the safety assessment pass for the August 5 inspection of tower T9?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "skipped"
+   ],
+   "required_facts": [
+    {
+     "fact": "assessment was skipped \u2014 never ran, outcome unknown",
+     "acceptable": [],
+     "spans": []
+    }
+   ],
+   "plausible_misleading": "towerlog-a1#p4"
+  },
+  {
+   "id": "a06",
+   "question": "Did the inspection of tower T9 take place on August 6?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "explicit-negative",
+    "neg"
+   ],
+   "required_facts": [
+    {
+     "fact": "never took place \u2014 explicit negative",
+     "acceptable": [
+      "towerlog-a1#p5"
+     ],
+     "spans": [
+      "never took place"
+     ],
+     "answer_polarity": "negative"
+    }
+   ]
+  },
+  {
+   "id": "a07",
+   "question": "Did the safety assessment pass for the August 7 inspection of tower T9?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "no-result"
+   ],
+   "required_facts": [
+    {
+     "fact": "no result recorded \u2014 unknown whether it even ran",
+     "acceptable": [],
+     "spans": []
+    }
+   ],
+   "plausible_misleading": "towerlog-a1#p6"
+  },
+  {
+   "id": "a08",
+   "question": "Did the repair of the north stair finish on August 8?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "competing-activity"
+   ],
+   "required_facts": [
+    {
+     "fact": "the inspection finished, not the repair \u2014 competing activities same paragraph",
+     "acceptable": [],
+     "spans": []
+    }
+   ],
+   "plausible_misleading": "towerlog-a1#p7"
+  },
+  {
+   "id": "a09",
+   "question": "Did the inspection of tower T9 finish on August 8?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "affirmative",
+    "competing-activity"
+   ],
+   "required_facts": [
+    {
+     "fact": "inspection finished 11:00",
+     "acceptable": [
+      "towerlog-a1#p7"
+     ],
+     "spans": [
+      "inspection of tower T9 finished at 11:00"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "a10",
+   "question": "Did the repair of the north stair finish on August 9?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "affirmative"
+   ],
+   "required_facts": [
+    {
+     "fact": "repair finished 15:30",
+     "acceptable": [
+      "towerlog-a1#p8"
+     ],
+     "spans": [
+      "repair finished at 15:30"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  }
+ ]
+}

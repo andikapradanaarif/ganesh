@@ -1,0 +1,29 @@
+The Cedar Ridge fire lookout is a fictional forest service installation used as the frozen development fixture for negated-activity testing. This is its maintenance log.
+
+== Visit August 3 ==
+
+The inspection of tower T9 started at 10:00 UTC. The inspection finished at 11:20 UTC and the safety assessment passed.
+
+== Visit August 4 ==
+
+The inspection of tower T9 was scheduled. The inspection was cancelled before execution because of lightning risk.
+
+== Visit August 5 ==
+
+The inspection of tower T9 started at 10:00 UTC. The safety assessment was skipped. The crew left at noon.
+
+== Visit August 6 ==
+
+The inspection of tower T9 was planned for the morning. The inspection never took place. The access road was washed out.
+
+== Visit August 7 ==
+
+The inspection of tower T9 started at 10:00 UTC. No result was recorded for the safety assessment.
+
+== Visit August 8 ==
+
+The inspection of tower T9 finished at 11:00 UTC while the repair of the north stair continued.
+
+== Visit August 9 ==
+
+The repair of the north stair started at 09:00 UTC. The repair finished at 15:30 UTC.
