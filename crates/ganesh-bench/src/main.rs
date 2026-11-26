@@ -27,12 +27,18 @@ struct KeyQuestion {
     required_facts: Vec<KeyFact>,
     #[serde(default)]
     missing_detail: Option<String>,
+    #[serde(default)]
+    plausible_misleading: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
 struct KeyFact {
     fact: String,
     acceptable: Vec<String>,
+    #[serde(default)]
+    spans: Vec<String>,
+    #[serde(default)]
+    answer_polarity: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -294,6 +300,37 @@ fn unrun_incomplete(report_path: &str, questions_path: &str, reason: String) -> 
     3
 }
 
+/// Normalize whitespace and case for span containment checks. The trace or
+/// key span need not match generated wording — only the cited passage text.
+fn norm_text(t: &str) -> String {
+    t.split_whitespace().collect::<Vec<_>>().join(" ").to_ascii_lowercase()
+}
+
+/// Evidence correctness for one question (issue #165): every required fact
+/// must have an acceptable passage in the returned set whose text contains at
+/// least one of the fact's acceptable spans. When a fact records no spans,
+/// passage-level acceptability is sufficient (legacy keys). Returns the list
+/// of facts lacking correct evidence; empty means evidence-correct.
+fn evidence_misses(facts: &[KeyFact], returned: &[(String, String)]) -> Vec<String> {
+    let mut missing = Vec::new();
+    for f in facts {
+        let mut ok = false;
+        for (pid, text) in returned {
+            if !f.acceptable.iter().any(|a| a == pid) {
+                continue;
+            }
+            if f.spans.is_empty() || f.spans.iter().any(|sp| norm_text(text).contains(&norm_text(sp))) {
+                ok = true;
+                break;
+            }
+        }
+        if !ok {
+            missing.push(f.fact.clone());
+        }
+    }
+    missing
+}
+
 fn run(questions_path: &str, report_path: &str, corpus_dir: &str, details_path: Option<&str>, mode: Mode, scoring_spec_path: Option<&str>) -> i32 {
     let t0 = Instant::now();
     let mut log_lines: Vec<String> = Vec::new();
@@ -396,6 +433,7 @@ fn run(questions_path: &str, report_path: &str, corpus_dir: &str, details_path: 
         rest_ids: Vec<String>,
         mcp_ids: Vec<String>,
         hit: Option<bool>,
+        evidence_correct: Option<bool>,
         insufficient_correct: Option<bool>,
         adapter_agree: bool,
         citations_checked: usize,
@@ -405,6 +443,20 @@ fn run(questions_path: &str, report_path: &str, corpus_dir: &str, details_path: 
         latency_mcp_ms: f64,
         response_bytes_rest: usize,
         response_bytes_mcp: usize,
+    }
+
+    // Fixture validation (issue #165): an answerable question whose key
+    // records no acceptable evidence can never be satisfied — fail before the
+    // run rather than silently scoring it as a miss.
+    for q in &key.questions {
+        if q.expected_status == "ok" {
+            for f in &q.required_facts {
+                if f.acceptable.is_empty() {
+                    eprintln!("fixture validation error: answerable question {} has a fact with no acceptable evidence: {}", q.id, f.fact);
+                    return 2;
+                }
+            }
+        }
     }
 
     let mut outcomes: Vec<QOutcome> = Vec::new();
@@ -488,9 +540,21 @@ fn run(questions_path: &str, report_path: &str, corpus_dir: &str, details_path: 
                 oc.hit = Some(false);
                 missing.push("(abstained)".to_string());
             } else {
+                // Tiered credit: passage-level acceptability first (legacy
+                // hit), then span-level evidence inside the cited passage.
                 for f in &q.required_facts {
                     if !f.acceptable.iter().any(|a| oc.rest_ids.iter().any(|id| id == a)) {
                         missing.push(f.fact.clone());
+                    }
+                }
+                let returned: Vec<(String, String)> = rest_json["passages"].as_array().map(|a| {
+                    a.iter().filter_map(|p| Some((p["passage_id"].as_str()?.to_string(), p["text"].as_str()?.to_string()))).collect()
+                }).unwrap_or_default();
+                let ev_missing = evidence_misses(&q.required_facts, &returned);
+                oc.evidence_correct = Some(ev_missing.is_empty());
+                for m in ev_missing {
+                    if !missing.contains(&m) {
+                        missing.push(format!("evidence-not-in-citation: {m}"));
                     }
                 }
                 oc.hit = Some(missing.is_empty());
@@ -507,6 +571,7 @@ fn run(questions_path: &str, report_path: &str, corpus_dir: &str, details_path: 
     let answerable: Vec<&QOutcome> = outcomes.iter().filter(|o| o.expected == "ok").collect();
     let insufficient: Vec<&QOutcome> = outcomes.iter().filter(|o| o.expected != "ok").collect();
     let hits = answerable.iter().filter(|o| o.hit == Some(true)).count();
+    let ev_correct = answerable.iter().filter(|o| o.evidence_correct == Some(true)).count();
     let ins_correct = insufficient.iter().filter(|o| o.insufficient_correct == Some(true)).count();
     let agree = outcomes.iter().filter(|o| o.adapter_agree).count();
     let cit_checked: usize = outcomes.iter().map(|o| o.citations_checked).sum();
@@ -700,13 +765,14 @@ fn run(questions_path: &str, report_path: &str, corpus_dir: &str, details_path: 
 
     if let Some(dp) = details_path {
         let details: Vec<Value> = outcomes.iter().map(|o| json!({
+            "evidence_correct": o.evidence_correct,
             "id": o.id, "expected": o.expected, "rest_status": o.rest_status, "mcp_status": o.mcp_status,
             "rest_ids": o.rest_ids, "mcp_ids": o.mcp_ids, "hit": o.hit, "insufficient_correct": o.insufficient_correct,
             "adapter_agree": o.adapter_agree, "citations_checked": o.citations_checked, "citations_ok": o.citations_ok,
             "latency_rest_ms": o.latency_rest_ms, "latency_mcp_ms": o.latency_mcp_ms,
         })).collect();
         std::fs::write(dp, serde_json::to_string_pretty(&json!({
-            "questions": questions_path, "outcomes": details,
+            "questions": questions_path, "evidence_correct_answerable": ev_correct, "outcomes": details,
             "result": machine.clone(),
             "summary": {
                 "hits": hits, "answerable": answerable.len(),
@@ -839,5 +905,45 @@ mod tests {
             _ => None,
         });
         assert_eq!((checked, ok), (3, 0));
+    }
+}
+
+
+#[cfg(test)]
+mod evidence_scorer_tests {
+    use super::*;
+
+    fn fact(acceptable: &[&str], spans: &[&str]) -> KeyFact {
+        KeyFact {
+            fact: "f".into(),
+            acceptable: acceptable.iter().map(|s| s.to_string()).collect(),
+            spans: spans.iter().map(|s| s.to_string()).collect(),
+            answer_polarity: None,
+        }
+    }
+
+    #[test]
+    fn evidence_credit_requires_span_inside_cited_passage() {
+        // Right status and right passage ID, but the passage text concerns a
+        // different environment: the span about production is absent.
+        let facts = vec![fact(&["r#p1"], &["deployed to production"])];
+        let returned = vec![("r#p1".to_string(), "The deployment check confirmed revision R8 was running in staging.".to_string())];
+        assert_eq!(evidence_misses(&facts, &returned).len(), 1, "staging-only text must not earn production credit");
+        let returned_ok = vec![("r#p1".to_string(), "Revision R7 was deployed to production after the checklist passed.".to_string())];
+        assert!(evidence_misses(&facts, &returned_ok).is_empty());
+    }
+
+    #[test]
+    fn negative_answer_span_earns_credit() {
+        let facts = vec![fact(&["r#p4"], &["did not confirm revision R6"])];
+        let returned = vec![("r#p4".to_string(), "The team did not confirm revision R6 in any environment.".to_string())];
+        assert!(evidence_misses(&facts, &returned).is_empty(), "explicit negative spans count as evidence");
+    }
+
+    #[test]
+    fn legacy_facts_without_spans_score_at_passage_level() {
+        let facts = vec![fact(&["r#p1"], &[])];
+        let returned = vec![("r#p1".to_string(), "anything".to_string())];
+        assert!(evidence_misses(&facts, &returned).is_empty());
     }
 }

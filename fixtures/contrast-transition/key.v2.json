@@ -1,0 +1,259 @@
+{
+ "version": "contrast-transition.v2",
+ "notes": "Corrected key per evidence-contract.md audit. Span-level acceptable evidence; negative answers earn credit; insufficient cases record the missing fact and a plausible misleading passage. v1 labels: qB06 corrected (explicit negative), qB02/qB07 split into unambiguous variants.",
+ "questions": [
+  {
+   "id": "qB01",
+   "question": "Was the deployment of revision R9 of Northstar proposed?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "state",
+    "propose"
+   ],
+   "required_facts": [
+    {
+     "fact": "the team proposed deploying revision R9",
+     "acceptable": [
+      "northstar-r1#p2"
+     ],
+     "spans": [
+      "team proposed deploying revision R9"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "qB02a",
+   "question": "Did the team verify the outcome of the revision R9 deployment attempt?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "state",
+    "explicit-negative"
+   ],
+   "required_facts": [
+    {
+     "fact": "the outcome of the R9 attempt was unverified \u2014 explicit negative",
+     "acceptable": [
+      "northstar-r1#p3"
+     ],
+     "spans": [
+      "The outcome was unverified"
+     ],
+     "answer_polarity": "negative"
+    }
+   ]
+  },
+  {
+   "id": "qB02b",
+   "question": "Was revision R9 ever verified running in production?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "state",
+    "unresolved"
+   ],
+   "required_facts": [
+    {
+     "fact": "missing: any record of R9 verified running in production; the unverified attempt outcome does not settle production state",
+     "acceptable": [],
+     "spans": [],
+     "answer_polarity": "affirmative"
+    }
+   ],
+   "plausible_misleading": "northstar-r1#p3"
+  },
+  {
+   "id": "qB03",
+   "question": "Was revision R8 of Northstar verified running in production?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "state",
+    "wrong-environment"
+   ],
+   "required_facts": [
+    {
+     "fact": "missing: production evidence for R8; staging confirmation does not transfer",
+     "acceptable": [],
+     "spans": [],
+     "answer_polarity": "affirmative"
+    }
+   ],
+   "plausible_misleading": "northstar-r1#p4"
+  },
+  {
+   "id": "qB04",
+   "question": "Was revision R8 of Northstar verified running in staging?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "state",
+    "verify"
+   ],
+   "required_facts": [
+    {
+     "fact": "the deployment check confirmed R8 running in staging",
+     "acceptable": [
+      "northstar-r1#p4"
+     ],
+     "spans": [
+      "confirmed revision R8 was running in staging"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "qB05",
+   "question": "Was revision R7 verified running in production?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "state",
+    "verify",
+    "assumption-recorded"
+   ],
+   "required_facts": [
+    {
+     "fact": "R7 deployed to production after the checklist passed (checklist = verification instrument)",
+     "acceptable": [
+      "northstar-r1#p4"
+     ],
+     "spans": [
+      "deployed to production after the checklist passed"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "qB06",
+   "question": "Was revision R6 of Northstar confirmed?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "state",
+    "explicit-negative",
+    "benchmark-correction"
+   ],
+   "required_facts": [
+    {
+     "fact": "the team did not confirm R6 in any environment \u2014 explicit negative",
+     "acceptable": [
+      "northstar-r1#p4"
+     ],
+     "spans": [
+      "did not confirm revision R6"
+     ],
+     "answer_polarity": "negative"
+    }
+   ]
+  },
+  {
+   "id": "qB07a",
+   "question": "Did revision R7 reach production?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "state",
+    "affirmative"
+   ],
+   "required_facts": [
+    {
+     "fact": "R7 was deployed to production",
+     "acceptable": [
+      "northstar-r1#p4"
+     ],
+     "spans": [
+      "deployed to production"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "qB07b",
+   "question": "Who verified revision R7 in production?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "state",
+    "actor-unresolved"
+   ],
+   "required_facts": [
+    {
+     "fact": "missing: the verifier is unnamed; the deployment record is passive",
+     "acceptable": [],
+     "spans": [],
+     "answer_polarity": "affirmative"
+    }
+   ],
+   "plausible_misleading": "northstar-r1#p4"
+  },
+  {
+   "id": "qB08",
+   "question": "Did lazy evaluation become optional in Lazylang?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "transition",
+    "unresolved"
+   ],
+   "required_facts": [
+    {
+     "fact": "missing: optionality of lazy evaluation; remaining the default is compatible with optional or mandatory",
+     "acceptable": [],
+     "spans": [],
+     "answer_polarity": "affirmative"
+    }
+   ],
+   "plausible_misleading": "lazylang-r1#p2"
+  },
+  {
+   "id": "qB09",
+   "question": "Did eager evaluation become optional in Lazylang?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "transition"
+   ],
+   "required_facts": [
+    {
+     "fact": "eager evaluation became optional through strictness annotations",
+     "acceptable": [
+      "lazylang-r1#p2"
+     ],
+     "spans": [
+      "eager evaluation became optional"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "qB10",
+   "question": "Are type annotations optional in Lazylang?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "state",
+    "ordinary-control"
+   ],
+   "required_facts": [
+    {
+     "fact": "type annotations are optional in Lazylang",
+     "acceptable": [
+      "lazylang-r1#p2"
+     ],
+     "spans": [
+      "Type annotations are optional"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  }
+ ]
+}

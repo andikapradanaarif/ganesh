@@ -32,6 +32,33 @@ pub struct StateSpan {
     pub negated: bool,
     pub environment: Option<String>,
     pub object_terms: Vec<String>,
+    /// Proposition verdict (experiment C): supports / contradicts / unresolved.
+    pub verdict: String,
+}
+
+/// Predicate groups for contradiction matching. A negated statement only
+/// contradicts the asked proposition when the negated predicate is the same
+/// one — "did not confirm" contradicts confirmed(R6) but says nothing about
+/// deployed(R6). Support may use the looser class hierarchy; contradiction
+/// may not.
+const PREDICATE_GROUPS: &[&[&str]] = &[
+    &["verifi", "confirm", "unverifi", "unconfirm"],
+    &["deploy", "run", "live"],
+    &["start"],
+    &["pass", "succeed", "complet"],
+    &["propos", "plan", "intend", "suggest", "consider"],
+    &["attempt", "tri", "effort"],
+    &["becam", "becom", "option", "mandatori", "deprecat", "drop", "adopt"],
+];
+
+fn predicate_group(stem: &str) -> Option<usize> {
+    PREDICATE_GROUPS.iter().position(|g| g.contains(&stem))
+}
+
+/// The dominant predicate stem of a question: the first cue-class term in
+/// the question's stemmed terms that belongs to a predicate group.
+pub fn question_predicate(terms: &[String]) -> Option<String> {
+    terms.iter().find(|t| predicate_group(t).is_some()).cloned()
 }
 
 #[derive(Debug, Clone, Default)]
@@ -208,7 +235,7 @@ fn version_tokens(text: &str) -> std::collections::BTreeSet<String> {
 // Experiment B lexicons: epistemic cue classes, in stemmed form.
 // ---------------------------------------------------------------------------
 
-pub const VERIFY_CUES: &[&str] = &["verifi", "confirm", "deploy", "run", "pass", "succeed", "complet", "live"];
+pub const VERIFY_CUES: &[&str] = &["verifi", "confirm", "deploy", "run", "pass", "succeed", "complet", "live", "start", "unverifi", "unconfirm"];
 pub const PROPOSE_CUES: &[&str] = &["propos", "plan", "intend", "suggest", "consider"];
 pub const ATTEMPT_CUES: &[&str] = &["attempt", "tri", "effort"];
 pub const TRANSITION_CUES: &[&str] = &["becam", "becom", "option", "mandatori", "deprecat", "drop", "adopt"];
@@ -313,6 +340,9 @@ pub struct DecideInput<'a> {
     pub any_numeric_token: bool,
     pub quantity_binding: bool,
     pub transition_check: bool,
+    /// Experiment C: proposition-level verdicts. Negated compatible evidence
+    /// contradicts and can settle a yes/no question with an explicit negative.
+    pub proposition_check: bool,
 }
 
 fn stemmed_query_like(text: &str) -> Vec<String> {
@@ -424,8 +454,22 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
             };
             let mut supportive = false;
             for (pid, verbatim, _) in input.passages {
+                let passage_idents: std::collections::BTreeSet<String> = crate::search::stemmed_tokens(verbatim)
+                    .into_iter()
+                    .filter(|t| t.chars().any(|c| c.is_ascii_digit()) && t.chars().any(|c| c.is_alphabetic()))
+                    .collect();
+                let inherited: Option<String> = if passage_idents.len() == 1 {
+                    passage_idents.iter().next().cloned()
+                } else {
+                    None
+                };
                 for sentence in &sentences(verbatim) {
-                    let sent_stemmed = stemmed_query_like(sentence);
+                    let mut sent_stemmed = stemmed_query_like(sentence);
+                    if let Some(idt) = &inherited {
+                        if !sent_stemmed.contains(idt) {
+                            sent_stemmed.push(idt.clone());
+                        }
+                    }
                     let object_terms: Vec<String> = input
                         .terms
                         .iter()
@@ -470,13 +514,14 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
                     if classes.is_empty() {
                         continue;
                     }
-                    let span = StateSpan {
+                    let mut span = StateSpan {
                         passage_id: pid.clone(),
                         sentence: sentence.clone(),
                         cue_class: classes.join("+"),
                         negated: negated(sentence),
                         environment: env_of(&sent_stemmed),
                         object_terms,
+                        verdict: "unresolved".to_string(),
                     };
                     let env_ok = match (&q_env, &span.environment) {
                         (Some(qe), Some(se)) => qe == se,
@@ -484,15 +529,41 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
                         (None, _) => true,
                     };
                     let class_ok = classes.iter().any(|c| class_satisfies(required, c));
-                    if class_ok && env_ok && !span.negated {
+                    let mut verdict = "unresolved".to_string();
+                    if class_ok && env_ok {
+                        if !span.negated {
+                            verdict = "supports".to_string();
+                        } else if input.proposition_check {
+                            // Contradiction requires the negated predicate to
+                            // match the asked predicate group: non-confirmation
+                            // does not contradict deployment, only confirmation.
+                            let q_pred = question_predicate(&input.terms.to_vec());
+                            let pred_match = q_pred.as_ref().map(|qp| {
+                                let qg = predicate_group(qp);
+                                sent_stemmed.iter().any(|t| {
+                                    t != qp && predicate_group(t).is_some() && predicate_group(t) == qg
+                                        || t == qp
+                                })
+                            }).unwrap_or(false);
+                            if pred_match {
+                                verdict = "contradicts".to_string();
+                            }
+                        }
+                    }
+                    if verdict == "supports" {
                         supportive = true;
                     }
+                    if input.proposition_check && verdict == "contradicts" {
+                        supportive = true; // an explicit negative settles yes/no
+                    }
+                    span.verdict = verdict;
                     trace.state_spans.push(span);
                 }
             }
             if !supportive {
+                let mode = if input.proposition_check { "supports or explicitly contradicts" } else { "establishes" };
                 trace.reasons.push(format!(
-                    "transition-check: no sentence establishes the required '{required}' state with compatible polarity and environment"
+                    "transition-check: no sentence {mode} the required '{required}' state with compatible predicate and environment"
                 ));
             }
         }

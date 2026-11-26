@@ -14,7 +14,12 @@
    "required_facts": [
     {
      "fact": "Novolang 1.0 defined 12 keywords",
-     "acceptable": []
+     "acceptable": [
+      "novolang-r1#p2"
+     ],
+     "spans": [
+      "defined 12 keywords"
+     ]
     }
    ]
   },
@@ -30,7 +35,12 @@
    "required_facts": [
     {
      "fact": "Novolang 2.0 expanded to eighteen keywords",
-     "acceptable": []
+     "acceptable": [
+      "novolang-r1#p2"
+     ],
+     "spans": [
+      "eighteen keywords"
+     ]
     }
    ]
   },
@@ -46,7 +56,12 @@
    "required_facts": [
     {
      "fact": "int32 is a 32-bit signed integer",
-     "acceptable": []
+     "acceptable": [
+      "novolang-r1#p2"
+     ],
+     "spans": [
+      "32-bit"
+     ]
     }
    ]
   },
@@ -62,7 +77,12 @@
    "required_facts": [
     {
      "fact": "the committee held 12 meetings",
-     "acceptable": []
+     "acceptable": [
+      "novolang-r1#p3"
+     ],
+     "spans": [
+      "holds 12 meetings"
+     ]
     }
    ]
   },
@@ -110,7 +130,12 @@
    "required_facts": [
     {
      "fact": "Zetalang has 40 keywords",
-     "acceptable": []
+     "acceptable": [
+      "novolang-r1#p3"
+     ],
+     "spans": [
+      "Zetalang has 40 keywords"
+     ]
     }
    ]
   },
@@ -126,7 +151,12 @@
    "required_facts": [
     {
      "fact": "int64 uses 64 bits",
-     "acceptable": []
+     "acceptable": [
+      "novolang-r1#p2"
+     ],
+     "spans": [
+      "64 bits"
+     ]
     }
    ]
   }

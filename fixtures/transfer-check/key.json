@@ -1,0 +1,167 @@
+{
+ "version": "transfer-check.v1",
+ "notes": "Frozen before candidate tuning. Affirmative, explicit-negative and unknown cases with actor/revision/environment/negation varied; ordinary controls included.",
+ "questions": [
+  {
+   "id": "t01",
+   "question": "Did the backup of archive volume V12 complete on April 3?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "affirmative"
+   ],
+   "required_facts": [
+    {
+     "fact": "the April 3 transfer completed and the integrity check passed",
+     "acceptable": [
+      "meridian-t1#p3"
+     ],
+     "spans": [
+      "transfer completed at 02:41"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "t02",
+   "question": "Did the backup of archive volume V12 complete on April 4?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "explicit-negative"
+   ],
+   "required_facts": [
+    {
+     "fact": "the April 4 transfer did not complete \u2014 explicit negative",
+     "acceptable": [
+      "meridian-t1#p4"
+     ],
+     "spans": [
+      "did not complete"
+     ],
+     "answer_polarity": "negative"
+    }
+   ]
+  },
+  {
+   "id": "t03",
+   "question": "Did the April 4 backup pass its integrity check?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "unknown"
+   ],
+   "required_facts": [
+    {
+     "fact": "missing: integrity outcome for April 4; the check was not run, which is neither pass nor fail",
+     "acceptable": [],
+     "spans": [],
+     "answer_polarity": "affirmative"
+    }
+   ],
+   "plausible_misleading": "meridian-t1#p4"
+  },
+  {
+   "id": "t04",
+   "question": "Did the backup of archive volume V12 start on April 5?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "explicit-negative",
+    "negation-varied"
+   ],
+   "required_facts": [
+    {
+     "fact": "the April 5 scheduled backup did not start \u2014 explicit negative",
+     "acceptable": [
+      "meridian-t1#p5"
+     ],
+     "spans": [
+      "did not start"
+     ],
+     "answer_polarity": "negative"
+    }
+   ]
+  },
+  {
+   "id": "t05",
+   "question": "Are Meridian backups scheduled at 02:00 UTC?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "ordinary"
+   ],
+   "required_facts": [
+    {
+     "fact": "nightly backups are scheduled at 02:00 UTC",
+     "acceptable": [
+      "meridian-t1#p2"
+     ],
+     "spans": [
+      "scheduled at 02:00"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "t06",
+   "question": "Did pattern matching become optional in Ferretlang release 4.0?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "transfer-v27-style"
+   ],
+   "required_facts": [
+    {
+     "fact": "missing: optionality of pattern matching; remaining the default dispatch is compatible with optional or mandatory",
+     "acceptable": [],
+     "spans": [],
+     "answer_polarity": "affirmative"
+    }
+   ],
+   "plausible_misleading": "ferretlang-t1#p2"
+  },
+  {
+   "id": "t07",
+   "question": "Did tail-call optimization become optional in Ferretlang release 4.0?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "affirmative",
+    "transition"
+   ],
+   "required_facts": [
+    {
+     "fact": "tail-call optimization became optional through compiler flags",
+     "acceptable": [
+      "ferretlang-t1#p2"
+     ],
+     "spans": [
+      "tail-call optimization became optional"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "t08",
+   "question": "Did the backup of archive volume V13 complete on April 3?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "revision-varied"
+   ],
+   "required_facts": [
+    {
+     "fact": "missing: the log covers volume V12 only; nothing settles V13",
+     "acceptable": [],
+     "spans": [],
+     "answer_polarity": "affirmative"
+    }
+   ],
+   "plausible_misleading": "meridian-t1#p3"
+  }
+ ]
+}

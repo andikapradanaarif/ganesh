@@ -28,6 +28,9 @@ pub struct RetrievalConfig {
     /// Experiment B (issue #163): state/transition questions need cue-class,
     /// polarity and environment compatible evidence in one sentence.
     pub transition_check: bool,
+    /// Experiment C (issue #165): proposition verdicts — explicit contradiction
+    /// of the asked predicate also settles yes/no questions.
+    pub proposition_check: bool,
 }
 
 impl Default for RetrievalConfig {
@@ -40,6 +43,7 @@ impl Default for RetrievalConfig {
             candidate_limit: 50,
             quantity_binding: std::env::var("GANESH_QUANTITY_BINDING").map(|v| v == "1").unwrap_or(false),
             transition_check: std::env::var("GANESH_TRANSITION_CHECK").map(|v| v == "1").unwrap_or(false),
+            proposition_check: std::env::var("GANESH_PROPOSITION_CHECK").map(|v| v == "1").unwrap_or(false),
         }
     }
 }
@@ -519,7 +523,7 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
     // cue vocabulary the evidence expresses with different words ("verified"
     // vs "deployed ... passed"). A question cue term counts as covered when a
     // class-compatible cue appears in the selected passages.
-    if cfg.transition_check {
+    if cfg.transition_check || cfg.proposition_check {
         if let Some(required) = accept::cue_class_of(&terms) {
             let all_tokens: Vec<String> = passage_texts.iter().flat_map(|(_, t)| t.clone()).collect();
             let mut adjusted = debug.unmatched_terms.clone();
@@ -571,7 +575,8 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
         quantity_unit_missing,
         any_numeric_token: any_numeric,
         quantity_binding: cfg.quantity_binding,
-        transition_check: cfg.transition_check,
+        transition_check: cfg.transition_check || cfg.proposition_check,
+        proposition_check: cfg.proposition_check,
     };
     let trace = accept::decide(&input);
     let abstain = trace.decision != "ok";

@@ -1,0 +1,17 @@
+The Meridian backup service is a fictional system used for transfer testing. This document is its operations log.
+
+== Schedule ==
+
+Nightly backups of the Meridian archive are scheduled at 02:00 UTC.
+
+== April 3 ==
+
+The backup of archive volume V12 started at 02:00 UTC. The transfer completed at 02:41 UTC and the integrity check passed.
+
+== April 4 ==
+
+The backup of archive volume V12 started at 02:00 UTC. The transfer to the secondary site did not complete; the integrity check was not run.
+
+== April 5 ==
+
+The scheduled backup of archive volume V12 did not start.
