@@ -48,6 +48,8 @@ fn action_group(stem: &str) -> Option<&'static str> {
         "start" | "begin" | "began" => "start",
         "deploy" => "deploy",
         "run" => "run",
+        "perform" | "occur" | "take" => "activity",
+        "cancel" | "skip" => "cancel",
         "pass" => "pass",
         "fail" => "pass",
         "verifi" | "confirm" | "unverifi" | "unconfirm" => "verify",
@@ -269,7 +271,7 @@ fn version_tokens(text: &str) -> std::collections::BTreeSet<String> {
 // Experiment B lexicons: epistemic cue classes, in stemmed form.
 // ---------------------------------------------------------------------------
 
-pub const VERIFY_CUES: &[&str] = &["verifi", "confirm", "deploy", "run", "pass", "succeed", "complet", "live", "start", "unverifi", "unconfirm", "finish", "fail", "begin", "began", "reach"];
+pub const VERIFY_CUES: &[&str] = &["verifi", "confirm", "deploy", "run", "pass", "succeed", "complet", "live", "start", "unverifi", "unconfirm", "finish", "fail", "begin", "began", "reach", "perform", "cancel", "skip", "take", "occur"];
 pub const PROPOSE_CUES: &[&str] = &["propos", "plan", "intend", "suggest", "consider"];
 pub const ATTEMPT_CUES: &[&str] = &["attempt", "tri", "effort"];
 pub const TRANSITION_CUES: &[&str] = &["becam", "becom", "option", "mandatori", "deprecat", "drop", "adopt"];
@@ -519,7 +521,8 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
                 let passage_sentences = sentences(verbatim);
                 let mut antecedent_tokens: Vec<String> = Vec::new();
                 for sentence in &passage_sentences {
-                    let mut sent_stemmed = stemmed_query_like(sentence);
+                    let own_stemmed = stemmed_query_like(sentence);
+                    let mut sent_stemmed = own_stemmed.clone();
                     let own_ident = sent_stemmed.iter().any(|t| {
                         t.chars().any(|c| c.is_ascii_digit()) && t.chars().any(|c| c.is_alphabetic())
                     });
@@ -611,7 +614,7 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
                     // membership alone never suffices.
                     let action_ok = if input.action_check {
                         question_predicate(&input.terms.to_vec()).map(|qp| {
-                            sent_stemmed.iter().any(|t| action_supports(&qp, t))
+                            own_stemmed.iter().any(|t| action_supports(&qp, t))
                         }).unwrap_or(false)
                     } else {
                         true
@@ -631,7 +634,7 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
                             // stem (unverified/verified); nothing broader.
                             let q_pred = question_predicate(&input.terms.to_vec());
                             let pred_match = q_pred.as_ref().map(|qp| {
-                                sent_stemmed.iter().any(|t| {
+                                own_stemmed.iter().any(|t| {
                                     t == qp
                                         || (qp == "verifi" && t == "unverifi")
                                         || (qp == "confirm" && t == "unconfirm")

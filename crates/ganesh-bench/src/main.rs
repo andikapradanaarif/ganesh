@@ -89,6 +89,96 @@ fn main() {
         probe(&qpath.expect("--questions required"), &cdir);
         return;
     }
+    if args.len() >= 2 && args[1] == "preflight" {
+        // Pre-freeze validation (issue #173): uses the production importer and
+        // segmenter; never ranks results or runs a candidate.
+        let mut qf = String::new(); let mut corpus = String::new();
+        let mut i = 2;
+        while i < args.len() {
+            match args[i].as_str() {
+                "--questions" => { qf = args.get(i+1).cloned().unwrap_or_default(); i += 2; }
+                "--corpus" => { corpus = args.get(i+1).cloned().unwrap_or_default(); i += 2; }
+                _ => { i += 1; }
+            }
+        }
+        let key: serde_json::Value = serde_json::from_str(&std::fs::read_to_string(&qf).expect("read key")).expect("parse key");
+        let mani_text = std::fs::read_to_string(format!("{corpus}/manifest.json")).expect("read manifest");
+        let mani: serde_json::Value = serde_json::from_str(&mani_text).expect("parse manifest");
+        let mut problems: Vec<String> = Vec::new();
+        let mut warnings: Vec<String> = Vec::new();
+        // 1. digest verification + passage resolution + span presence
+        for a in mani["articles"].as_array().unwrap() {
+            let path = format!("{}/{}", corpus, a["file"].as_str().unwrap());
+            let bytes = std::fs::read(&path).expect("read snapshot");
+            let digest = ganesh_core::citation::sha256_hex(&bytes);
+            if digest != a["sha256"].as_str().unwrap() { problems.push(format!("digest mismatch {}", a["article_id"])); }
+        }
+        let mut texts: std::collections::HashMap<String, String> = std::collections::HashMap::new();
+        for a in mani["articles"].as_array().unwrap() {
+            let path = format!("{}/{}", corpus, a["file"].as_str().unwrap());
+            texts.insert(a["article_id"].as_str().unwrap().to_string(), std::fs::read_to_string(&path).unwrap_or_default());
+        }
+        let mut passage_use: std::collections::HashMap<String, Vec<String>> = std::collections::HashMap::new();
+        for q in key["questions"].as_array().unwrap() {
+            let qid = q["id"].as_str().unwrap();
+            let answerable = q["expected_status"] == "ok";
+            let mut has_evidence = false;
+            for f in q["required_facts"].as_array().unwrap() {
+                for acc in f["acceptable"].as_array().cloned().unwrap_or_default() {
+                    let acc = acc.as_str().unwrap().to_string();
+                    let (art, rest) = acc.split_once("-a1#p").unwrap_or((&acc, "0"));
+                    let seq: u32 = rest.parse().unwrap_or(0);
+                    let text = texts.get(art).cloned().unwrap_or_default();
+                    let segs = ganesh_core::segment::segment(&text);
+                    match segs.iter().find(|p| p.seq == seq) {
+                        None => problems.push(format!("{qid}: unresolved locator {acc}")),
+                        Some(p) => {
+                            passage_use.entry(acc.clone()).or_default().push(qid.to_string());
+                            for span in f["spans"].as_array().cloned().unwrap_or_default() {
+                                let sp = span.as_str().unwrap().to_lowercase();
+                                if !p.text.to_lowercase().contains(&sp) {
+                                    problems.push(format!("{qid}: span absent in {acc}: {sp}"));
+                                } else {
+                                    has_evidence = true;
+                                    // 4. sufficiency heuristic: when/how-many questions
+                                    // need a digit or number-word in the span
+                                    let qt = q["question"].as_str().unwrap().to_lowercase();
+                                    if (qt.starts_with("when") || qt.starts_with("how many") || qt.contains(" date"))
+                                        && !sp.chars().any(|c| c.is_ascii_digit())
+                                        && !["one","two","three","four","five","six","seven","eight","nine","ten"].iter().any(|w| sp.contains(w)) {
+                                        warnings.push(format!("{qid}: span lacks any date/count token though question asks for one: {sp}"));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if answerable && !has_evidence { problems.push(format!("{qid}: answerable case without usable evidence")); }
+        }
+        // 2. family overlap with earlier manifests
+        for prior in ["fixtures/corpus/manifest.json", "fixtures/corpus-v2/manifest.json"] {
+            if let Ok(pm) = std::fs::read_to_string(prior) {
+                let pm: serde_json::Value = serde_json::from_str(&pm).unwrap_or(serde_json::json!({}));
+                for a in mani["articles"].as_array().unwrap() {
+                    for pa in pm["articles"].as_array().cloned().unwrap_or_default() {
+                        if a["url"] == pa["url"] || a["title"] == pa["title"] {
+                            problems.push(format!("FAMILY OVERLAP: {} ({}) already in {}", a["article_id"], a["title"], prior));
+                        }
+                    }
+                }
+            }
+        }
+        // 3. duplicate-fact warnings: same passage keyed by 2+ questions
+        for (acc, qs) in &passage_use {
+            if qs.len() > 1 { warnings.push(format!("possible duplicate fact: {} keyed by {}", acc, qs.join(","))); }
+        }
+        for w in &warnings { println!("WARNING: {w}"); }
+        for p in &problems { println!("PROBLEM: {p}"); }
+        if problems.is_empty() { println!("preflight PASS ({} warnings)", warnings.len()); std::process::exit(0); }
+        println!("preflight FAIL: {} problems, {} warnings", problems.len(), warnings.len());
+        std::process::exit(1);
+    }
     if args.len() < 2 || args[1] != "run" {
         eprintln!("usage: ganesh-bench run --questions <key.json> --report <out.md> [--corpus fixtures/corpus] [--details out.json] [--mode gate|dev] [--scoring-spec spec.json]");
         std::process::exit(2);
