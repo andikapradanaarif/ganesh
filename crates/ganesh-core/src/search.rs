@@ -353,6 +353,98 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
 
     let term_present = |term: &str, tokens: &[String]| tokens.iter().any(|h| h == term);
 
+    // Date-aware selection signal (issue #184). Activation and precision derive
+    // from the question text alone. A candidate carries the signal when one of
+    // its body sentences contains both a date of suitable precision and at
+    // least one event term — a query term that does not come from the mentioned
+    // subject's title vocabulary. A landing date in a sentence that never
+    // mentions launching earns nothing for a launch question; a date tied to a
+    // different subject earns nothing because the event terms are absent.
+    let qlc = query.to_lowercase();
+    let date_activated = qlc.contains("when")
+        || qlc.contains("what year")
+        || qlc.contains("which year")
+        || qlc.contains("what date")
+        || qlc.contains("what day")
+        || qlc.contains("on what");
+    let exact_required = qlc.contains("exact") || qlc.contains("what date") || qlc.contains("what day");
+    let year_only = qlc.contains("what year") || qlc.contains("which year");
+    let months = [
+        "january", "february", "march", "april", "may", "june", "july", "august", "september",
+        "october", "november", "december",
+    ];
+    let mut subject_vocab: std::collections::BTreeSet<String> = std::collections::BTreeSet::new();
+    if let Ok(mut stmt) = store.conn.prepare("SELECT article_id, title FROM sources") {
+        if let Ok(source_rows) = stmt.query_map([], |row| Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?))) {
+            for row in source_rows.flatten() {
+                let (article_id, title) = row;
+                if mentioned_subjects.contains(&article_id) {
+                    for t in title_subject_terms(&title) {
+                        subject_vocab.insert(t);
+                    }
+                }
+            }
+        }
+    }
+    let event_terms: Vec<String> = terms
+        .iter()
+        .filter(|t| !subject_vocab.contains(*t))
+        .cloned()
+        .collect();
+    let sentence_signal = |sent: &str, want_exact: bool| -> bool {
+        let toks = stemmed_tokens(sent);
+        if !event_terms.iter().any(|t| term_present(t, &toks)) {
+            return false;
+        }
+        let low = sent.to_lowercase();
+        let has_year = low
+            .split(|c: char| !c.is_ascii_digit())
+            .any(|w| w.len() == 4 && w >= "1000" && w <= "2099");
+        if !has_year {
+            return false;
+        }
+        if year_only || !want_exact {
+            return true;
+        }
+        let has_month = months.iter().any(|m| low.contains(m));
+        let has_day = low
+            .split(|c: char| !c.is_ascii_digit())
+            .any(|w| (w.len() == 1 || w.len() == 2) && w.parse::<u32>().map(|d| (1..=31).contains(&d)).unwrap_or(false));
+        has_month && has_day
+    };
+    let mut date_signal: Vec<bool> = vec![false; candidate_texts.len()];
+    if date_activated {
+        for cand in &rows {
+            let body: String = store
+                .conn
+                .query_row(
+                    "SELECT text FROM passages WHERE id = ?1",
+                    rusqlite::params![cand.passage_id],
+                    |row| row.get(0),
+                )
+                .unwrap_or_default();
+            if let Some(pos) = rows.iter().position(|c| c.passage_id == cand.passage_id) {
+                let idx = pos;
+                let mut hit = false;
+                for sent in body.split(|c| c == '.' || c == '\n') {
+                    if sentence_signal(sent, exact_required) {
+                        hit = true;
+                        break;
+                    }
+                }
+                if !hit && !exact_required && !year_only {
+                    for sent in body.split(|c| c == '.' || c == '\n') {
+                        if sentence_signal(sent, false) {
+                            hit = true;
+                            break;
+                        }
+                    }
+                }
+                date_signal[idx] = hit;
+            }
+        }
+    }
+
     // Document-frequency weights for query terms, computed once per query.
     let mut term_weights: std::collections::HashMap<String, f64> = std::collections::HashMap::new();
     {
@@ -386,6 +478,17 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
     let mut selected: Vec<usize> = Vec::new();
     if want > 0 {
         selected.push(eligible[0]);
+        // Date-aware insertion: when activated, the first bm25-ordered
+        // remaining candidate whose body ties a suitably precise date to the
+        // queried event terms is promoted into the second slot. Everything
+        // else — first pick, marginal walk, fill order — stays as in #178.
+        if date_activated && want > 1 {
+            if let Some(&sig) = eligible.iter().skip(1).find(|idx| date_signal[**idx]) {
+                if !selected.contains(&sig) {
+                    selected.push(sig);
+                }
+            }
+        }
         let mut covered = std::collections::BTreeSet::new();
         for t in &terms {
             if term_present(t, &candidate_texts[eligible[0]].1) {
