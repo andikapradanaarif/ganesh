@@ -1,0 +1,554 @@
+[
+ {
+  "id": "w01",
+  "expected": "ok",
+  "question": "When was the Curiosity rover launched?",
+  "facts": [
+   {
+    "fact": "launched from Cape Canaveral, Florida, on November 26, 2011",
+    "passage": "curiosity-a1#p2",
+    "raw_rank": 6,
+    "eligible": true,
+    "selected_position": null
+   }
+  ],
+  "pool_ceiling": true,
+  "eligible_ceiling": true,
+  "selected_settles": false,
+  "api_status": "ok",
+  "credited": false,
+  "pool_size": 50
+ },
+ {
+  "id": "w02",
+  "expected": "ok",
+  "question": "When did Curiosity land on Mars?",
+  "facts": [
+   {
+    "fact": "landed on Aeolis Palus inside Gale crater on Mars on August 6, 2012",
+    "passage": "curiosity-a1#p2",
+    "raw_rank": 6,
+    "eligible": true,
+    "selected_position": 3
+   }
+  ],
+  "pool_ceiling": true,
+  "eligible_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "credited": true,
+  "pool_size": 50
+ },
+ {
+  "id": "w03",
+  "expected": "ok",
+  "question": "Where on Mars did Curiosity land?",
+  "facts": [
+   {
+    "fact": "landed on Aeolis Palus inside Gale crater",
+    "passage": "curiosity-a1#p2",
+    "raw_rank": 6,
+    "eligible": true,
+    "selected_position": null
+   }
+  ],
+  "pool_ceiling": true,
+  "eligible_ceiling": true,
+  "selected_settles": false,
+  "api_status": "ok",
+  "credited": false,
+  "pool_size": 50
+ },
+ {
+  "id": "w04",
+  "expected": "ok",
+  "question": "How much electrical power is the Curiosity rover's MMRTG designed to p",
+  "facts": [
+   {
+    "fact": "produce 110 watts of electrical power",
+    "passage": "curiosity-a1#p22",
+    "raw_rank": 1,
+    "eligible": true,
+    "selected_position": 1
+   }
+  ],
+  "pool_ceiling": true,
+  "eligible_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "credited": true,
+  "pool_size": 50
+ },
+ {
+  "id": "w05",
+  "expected": "ok",
+  "question": "When did Voyager 1 cross the heliopause?",
+  "facts": [
+   {
+    "fact": "crossed the heliopause and entered interstellar space on August 25, 20",
+    "passage": "voyager-a1#p4",
+    "raw_rank": 4,
+    "eligible": true,
+    "selected_position": 3
+   }
+  ],
+  "pool_ceiling": true,
+  "eligible_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "credited": true,
+  "pool_size": 50
+ },
+ {
+  "id": "w06",
+  "expected": "ok",
+  "question": "When was Voyager 1 launched?",
+  "facts": [
+   {
+    "fact": "launched by NASA on September 5, 1977",
+    "passage": "voyager-a1#p1",
+    "raw_rank": 6,
+    "eligible": true,
+    "selected_position": null
+   }
+  ],
+  "pool_ceiling": true,
+  "eligible_ceiling": true,
+  "selected_settles": false,
+  "api_status": "ok",
+  "credited": false,
+  "pool_size": 50
+ },
+ {
+  "id": "w07",
+  "expected": "ok",
+  "question": "When was Voyager 2 launched?",
+  "facts": [
+   {
+    "fact": "Voyager 2 probe had been launched two weeks earlier, on August 20, 197",
+    "passage": "voyager-a1#p35",
+    "raw_rank": 1,
+    "eligible": true,
+    "selected_position": 1
+   }
+  ],
+  "pool_ceiling": true,
+  "eligible_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "credited": true,
+  "pool_size": 50
+ },
+ {
+  "id": "w08",
+  "expected": "ok",
+  "question": "In which year was the Hubble Space Telescope launched?",
+  "facts": [
+   {
+    "fact": "launched into low Earth orbit in 1990",
+    "passage": "hubble-a1#p1",
+    "raw_rank": 31,
+    "eligible": true,
+    "selected_position": null
+   }
+  ],
+  "pool_ceiling": true,
+  "eligible_ceiling": true,
+  "selected_settles": false,
+  "api_status": "ok",
+  "credited": false,
+  "pool_size": 50
+ },
+ {
+  "id": "w09",
+  "expected": "ok",
+  "question": "When was the James Webb Space Telescope launched?",
+  "facts": [
+   {
+    "fact": "James Webb Space Telescope (JWST), which was launched on December 25, ",
+    "passage": "hubble-a1#p4",
+    "raw_rank": 1,
+    "eligible": true,
+    "selected_position": 1
+   }
+  ],
+  "pool_ceiling": true,
+  "eligible_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "credited": true,
+  "pool_size": 50
+ },
+ {
+  "id": "w10",
+  "expected": "ok",
+  "question": "In which year was the telescope named after Edwin Hubble?",
+  "facts": [
+   {
+    "fact": "In 1983, the telescope was named after Edwin Hubble",
+    "passage": "hubble-a1#p15",
+    "raw_rank": 3,
+    "eligible": true,
+    "selected_position": 3
+   }
+  ],
+  "pool_ceiling": true,
+  "eligible_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "credited": true,
+  "pool_size": 50
+ },
+ {
+  "id": "w11",
+  "expected": "ok",
+  "question": "When was the Perseverance rover launched?",
+  "facts": [
+   {
+    "fact": "launched on July 30, 2020",
+    "passage": "perseverance-a1#p1",
+    "raw_rank": 5,
+    "eligible": true,
+    "selected_position": null
+   }
+  ],
+  "pool_ceiling": true,
+  "eligible_ceiling": true,
+  "selected_settles": false,
+  "api_status": "ok",
+  "credited": false,
+  "pool_size": 50
+ },
+ {
+  "id": "w12",
+  "expected": "ok",
+  "question": "In which crater did Perseverance land?",
+  "facts": [
+   {
+    "fact": "landed in Jezero Crater",
+    "passage": "perseverance-a1#p1",
+    "raw_rank": 7,
+    "eligible": true,
+    "selected_position": null
+   }
+  ],
+  "pool_ceiling": true,
+  "eligible_ceiling": true,
+  "selected_settles": false,
+  "api_status": "ok",
+  "credited": false,
+  "pool_size": 50
+ },
+ {
+  "id": "w13",
+  "expected": "ok",
+  "question": "When did Ingenuity perform its first flight on Mars?",
+  "facts": [
+   {
+    "fact": "first flight was April 19, 2021",
+    "passage": "perseverance-a1#p21",
+    "raw_rank": 2,
+    "eligible": true,
+    "selected_position": 2
+   }
+  ],
+  "pool_ceiling": true,
+  "eligible_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "credited": true,
+  "pool_size": 50
+ },
+ {
+  "id": "w14",
+  "expected": "ok",
+  "question": "How many flights did Ingenuity make in total?",
+  "facts": [
+   {
+    "fact": "made 72 flights in nearly three years",
+    "passage": "perseverance-a1#p21",
+    "raw_rank": 3,
+    "eligible": true,
+    "selected_position": null
+   }
+  ],
+  "pool_ceiling": true,
+  "eligible_ceiling": true,
+  "selected_settles": false,
+  "api_status": "ok",
+  "credited": false,
+  "pool_size": 50
+ },
+ {
+  "id": "w15",
+  "expected": "ok",
+  "question": "Approximately how much electricity does Perseverance's power source pr",
+  "facts": [
+   {
+    "fact": "approximately 110 watts at launch",
+    "passage": "perseverance-a1#p16",
+    "raw_rank": 1,
+    "eligible": true,
+    "selected_position": 1
+   }
+  ],
+  "pool_ceiling": true,
+  "eligible_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "credited": true,
+  "pool_size": 50
+ },
+ {
+  "id": "w16",
+  "expected": "ok",
+  "question": "When did Voyager 1 transmit the first detailed image of the Great Red ",
+  "facts": [
+   {
+    "fact": "date + transmission fact",
+    "passage": "voyager-a1#p44",
+    "raw_rank": 1,
+    "eligible": true,
+    "selected_position": 1
+   }
+  ],
+  "pool_ceiling": true,
+  "eligible_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "credited": true,
+  "pool_size": 50
+ },
+ {
+  "id": "s01",
+  "expected": "ok",
+  "question": "Did the germination test of seed lot G11 finish on January 5?",
+  "facts": [
+   {
+    "fact": "The test finished at 16:00 UTC",
+    "passage": "seedlog-a1#p2",
+    "raw_rank": 1,
+    "eligible": true,
+    "selected_position": 1
+   }
+  ],
+  "pool_ceiling": true,
+  "eligible_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "credited": true,
+  "pool_size": 50
+ },
+ {
+  "id": "s02",
+  "expected": "ok",
+  "question": "Did the viability count pass for the January 5 test of seed lot G11?",
+  "facts": [
+   {
+    "fact": "viability count passed",
+    "passage": "seedlog-a1#p2",
+    "raw_rank": 1,
+    "eligible": true,
+    "selected_position": 1
+   }
+  ],
+  "pool_ceiling": true,
+  "eligible_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "credited": true,
+  "pool_size": 50
+ },
+ {
+  "id": "s03",
+  "expected": "ok",
+  "question": "Did the germination test of seed lot G11 finish on January 6?",
+  "facts": [
+   {
+    "fact": "The test did not finish",
+    "passage": "seedlog-a1#p3",
+    "raw_rank": 1,
+    "eligible": true,
+    "selected_position": 1
+   }
+  ],
+  "pool_ceiling": true,
+  "eligible_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "credited": true,
+  "pool_size": 50
+ },
+ {
+  "id": "s04",
+  "expected": "ok",
+  "question": "Did the moisture reading finish on January 7?",
+  "facts": [
+   {
+    "fact": "moisture reading finished at 09:00 UTC",
+    "passage": "seedlog-a1#p4",
+    "raw_rank": 1,
+    "eligible": true,
+    "selected_position": 1
+   }
+  ],
+  "pool_ceiling": true,
+  "eligible_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "credited": true,
+  "pool_size": 36
+ },
+ {
+  "id": "s05",
+  "expected": "ok",
+  "question": "Was the germination test of seed lot G12 underway at 09:00 on January ",
+  "facts": [
+   {
+    "fact": "test continued",
+    "passage": "seedlog-a1#p4",
+    "raw_rank": 1,
+    "eligible": true,
+    "selected_position": 1
+   }
+  ],
+  "pool_ceiling": true,
+  "eligible_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "credited": true,
+  "pool_size": 50
+ },
+ {
+  "id": "s06",
+  "expected": "ok",
+  "question": "Did the germination test of seed lot G12 finish on January 9?",
+  "facts": [
+   {
+    "fact": "test finished at 14:30 UTC",
+    "passage": "seedlog-a1#p6",
+    "raw_rank": 1,
+    "eligible": true,
+    "selected_position": 1
+   }
+  ],
+  "pool_ceiling": true,
+  "eligible_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "credited": true,
+  "pool_size": 50
+ },
+ {
+  "id": "s07",
+  "expected": "ok",
+  "question": "Did the moisture reading finish on January 9?",
+  "facts": [
+   {
+    "fact": "moisture reading finished at 09:00 UTC",
+    "passage": "seedlog-a1#p4",
+    "raw_rank": 2,
+    "eligible": true,
+    "selected_position": 2
+   }
+  ],
+  "pool_ceiling": true,
+  "eligible_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "credited": true,
+  "pool_size": 44
+ },
+ {
+  "id": "s08",
+  "expected": "ok",
+  "question": "Did the germination test of seed lot G13 finish on January 10?",
+  "facts": [
+   {
+    "fact": "germination test of seed lot G13 finished at 12:00 UTC",
+    "passage": "seedlog-a1#p7",
+    "raw_rank": 1,
+    "eligible": true,
+    "selected_position": 1
+   }
+  ],
+  "pool_ceiling": true,
+  "eligible_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "credited": true,
+  "pool_size": 50
+ },
+ {
+  "id": "i01",
+  "expected": "insufficient_context",
+  "question": "Did the germination test of seed lot G12 finish on January 7?",
+  "facts": [],
+  "pool_ceiling": false,
+  "eligible_ceiling": false,
+  "selected_settles": false,
+  "api_status": "ok",
+  "credited": false,
+  "pool_size": 50
+ },
+ {
+  "id": "i02",
+  "expected": "insufficient_context",
+  "question": "Did the germination test of seed lot G11 finish on January 8?",
+  "facts": [],
+  "pool_ceiling": false,
+  "eligible_ceiling": false,
+  "selected_settles": false,
+  "api_status": "insufficient_context",
+  "credited": true,
+  "pool_size": 50
+ },
+ {
+  "id": "i03",
+  "expected": "insufficient_context",
+  "question": "Did the viability count pass for the January 6 test of seed lot G11?",
+  "facts": [],
+  "pool_ceiling": false,
+  "eligible_ceiling": false,
+  "selected_settles": false,
+  "api_status": "insufficient_context",
+  "credited": true,
+  "pool_size": 50
+ },
+ {
+  "id": "i04",
+  "expected": "insufficient_context",
+  "question": "On what exact calendar date did Congress approve funding for the Large",
+  "facts": [],
+  "pool_ceiling": false,
+  "eligible_ceiling": false,
+  "selected_settles": false,
+  "api_status": "ok",
+  "credited": false,
+  "pool_size": 50
+ },
+ {
+  "id": "i05",
+  "expected": "insufficient_context",
+  "question": "What is the diameter of Hubble's main mirror in meters?",
+  "facts": [],
+  "pool_ceiling": false,
+  "eligible_ceiling": false,
+  "selected_settles": false,
+  "api_status": "ok",
+  "credited": false,
+  "pool_size": 50
+ },
+ {
+  "id": "i06",
+  "expected": "insufficient_context",
+  "question": "On what date did the Curiosity rover's mission end?",
+  "facts": [],
+  "pool_ceiling": false,
+  "eligible_ceiling": false,
+  "selected_settles": false,
+  "api_status": "ok",
+  "credited": false,
+  "pool_size": 50
+ }
+]
