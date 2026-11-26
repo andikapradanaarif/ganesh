@@ -1,0 +1,11 @@
+Lazylang is a fictional functional programming language used for retrieval experiments.
+
+== Semantics ==
+
+Lazylang evaluates expressions lazily by default, and this lazy evaluation behavior is central to its design.
+Type annotations are optional in Lazylang, since the compiler infers most types.
+Since version 2.0, eager evaluation became optional through strictness annotations. Lazy evaluation remained the default in every version.
+
+== Implementation ==
+
+The reference Lazylang interpreter is written in Haskell.

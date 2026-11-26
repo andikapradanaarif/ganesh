@@ -1,0 +1,17 @@
+Novolang is a small fictional programming language created for retrieval experiments. It is statically typed and compiles to bytecode.
+
+== History ==
+
+The first edition, Novolang 1.0, defined 12 keywords in its specification.
+Novolang 2.0, published in 2019, expanded the language to eighteen keywords and added type inference.
+In 2021, the Novolang 3.0 keyword list was revised for consistency, though the standard itself does not state how many keywords the language has.
+The integer type int32 is a 32-bit signed integer, while int64 uses 64 bits.
+
+== Governance ==
+
+The Novolang committee holds 12 meetings each year to discuss membership applications. The charter does not state how many members the committee has.
+Unlike Novolang, the related language Zetalang has 40 keywords, though Zetalang is outside the scope of this specification.
+
+== Implementation ==
+
+The reference implementation of Novolang is written in Rust and targets a register-based virtual machine.

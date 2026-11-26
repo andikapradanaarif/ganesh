@@ -1,3 +1,4 @@
+use crate::accept::{self, AcceptanceTrace};
 use crate::citation;
 use crate::store::{permitted, Store};
 use crate::types::{PassageHit, SearchResponse};
@@ -20,6 +21,13 @@ pub struct RetrievalConfig {
     pub min_top_coverage: f64,
     /// Number of rows pulled from the FTS index before abstention analysis.
     pub candidate_limit: usize,
+    /// Experiment A (issue #163): quantity evidence must bind a digit literal
+    /// or number word to a measured-property term in the same sentence.
+    /// Default off reproduces the revised v2 reference behavior.
+    pub quantity_binding: bool,
+    /// Experiment B (issue #163): state/transition questions need cue-class,
+    /// polarity and environment compatible evidence in one sentence.
+    pub transition_check: bool,
 }
 
 impl Default for RetrievalConfig {
@@ -30,6 +38,8 @@ impl Default for RetrievalConfig {
             min_union_coverage: 0.0,
             min_top_coverage: 0.0,
             candidate_limit: 50,
+            quantity_binding: std::env::var("GANESH_QUANTITY_BINDING").map(|v| v == "1").unwrap_or(false),
+            transition_check: std::env::var("GANESH_TRANSITION_CHECK").map(|v| v == "1").unwrap_or(false),
         }
     }
 }
@@ -209,6 +219,8 @@ pub struct SearchDebug {
     pub terms: Vec<String>,
     pub unmatched_terms: Vec<String>,
     pub candidates: Vec<(String, f64)>,
+    pub selected: Vec<String>,
+    pub trace: AcceptanceTrace,
 }
 
 fn title_subject_terms(title: &str) -> std::collections::BTreeSet<String> {
@@ -232,6 +244,8 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
         terms: vec![],
         unmatched_terms: vec![],
         candidates: vec![],
+        selected: vec![],
+        trace: AcceptanceTrace::default(),
     };
     let empty = |status: &str| SearchResponse {
         status: status.to_string(),
@@ -465,21 +479,103 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
         }
     }
 
-    // Quantity questions need quantity-like evidence, not merely nearby
-    // mentions of the measured things. Exact-number units are deliberately
-    // unstemmed, so a question about bytes is not supported by a passage that
-    // only mentions the byte type. A numeric token is weak evidence and not
-    // sufficient by itself, but its complete absence is strong evidence that
-    // no quantity was stated.
+    // Acceptance decision (issue #163): extracted into accept::decide so every
+    // rule records the sentence span it relied on. Verbatim text of the
+    // selected passages is loaded here for sentence-level evidence analysis;
+    // ranking and selection above are unaffected.
+    let mut verbatim_by_id: std::collections::HashMap<String, String> = std::collections::HashMap::new();
+    for (pid, _) in &passage_texts {
+        let text: String = store.conn.query_row(
+            "SELECT text FROM passages WHERE id = ?1",
+            rusqlite::params![pid],
+            |row| row.get(0),
+        ).unwrap_or_default();
+        verbatim_by_id.insert(pid.clone(), text);
+    }
+    let selected_full: Vec<(String, String, Vec<String>)> = passage_texts.iter()
+        .map(|(pid, tokens)| (pid.clone(), verbatim_by_id.get(pid).cloned().unwrap_or_default(), tokens.clone()))
+        .collect();
+    debug.selected = passage_texts.iter().map(|(pid, _)| pid.clone()).collect();
+
+    // Query terms that name a source subject are not measured properties.
+    let mut subject_query_terms = std::collections::BTreeSet::new();
+    if let Ok(mut stmt) = store.conn.prepare("SELECT title FROM sources") {
+        if let Ok(rows) = stmt.query_map([], |row| row.get::<_, String>(0)) {
+            for title in rows.flatten() {
+                for t in title_subject_terms(&title) {
+                    if terms.contains(&t) {
+                        subject_query_terms.insert(t);
+                    }
+                }
+            }
+        }
+    }
+
     let quantity = quantity_question(query);
     let quantity_unit_missing = quantity && terms.iter().any(|t| exact_number_unit(t))
         && terms.iter().filter(|t| exact_number_unit(t)).any(|t| !passage_texts.iter().any(|(_, tokens)| term_present(t, tokens)));
-    let numeric_missing = quantity && !passage_texts.iter().any(|(_, tokens)| tokens.iter().any(|t| numeric_token(t)));
-    let abstain = debug.idf_union_coverage < cfg.min_idf_union_coverage
-        || union_coverage < cfg.min_union_coverage
-        || top_coverage < cfg.min_top_coverage
-        || quantity_unit_missing
-        || numeric_missing;
+    let any_numeric = passage_texts.iter().any(|(_, tokens)| tokens.iter().any(|t| numeric_token(t)));
+    // Cue-aware coverage (experiment B): state/transition questions often use
+    // cue vocabulary the evidence expresses with different words ("verified"
+    // vs "deployed ... passed"). A question cue term counts as covered when a
+    // class-compatible cue appears in the selected passages.
+    if cfg.transition_check {
+        if let Some(required) = accept::cue_class_of(&terms) {
+            let all_tokens: Vec<String> = passage_texts.iter().flat_map(|(_, t)| t.clone()).collect();
+            let mut adjusted = debug.unmatched_terms.clone();
+            adjusted.retain(|t| {
+                let is_cue = accept::VERIFY_CUES.contains(&t.as_str())
+                    || accept::PROPOSE_CUES.contains(&t.as_str())
+                    || accept::ATTEMPT_CUES.contains(&t.as_str())
+                    || accept::TRANSITION_CUES.contains(&t.as_str());
+                if !is_cue {
+                    return true;
+                }
+                let class_of_stem = |stem: &str| -> Option<&'static str> {
+                    if accept::VERIFY_CUES.contains(&stem) { Some("verify") }
+                    else if accept::PROPOSE_CUES.contains(&stem) { Some("propose") }
+                    else if accept::ATTEMPT_CUES.contains(&stem) { Some("attempt") }
+                    else if accept::TRANSITION_CUES.contains(&stem) { Some("transition") }
+                    else { None }
+                };
+                let compat = accept::VERIFY_CUES.iter().chain(accept::PROPOSE_CUES.iter()).chain(accept::ATTEMPT_CUES.iter()).chain(accept::TRANSITION_CUES.iter())
+                    .any(|cue| all_tokens.iter().any(|tok| tok == cue) && class_of_stem(cue).map(|c| accept::class_satisfies(required, c)).unwrap_or(false));
+                !compat
+            });
+            if adjusted.len() < debug.unmatched_terms.len() {
+                let total_w: f64 = terms.iter().map(|t| weight_of(t)).sum();
+                if total_w > 0.0 {
+                    let union_w: f64 = terms.iter()
+                        .filter(|t| !adjusted.contains(*t) && passage_texts.iter().any(|(_, tokens)| term_present(t, tokens)) || !adjusted.contains(*t) && accept::VERIFY_CUES.iter().chain(accept::PROPOSE_CUES.iter()).chain(accept::ATTEMPT_CUES.iter()).chain(accept::TRANSITION_CUES.iter()).any(|c| c == t))
+                        .map(|t| weight_of(t))
+                        .sum();
+                    debug.idf_union_coverage = union_w / total_w;
+                    debug.unmatched_terms = adjusted;
+                }
+            }
+        }
+    }
+
+    let input = accept::DecideInput {
+        query,
+        terms: &terms,
+        subject_terms: &subject_query_terms,
+        passages: &selected_full,
+        idf_union_coverage: debug.idf_union_coverage,
+        union_coverage,
+        top_coverage,
+        min_idf_union_coverage: cfg.min_idf_union_coverage,
+        min_union_coverage: cfg.min_union_coverage,
+        min_top_coverage: cfg.min_top_coverage,
+        quantity_question: quantity,
+        quantity_unit_missing,
+        any_numeric_token: any_numeric,
+        quantity_binding: cfg.quantity_binding,
+        transition_check: cfg.transition_check,
+    };
+    let trace = accept::decide(&input);
+    let abstain = trace.decision != "ok";
+    debug.trace = trace;
     if abstain {
         return (empty("insufficient_context"), debug);
     }

@@ -1,0 +1,51 @@
+qb-mode quantity_binding=false transition_check=false
+== qB01 [Was the deployment of revision R9 of Northstar proposed?] expect=ok got=ok
+   candidates: northstar-r1#p2(-3.32) northstar-r1#p3(-1.16) northstar-r1#p4(-0.37) northstar-r1#p1(-0.00)
+   selected:   northstar-r1#p2 northstar-r1#p3 northstar-r1#p4
+   coverage:   u:1.00 iu:1.00 unmatched: 
+   decision:   ok | 
+== qB02 [Was revision R9 of Northstar verified as deployed?] expect=insufficient_context got=insufficient_context
+   candidates: northstar-r1#p2(-1.16) northstar-r1#p3(-1.16) northstar-r1#p4(-0.37) northstar-r1#p1(-0.00)
+   selected:   northstar-r1#p2 northstar-r1#p3 northstar-r1#p4
+   coverage:   u:0.80 iu:0.65 unmatched: verifi
+   decision:   insufficient_context | idf-union-coverage 0.654 below threshold 0.750
+== qB03 [Was revision R8 of Northstar verified running in production?] expect=insufficient_context got=insufficient_context
+   candidates: northstar-r1#p4(-3.63) northstar-r1#p2(-1.16) northstar-r1#p3(-0.28) northstar-r1#p1(-0.00)
+   selected:   northstar-r1#p4 northstar-r1#p2 northstar-r1#p3
+   coverage:   u:0.83 iu:0.74 unmatched: verifi
+   decision:   insufficient_context | idf-union-coverage 0.743 below threshold 0.750
+== qB04 [Was revision R8 of Northstar verified running in staging?] expect=ok got=ok
+   candidates: northstar-r1#p4(-4.22) northstar-r1#p2(-0.28) northstar-r1#p3(-0.28) northstar-r1#p1(-0.00)
+   selected:   northstar-r1#p4 northstar-r1#p2 northstar-r1#p3
+   coverage:   u:0.83 iu:0.75 unmatched: verifi
+   decision:   ok | 
+== qB05 [Was revision R7 of Northstar verified running in production?] expect=ok got=insufficient_context
+   candidates: northstar-r1#p4(-3.63) northstar-r1#p2(-1.16) northstar-r1#p3(-0.28) northstar-r1#p1(-0.00)
+   selected:   northstar-r1#p4 northstar-r1#p2 northstar-r1#p3
+   coverage:   u:0.83 iu:0.74 unmatched: verifi
+   decision:   insufficient_context | idf-union-coverage 0.743 below threshold 0.750
+== qB06 [Was revision R6 of Northstar confirmed?] expect=insufficient_context got=ok
+   candidates: northstar-r1#p4(-3.49) northstar-r1#p2(-0.28) northstar-r1#p3(-0.28) northstar-r1#p1(-0.00)
+   selected:   northstar-r1#p4 northstar-r1#p2 northstar-r1#p3
+   coverage:   u:1.00 iu:1.00 unmatched: 
+   decision:   ok | 
+== qB07 [Did the Northstar team verify revision R7 in production?] expect=ok got=insufficient_context
+   candidates: northstar-r1#p4(-3.03) northstar-r1#p2(-2.03) northstar-r1#p3(-0.28) northstar-r1#p1(-0.00)
+   selected:   northstar-r1#p4 northstar-r1#p2 northstar-r1#p3
+   coverage:   u:0.83 iu:0.73 unmatched: verifi
+   decision:   insufficient_context | idf-union-coverage 0.734 below threshold 0.750
+== qB08 [Did lazy evaluation become optional in Lazylang?] expect=insufficient_context got=insufficient_context
+   candidates: lazylang-r1#p2(-5.48) lazylang-r1#p3(-0.40) lazylang-r1#p1(-0.38)
+   selected:   lazylang-r1#p2 lazylang-r1#p3 lazylang-r1#p1
+   coverage:   u:0.80 iu:0.72 unmatched: becom
+   decision:   insufficient_context | idf-union-coverage 0.723 below threshold 0.750
+== qB09 [Did eager evaluation become optional in Lazylang?] expect=ok got=insufficient_context
+   candidates: lazylang-r1#p2(-4.96) lazylang-r1#p3(-0.40) lazylang-r1#p1(-0.38)
+   selected:   lazylang-r1#p2 lazylang-r1#p3 lazylang-r1#p1
+   coverage:   u:0.80 iu:0.72 unmatched: becom
+   decision:   insufficient_context | idf-union-coverage 0.723 below threshold 0.750
+== qB10 [Are type annotations optional in Lazylang?] expect=ok got=ok
+   candidates: lazylang-r1#p2(-4.94) lazylang-r1#p3(-0.40) lazylang-r1#p1(-0.38)
+   selected:   lazylang-r1#p2 lazylang-r1#p3 lazylang-r1#p1
+   coverage:   u:1.00 iu:1.00 unmatched: 
+   decision:   ok | 

@@ -758,15 +758,47 @@ fn probe(questions_path: &str, corpus_dir: &str) {
     store.rebuild_index().expect("rebuild");
     let key_text = std::fs::read_to_string(questions_path).expect("questions");
     let key: KeyFile = serde_json::from_str(&key_text).expect("parse questions");
-    let cfg = RetrievalConfig { candidate_limit: 20, ..RetrievalConfig::default() };
-    println!("id    expected             union  top    terms  top-candidates");
+    let cfg = RetrievalConfig::default();
+    // Development-only acceptance diagnostic (issue #163). For each question:
+    // candidate pool, selected top three, acceptance decision with the exact
+    // reasons and sentence spans it relied on, and — joining the key on the
+    // evaluator side only — whether acceptable passages ever entered the
+    // candidate pool or the selection. The service never sees the key.
+    println!("qb-mode quantity_binding={} transition_check={}", cfg.quantity_binding, cfg.transition_check);
     for q in &key.questions {
-        let (_resp, dbg) = search_debug(&store, &q.question, "probe", &cfg);
-        let cands: Vec<String> = dbg.candidates.iter().map(|(id, s)| format!("{id}({s:.3})")).collect();
-        println!("{:<5} {:<20} u:{:.2} iu:{:.2} i2:{:.2}  {}",
-            q.id, q.expected_status, dbg.union_coverage,
-            dbg.idf_union_coverage, dbg.idf2_union_coverage, cands.join(" "));
-        println!("      unmatched: {}", dbg.unmatched_terms.join(","));
+        let (resp, dbg) = search_debug(&store, &q.question, "probe", &cfg);
+        println!("== {} [{}] expect={} got={}", q.id, q.question, q.expected_status, resp.status);
+        let cands: Vec<String> = dbg.candidates.iter().take(10).map(|(id, s)| format!("{id}({s:.2})")).collect();
+        println!("   candidates: {}", cands.join(" "));
+        println!("   selected:   {}", dbg.selected.join(" "));
+        println!("   coverage:   u:{:.2} iu:{:.2} unmatched: {}", dbg.union_coverage, dbg.idf_union_coverage, dbg.unmatched_terms.join(","));
+        println!("   decision:   {} | {}", dbg.trace.decision, dbg.trace.reasons.join(" ; "));
+        for m in &dbg.trace.quantity_mentions {
+            println!("   qty: {} `{}` bound=[{}] excl={} | {}",
+                m.passage_id, m.token, m.bound_terms.join(","),
+                m.exclusion.clone().unwrap_or_else(|| "-".into()),
+                if m.sentence.len() > 110 { format!("{}…", &m.sentence[..110]) } else { m.sentence.clone() });
+        }
+        for sp in &dbg.trace.state_spans {
+            println!("   state: {} class={} neg={} env={} obj=[{}] | {}",
+                sp.passage_id, sp.cue_class, sp.negated,
+                sp.environment.clone().unwrap_or_else(|| "-".into()),
+                sp.object_terms.join(","),
+                if sp.sentence.len() > 110 { format!("{}…", &sp.sentence[..110]) } else { sp.sentence.clone() });
+        }
+        // Evaluator-side key join: did the evidence needed by the key ever
+        // enter the candidate pool / the final selection?
+        let mut acceptable: Vec<String> = Vec::new();
+        for f in &q.required_facts {
+            acceptable.extend(f.acceptable.clone());
+        }
+        if !acceptable.is_empty() {
+            for a in &acceptable {
+                let in_pool = dbg.candidates.iter().any(|(id, _)| id == a);
+                let in_sel = dbg.selected.iter().any(|id| id == a);
+                println!("   key {}: in-pool={} in-selection={}", a, in_pool, in_sel);
+            }
+        }
     }
 }
 

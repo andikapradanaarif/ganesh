@@ -1,0 +1,28 @@
+{
+ "version": "contrast-quantity.v1",
+ "created": "2026-11-27",
+ "frame": "synthetic contrast fixture, authored for issue #163 experiment A",
+ "seed": 0,
+ "exclusions": [],
+ "sampling": "hand-authored minimal passages; not sampled",
+ "snapshot_format": "plaintext with wiki-style section headings",
+ "articles": [
+  {
+   "article_id": "novolang",
+   "title": "Novolang (programming language)",
+   "pageid": 0,
+   "revision": "novolang-r1",
+   "revision_url": "https://example.invalid/novolang/r1",
+   "publisher": "Ganesh fixture authors",
+   "url": "https://example.invalid/novolang",
+   "license": "CC0 1.0",
+   "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "permission": "Synthetic fixture text written for this project; no external content.",
+   "retrieved": "2026-11-27",
+   "bytes": 973,
+   "sha256": "bdd516d64b14301b7117175bdf2b4392e5edff4fe3862644669c7ee6758cd909",
+   "file": "snapshots/novolang.txt",
+   "family": "contrast"
+  }
+ ]
+}

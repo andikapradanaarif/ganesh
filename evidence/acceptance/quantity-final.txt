@@ -1,0 +1,119 @@
+qb-mode quantity_binding=true transition_check=false
+== qA01 [How many keywords did Novolang 1.0 define?] expect=ok got=ok
+   candidates: novolang-r1#p2(-2.40) novolang-r1#p3(-0.00) novolang-r1#p4(-0.00) novolang-r1#p1(-0.00)
+   selected:   novolang-r1#p2 novolang-r1#p3 novolang-r1#p4
+   coverage:   u:1.00 iu:1.00 unmatched: 
+   decision:   ok | 
+   qty: novolang-r1#p2 `1.0` bound=[keyword] excl=version or identifier token | The first edition, Novolang 1.0, defined 12 keywords in its specification.
+   qty: novolang-r1#p2 `12` bound=[keyword] excl=- | The first edition, Novolang 1.0, defined 12 keywords in its specification.
+   qty: novolang-r1#p2 `2.0` bound=[keyword] excl=version or identifier token | Novolang 2.0, published in 2019, expanded the language to eighteen keywords and added type inference.
+   qty: novolang-r1#p2 `2019` bound=[keyword] excl=year-like 4-digit literal | Novolang 2.0, published in 2019, expanded the language to eighteen keywords and added type inference.
+   qty: novolang-r1#p2 `eighteen` bound=[keyword] excl=version mismatch with question | Novolang 2.0, published in 2019, expanded the language to eighteen keywords and added type inference.
+   qty: novolang-r1#p2 `2021` bound=[keyword] excl=year-like 4-digit literal | In 2021, the Novolang 3.0 keyword list was revised for consistency, though the standard itself does not state …
+   qty: novolang-r1#p2 `3.0` bound=[keyword] excl=version or identifier token | In 2021, the Novolang 3.0 keyword list was revised for consistency, though the standard itself does not state …
+   qty: novolang-r1#p2 `int32` bound=[] excl=version or identifier token | The integer type int32 is a 32-bit signed integer, while int64 uses 64 bits.
+   qty: novolang-r1#p2 `32` bound=[] excl=version mismatch with question | The integer type int32 is a 32-bit signed integer, while int64 uses 64 bits.
+   qty: novolang-r1#p2 `int64` bound=[] excl=version or identifier token | The integer type int32 is a 32-bit signed integer, while int64 uses 64 bits.
+   qty: novolang-r1#p2 `64` bound=[] excl=version mismatch with question | The integer type int32 is a 32-bit signed integer, while int64 uses 64 bits.
+   qty: novolang-r1#p3 `12` bound=[] excl=version mismatch with question | The Novolang committee holds 12 meetings each year to discuss membership applications.
+   qty: novolang-r1#p3 `40` bound=[keyword] excl=version mismatch with question | Unlike Novolang, the related language Zetalang has 40 keywords, though Zetalang is outside the scope of this s…
+== qA02 [How many keywords does Novolang 2.0 have?] expect=ok got=ok
+   candidates: novolang-r1#p2(-1.77) novolang-r1#p3(-0.00) novolang-r1#p4(-0.00) novolang-r1#p1(-0.00)
+   selected:   novolang-r1#p2 novolang-r1#p3 novolang-r1#p4
+   coverage:   u:1.00 iu:1.00 unmatched: 
+   decision:   ok | 
+   qty: novolang-r1#p2 `1.0` bound=[keyword] excl=version or identifier token | The first edition, Novolang 1.0, defined 12 keywords in its specification.
+   qty: novolang-r1#p2 `12` bound=[keyword] excl=version mismatch with question | The first edition, Novolang 1.0, defined 12 keywords in its specification.
+   qty: novolang-r1#p2 `2.0` bound=[keyword] excl=version or identifier token | Novolang 2.0, published in 2019, expanded the language to eighteen keywords and added type inference.
+   qty: novolang-r1#p2 `2019` bound=[keyword] excl=year-like 4-digit literal | Novolang 2.0, published in 2019, expanded the language to eighteen keywords and added type inference.
+   qty: novolang-r1#p2 `eighteen` bound=[keyword] excl=- | Novolang 2.0, published in 2019, expanded the language to eighteen keywords and added type inference.
+   qty: novolang-r1#p2 `2021` bound=[keyword] excl=year-like 4-digit literal | In 2021, the Novolang 3.0 keyword list was revised for consistency, though the standard itself does not state …
+   qty: novolang-r1#p2 `3.0` bound=[keyword] excl=version or identifier token | In 2021, the Novolang 3.0 keyword list was revised for consistency, though the standard itself does not state …
+   qty: novolang-r1#p2 `int32` bound=[] excl=version or identifier token | The integer type int32 is a 32-bit signed integer, while int64 uses 64 bits.
+   qty: novolang-r1#p2 `32` bound=[] excl=version mismatch with question | The integer type int32 is a 32-bit signed integer, while int64 uses 64 bits.
+   qty: novolang-r1#p2 `int64` bound=[] excl=version or identifier token | The integer type int32 is a 32-bit signed integer, while int64 uses 64 bits.
+   qty: novolang-r1#p2 `64` bound=[] excl=version mismatch with question | The integer type int32 is a 32-bit signed integer, while int64 uses 64 bits.
+   qty: novolang-r1#p3 `12` bound=[] excl=version mismatch with question | The Novolang committee holds 12 meetings each year to discuss membership applications.
+   qty: novolang-r1#p3 `40` bound=[keyword] excl=version mismatch with question | Unlike Novolang, the related language Zetalang has 40 keywords, though Zetalang is outside the scope of this s…
+== qA03 [How many bits is the Novolang int32 type?] expect=ok got=ok
+   candidates: novolang-r1#p2(-1.27) novolang-r1#p1(-0.00) novolang-r1#p4(-0.00) novolang-r1#p3(-0.00)
+   selected:   novolang-r1#p2 novolang-r1#p1 novolang-r1#p4
+   coverage:   u:1.00 iu:1.00 unmatched: 
+   decision:   ok | 
+   qty: novolang-r1#p2 `1.0` bound=[] excl=version or identifier token | The first edition, Novolang 1.0, defined 12 keywords in its specification.
+   qty: novolang-r1#p2 `12` bound=[] excl=version mismatch with question | The first edition, Novolang 1.0, defined 12 keywords in its specification.
+   qty: novolang-r1#p2 `2.0` bound=[] excl=version or identifier token | Novolang 2.0, published in 2019, expanded the language to eighteen keywords and added type inference.
+   qty: novolang-r1#p2 `2019` bound=[] excl=year-like 4-digit literal | Novolang 2.0, published in 2019, expanded the language to eighteen keywords and added type inference.
+   qty: novolang-r1#p2 `eighteen` bound=[] excl=version mismatch with question | Novolang 2.0, published in 2019, expanded the language to eighteen keywords and added type inference.
+   qty: novolang-r1#p2 `2021` bound=[] excl=year-like 4-digit literal | In 2021, the Novolang 3.0 keyword list was revised for consistency, though the standard itself does not state …
+   qty: novolang-r1#p2 `3.0` bound=[] excl=version or identifier token | In 2021, the Novolang 3.0 keyword list was revised for consistency, though the standard itself does not state …
+   qty: novolang-r1#p2 `int32` bound=[bits] excl=version or identifier token | The integer type int32 is a 32-bit signed integer, while int64 uses 64 bits.
+   qty: novolang-r1#p2 `32` bound=[bits] excl=- | The integer type int32 is a 32-bit signed integer, while int64 uses 64 bits.
+   qty: novolang-r1#p2 `int64` bound=[bits] excl=version or identifier token | The integer type int32 is a 32-bit signed integer, while int64 uses 64 bits.
+   qty: novolang-r1#p2 `64` bound=[bits] excl=- | The integer type int32 is a 32-bit signed integer, while int64 uses 64 bits.
+== qA04 [How many meetings did the Novolang committee hold?] expect=ok got=ok
+   candidates: novolang-r1#p3(-2.79) novolang-r1#p4(-0.00) novolang-r1#p1(-0.00) novolang-r1#p2(-0.00)
+   selected:   novolang-r1#p3 novolang-r1#p4 novolang-r1#p1
+   coverage:   u:1.00 iu:1.00 unmatched: 
+   decision:   ok | 
+   qty: novolang-r1#p3 `12` bound=[meet] excl=- | The Novolang committee holds 12 meetings each year to discuss membership applications.
+   qty: novolang-r1#p3 `40` bound=[] excl=- | Unlike Novolang, the related language Zetalang has 40 keywords, though Zetalang is outside the scope of this s…
+== qA05 [How many members does the Novolang committee have?] expect=insufficient_context got=insufficient_context
+   candidates: novolang-r1#p3(-1.97) novolang-r1#p4(-0.00) novolang-r1#p1(-0.00) novolang-r1#p2(-0.00)
+   selected:   novolang-r1#p3 novolang-r1#p4 novolang-r1#p1
+   coverage:   u:1.00 iu:1.00 unmatched: 
+   decision:   insufficient_context | quantity-binding: no digit literal or number word shares a sentence with the measured property in a version-consistent way
+   qty: novolang-r1#p3 `12` bound=[] excl=- | The Novolang committee holds 12 meetings each year to discuss membership applications.
+   qty: novolang-r1#p3 `40` bound=[] excl=- | Unlike Novolang, the related language Zetalang has 40 keywords, though Zetalang is outside the scope of this s…
+== qA06 [How many keywords does Novolang 3.0 have?] expect=insufficient_context got=insufficient_context
+   candidates: novolang-r1#p2(-1.77) novolang-r1#p3(-0.00) novolang-r1#p4(-0.00) novolang-r1#p1(-0.00)
+   selected:   novolang-r1#p2 novolang-r1#p3 novolang-r1#p4
+   coverage:   u:1.00 iu:1.00 unmatched: 
+   decision:   insufficient_context | quantity-binding: no digit literal or number word shares a sentence with the measured property in a version-consistent way
+   qty: novolang-r1#p2 `1.0` bound=[keyword] excl=version or identifier token | The first edition, Novolang 1.0, defined 12 keywords in its specification.
+   qty: novolang-r1#p2 `12` bound=[keyword] excl=version mismatch with question | The first edition, Novolang 1.0, defined 12 keywords in its specification.
+   qty: novolang-r1#p2 `2.0` bound=[keyword] excl=version or identifier token | Novolang 2.0, published in 2019, expanded the language to eighteen keywords and added type inference.
+   qty: novolang-r1#p2 `2019` bound=[keyword] excl=year-like 4-digit literal | Novolang 2.0, published in 2019, expanded the language to eighteen keywords and added type inference.
+   qty: novolang-r1#p2 `eighteen` bound=[keyword] excl=version mismatch with question | Novolang 2.0, published in 2019, expanded the language to eighteen keywords and added type inference.
+   qty: novolang-r1#p2 `2021` bound=[keyword] excl=year-like 4-digit literal | In 2021, the Novolang 3.0 keyword list was revised for consistency, though the standard itself does not state …
+   qty: novolang-r1#p2 `3.0` bound=[keyword] excl=version or identifier token | In 2021, the Novolang 3.0 keyword list was revised for consistency, though the standard itself does not state …
+   qty: novolang-r1#p2 `int32` bound=[] excl=version or identifier token | The integer type int32 is a 32-bit signed integer, while int64 uses 64 bits.
+   qty: novolang-r1#p2 `32` bound=[] excl=version mismatch with question | The integer type int32 is a 32-bit signed integer, while int64 uses 64 bits.
+   qty: novolang-r1#p2 `int64` bound=[] excl=version or identifier token | The integer type int32 is a 32-bit signed integer, while int64 uses 64 bits.
+   qty: novolang-r1#p2 `64` bound=[] excl=version mismatch with question | The integer type int32 is a 32-bit signed integer, while int64 uses 64 bits.
+   qty: novolang-r1#p3 `12` bound=[] excl=version mismatch with question | The Novolang committee holds 12 meetings each year to discuss membership applications.
+   qty: novolang-r1#p3 `40` bound=[keyword] excl=version mismatch with question | Unlike Novolang, the related language Zetalang has 40 keywords, though Zetalang is outside the scope of this s…
+== qA07 [How many keywords does Zetalang have?] expect=ok got=ok
+   candidates: novolang-r1#p3(-1.14) novolang-r1#p2(-0.00)
+   selected:   novolang-r1#p3 novolang-r1#p2
+   coverage:   u:1.00 iu:1.00 unmatched: 
+   decision:   ok | 
+   qty: novolang-r1#p3 `12` bound=[] excl=- | The Novolang committee holds 12 meetings each year to discuss membership applications.
+   qty: novolang-r1#p3 `40` bound=[keyword] excl=- | Unlike Novolang, the related language Zetalang has 40 keywords, though Zetalang is outside the scope of this s…
+   qty: novolang-r1#p2 `1.0` bound=[keyword] excl=version or identifier token | The first edition, Novolang 1.0, defined 12 keywords in its specification.
+   qty: novolang-r1#p2 `12` bound=[keyword] excl=- | The first edition, Novolang 1.0, defined 12 keywords in its specification.
+   qty: novolang-r1#p2 `2.0` bound=[keyword] excl=version or identifier token | Novolang 2.0, published in 2019, expanded the language to eighteen keywords and added type inference.
+   qty: novolang-r1#p2 `2019` bound=[keyword] excl=year-like 4-digit literal | Novolang 2.0, published in 2019, expanded the language to eighteen keywords and added type inference.
+   qty: novolang-r1#p2 `eighteen` bound=[keyword] excl=- | Novolang 2.0, published in 2019, expanded the language to eighteen keywords and added type inference.
+   qty: novolang-r1#p2 `2021` bound=[keyword] excl=year-like 4-digit literal | In 2021, the Novolang 3.0 keyword list was revised for consistency, though the standard itself does not state …
+   qty: novolang-r1#p2 `3.0` bound=[keyword] excl=version or identifier token | In 2021, the Novolang 3.0 keyword list was revised for consistency, though the standard itself does not state …
+   qty: novolang-r1#p2 `int32` bound=[] excl=version or identifier token | The integer type int32 is a 32-bit signed integer, while int64 uses 64 bits.
+   qty: novolang-r1#p2 `32` bound=[] excl=- | The integer type int32 is a 32-bit signed integer, while int64 uses 64 bits.
+   qty: novolang-r1#p2 `int64` bound=[] excl=version or identifier token | The integer type int32 is a 32-bit signed integer, while int64 uses 64 bits.
+   qty: novolang-r1#p2 `64` bound=[] excl=- | The integer type int32 is a 32-bit signed integer, while int64 uses 64 bits.
+== qA08 [How many bits does the Novolang int64 type use?] expect=ok got=ok
+   candidates: novolang-r1#p2(-1.90) novolang-r1#p1(-0.00) novolang-r1#p4(-0.00) novolang-r1#p3(-0.00)
+   selected:   novolang-r1#p2 novolang-r1#p1 novolang-r1#p4
+   coverage:   u:1.00 iu:1.00 unmatched: 
+   decision:   ok | 
+   qty: novolang-r1#p2 `1.0` bound=[] excl=version or identifier token | The first edition, Novolang 1.0, defined 12 keywords in its specification.
+   qty: novolang-r1#p2 `12` bound=[] excl=version mismatch with question | The first edition, Novolang 1.0, defined 12 keywords in its specification.
+   qty: novolang-r1#p2 `2.0` bound=[] excl=version or identifier token | Novolang 2.0, published in 2019, expanded the language to eighteen keywords and added type inference.
+   qty: novolang-r1#p2 `2019` bound=[] excl=year-like 4-digit literal | Novolang 2.0, published in 2019, expanded the language to eighteen keywords and added type inference.
+   qty: novolang-r1#p2 `eighteen` bound=[] excl=version mismatch with question | Novolang 2.0, published in 2019, expanded the language to eighteen keywords and added type inference.
+   qty: novolang-r1#p2 `2021` bound=[] excl=year-like 4-digit literal | In 2021, the Novolang 3.0 keyword list was revised for consistency, though the standard itself does not state …
+   qty: novolang-r1#p2 `3.0` bound=[] excl=version or identifier token | In 2021, the Novolang 3.0 keyword list was revised for consistency, though the standard itself does not state …
+   qty: novolang-r1#p2 `int32` bound=[bits] excl=version or identifier token | The integer type int32 is a 32-bit signed integer, while int64 uses 64 bits.
+   qty: novolang-r1#p2 `32` bound=[bits] excl=- | The integer type int32 is a 32-bit signed integer, while int64 uses 64 bits.
+   qty: novolang-r1#p2 `int64` bound=[bits] excl=version or identifier token | The integer type int32 is a 32-bit signed integer, while int64 uses 64 bits.
+   qty: novolang-r1#p2 `64` bound=[bits] excl=- | The integer type int32 is a 32-bit signed integer, while int64 uses 64 bits.

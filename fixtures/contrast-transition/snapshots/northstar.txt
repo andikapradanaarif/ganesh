@@ -1,0 +1,15 @@
+The Northstar service is a fictional deployment target used for retrieval experiments. This document is its project handoff log.
+
+== Proposal ==
+
+In March, the team proposed deploying revision R9 of the Northstar service to production.
+
+== Attempt ==
+
+We attempted to deploy revision R9 last week. The outcome was unverified.
+
+== Verification ==
+
+The deployment check confirmed revision R8 was running in staging.
+Revision R7 was deployed to production after the checklist passed.
+The team did not confirm revision R6 in any environment.

@@ -1,0 +1,62 @@
+qb-mode quantity_binding=false transition_check=true
+== qB01 [Was the deployment of revision R9 of Northstar proposed?] expect=ok got=ok
+   candidates: northstar-r1#p2(-3.33) northstar-r1#p3(-1.16) northstar-r1#p4(-0.37) northstar-r1#p1(-0.00)
+   selected:   northstar-r1#p2 northstar-r1#p3 northstar-r1#p4
+   coverage:   u:1.00 iu:1.00 unmatched: 
+   decision:   ok | 
+   state: northstar-r1#p2 class=propose neg=false env=product obj=[r9,revis] | In March, the team proposed deploying revision R9 of the Northstar service to production.
+   state: northstar-r1#p3 class=attempt neg=false env=- obj=[r9,revis] | We attempted to deploy revision R9 last week.
+== qB02 [Was revision R9 of Northstar verified as deployed?] expect=insufficient_context got=insufficient_context
+   candidates: northstar-r1#p2(-1.16) northstar-r1#p3(-1.16) northstar-r1#p4(-0.37) northstar-r1#p1(-0.00)
+   selected:   northstar-r1#p2 northstar-r1#p3 northstar-r1#p4
+   coverage:   u:0.80 iu:1.00 unmatched: 
+   decision:   insufficient_context | transition-check: no sentence establishes the required 'verify' state with compatible polarity and environment
+   state: northstar-r1#p2 class=propose neg=false env=product obj=[r9,revis] | In March, the team proposed deploying revision R9 of the Northstar service to production.
+   state: northstar-r1#p3 class=attempt neg=false env=- obj=[r9,revis] | We attempted to deploy revision R9 last week.
+== qB03 [Was revision R8 of Northstar verified running in production?] expect=insufficient_context got=insufficient_context
+   candidates: northstar-r1#p4(-3.64) northstar-r1#p2(-1.16) northstar-r1#p3(-0.28) northstar-r1#p1(-0.00)
+   selected:   northstar-r1#p4 northstar-r1#p2 northstar-r1#p3
+   coverage:   u:0.83 iu:1.00 unmatched: 
+   decision:   insufficient_context | transition-check: no sentence establishes the required 'verify' state with compatible polarity and environment
+   state: northstar-r1#p4 class=verify neg=false env=- obj=[r8,revis] | The deployment check confirmed revision R8 was running in staging.
+== qB04 [Was revision R8 of Northstar verified running in staging?] expect=ok got=ok
+   candidates: northstar-r1#p4(-4.24) northstar-r1#p2(-0.28) northstar-r1#p3(-0.28) northstar-r1#p1(-0.00)
+   selected:   northstar-r1#p4 northstar-r1#p2 northstar-r1#p3
+   coverage:   u:0.83 iu:1.00 unmatched: 
+   decision:   ok | 
+   state: northstar-r1#p4 class=verify neg=false env=- obj=[r8,revis,stage] | The deployment check confirmed revision R8 was running in staging.
+== qB05 [Was revision R7 of Northstar verified running in production?] expect=ok got=ok
+   candidates: northstar-r1#p4(-3.64) northstar-r1#p2(-1.16) northstar-r1#p3(-0.28) northstar-r1#p1(-0.00)
+   selected:   northstar-r1#p4 northstar-r1#p2 northstar-r1#p3
+   coverage:   u:0.83 iu:1.00 unmatched: 
+   decision:   ok | 
+   state: northstar-r1#p4 class=verify neg=false env=product obj=[r7,revis] | Revision R7 was deployed to production after the checklist passed.
+== qB06 [Was revision R6 of Northstar confirmed?] expect=insufficient_context got=insufficient_context
+   candidates: northstar-r1#p4(-3.50) northstar-r1#p2(-0.28) northstar-r1#p3(-0.28) northstar-r1#p1(-0.00)
+   selected:   northstar-r1#p4 northstar-r1#p2 northstar-r1#p3
+   coverage:   u:1.00 iu:1.00 unmatched: 
+   decision:   insufficient_context | transition-check: no sentence establishes the required 'verify' state with compatible polarity and environment
+   state: northstar-r1#p4 class=verify neg=true env=- obj=[r6,revis] | The team did not confirm revision R6 in any environment.
+== qB07 [Did the Northstar team verify revision R7 in production?] expect=ok got=ok
+   candidates: northstar-r1#p4(-3.04) northstar-r1#p2(-2.04) northstar-r1#p3(-0.28) northstar-r1#p1(-0.00)
+   selected:   northstar-r1#p4 northstar-r1#p2 northstar-r1#p3
+   coverage:   u:0.83 iu:1.00 unmatched: 
+   decision:   ok | 
+   state: northstar-r1#p4 class=verify neg=false env=product obj=[r7,revis] | Revision R7 was deployed to production after the checklist passed.
+== qB08 [Did lazy evaluation become optional in Lazylang?] expect=insufficient_context got=ok
+   candidates: lazylang-r1#p2(-5.45) lazylang-r1#p3(-0.40) lazylang-r1#p1(-0.38)
+   selected:   lazylang-r1#p2 lazylang-r1#p3 lazylang-r1#p1
+   coverage:   u:0.80 iu:1.00 unmatched: 
+   decision:   ok | 
+   state: lazylang-r1#p2 class=transition neg=false env=- obj=[evalu,option] | Since version 2.0, eager evaluation became optional through strictness annotations.
+== qB09 [Did eager evaluation become optional in Lazylang?] expect=ok got=ok
+   candidates: lazylang-r1#p2(-4.92) lazylang-r1#p3(-0.40) lazylang-r1#p1(-0.38)
+   selected:   lazylang-r1#p2 lazylang-r1#p3 lazylang-r1#p1
+   coverage:   u:0.80 iu:1.00 unmatched: 
+   decision:   ok | 
+   state: lazylang-r1#p2 class=transition neg=false env=- obj=[eager,evalu,option] | Since version 2.0, eager evaluation became optional through strictness annotations.
+== qB10 [Are type annotations optional in Lazylang?] expect=ok got=ok
+   candidates: lazylang-r1#p2(-4.90) lazylang-r1#p3(-0.40) lazylang-r1#p1(-0.38)
+   selected:   lazylang-r1#p2 lazylang-r1#p3 lazylang-r1#p1
+   coverage:   u:1.00 iu:1.00 unmatched: 
+   decision:   ok | 

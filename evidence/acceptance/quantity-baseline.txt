@@ -1,0 +1,41 @@
+qb-mode quantity_binding=false transition_check=false
+== qA01 [How many keywords did Novolang 1.0 define?] expect=ok got=ok
+   candidates: novolang-r1#p2(-2.39) novolang-r1#p3(-0.00) novolang-r1#p4(-0.00) novolang-r1#p1(-0.00)
+   selected:   novolang-r1#p2 novolang-r1#p3 novolang-r1#p4
+   coverage:   u:1.00 iu:1.00 unmatched: 
+   decision:   ok | 
+== qA02 [How many keywords does Novolang 2.0 have?] expect=ok got=ok
+   candidates: novolang-r1#p2(-1.76) novolang-r1#p3(-0.00) novolang-r1#p4(-0.00) novolang-r1#p1(-0.00)
+   selected:   novolang-r1#p2 novolang-r1#p3 novolang-r1#p4
+   coverage:   u:1.00 iu:1.00 unmatched: 
+   decision:   ok | 
+== qA03 [How many bits is the Novolang int32 type?] expect=ok got=ok
+   candidates: novolang-r1#p2(-1.26) novolang-r1#p1(-0.00) novolang-r1#p4(-0.00) novolang-r1#p3(-0.00)
+   selected:   novolang-r1#p2 novolang-r1#p1 novolang-r1#p4
+   coverage:   u:1.00 iu:1.00 unmatched: 
+   decision:   ok | 
+== qA04 [How many meetings did the Novolang committee hold?] expect=ok got=insufficient_context
+   candidates: novolang-r1#p3(-1.98) novolang-r1#p4(-0.00) novolang-r1#p1(-0.00) novolang-r1#p2(-0.00)
+   selected:   novolang-r1#p3 novolang-r1#p4 novolang-r1#p1
+   coverage:   u:0.75 iu:0.63 unmatched: hold
+   decision:   insufficient_context | idf-union-coverage 0.625 below threshold 0.750
+== qA05 [How many members does the Novolang committee have?] expect=insufficient_context got=ok
+   candidates: novolang-r1#p3(-1.98) novolang-r1#p4(-0.00) novolang-r1#p1(-0.00) novolang-r1#p2(-0.00)
+   selected:   novolang-r1#p3 novolang-r1#p4 novolang-r1#p1
+   coverage:   u:1.00 iu:1.00 unmatched: 
+   decision:   ok | 
+== qA06 [How many keywords does Novolang 3.0 have?] expect=insufficient_context got=ok
+   candidates: novolang-r1#p2(-1.76) novolang-r1#p3(-0.00) novolang-r1#p4(-0.00) novolang-r1#p1(-0.00)
+   selected:   novolang-r1#p2 novolang-r1#p3 novolang-r1#p4
+   coverage:   u:1.00 iu:1.00 unmatched: 
+   decision:   ok | 
+== qA07 [How many keywords does Zetalang have according to the Novolang specification?] expect=ok got=insufficient_context
+   candidates: novolang-r1#p3(-1.15) novolang-r1#p2(-0.00) novolang-r1#p4(-0.00) novolang-r1#p1(-0.00)
+   selected:   novolang-r1#p3 novolang-r1#p2 novolang-r1#p4
+   coverage:   u:0.80 iu:0.67 unmatched: accord
+   decision:   insufficient_context | idf-union-coverage 0.670 below threshold 0.750
+== qA08 [How many bits does the Novolang int64 type use?] expect=ok got=ok
+   candidates: novolang-r1#p2(-1.89) novolang-r1#p1(-0.00) novolang-r1#p4(-0.00) novolang-r1#p3(-0.00)
+   selected:   novolang-r1#p2 novolang-r1#p1 novolang-r1#p4
+   coverage:   u:1.00 iu:1.00 unmatched: 
+   decision:   ok | 
