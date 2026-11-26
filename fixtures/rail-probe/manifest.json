@@ -1,0 +1,28 @@
+{
+ "version": "rail-probe.v1",
+ "created": "2026-11-27",
+ "frame": "frozen transfer group for e08-class activity attribution, frozen before implementing the fix (issue #177); rail yard domain, distinct wording",
+ "seed": 0,
+ "exclusions": [],
+ "sampling": "hand-authored",
+ "snapshot_format": "plaintext with wiki-style section headings",
+ "articles": [
+  {
+   "article_id": "raillog",
+   "title": "Alderton rail yard operations log",
+   "pageid": 0,
+   "revision": "raillog-a1",
+   "revision_url": "https://example.invalid/raillog",
+   "publisher": "Ganesh fixture authors",
+   "url": "https://example.invalid/raillog",
+   "license": "CC0 1.0",
+   "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "permission": "Synthetic fixture text written for this project; no external content.",
+   "retrieved": "2026-11-27",
+   "bytes": 805,
+   "sha256": "53512c7c339988b65ff9228e9f688782eb9065ba8ad96794beffa548adcea30e",
+   "file": "snapshots/raillog.txt",
+   "family": "railprobe"
+  }
+ ]
+}

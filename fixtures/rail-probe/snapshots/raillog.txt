@@ -1,0 +1,21 @@
+The Alderton rail yard is a fictional freight facility used as the frozen transfer group for activity-outcome attribution. This is its operations log.
+
+== Movement November 3 ==
+
+The shunting of wagon W3 finished at 10:15 UTC.
+
+== Movement November 4 ==
+
+The shunting of wagon W3 started at 10:00 UTC. The shunting finished at 10:40 UTC.
+
+== Movement November 5 ==
+
+The coupling of wagon W5 started at 10:00 UTC. The brake test finished at 10:30 UTC while the coupling continued.
+
+== Movement November 6 ==
+
+The coupling of wagon W5 started at 10:00 UTC. The loading of wagon W7 started at 10:05 UTC. It finished at 11:20 UTC.
+
+== Movement November 7 ==
+
+The coupling of wagon W5 started at 10:00 UTC. The brake test finished at 10:30 UTC while the coupling continued. The coupling finished at 13:45 UTC.
