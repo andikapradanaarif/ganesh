@@ -31,6 +31,9 @@ pub struct RetrievalConfig {
     /// Experiment C (issue #165): proposition verdicts — explicit contradiction
     /// of the asked predicate also settles yes/no questions.
     pub proposition_check: bool,
+    /// Experiment D (issue #167): dated-entry context — section headings and
+    /// unambiguous single-subject antecedents augment continuation sentences.
+    pub context_chain: bool,
 }
 
 impl Default for RetrievalConfig {
@@ -44,6 +47,7 @@ impl Default for RetrievalConfig {
             quantity_binding: std::env::var("GANESH_QUANTITY_BINDING").map(|v| v == "1").unwrap_or(false),
             transition_check: std::env::var("GANESH_TRANSITION_CHECK").map(|v| v == "1").unwrap_or(false),
             proposition_check: std::env::var("GANESH_PROPOSITION_CHECK").map(|v| v == "1").unwrap_or(false),
+            context_chain: std::env::var("GANESH_CONTEXT_CHAIN").map(|v| v == "1").unwrap_or(false),
         }
     }
 }
@@ -487,17 +491,20 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
     // rule records the sentence span it relied on. Verbatim text of the
     // selected passages is loaded here for sentence-level evidence analysis;
     // ranking and selection above are unaffected.
-    let mut verbatim_by_id: std::collections::HashMap<String, String> = std::collections::HashMap::new();
+    let mut verbatim_by_id: std::collections::HashMap<String, (String, String)> = std::collections::HashMap::new();
     for (pid, _) in &passage_texts {
-        let text: String = store.conn.query_row(
-            "SELECT text FROM passages WHERE id = ?1",
+        let row: (String, String) = store.conn.query_row(
+            "SELECT text, section FROM passages WHERE id = ?1",
             rusqlite::params![pid],
-            |row| row.get(0),
+            |row| Ok((row.get(0)?, row.get(1)?)),
         ).unwrap_or_default();
-        verbatim_by_id.insert(pid.clone(), text);
+        verbatim_by_id.insert(pid.clone(), row);
     }
-    let selected_full: Vec<(String, String, Vec<String>)> = passage_texts.iter()
-        .map(|(pid, tokens)| (pid.clone(), verbatim_by_id.get(pid).cloned().unwrap_or_default(), tokens.clone()))
+    let selected_full: Vec<(String, String, String, Vec<String>)> = passage_texts.iter()
+        .map(|(pid, tokens)| {
+            let (text, section) = verbatim_by_id.get(pid).cloned().unwrap_or_default();
+            (pid.clone(), text, section, tokens.clone())
+        })
         .collect();
     debug.selected = passage_texts.iter().map(|(pid, _)| pid.clone()).collect();
 
@@ -577,6 +584,7 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
         quantity_binding: cfg.quantity_binding,
         transition_check: cfg.transition_check || cfg.proposition_check,
         proposition_check: cfg.proposition_check,
+        context_chain: cfg.context_chain,
     };
     let trace = accept::decide(&input);
     let abstain = trace.decision != "ok";

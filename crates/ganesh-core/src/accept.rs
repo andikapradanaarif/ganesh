@@ -327,8 +327,8 @@ pub struct DecideInput<'a> {
     /// from measured-property binding because they name the subject, not the
     /// measured thing.
     pub subject_terms: &'a std::collections::BTreeSet<String>,
-    /// Selected passages: id, verbatim text, stemmed index tokens.
-    pub passages: &'a [(String, String, Vec<String>)],
+    /// Selected passages: id, verbatim text, section heading, stemmed index tokens.
+    pub passages: &'a [(String, String, String, Vec<String>)],
     pub idf_union_coverage: f64,
     pub union_coverage: f64,
     pub top_coverage: f64,
@@ -343,6 +343,9 @@ pub struct DecideInput<'a> {
     /// Experiment C: proposition-level verdicts. Negated compatible evidence
     /// contradicts and can settle a yes/no question with an explicit negative.
     pub proposition_check: bool,
+    /// Experiment D: dated-entry context chain — headings plus unambiguous
+    /// antecedents augment continuation sentences.
+    pub context_chain: bool,
 }
 
 fn stemmed_query_like(text: &str) -> Vec<String> {
@@ -387,7 +390,7 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
             let measured_terms = measured_property_terms(input.query);
             let q_versions = version_tokens(input.query);
             let mut bound_found = false;
-            for (pid, verbatim, _) in input.passages {
+            for (pid, verbatim, _, _) in input.passages {
                 for sentence in &sentences(verbatim) {
                     let cands = quantity_candidates(sentence);
                     if cands.is_empty() {
@@ -453,7 +456,7 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
                 env_of(&qt)
             };
             let mut supportive = false;
-            for (pid, verbatim, _) in input.passages {
+            for (pid, verbatim, section, _) in input.passages {
                 let passage_idents: std::collections::BTreeSet<String> = crate::search::stemmed_tokens(verbatim)
                     .into_iter()
                     .filter(|t| t.chars().any(|c| c.is_ascii_digit()) && t.chars().any(|c| c.is_alphabetic()))
@@ -463,8 +466,43 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
                 } else {
                     None
                 };
-                for sentence in &sentences(verbatim) {
+                // Experiment D: the heading is the entry's date/context —
+                // retrieval already indexes it, acceptance now sees it too.
+                let heading_tokens: Vec<String> = if input.context_chain {
+                    stemmed_query_like(section)
+                } else {
+                    Vec::new()
+                };
+                // Bounded chain: when the passage has exactly one subject
+                // identifier, continuation sentences inherit the entry's
+                // antecedent context. A second identifier (two subjects,
+                // subject switch) disables chaining entirely; a cue sentence
+                // carrying its own identifier is never augmented.
+                let chainable = input.context_chain && passage_idents.len() == 1;
+                let passage_sentences = sentences(verbatim);
+                let mut antecedent_tokens: Vec<String> = Vec::new();
+                for sentence in &passage_sentences {
                     let mut sent_stemmed = stemmed_query_like(sentence);
+                    let own_ident = sent_stemmed.iter().any(|t| {
+                        t.chars().any(|c| c.is_ascii_digit()) && t.chars().any(|c| c.is_alphabetic())
+                    });
+                    if chainable && !own_ident {
+                        for t in &antecedent_tokens {
+                            if !sent_stemmed.contains(t) {
+                                sent_stemmed.push(t.clone());
+                            }
+                        }
+                    }
+                    for t in stemmed_query_like(sentence) {
+                        if !antecedent_tokens.contains(&t) {
+                            antecedent_tokens.push(t);
+                        }
+                    }
+                    for t in &heading_tokens {
+                        if !sent_stemmed.contains(t) {
+                            sent_stemmed.push(t.clone());
+                        }
+                    }
                     if let Some(idt) = &inherited {
                         if !sent_stemmed.contains(idt) {
                             sent_stemmed.push(idt.clone());
@@ -537,12 +575,18 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
                             // Contradiction requires the negated predicate to
                             // match the asked predicate group: non-confirmation
                             // does not contradict deployment, only confirmation.
+                            // Contradiction is predicate-exact: a negation only
+                            // contradicts the predicate it actually states.
+                            // "The transfer did not complete" contradicts
+                            // completion, never the integrity check passing.
+                            // The un-prefixed forms pair with their positive
+                            // stem (unverified/verified); nothing broader.
                             let q_pred = question_predicate(&input.terms.to_vec());
                             let pred_match = q_pred.as_ref().map(|qp| {
-                                let qg = predicate_group(qp);
                                 sent_stemmed.iter().any(|t| {
-                                    t != qp && predicate_group(t).is_some() && predicate_group(t) == qg
-                                        || t == qp
+                                    t == qp
+                                        || (qp == "verifi" && t == "unverifi")
+                                        || (qp == "confirm" && t == "unconfirm")
                                 })
                             }).unwrap_or(false);
                             if pred_match {
