@@ -40,13 +40,43 @@ real MCP stdio bridge, opens every returned citation through both adapters,
 scores against the frozen key and writes the report with measured costs.
 Everything runs offline against the frozen inputs.
 
-The development-set equivalent (used for tuning, not acceptance evidence):
+### Executable gate
+
+`run` defaults to held-out gate mode. It reads `scoring-spec.json` beside the
+questions file (or `--scoring-spec`), enforces the frozen denominators and the
+top-three passage limit, prints a final machine-readable JSON result, and uses
+these exit codes:
+
+- `0` — PASS
+- `1` — FAIL
+- `3` — INCOMPLETE (empty/partial roster, malformed adapter response, transport
+  interruption, missing or inconsistent scoring specification)
+- `2` — command-line usage error
+
+An incomplete or malformed run can never produce PASS. Development mode keeps
+the same diagnostics without enforcing the held-out roster:
 
 ```
-cargo run --release -p ganesh-bench -- run \
+cargo run --release -p ganesh-bench -- run --mode dev \
   --questions fixtures/questions/dev.v1.json \
   --report out/dev-report.md
 ```
+
+The controlled gate fixtures demonstrate all three exit paths offline:
+
+```
+for f in pass fail incomplete; do
+  cargo run --release -p ganesh-bench -- run \
+    --questions fixtures/gate/$f.questions.json \
+    --report out/gate-$f.md
+  echo "$f exit=$?"
+done
+```
+
+Expected: PASS exits 0, FAIL exits 1, INCOMPLETE exits 3. The PASS fixture is
+also the quick end-to-end example: d01 is a successful cited lookup (Java's
+originators and original name) and d12 is an explicit `insufficient_context`
+result (the corpus does not state a default Java maximum heap size).
 
 ## Manual use
 

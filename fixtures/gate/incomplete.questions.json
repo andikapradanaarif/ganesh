@@ -1,0 +1,31 @@
+{
+ "version": "gate-fixture.v1",
+ "questions": [
+  {
+   "id": "d01",
+   "question": "Who initiated the Java language project, and what was the language initially called?",
+   "tags": [
+    "multi"
+   ],
+   "expected_status": "ok",
+   "scope": "public",
+   "revisions": [
+    "1386054413"
+   ],
+   "required_facts": [
+    {
+     "fact": "Java language project was initiated by James Gosling, Mike Sheridan, and Patrick Naughton in June 1991",
+     "acceptable": [
+      "1386054413#p2"
+     ]
+    },
+    {
+     "fact": "The language was initially called Oak",
+     "acceptable": [
+      "1386054413#p2"
+     ]
+    }
+   ]
+  }
+ ]
+}

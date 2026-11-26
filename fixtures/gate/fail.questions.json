@@ -1,0 +1,38 @@
+{
+ "version": "gate-fixture.v1",
+ "questions": [
+  {
+   "id": "d07",
+   "question": "In Rust, how does a programmer declare a variable that can be modified after creation?",
+   "tags": [
+    "paraphrase"
+   ],
+   "expected_status": "ok",
+   "scope": "public",
+   "revisions": [
+    "1386182972"
+   ],
+   "required_facts": [
+    {
+     "fact": "Variables are immutable by default unless the mut keyword is added",
+     "acceptable": [
+      "1386182972#p10"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "d12",
+   "question": "What is the default maximum heap size of the Java virtual machine in megabytes?",
+   "tags": [
+    "missing",
+    "plausible"
+   ],
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "revisions": [],
+   "required_facts": [],
+   "missing_detail": "The Java article discusses automatic memory management and the heap at length but never states a default maximum heap size figure."
+  }
+ ]
+}

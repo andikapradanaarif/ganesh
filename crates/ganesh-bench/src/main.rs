@@ -35,13 +35,38 @@ struct KeyFact {
     acceptable: Vec<String>,
 }
 
+#[derive(Debug, Deserialize)]
+struct ScoringSpec {
+    version: String,
+    evidence_coverage_min: usize,
+    evidence_coverage_total: usize,
+    insufficient_min: usize,
+    insufficient_total: usize,
+    adapter_agreement_total: usize,
+    citation_integrity_min_fraction: f64,
+    top_k: usize,
+    provider_calls_max: usize,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Mode {
+    Gate,
+    Development,
+}
+
+#[derive(Debug)]
+struct StructuralFinding {
+    question_id: String,
+    problem: String,
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let mut questions_path = None;
     let mut report_path = None;
     let mut corpus_dir = "fixtures/corpus".to_string();
     let mut details_path = None;
-    let mut i = 1;
+    let mut i;
     if args.len() >= 2 && args[1] == "probe" {
         // ganesh-bench probe --questions dev.v1.json [--corpus fixtures/corpus]
         // Development-time coverage analysis: prints per-question coverage diagnostics.
@@ -59,23 +84,35 @@ fn main() {
         return;
     }
     if args.len() < 2 || args[1] != "run" {
-        eprintln!("usage: ganesh-bench run --questions <key.json> --report <out.md> [--corpus fixtures/corpus] [--details out.json]");
+        eprintln!("usage: ganesh-bench run --questions <key.json> --report <out.md> [--corpus fixtures/corpus] [--details out.json] [--mode gate|dev] [--scoring-spec spec.json]");
         std::process::exit(2);
     }
     i = 2;
+    let mut mode = Mode::Gate;
+    let mut scoring_spec_path = None;
     while i < args.len() {
         match args[i].as_str() {
             "--questions" => { questions_path = args.get(i + 1).cloned(); i += 2; }
             "--report" => { report_path = args.get(i + 1).cloned(); i += 2; }
             "--corpus" => { corpus_dir = args.get(i + 1).cloned().unwrap(); i += 2; }
             "--details" => { details_path = args.get(i + 1).cloned(); i += 2; }
+            "--scoring-spec" => { scoring_spec_path = args.get(i + 1).cloned(); i += 2; }
+            "--mode" => {
+                let value = args.get(i + 1).map(String::as_str).unwrap_or("");
+                mode = match value {
+                    "gate" => Mode::Gate,
+                    "dev" | "development" => Mode::Development,
+                    _ => { eprintln!("--mode must be gate or dev"); std::process::exit(2); }
+                };
+                i += 2;
+            }
             other => { eprintln!("unknown argument: {other}"); std::process::exit(2); }
         }
     }
     let questions_path = questions_path.expect("--questions required");
     let report_path = report_path.expect("--report required");
 
-    let code = run(&questions_path, &report_path, &corpus_dir, details_path.as_deref());
+    let code = run(&questions_path, &report_path, &corpus_dir, details_path.as_deref(), mode, scoring_spec_path.as_deref());
     std::process::exit(code);
 }
 
@@ -166,9 +203,117 @@ fn sibling_binary(name: &str) -> std::path::PathBuf {
     candidate
 }
 
-fn run(questions_path: &str, report_path: &str, corpus_dir: &str, details_path: Option<&str>) -> i32 {
+fn default_scoring_spec_path(questions_path: &str) -> std::path::PathBuf {
+    std::path::Path::new(questions_path)
+        .parent()
+        .unwrap_or_else(|| std::path::Path::new("."))
+        .join("scoring-spec.json")
+}
+
+fn load_scoring_spec(questions_path: &str, explicit: Option<&str>) -> Result<ScoringSpec, String> {
+    let path = explicit.map(std::path::PathBuf::from).unwrap_or_else(|| default_scoring_spec_path(questions_path));
+    let text = std::fs::read_to_string(&path).map_err(|e| format!("read scoring spec {}: {e}", path.display()))?;
+    serde_json::from_str(&text).map_err(|e| format!("parse scoring spec {}: {e}", path.display()))
+}
+
+/// Count one expected citation opening for every passage object an adapter
+/// returned, whether or not its citation member is present or well formed.
+/// The opener is adapter-specific; this function supplies the accounting and
+/// exact passage/revision comparison shared by REST and MCP.
+fn citation_openings(adapter_json: &Value, mut open: impl FnMut(&str) -> Option<Value>) -> (usize, usize) {
+    let mut checked = 0usize;
+    let mut ok = 0usize;
+    if let Some(passages) = adapter_json["passages"].as_array() {
+        for p in passages {
+            checked += 1;
+            let token = p["citation"].as_str().unwrap_or("");
+            if token.is_empty() {
+                continue;
+            }
+            let want_pid = p["passage_id"].as_str().unwrap_or("");
+            let want_rev = p["revision"].as_str().unwrap_or("");
+            if let Some(opened) = open(token) {
+                if opened["passage_id"].as_str() == Some(want_pid) && opened["revision"].as_str() == Some(want_rev) {
+                    ok += 1;
+                }
+            }
+        }
+    }
+    (checked, ok)
+}
+
+fn adapter_shape_findings(question_id: &str, adapter: &str, response: &Value, top_k: usize) -> Vec<StructuralFinding> {
+    let mut findings = Vec::new();
+    let status = response["status"].as_str().unwrap_or("");
+    if status != "ok" && status != "insufficient_context" {
+        findings.push(StructuralFinding {
+            question_id: question_id.to_string(),
+            problem: format!("{adapter} status is missing or not an approved status"),
+        });
+    }
+    match response["passages"].as_array() {
+        None => findings.push(StructuralFinding {
+            question_id: question_id.to_string(),
+            problem: format!("{adapter} passages member is missing or not an array"),
+        }),
+        Some(passages) => {
+            if passages.len() > top_k {
+                findings.push(StructuralFinding {
+                    question_id: question_id.to_string(),
+                    problem: format!("{adapter} returned {} passages, above the frozen top-{top_k} limit", passages.len()),
+                });
+            }
+            for (index, p) in passages.iter().enumerate() {
+                if p["passage_id"].as_str().is_none() || p["revision"].as_str().is_none() {
+                    findings.push(StructuralFinding {
+                        question_id: question_id.to_string(),
+                        problem: format!("{adapter} passage {index} lacks a passage_id or revision"),
+                    });
+                }
+            }
+        }
+    }
+    findings
+}
+
+fn unrun_incomplete(report_path: &str, questions_path: &str, reason: String) -> i32 {
+    let result = json!({
+        "version": "bench-result.v1",
+        "mode": "gate",
+        "verdict": "INCOMPLETE",
+        "questions": questions_path,
+        "incomplete": true,
+        "reasons": [reason],
+    });
+    let report = format!("# Ganesh M1 benchmark report — incomplete\n\nThe run could not start: {}\n", result["reasons"][0].as_str().unwrap_or("unknown"));
+    if let Some(parent) = std::path::Path::new(report_path).parent() {
+        let _ = std::fs::create_dir_all(parent);
+    }
+    let _ = std::fs::write(report_path, report);
+    println!("{}", serde_json::to_string(&result).unwrap());
+    3
+}
+
+fn run(questions_path: &str, report_path: &str, corpus_dir: &str, details_path: Option<&str>, mode: Mode, scoring_spec_path: Option<&str>) -> i32 {
     let t0 = Instant::now();
     let mut log_lines: Vec<String> = Vec::new();
+
+    let key_text = match std::fs::read_to_string(questions_path) {
+        Ok(text) => text,
+        Err(e) => return unrun_incomplete(report_path, questions_path, format!("read questions: {e}")),
+    };
+    let key: KeyFile = match serde_json::from_str(&key_text) {
+        Ok(key) => key,
+        Err(e) => return unrun_incomplete(report_path, questions_path, format!("parse questions: {e}")),
+    };
+    let scoring_spec = if mode == Mode::Gate {
+        match load_scoring_spec(questions_path, scoring_spec_path) {
+            Ok(spec) => Some(spec),
+            Err(e) => return unrun_incomplete(report_path, questions_path, e),
+        }
+    } else {
+        None
+    };
 
     // 1. Fresh store.
     let tmp = tempfile::tempdir().expect("tempdir");
@@ -240,9 +385,6 @@ fn run(questions_path: &str, report_path: &str, corpus_dir: &str, details_path: 
     assert!(tool_names.contains(&"search_context") && tool_names.contains(&"open_citation"), "required tools present: {tool_names:?}");
 
     // 6. Execute questions.
-    let key_text = std::fs::read_to_string(questions_path).expect("questions");
-    let key: KeyFile = serde_json::from_str(&key_text).expect("parse questions");
-
     #[derive(Default)]
     struct QOutcome {
         id: String,
@@ -267,6 +409,8 @@ fn run(questions_path: &str, report_path: &str, corpus_dir: &str, details_path: 
 
     let mut outcomes: Vec<QOutcome> = Vec::new();
     let mut incomplete = false;
+    let mut structural_findings: Vec<StructuralFinding> = Vec::new();
+    let shape_top_k = scoring_spec.as_ref().map(|s| s.top_k).unwrap_or(3);
 
     for q in &key.questions {
         let mut oc = QOutcome {
@@ -314,37 +458,28 @@ fn run(questions_path: &str, report_path: &str, corpus_dir: &str, details_path: 
             a.iter().filter_map(|p| p["passage_id"].as_str().map(String::from)).collect()
         }).unwrap_or_default();
 
+        structural_findings.extend(adapter_shape_findings(&q.id, "REST", &rest_json, shape_top_k));
+        structural_findings.extend(adapter_shape_findings(&q.id, "MCP", &mcp_json, shape_top_k));
+
         oc.adapter_agree = oc.rest_status == oc.mcp_status && oc.rest_ids == oc.mcp_ids;
 
-        // Citation opening through both adapters.
-        let check_openings = |adapter_json: &Value, via_mcp: bool, mcp: &mut McpClient, oc: &mut QOutcome| {
-            if let Some(passages) = adapter_json["passages"].as_array() {
-                for p in passages {
-                    let token = p["citation"].as_str().unwrap_or("");
-                    let want_pid = p["passage_id"].as_str().unwrap_or("");
-                    let want_rev = p["revision"].as_str().unwrap_or("");
-                    if token.is_empty() { continue; }
-                    oc.citations_checked += 1;
-                    let opened: Option<Value> = if via_mcp {
-                        mcp.call("tools/call", json!({
-                            "name": "open_citation", "arguments": { "citation": token }
-                        })).ok().and_then(|res| {
-                            res["content"][0]["text"].as_str().and_then(|t| serde_json::from_str(t).ok())
-                        })
-                    } else {
-                        ureq::get(&format!("{rest}/v1/citations/{token}")).call().ok()
-                            .and_then(|r| r.into_json::<Value>().ok())
-                    };
-                    if let Some(o) = opened {
-                        if o["passage_id"].as_str() == Some(want_pid) && o["revision"].as_str() == Some(want_rev) {
-                            oc.citations_ok += 1;
-                        }
-                    }
-                }
-            }
-        };
-        check_openings(&rest_json, false, &mut mcp, &mut oc);
-        check_openings(&mcp_json, true, &mut mcp, &mut oc);
+        // Citation opening through both adapters. Every returned passage
+        // contributes one expected opening before its token is inspected.
+        let (rest_checked, rest_opened) = citation_openings(&rest_json, |token| {
+            ureq::get(&format!("{rest}/v1/citations/{token}")).call().ok()
+                .and_then(|r| r.into_json::<Value>().ok())
+        });
+        oc.citations_checked += rest_checked;
+        oc.citations_ok += rest_opened;
+        let (mcp_checked, mcp_opened) = citation_openings(&mcp_json, |token| {
+            mcp.call("tools/call", json!({
+                "name": "open_citation", "arguments": { "citation": token }
+            })).ok().and_then(|res| {
+                res["content"][0]["text"].as_str().and_then(|t| serde_json::from_str(t).ok())
+            })
+        });
+        oc.citations_checked += mcp_checked;
+        oc.citations_ok += mcp_opened;
 
         // Scoring.
         if q.expected_status == "ok" {
@@ -392,10 +527,92 @@ fn run(questions_path: &str, report_path: &str, corpus_dir: &str, details_path: 
         }
     }
 
+    let mut gate_reasons: Vec<String> = structural_findings.iter()
+        .map(|f| format!("{}: {}", f.question_id, f.problem))
+        .collect();
+    if outcomes.is_empty() {
+        gate_reasons.push("question roster is empty".to_string());
+    }
+    if incomplete {
+        gate_reasons.push("one or more adapter calls errored or the run was interrupted".to_string());
+    }
+
+    let mut coverage_pass = true;
+    let mut insufficient_pass = true;
+    let mut adapter_pass = true;
+    let mut citation_pass = true;
+    let mut provider_pass = true;
+    if let Some(spec) = &scoring_spec {
+        if spec.evidence_coverage_total + spec.insufficient_total != spec.adapter_agreement_total {
+            gate_reasons.push(format!(
+                "scoring spec denominators are inconsistent: {} answerable + {} insufficient != {} total",
+                spec.evidence_coverage_total, spec.insufficient_total, spec.adapter_agreement_total
+            ));
+        }
+        if answerable.len() != spec.evidence_coverage_total {
+            gate_reasons.push(format!("answerable roster is {}, expected {}", answerable.len(), spec.evidence_coverage_total));
+        }
+        if insufficient.len() != spec.insufficient_total {
+            gate_reasons.push(format!("insufficient-evidence roster is {}, expected {}", insufficient.len(), spec.insufficient_total));
+        }
+        if outcomes.len() != spec.adapter_agreement_total {
+            gate_reasons.push(format!("question roster is {}, expected {}", outcomes.len(), spec.adapter_agreement_total));
+        }
+        coverage_pass = hits >= spec.evidence_coverage_min;
+        insufficient_pass = ins_correct >= spec.insufficient_min;
+        adapter_pass = agree == spec.adapter_agreement_total;
+        let citation_fraction = if cit_checked == 0 { 1.0 } else { cit_ok as f64 / cit_checked as f64 };
+        citation_pass = citation_fraction >= spec.citation_integrity_min_fraction;
+        let provider_calls = 0usize;
+        provider_pass = provider_calls <= spec.provider_calls_max;
+    }
+
+    let run_incomplete = incomplete || !gate_reasons.is_empty();
+    let gate_pass = coverage_pass && insufficient_pass && adapter_pass && citation_pass && provider_pass;
+    let verdict = if mode == Mode::Development {
+        "DEVELOPMENT"
+    } else if run_incomplete {
+        "INCOMPLETE"
+    } else if gate_pass {
+        "PASS"
+    } else {
+        "FAIL"
+    };
+    let exit_code = if mode == Mode::Development {
+        if incomplete { 3 } else { 0 }
+    } else {
+        match verdict {
+            "PASS" => 0,
+            "FAIL" => 1,
+            _ => 3,
+        }
+    };
+    let machine = json!({
+        "version": "bench-result.v1",
+        "mode": if mode == Mode::Gate { "gate" } else { "development" },
+        "verdict": verdict,
+        "questions": questions_path,
+        "corpus": corpus_dir,
+        "incomplete": run_incomplete,
+        "checks": {
+            "evidence_coverage": { "hits": hits, "answerable": answerable.len(), "pass": coverage_pass },
+            "insufficient_evidence": { "correct": ins_correct, "total": insufficient.len(), "pass": insufficient_pass },
+            "adapter_agreement": { "agree": agree, "total": outcomes.len(), "pass": adapter_pass },
+            "citation_integrity": { "ok": cit_ok, "checked": cit_checked, "pass": citation_pass },
+            "provider_calls": { "count": 0, "pass": provider_pass },
+        },
+        "reasons": gate_reasons.clone(),
+    });
+
     // 8. Report.
     let mut r = String::new();
     r.push_str(&format!("# Ganesh M1 benchmark report — {}\n\n", key.version));
-    r.push_str(&format!("- questions file: `{questions_path}`\n- corpus: `{corpus_dir}` ({} articles, {total_passages} passages, {corpus_bytes} snapshot bytes)\n- incomplete run: {incomplete}\n\n", manifest.articles.len()));
+    r.push_str(&format!("- verdict: **{verdict}**\n- mode: {}\n- questions file: `{questions_path}`\n- corpus: `{corpus_dir}` ({} articles, {total_passages} passages, {corpus_bytes} snapshot bytes)\n- incomplete run: {run_incomplete}\n",
+        if mode == Mode::Gate { "held-out gate" } else { "development" }, manifest.articles.len()));
+    if let Some(spec) = &scoring_spec {
+        r.push_str(&format!("- scoring specification: `{}` (coverage {}/{}, insufficient {}/{}, adapter total {}, top {})\n", spec.version, spec.evidence_coverage_min, spec.evidence_coverage_total, spec.insufficient_min, spec.insufficient_total, spec.adapter_agreement_total, spec.top_k));
+    }
+    r.push('\n');
     r.push_str("## Summary\n\n");
     r.push_str(&format!("| Check | Result |\n| --- | --- |\n"));
     r.push_str(&format!("| Evidence coverage | {hits}/{} answerable hits |\n", answerable.len()));
@@ -464,6 +681,14 @@ fn run(questions_path: &str, report_path: &str, corpus_dir: &str, details_path: 
     r.push_str(&format!("| Hardware | {} |\n", hardware()));
     r.push_str("| Provider calls | 0 (no network access in the retrieval path; corpus is local frozen bytes) |\n\n");
 
+    if !gate_reasons.is_empty() {
+        r.push_str("## Gate completeness findings\n\n");
+        for reason in &gate_reasons {
+            r.push_str(&format!("- {reason}\n"));
+        }
+        r.push('\n');
+    }
+
     r.push_str("## Notes\n\n");
     for l in &log_lines {
         r.push_str(&format!("- {l}\n"));
@@ -482,21 +707,23 @@ fn run(questions_path: &str, report_path: &str, corpus_dir: &str, details_path: 
         })).collect();
         std::fs::write(dp, serde_json::to_string_pretty(&json!({
             "questions": questions_path, "outcomes": details,
+            "result": machine.clone(),
             "summary": {
                 "hits": hits, "answerable": answerable.len(),
                 "insufficient_correct": ins_correct, "insufficient": insufficient.len(),
                 "adapter_agree": agree, "total": outcomes.len(),
                 "citations_checked": cit_checked, "citations_ok": cit_ok,
-                "incomplete": incomplete,
+                "incomplete": run_incomplete,
             }
         })).unwrap()).ok();
     }
 
     let _ = server.kill();
     println!("report written to {report_path}");
-    println!("coverage {hits}/{}, insufficient {ins_correct}/{}, adapter {agree}/{}, citations {cit_ok}/{cit_checked}, incomplete={incomplete}",
+    println!("coverage {hits}/{}, insufficient {ins_correct}/{}, adapter {agree}/{}, citations {cit_ok}/{cit_checked}, incomplete={run_incomplete}",
         answerable.len(), insufficient.len(), outcomes.len());
-    if incomplete { 3 } else { 0 }
+    println!("{}", serde_json::to_string(&machine).unwrap());
+    exit_code
 }
 
 fn hardware() -> String {
@@ -540,5 +767,45 @@ fn probe(questions_path: &str, corpus_dir: &str) {
             q.id, q.expected_status, dbg.union_coverage,
             dbg.idf_union_coverage, dbg.idf2_union_coverage, cands.join(" "));
         println!("      unmatched: {}", dbg.unmatched_terms.join(","));
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn citation_accounting_counts_a_missing_citation_as_a_failed_opening() {
+        let response = json!({
+            "status": "ok",
+            "passages": [
+                { "passage_id": "1#p1", "revision": "1", "citation": "good-1" },
+                { "passage_id": "1#p2", "revision": "1" },
+                { "passage_id": "1#p3", "revision": "1", "citation": "good-3" }
+            ]
+        });
+        let (checked, ok) = citation_openings(&response, |token| match token {
+            "good-1" => Some(json!({ "passage_id": "1#p1", "revision": "1" })),
+            "good-3" => Some(json!({ "passage_id": "1#p3", "revision": "1" })),
+            _ => None,
+        });
+        assert_eq!((checked, ok), (3, 2));
+    }
+
+    #[test]
+    fn citation_accounting_counts_malformed_and_unresolvable_citations() {
+        let response = json!({
+            "status": "ok",
+            "passages": [
+                { "passage_id": "1#p1", "revision": "1", "citation": "" },
+                { "passage_id": "1#p2", "revision": "1", "citation": "not-a-real-citation" },
+                { "passage_id": "1#p3", "revision": "1", "citation": "wrong-passage" }
+            ]
+        });
+        let (checked, ok) = citation_openings(&response, |token| match token {
+            "wrong-passage" => Some(json!({ "passage_id": "1#pX", "revision": "1" })),
+            _ => None,
+        });
+        assert_eq!((checked, ok), (3, 0));
     }
 }
