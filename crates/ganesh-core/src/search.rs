@@ -29,7 +29,7 @@ impl Default for RetrievalConfig {
             min_idf_union_coverage: 0.75,
             min_union_coverage: 0.0,
             min_top_coverage: 0.0,
-            candidate_limit: 3,
+            candidate_limit: 50,
         }
     }
 }
@@ -133,6 +133,30 @@ fn stem_token(token: &str) -> String {
     STEMMER.with(|s| s.stem(token).into_owned())
 }
 
+/// Quantity units whose singular and plural forms carry different meanings in
+/// this corpus (`byte` the type versus `bytes` the unit, for example). These
+/// keep their exact surface number instead of being conflated by stemming.
+fn exact_number_unit(token: &str) -> bool {
+    matches!(token, "byte" | "bytes" | "bit" | "bits" | "kilobyte" | "kilobytes" | "megabyte" | "megabytes")
+}
+
+fn quantity_question(query: &str) -> bool {
+    let q = query.to_ascii_lowercase();
+    q.contains("how many") || q.contains("how much") || q.contains("number of")
+}
+
+fn numeric_token(token: &str) -> bool {
+    !token.is_empty() && token.chars().all(|c| c.is_ascii_digit())
+}
+
+fn normalize_token(token: &str) -> String {
+    if exact_number_unit(token) {
+        token.to_string()
+    } else {
+        stem_token(token)
+    }
+}
+
 /// Stemmed content tokens of a text, English Porter, stopwords removed.
 /// The search index stores passage text in this normalized form; queries are
 /// normalized the same way, so matching is morphologically tolerant while the
@@ -142,7 +166,7 @@ pub fn stemmed_tokens(text: &str) -> Vec<String> {
         .into_iter()
         .chain(identifier_alias_tokens(text))
         .filter(|t| keep_token(t))
-        .map(|t| stem_token(&t))
+        .map(|t| normalize_token(&t))
         .collect()
 }
 
@@ -185,6 +209,13 @@ pub struct SearchDebug {
     pub terms: Vec<String>,
     pub unmatched_terms: Vec<String>,
     pub candidates: Vec<(String, f64)>,
+}
+
+fn title_subject_terms(title: &str) -> std::collections::BTreeSet<String> {
+    stemmed_tokens(title)
+        .into_iter()
+        .filter(|t| t != &stem_token("programming") && t != &stem_token("language"))
+        .collect()
 }
 
 pub fn search(store: &Store, query: &str, caller: &str, cfg: &RetrievalConfig) -> SearchResponse {
@@ -242,9 +273,12 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
     }
     debug.candidates = rows.iter().map(|c| (c.passage_id.clone(), c.score)).collect();
 
-    // Coverage analysis over distinct stemmed terms.
-    let mut passage_texts: Vec<(String, Vec<String>)> = Vec::new();
-    for cand in rows.iter().take(cfg.top_k) {
+    // Coverage analysis over distinct stemmed terms. The public response is
+    // still top-k, but selection starts from a deeper candidate pool so a
+    // passage covering a different facet of a compound question can be chosen
+    // instead of a near-duplicate of the first hit.
+    let mut candidate_texts: Vec<(String, Vec<String>, String)> = Vec::new();
+    for cand in &rows {
         let stemmed: String = store
             .conn
             .query_row(
@@ -253,10 +287,116 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
                 |row| row.get(0),
             )
             .unwrap_or_default();
-        passage_texts.push((cand.passage_id.clone(), stemmed.split_whitespace().map(String::from).collect()));
+        let article_id: String = store
+            .conn
+            .query_row(
+                "SELECT r.article_id FROM passages p JOIN revisions r ON p.revision = r.revision WHERE p.id = ?1",
+                rusqlite::params![cand.passage_id],
+                |row| row.get(0),
+            )
+            .unwrap_or_default();
+        candidate_texts.push((cand.passage_id.clone(), stemmed.split_whitespace().map(String::from).collect(), article_id));
     }
 
+    // Source titles define the subject vocabulary known to the service. If the
+    // query mentions exactly one subject, selection is restricted to passages
+    // from that subject when any are present. Queries naming zero or multiple
+    // subjects remain unrestricted, preserving legitimate comparisons.
+    let mut mentioned_subjects = std::collections::BTreeSet::new();
+    if let Ok(mut stmt) = store.conn.prepare("SELECT article_id, title FROM sources") {
+        if let Ok(source_rows) = stmt.query_map([], |row| Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?))) {
+            for row in source_rows.flatten() {
+                let (article_id, title) = row;
+                let subject_terms = title_subject_terms(&title);
+                if terms.iter().any(|t| subject_terms.contains(t)) {
+                    mentioned_subjects.insert(article_id);
+                }
+            }
+        }
+    }
+    let restricted_article = if mentioned_subjects.len() == 1 {
+        mentioned_subjects.iter().next().cloned()
+    } else {
+        None
+    };
+    let eligible: Vec<usize> = match &restricted_article {
+        Some(article) if candidate_texts.iter().any(|(_, _, a)| a == article) => {
+            (0..candidate_texts.len()).filter(|idx| candidate_texts[*idx].2 == *article).collect()
+        }
+        _ => (0..candidate_texts.len()).collect(),
+    };
+
     let term_present = |term: &str, tokens: &[String]| tokens.iter().any(|h| h == term);
+
+    // Document-frequency weights for query terms, computed once per query.
+    let mut term_weights: std::collections::HashMap<String, f64> = std::collections::HashMap::new();
+    {
+        let mut df: std::collections::HashMap<String, usize> = std::collections::HashMap::new();
+        let mut npass = 0usize;
+        if let Ok(mut stmt) = store.conn.prepare("SELECT index_text FROM passages_fts") {
+            if let Ok(rows) = stmt.query_map([], |row| row.get::<_, String>(0)) {
+                for row in rows.flatten() {
+                    npass += 1;
+                    let mut seen = std::collections::BTreeSet::new();
+                    for t in row.split_whitespace() {
+                        if seen.insert(t.to_string()) {
+                            *df.entry(t.to_string()).or_insert(0) += 1;
+                        }
+                    }
+                }
+            }
+        }
+        for t in &terms {
+            let d = df.get(t).copied().unwrap_or(0) as f64;
+            term_weights.insert(t.clone(), ((npass as f64 + 1.0) / (d + 0.5)).ln() + 1.0);
+        }
+    }
+    let weight_of = |t: &str| term_weights.get(t).copied().unwrap_or(1.0);
+
+    // Complementary selection: keep the best BM25 candidate, then add the
+    // candidate with the largest weighted marginal coverage of query terms not
+    // already covered. When no candidate adds a term, fill by original rank.
+    // Final display order remains the original BM25 order of the selected set.
+    let want = cfg.top_k.min(eligible.len());
+    let mut selected: Vec<usize> = Vec::new();
+    if want > 0 {
+        selected.push(eligible[0]);
+        let mut covered = std::collections::BTreeSet::new();
+        for t in &terms {
+            if term_present(t, &candidate_texts[eligible[0]].1) {
+                covered.insert(t.clone());
+            }
+        }
+        while selected.len() < want {
+            let mut best: Option<(usize, f64)> = None;
+            for &idx in eligible.iter().skip(1) {
+                if selected.contains(&idx) {
+                    continue;
+                }
+                let marginal: f64 = terms.iter()
+                    .filter(|t| !covered.contains(*t) && term_present(t, &candidate_texts[idx].1))
+                    .map(|t| weight_of(t))
+                    .sum();
+                if marginal > 0.0 && best.map(|(_, b)| marginal > b).unwrap_or(true) {
+                    best = Some((idx, marginal));
+                }
+            }
+            let next = match best {
+                Some((idx, _)) => idx,
+                None => *eligible.iter().find(|idx| !selected.contains(idx)).unwrap(),
+            };
+            for t in &terms {
+                if term_present(t, &candidate_texts[next].1) {
+                    covered.insert(t.clone());
+                }
+            }
+            selected.push(next);
+        }
+        selected.sort_unstable();
+    }
+    let passage_texts: Vec<(String, Vec<String>)> = selected.iter()
+        .map(|idx| (candidate_texts[*idx].0.clone(), candidate_texts[*idx].1.clone()))
+        .collect();
 
     let total = terms.len() as f64;
     let mut union_matched = std::collections::BTreeSet::new();
@@ -295,10 +435,7 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
                 }
             }
         }
-        let weight = |t: &str| -> f64 {
-            let d = df.get(t).copied().unwrap_or(0) as f64;
-            ((npass as f64 + 1.0) / (d + 0.5)).ln() + 1.0
-        };
+        let weight = |t: &str| -> f64 { weight_of(t) };
         let total_w: f64 = terms.iter().map(|t| weight(t)).sum();
         if total_w > 0.0 {
             let mut union_w = 0.0;
@@ -328,9 +465,21 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
         }
     }
 
+    // Quantity questions need quantity-like evidence, not merely nearby
+    // mentions of the measured things. Exact-number units are deliberately
+    // unstemmed, so a question about bytes is not supported by a passage that
+    // only mentions the byte type. A numeric token is weak evidence and not
+    // sufficient by itself, but its complete absence is strong evidence that
+    // no quantity was stated.
+    let quantity = quantity_question(query);
+    let quantity_unit_missing = quantity && terms.iter().any(|t| exact_number_unit(t))
+        && terms.iter().filter(|t| exact_number_unit(t)).any(|t| !passage_texts.iter().any(|(_, tokens)| term_present(t, tokens)));
+    let numeric_missing = quantity && !passage_texts.iter().any(|(_, tokens)| tokens.iter().any(|t| numeric_token(t)));
     let abstain = debug.idf_union_coverage < cfg.min_idf_union_coverage
         || union_coverage < cfg.min_union_coverage
-        || top_coverage < cfg.min_top_coverage;
+        || top_coverage < cfg.min_top_coverage
+        || quantity_unit_missing
+        || numeric_missing;
     if abstain {
         return (empty("insufficient_context"), debug);
     }
@@ -393,5 +542,18 @@ mod tests {
         assert!(toks.contains(&stem_token("user")));
         assert!(toks.iter().any(|t| t == "1"));
         assert!(toks.iter().any(|t| t == "18"));
+    }
+}
+
+#[cfg(test)]
+mod quantity_unit_tests {
+    use super::*;
+
+    #[test]
+    fn quantity_units_preserve_surface_number() {
+        assert!(stemmed_tokens("bytes").contains(&"bytes".to_string()));
+        assert!(stemmed_tokens("byte").contains(&"byte".to_string()));
+        assert!(!stemmed_tokens("bytes").contains(&"byte".to_string()));
+        assert!(!stemmed_tokens("byte").contains(&"bytes".to_string()));
     }
 }
