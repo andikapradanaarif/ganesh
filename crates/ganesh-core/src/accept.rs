@@ -36,6 +36,40 @@ pub struct StateSpan {
     pub verdict: String,
 }
 
+/// Action groups for positive support. Positive evidence must establish the
+/// requested action or a justified equivalent — never a merely class-related
+/// event. Directional inference: completion entails the action started, never
+/// the reverse. Counterexample where it must abstain: "the export finished"
+/// cannot answer "did the export start on May 4" for a *different* export or
+/// date, and "the export started" can never answer "did it finish".
+fn action_group(stem: &str) -> Option<&'static str> {
+    Some(match stem {
+        "complet" | "finish" | "succeed" => "finish",
+        "start" | "begin" | "began" => "start",
+        "deploy" => "deploy",
+        "run" => "run",
+        "pass" => "pass",
+        "fail" => "pass",
+        "verifi" | "confirm" | "unverifi" | "unconfirm" => "verify",
+        "propos" | "plan" | "intend" | "suggest" | "consider" => "propose",
+        "attempt" | "tri" | "effort" => "attempt",
+        "becam" | "becom" | "option" | "mandatori" | "deprecat" | "drop" | "adopt" => "transition",
+        "live" => "run",
+        _ => return None,
+    })
+}
+
+/// Positive support: same action, or the directional completion-implies-start
+/// inference. Everything else — including two events in the same epistemic
+/// class — is not evidence for the asked action.
+pub fn action_supports(q_pred: &str, evidence_stem: &str) -> bool {
+    match (action_group(q_pred), action_group(evidence_stem)) {
+        (Some(q), Some(e)) if q == e => true,
+        (Some("start"), Some("finish")) => true,
+        _ => false,
+    }
+}
+
 /// Predicate groups for contradiction matching. A negated statement only
 /// contradicts the asked proposition when the negated predicate is the same
 /// one — "did not confirm" contradicts confirmed(R6) but says nothing about
@@ -56,9 +90,9 @@ fn predicate_group(stem: &str) -> Option<usize> {
 }
 
 /// The dominant predicate stem of a question: the first cue-class term in
-/// the question's stemmed terms that belongs to a predicate group.
+/// the question's stemmed terms that belongs to an action group.
 pub fn question_predicate(terms: &[String]) -> Option<String> {
-    terms.iter().find(|t| predicate_group(t).is_some()).cloned()
+    terms.iter().find(|t| action_group(t).is_some()).cloned()
 }
 
 #[derive(Debug, Clone, Default)]
@@ -235,7 +269,7 @@ fn version_tokens(text: &str) -> std::collections::BTreeSet<String> {
 // Experiment B lexicons: epistemic cue classes, in stemmed form.
 // ---------------------------------------------------------------------------
 
-pub const VERIFY_CUES: &[&str] = &["verifi", "confirm", "deploy", "run", "pass", "succeed", "complet", "live", "start", "unverifi", "unconfirm"];
+pub const VERIFY_CUES: &[&str] = &["verifi", "confirm", "deploy", "run", "pass", "succeed", "complet", "live", "start", "unverifi", "unconfirm", "finish", "fail", "begin", "began", "reach"];
 pub const PROPOSE_CUES: &[&str] = &["propos", "plan", "intend", "suggest", "consider"];
 pub const ATTEMPT_CUES: &[&str] = &["attempt", "tri", "effort"];
 pub const TRANSITION_CUES: &[&str] = &["becam", "becom", "option", "mandatori", "deprecat", "drop", "adopt"];
@@ -346,6 +380,9 @@ pub struct DecideInput<'a> {
     /// Experiment D: dated-entry context chain — headings plus unambiguous
     /// antecedents augment continuation sentences.
     pub context_chain: bool,
+    /// Experiment E (issue #169): positive support must be action-exact or a
+    /// justified equivalent for the same subject and scope.
+    pub action_check: bool,
 }
 
 fn stemmed_query_like(text: &str) -> Vec<String> {
@@ -568,7 +605,18 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
                     };
                     let class_ok = classes.iter().any(|c| class_satisfies(required, c));
                     let mut verdict = "unresolved".to_string();
-                    if class_ok && env_ok {
+                    // Experiment E: positive support is action-aware. The
+                    // evidence sentence must contain a cue stem that establishes
+                    // the asked action or a justified equivalent — class
+                    // membership alone never suffices.
+                    let action_ok = if input.action_check {
+                        question_predicate(&input.terms.to_vec()).map(|qp| {
+                            sent_stemmed.iter().any(|t| action_supports(&qp, t))
+                        }).unwrap_or(false)
+                    } else {
+                        true
+                    };
+                    if class_ok && env_ok && action_ok {
                         if !span.negated {
                             verdict = "supports".to_string();
                         } else if input.proposition_check {
@@ -587,6 +635,7 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
                                     t == qp
                                         || (qp == "verifi" && t == "unverifi")
                                         || (qp == "confirm" && t == "unconfirm")
+                                        || (qp == "pass" && t == "fail")
                                 })
                             }).unwrap_or(false);
                             if pred_match {

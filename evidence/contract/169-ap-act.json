@@ -1,0 +1,220 @@
+{
+  "evidence_correct_answerable": 4,
+  "outcomes": [
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "e01",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.448699,
+      "latency_rest_ms": 1.931414,
+      "mcp_ids": [
+        "exportlog-a1#p2",
+        "exportlog-a1#p5",
+        "exportlog-a1#p3"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "exportlog-a1#p2",
+        "exportlog-a1#p5",
+        "exportlog-a1#p3"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "e02",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.44713,
+      "latency_rest_ms": 1.147787,
+      "mcp_ids": [
+        "exportlog-a1#p2",
+        "exportlog-a1#p5",
+        "exportlog-a1#p3"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "exportlog-a1#p2",
+        "exportlog-a1#p5",
+        "exportlog-a1#p3"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "e03",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.062985,
+      "latency_rest_ms": 1.0707449999999998,
+      "mcp_ids": [
+        "exportlog-a1#p3",
+        "exportlog-a1#p5",
+        "exportlog-a1#p2"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "exportlog-a1#p3",
+        "exportlog-a1#p5",
+        "exportlog-a1#p2"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "e04",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 0.9084720000000001,
+      "latency_rest_ms": 0.869125,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "e05",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 0.899057,
+      "latency_rest_ms": 0.802422,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "e06",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 0.93689,
+      "latency_rest_ms": 0.9884539999999999,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "e07",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.118746,
+      "latency_rest_ms": 1.082501,
+      "mcp_ids": [
+        "exportlog-a1#p6",
+        "exportlog-a1#p2",
+        "exportlog-a1#p7"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "exportlog-a1#p6",
+        "exportlog-a1#p2",
+        "exportlog-a1#p7"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": null,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "e08",
+      "insufficient_correct": false,
+      "latency_mcp_ms": 1.0451139999999999,
+      "latency_rest_ms": 1.019631,
+      "mcp_ids": [
+        "exportlog-a1#p7",
+        "exportlog-a1#p5",
+        "exportlog-a1#p3"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "exportlog-a1#p7",
+        "exportlog-a1#p5",
+        "exportlog-a1#p3"
+      ],
+      "rest_status": "ok"
+    }
+  ],
+  "questions": "fixtures/action-probe/key.json",
+  "result": {
+    "checks": {
+      "adapter_agreement": {
+        "agree": 8,
+        "pass": true,
+        "total": 8
+      },
+      "citation_integrity": {
+        "checked": 30,
+        "ok": 30,
+        "pass": true
+      },
+      "evidence_coverage": {
+        "answerable": 4,
+        "hits": 4,
+        "pass": true
+      },
+      "insufficient_evidence": {
+        "correct": 3,
+        "pass": true,
+        "total": 4
+      },
+      "provider_calls": {
+        "count": 0,
+        "pass": true
+      }
+    },
+    "corpus": "fixtures/action-probe",
+    "incomplete": false,
+    "mode": "development",
+    "questions": "fixtures/action-probe/key.json",
+    "reasons": [],
+    "verdict": "DEVELOPMENT",
+    "version": "bench-result.v1"
+  },
+  "summary": {
+    "adapter_agree": 8,
+    "answerable": 4,
+    "citations_checked": 30,
+    "citations_ok": 30,
+    "hits": 4,
+    "incomplete": false,
+    "insufficient": 4,
+    "insufficient_correct": 3,
+    "total": 8
+  }
+}

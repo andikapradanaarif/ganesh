@@ -34,6 +34,8 @@ pub struct RetrievalConfig {
     /// Experiment D (issue #167): dated-entry context — section headings and
     /// unambiguous single-subject antecedents augment continuation sentences.
     pub context_chain: bool,
+    /// Experiment E (issue #169): action-aware positive support.
+    pub action_check: bool,
 }
 
 impl Default for RetrievalConfig {
@@ -48,6 +50,7 @@ impl Default for RetrievalConfig {
             transition_check: std::env::var("GANESH_TRANSITION_CHECK").map(|v| v == "1").unwrap_or(false),
             proposition_check: std::env::var("GANESH_PROPOSITION_CHECK").map(|v| v == "1").unwrap_or(false),
             context_chain: std::env::var("GANESH_CONTEXT_CHAIN").map(|v| v == "1").unwrap_or(false),
+            action_check: std::env::var("GANESH_ACTION_CHECK").map(|v| v == "1").unwrap_or(false),
         }
     }
 }
@@ -585,6 +588,7 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
         transition_check: cfg.transition_check || cfg.proposition_check,
         proposition_check: cfg.proposition_check,
         context_chain: cfg.context_chain,
+        action_check: cfg.action_check,
     };
     let trace = accept::decide(&input);
     let abstain = trace.decision != "ok";

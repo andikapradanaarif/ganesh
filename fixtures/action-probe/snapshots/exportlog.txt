@@ -1,0 +1,25 @@
+The Cobalt export pipeline is a fictional data system used as the frozen transfer group for action-versus-outcome testing. This is its batch log.
+
+== Batch May 2 ==
+
+The export of dataset D7 started at 09:00 UTC. The export finished at 09:47 UTC and the validation passed.
+
+== Batch May 3 ==
+
+The export of dataset D7 started at 09:00 UTC. The export did not finish before the storage window closed.
+
+== Batch May 4 ==
+
+The export of dataset D8 started at 09:00 UTC. No further entries mention dataset D8 that day.
+
+== Batch May 5 ==
+
+Dataset D7 was queued for export. Dataset D8 finished its export at 10:15 UTC.
+
+== Batch May 6 ==
+
+The export of dataset D7 started at 09:00 UTC. The validation was not run. The storage window closed at 10:00 UTC.
+
+== Batch May 7 ==
+
+The export of dataset D7 started at 09:00 UTC. The validation finished at 09:30 UTC while the export continued.

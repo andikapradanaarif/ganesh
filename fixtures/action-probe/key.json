@@ -1,0 +1,162 @@
+{
+ "version": "action-probe.v1",
+ "notes": "Frozen before tuning. Export domain transfer group: equivalent wording, explicit negatives, unobserved outcomes, two subjects, different-events-same-passage.",
+ "questions": [
+  {
+   "id": "e01",
+   "question": "Did the export of dataset D7 finish on May 2?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "affirmative"
+   ],
+   "required_facts": [
+    {
+     "fact": "the export finished at 09:47",
+     "acceptable": [
+      "exportlog-a1#p2"
+     ],
+     "spans": [
+      "export finished at 09:47"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "e02",
+   "question": "Did the export of dataset D7 complete on May 2?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "equivalent-wording"
+   ],
+   "required_facts": [
+    {
+     "fact": "finish/complete equivalence: the export finished",
+     "acceptable": [
+      "exportlog-a1#p2"
+     ],
+     "spans": [
+      "export finished at 09:47"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "e03",
+   "question": "Did the export of dataset D7 finish on May 3?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "explicit-negative"
+   ],
+   "required_facts": [
+    {
+     "fact": "the export did not finish \u2014 explicit negative",
+     "acceptable": [
+      "exportlog-a1#p3"
+     ],
+     "spans": [
+      "did not finish"
+     ],
+     "answer_polarity": "negative"
+    }
+   ]
+  },
+  {
+   "id": "e04",
+   "question": "Did the export of dataset D8 finish on May 4?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "unobserved-outcome"
+   ],
+   "required_facts": [
+    {
+     "fact": "missing: D8 started, outcome unobserved",
+     "acceptable": [],
+     "spans": [],
+     "answer_polarity": "affirmative"
+    }
+   ],
+   "plausible_misleading": "exportlog-a1#p4"
+  },
+  {
+   "id": "e05",
+   "question": "Did dataset D7 finish its export on May 5?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "two-subjects"
+   ],
+   "required_facts": [
+    {
+     "fact": "missing: D8 finished, not D7 \u2014 two subjects different outcomes",
+     "acceptable": [],
+     "spans": [],
+     "answer_polarity": "affirmative"
+    }
+   ],
+   "plausible_misleading": "exportlog-a1#p5"
+  },
+  {
+   "id": "e06",
+   "question": "Did the validation pass for the May 6 export of dataset D7?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "unknown-outcome"
+   ],
+   "required_facts": [
+    {
+     "fact": "missing: validation was not run \u2014 neither pass nor fail",
+     "acceptable": [],
+     "spans": [],
+     "answer_polarity": "affirmative"
+    }
+   ],
+   "plausible_misleading": "exportlog-a1#p6"
+  },
+  {
+   "id": "e07",
+   "question": "Was the validation run for the May 6 export of dataset D7?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "explicit-negative"
+   ],
+   "required_facts": [
+    {
+     "fact": "validation was not run \u2014 explicit negative settles whether it ran",
+     "acceptable": [
+      "exportlog-a1#p6"
+     ],
+     "spans": [
+      "validation was not run"
+     ],
+     "answer_polarity": "negative"
+    }
+   ]
+  },
+  {
+   "id": "e08",
+   "question": "Did the export of dataset D7 finish on May 7?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "different-events-same-passage"
+   ],
+   "required_facts": [
+    {
+     "fact": "missing: 'finished' describes the validation, not the export \u2014 same passage, different events",
+     "acceptable": [],
+     "spans": [],
+     "answer_polarity": "affirmative"
+    }
+   ],
+   "plausible_misleading": "exportlog-a1#p7"
+  }
+ ]
+}
