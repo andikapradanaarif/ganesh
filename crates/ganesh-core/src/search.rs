@@ -382,6 +382,43 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
     // candidate with the largest weighted marginal coverage of query terms not
     // already covered. When no candidate adds a term, fill by original rank.
     // Final display order remains the original BM25 order of the selected set.
+    // Experiment F (issue #181): coverage-first selection. Distinct-term
+    // coverage is the fact-relevance signal; raw bm25 length/frequency
+    // artifacts are noise. Order candidates by weighted distinct coverage of
+    // query terms (descending), breaking ties by original rank.
+    // Experiment F (issue #181), body-coverage variant: the stemmed index text
+    // injects article title and section terms into every passage, so within one
+    // article distinct-term coverage ties and raw bm25 length/frequency noise
+    // dominates. Coverage of the passage's own body is the discriminating
+    // signal for ordinary lookups: a passage whose body mentions more distinct
+    // queried facets is more likely to state the requested fact. Order by
+    // IDF-weighted body coverage (desc), breaking ties by original bm25 rank.
+    let mut body_tokens: Vec<Vec<String>> = Vec::new();
+    for cand in &rows {
+        let body: String = store
+            .conn
+            .query_row(
+                "SELECT text FROM passages WHERE id = ?1",
+                rusqlite::params![cand.passage_id],
+                |row| row.get(0),
+            )
+            .unwrap_or_default();
+        body_tokens.push(stemmed_tokens(&body));
+    }
+    let mut coverage_ranked: Vec<usize> = eligible.clone();
+    {
+        let cov_score = |idx: usize| -> f64 {
+            terms.iter()
+                .filter(|t| term_present(t, &body_tokens[idx]))
+                .map(|t| weight_of(t))
+                .sum()
+        };
+        coverage_ranked.sort_by(|a, b| {
+            cov_score(*b).partial_cmp(&cov_score(*a)).unwrap_or(std::cmp::Ordering::Equal)
+                .then(a.cmp(b))
+        });
+    }
+    let eligible: Vec<usize> = coverage_ranked;
     let want = cfg.top_k.min(eligible.len());
     let mut selected: Vec<usize> = Vec::new();
     if want > 0 {
