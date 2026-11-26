@@ -1,0 +1,173 @@
+{
+ "version": "rr-xfer-v1",
+ "scoring": "scoring.v2",
+ "questions": [
+  {
+   "id": "r01",
+   "question": "When did the Brooklyn Bridge open?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "open-when"
+   ],
+   "required_facts": [
+    {
+     "fact": "May 24, 1883",
+     "acceptable": [
+      "bb-a1#p1"
+     ],
+     "spans": [
+      "May 24, 1883"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "r02",
+   "question": "On what exact date did the Manhattan Bridge open?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "exact-date",
+    "wrong-subject-distractor"
+   ],
+   "required_facts": [
+    {
+     "fact": "December 31, 1909",
+     "acceptable": [
+      "mb-a1#p2"
+     ],
+     "spans": [
+      "December 31, 1909"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "r03",
+   "question": "What is the length of the Brooklyn Bridge main span?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "quantity",
+    "scope-sensitive"
+   ],
+   "required_facts": [
+    {
+     "fact": "1595",
+     "acceptable": [
+      "bb-a1#p1"
+     ],
+     "spans": [
+      "1595"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "r04",
+   "question": "In what year did construction of the Brooklyn Bridge begin?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "year-only",
+    "multi-date"
+   ],
+   "required_facts": [
+    {
+     "fact": "1870",
+     "acceptable": [
+      "bb-a1#p2"
+     ],
+     "spans": [
+      "1870"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "r05",
+   "question": "When did the Brooklyn Bridge open, and what is its main span length?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "compound"
+   ],
+   "required_facts": [
+    {
+     "fact": "May 24, 1883",
+     "acceptable": [
+      "bb-a1#p1"
+     ],
+     "spans": [
+      "May 24, 1883"
+     ],
+     "answer_polarity": "affirmative"
+    },
+    {
+     "fact": "1595",
+     "acceptable": [
+      "bb-a1#p1"
+     ],
+     "spans": [
+      "1595"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "r06",
+   "question": "Which family designed the Brooklyn Bridge?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "non-date"
+   ],
+   "required_facts": [
+    {
+     "fact": "Roebling",
+     "acceptable": [
+      "bb-a1#p2"
+     ],
+     "spans": [
+      "Roebling"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "r07",
+   "question": "On what exact day was the Brooklyn Bridge first proposed to the New York legislature?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient"
+   ],
+   "required_facts": [],
+   "unresolved_detail": "proposal exact day absent from source"
+  },
+  {
+   "id": "r08",
+   "question": "How many wires does the entire Brooklyn Bridge contain across all cable types?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient"
+   ],
+   "required_facts": [],
+   "unresolved_detail": "per-cable or per-wire-type counts at most; bridge-wide total absent"
+  }
+ ]
+}
