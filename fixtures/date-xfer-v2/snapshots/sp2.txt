@@ -1,0 +1,92 @@
+Sputnik 2 (, , Satellite 2, or Prosteyshiy Sputnik 2 (PS-2, , Simplest Satellite 2, launched on 3 November 1957, was the second spacecraft launched into Earth orbit, and the first to carry an animal into orbit, a Soviet space dog named Laika.
+
+Launched by the Soviet Union on second and final flight of the Sputnik PS (derived from the R-7 intercontinental ballistic missile), Sputnik 2 was a cone-shaped capsule with a base diameter of that weighed around , though it was not designed to separate from the rocket core that brought it to orbit, bringing the total mass in orbit to . It contained several compartments for radio transmitters, a telemetry system, a programming unit, a regeneration and temperature-control system for the cabin, and scientific instruments. A separate sealed cabin contained the dog Laika.
+
+Though Laika died shortly after reaching orbit, Sputnik 2 marked another huge success for the Soviet Union in The Space Race, lofting a huge payload for the time, sending an animal into orbit, and, for the first time, returning scientific data from above the Earth's atmosphere for an extended period. The satellite reentered Earth's atmosphere on 14 April 1958. Korabl-Sputnik 2 returned the first animals from orbit safely in 1960, dogs Belka and Strelka, testing the crewed Vostok craft.
+
+==Background==
+In 1955, engineer Mikhail Tikhonravov created a proposal for "Object D", a satellite massing to , about a fourth of which would be devoted to scientific instruments. Upon learning that this spacecraft would outmass the announced American satellite by nearly 1,000 times, Soviet leader Nikita Khrushchev advocated for the proposal, which was approved by the government in Resolution #149-88 of 30 January 1956. Work began on the project in February with a launch date of latter 1957, in time for the International Geophysical Year. The design was finalized on 24 July.
+
+By the end of 1956, it had become clear that neither the complicated Object D nor the 8A91 satellite launch vehicle version of the R-7 ICBM under development to launch it would be finished in time for a 1957 launch. Thus, in December 1956, OKB-1 head Sergei Korolev proposed the development of two simpler satellites: PS, Prosteishy Sputnik, or Primitive Satellite. The two PS satellites would be simple spheres massing and equipped solely with a radio antenna. The project was approved by the government on 25 January 1957. The choice to launch these two instead of waiting for the more advanced Object D (which would eventually become Sputnik 3) to be finished was largely motivated by the desire to launch a satellite to orbit before the US. The first of these satellites, Sputnik 1 (PS-1), was successfully launched 4 October 1957, and became the world's first artificial satellite.
+
+Immediately following the launch, Nikita Khrushchev asked Sergei Korolev to prepare a Sputnik 2 in time for the 40th anniversary of the Bolshevik revolution in early November, just three weeks later. Details of the conversation vary, but it appears likely that Korolev suggested the idea of flying a dog, while Khrushchev emphasised the importance of the date.
+
+With only three weeks to prepare, OKB-1 had to scramble to assemble a new satellite. While PS-2 had been built, it was just a ball, identical to PS-1. Fortunately, the R-5A sounding rocket had recently been used to launch a series of suborbital missions carrying dogs as payloads. Korolev simply requisitioned a payload container used for these missions and had it installed in the upper stage of its R-7 launching rocket directly beneath the PS-2 sphere. Upon reaching orbit, the final stage or Blok A would detach from the satellite. No provision was made for the dog's recovery.
+
+==Spacecraft==
+
+Sputnik 2 was a cone-shaped capsule with a base diameter of that weighed around , though it was not designed to separate from the rocket core that brought it to orbit, bringing the total mass in orbit to .
+
+===Passenger===
+
+Laika ("Barker"), formerly Kudryavka (Little Curly), was the part-Samoyed terrier chosen to fly in Sputnik 2. Due to a shortness in the time frame, the candidate dog could not be trained for the mission. Again, OKB-1 borrowed from the sounding rocket program, choosing from ten candidates provided by the Air Force Institute of Aviation Medicine that were already trained for suborbital missions. Laika was chosen primarily because of her even temperament. Her backup was Albina, who had flown on two R-1E missions in June 1956. Laika weighed about .
+
+Both Laika and Albina had telemetry wires surgically attached to them before the flight to monitor respiration frequency, pulse, and blood pressure.
+
+The pressurized cabin on Sputnik 2 was padded and allowed enough room for Laika to lie down or stand. An air regeneration system provided oxygen; food and water were dispensed in a gelatinized form. Laika was chained in place and fitted with a harness, a bag to collect waste, and electrodes to monitor vital signs. A television camera was mounted in the passenger compartment to observe Laika. The camera could transmit 100-line video frames at 10 frames/second.
+
+===Experiments===
+
+Sputnik 2 was the first platform capable of making scientific measurements in orbit. This was potentially as significant as the biological payload. The Earth's atmosphere blocks the Sun's X-ray and ultraviolet output from ground observation. Moreover, solar output is unpredictable and fluctuates rapidly, making sub-orbital sounding rockets inadequate for the observation task. Thus a satellite is required for long-term, continuous study of the complete solar spectrum.
+
+Accordingly, Sputnik 2 carried two spectrophotometers, one for measuring solar ultraviolet rays and one for measuring X-rays. These instruments were provided by Professor Sergei Mandelstam of the Lebedev Institute of Physics and installed in the nose cone above the spherical PS. In addition, Sergei Vernov, who had completed a cosmic ray detector (using Geiger counters) for Object D, demanded that the instrument his Moscow University team (including Naum Grigoriev, Alexander Chudakov, and Yuri Logachev) had built also be carried on the flight. Korolev agreed, but as there was no more room on the satellite proper, the instrument was mounted on the Blok A and given its own battery and telemetry frequency.
+
+Engineering and biological data were transmitted using the Tral_D telemetry system, which would transmit data to Earth for 15 minutes of each orbit.
+
+==Launch preparations==
+Sputnik 2's launch vehicle, the R-7 ICBM (also known by the system's GRAU index 8K71) was modified for the PS-2 satellite launch and designated 8K71PS. 8K71PS serial number M1-2PS arrived at the NIIP-5 Test Range, the precursor to the Baikonur Cosmodrome, on 18 October 1957 for final integration of the rocket stages and satellite payload. Laika was put in the payload container mid-day 31 October, and that night, the payload was attached to the rocket. The container was heated via an external tube against the cold temperatures at the launch site.
+
+==Mission==
+thumb|150px|left|USSR 
+
+Sputnik 2 was launched at 02:30:42 UTC on 3 November 1957 from LC-1 of the NIIP-5 Test Range via Sputnik 8K71PS rocket (the same pad and rocket that launched Sputnik 1) The satellite's orbit was with a period of 103.7 minutes. After reaching orbit Sputnik 2's nose cone was jettisoned successfully, but the satellite did not separate from the Blok A. This, along with the loss of some thermal insulation, caused temperatures in the spacecraft to soar.
+
+At peak acceleration, Laika's respiration increased to between three and four times the pre-launch rate. The sensors showed her heart rate was 103 beats/min before launch and increased to 240 beats/min during the early acceleration. After three hours of weightlessness, Laika's pulse rate had settled back to 102 beats/min, three times longer than it had taken during earlier ground tests, an indication of the stress she was under. The early telemetry indicated that Laika was agitated but eating her food. After approximately five to seven hours into the flight, no further signs of life were received from the spacecraft.
+
+The Soviet scientists had planned to euthanise Laika with a serving of poisoned food. For many years, the Soviet Union gave several conflicting statements that she had died either from asphyxia, when the batteries failed, or that she had been euthanised. Many rumours circulated about the exact manner of her death. In 1999, several Russian sources reported that Laika had died when the cabin overheated on the fourth day. In October 2002, Dimitri Malashenkov, one of the scientists behind the Sputnik2 mission, revealed that Laika had died by the fourth circuit of flight from overheating. According to a paper he presented to the World Space Congress in Houston, Texas, "It turned out that it was practically impossible to create a reliable temperature control system in such limited time constraints."
+
+Because of the size of Sputnik 2 and its attached Blok A, the spacecraft was easy to track optically. In its last orbits, the combined body tumbled end over end, flashing brightly before it was incinerated over the north Atlantic after circling the Earth 2,370 times over the course of 162 days. The spacecraft reentered the Earth's atmosphere on 14 April 1958, at approximately 0200 hrs, on a line that stretched from New York to the Amazon. Its track was plotted by British ships and three "Moon Watch Observations", from New York. It was said to be glowing and did not develop a tail until it was at latitudes south of 20° North. Estimates put the average length of the tail at about .
+
+== Results==
+
+===Geopolitical impact===
+Massing , Sputnik 2 marked a dramatic leap in orbital mass over Sputnik 1 as well as the American Vanguard, which had yet to fly. The day after Sputnik 2 went into orbit the Gaither committee met with President Eisenhower to brief him on the current situation, demanding an urgent and more dramatic response than to the smaller Sputnik 1. It was clear now that the Soviets had missiles far superior to any in the American arsenal, a fact whose demonstration by Sputnik 2 was eagerly propounded by Soviet Premier Khrushchev at every opportunity. In the U.S.S.R., just six days after the launch of Sputnik 2, on the 40th anniversary of the October revolution, Khrushchev boasted in a speech “Now our first Sputnik is not lonely in its space travels.” Nevertheless, unlike most of the U.S., President Eisenhower kept calm through the time afterward just as he did after Sputnik 1 was launched. According to one of the president's aides, “The president's burning concern was to keep the country from going hog-wild and from embarking on foolish, costly schemes.”
+
+The mission sparked a debate across the globe on the mistreatment of animals and animal testing in general to advance science. In the United Kingdom, the National Canine Defence League called on all dog owners to observe a minute's silence on each day Laika remained in space, while the Royal Society for the Prevention of Cruelty to Animals (RSPCA) received protests even before Radio Moscow had finished announcing the launch. Animal rights groups at the time called on members of the public to protest at Soviet embassies. Others demonstrated outside the United Nations in New York. Laboratory researchers in the U.S. offered some support for the Soviets, at least before the news of Laika's death.
+
+===Experimental data===
+The cosmic ray detector transmitted for one week, going silent on 9 November when its battery was exhausted. The experiment reported unexpected results the day after launch, noting an increase in high-energy charged particles from a normal 18 pulses/sec to 72 pulses/sec at the highest latitudes of its orbit. Per two articles in the Soviet newspaper Pravda, the particle flux increased with altitude as well. It is likely that Sputnik 2 was detecting the lower levels of the Van Allen Belt when it reached the apogee of its orbit. However, because Sputnik 2 telemetry could only be received when it was flying over the Soviet Union, the data set was insufficient to draw conclusions, particularly as, most of the time, Sputnik 2 traveled below the Belt. Additional observational data had been received by Australian observers when the satellite was overhead, and Soviet scientists asked them for it. The secrecy-minded Soviets were not willing to give the Australians the code that would give them the ability to descramble and use the data themselves. As a result, the Australians declined to turn over their data. Thus, the Soviet Union missed out on its chance to get credit for the scientific discovery, which ultimately went to James Van Allen of the State University of Iowa, whose experiments on Explorer 1 and Explorer 3 first mapped the radiation belts that now bear his name.
+
+As for the ultraviolet and X-ray photometers, they were calibrated such that they were oversaturated by orbital radiation, returning no usable data.
+
+==Surviving examples==
+A USSR-built engineering model of the R-7 Sputnik 8K71PS (Sputnik II) is located at the Cosmosphere space museum in Hutchinson, Kansas, United States. The museum also has a flight-ready backup of the Sputnik 1, as well as replicas of the first two American satellites, Explorer 1 and Vanguard 1.
+
+A replica of Sputnik 2 is located at the Memorial Museum of Cosmonautics in Moscow.
+
+==See also==
+
+* Animals in space
+* Timeline of artificial satellites and space probes
+
+==Footnotes==
+
+==External links==
+
+*[http://www.mentallandscape.com/S_Sputnik.htm Sputnik: 50 Years Ago]
+*[https://www.russianspaceweb.com/sputnik2.html Anatoly Zak on Sputnik-2]
+*[https://www.orbitalfocus.uk/Diaries/Sputnik/Sputnik2.php Sputnik 2 Diary]
+*[https://web.archive.org/web/20250821060318/https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1957-002A NSSDC Master Catalog: Spacecraft Sputnik 2]
+*[https://web.archive.org/web/20060831060945/http://astronautix.com/craft/sputnik2.htm Sputnik 2 at Astronautix]
+
+Category:1957 in the Soviet Union
+Category:1958 in the Soviet Union
+Category:Animal testing in the Soviet Union
+Category:Biosatellites
+Category:Dogs in the Soviet Union
+Category:Earth observation satellites of the Soviet Union
+Category:Soviet inventions
+Category:Spacecraft launched in 1957
+Category:Spacecraft which reentered in 1958
+2
+Category:Successful space missions

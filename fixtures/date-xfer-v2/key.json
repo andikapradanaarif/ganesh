@@ -1,0 +1,214 @@
+{
+ "version": "date-xfer-v2-v1",
+ "scoring": "scoring.v2",
+ "questions": [
+  {
+   "id": "u01",
+   "question": "When was Sputnik 1 launched?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "open-when"
+   ],
+   "required_facts": [
+    {
+     "fact": "4 October 1957",
+     "acceptable": [
+      "sp1-a1#p1"
+     ],
+     "spans": [
+      "4 October 1957"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "u02",
+   "question": "On what exact date was Sputnik 2 launched?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "exact-date"
+   ],
+   "required_facts": [
+    {
+     "fact": "3 November 1957",
+     "acceptable": [
+      "sp2-a1#p1"
+     ],
+     "spans": [
+      "3 November 1957"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "u03",
+   "question": "In what year did Sputnik 2 reenter the atmosphere?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "year-only"
+   ],
+   "required_facts": [
+    {
+     "fact": "14 April 1958",
+     "acceptable": [
+      "sp2-a1#p3"
+     ],
+     "spans": [
+      "14 April 1958"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "u04",
+   "question": "On what date did Sputnik 1 reenter the atmosphere?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "multi-date-passage"
+   ],
+   "required_facts": [
+    {
+     "fact": "4 January 1958",
+     "acceptable": [
+      "sp1-a1#p1"
+     ],
+     "spans": [
+      "4 January 1958"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "u05",
+   "question": "When did the satellite carrying the dog Laika lift off?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "wrong-subject-distractor"
+   ],
+   "required_facts": [
+    {
+     "fact": "3 November 1957",
+     "acceptable": [
+      "sp2-a1#p1"
+     ],
+     "spans": [
+      "3 November 1957"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "u06",
+   "question": "When did Sputnik 1 radio transmissions cease?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "deep"
+   ],
+   "required_facts": [
+    {
+     "fact": "26 October 1957",
+     "acceptable": [
+      "sp1-a1#p36"
+     ],
+     "spans": [
+      "26 October 1957"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "u07",
+   "question": "On what exact date was Sputnik 1 launched, and what type of rocket carried it?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "compound"
+   ],
+   "required_facts": [
+    {
+     "fact": "4 October 1957",
+     "acceptable": [
+      "sp1-a1#p1"
+     ],
+     "spans": [
+      "4 October 1957"
+     ],
+     "answer_polarity": "affirmative"
+    },
+    {
+     "fact": "R-7",
+     "acceptable": [
+      "sp1-a1#p8"
+     ],
+     "spans": [
+      "R-7"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "u08",
+   "question": "What animal did the Sputnik 2 satellite carry?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "non-date"
+   ],
+   "required_facts": [
+    {
+     "fact": "Laika",
+     "acceptable": [
+      "sp2-a1#p3"
+     ],
+     "spans": [
+      "Laika"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "u09",
+   "question": "On what exact day did the Soviet government approve the orbital satellite program?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient"
+   ],
+   "required_facts": [],
+   "unresolved_detail": "approval given at most by month-year or year in source, exact day absent"
+  },
+  {
+   "id": "u10",
+   "question": "On what exact date did Laika land safely back on Earth?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient"
+   ],
+   "required_facts": [],
+   "unresolved_detail": "Laika never returned; no landing event exists in the source"
+  }
+ ]
+}

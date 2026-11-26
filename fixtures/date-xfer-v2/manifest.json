@@ -1,0 +1,45 @@
+{
+ "version": "date-xfer-v2",
+ "created": "2026-11-26",
+ "frame": "frozen transfer group v2: Sputnik 1/2 numeric-sibling articles, unused in any prior packet; predeclared 10-case mix per issue spec",
+ "seed": 0,
+ "exclusions": [],
+ "sampling": "hand-selected public documents",
+ "snapshot_format": "clean plaintext with wiki-style section headings, templates and citations stripped",
+ "articles": [
+  {
+   "article_id": "sp1",
+   "title": "Sputnik 1",
+   "pageid": 28484,
+   "revision": "sp1-a1",
+   "revision_url": "https://en.wikipedia.org/w/index.php?title=Sputnik_1&oldid=1387871662",
+   "publisher": "Wikipedia contributors",
+   "url": "https://en.wikipedia.org/wiki/Sputnik_1",
+   "license": "CC BY-SA 4.0",
+   "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+   "permission": "CC BY-SA 4.0 permits storage and replay with attribution",
+   "retrieved": "2026-11-26",
+   "bytes": 34224,
+   "sha256": "958adbf767b2b260611a46b8785982a3c51d3cd800b0e77317e85dcd4df683ea",
+   "file": "snapshots/sp1.txt",
+   "family": "sp1"
+  },
+  {
+   "article_id": "sp2",
+   "title": "Sputnik 2",
+   "pageid": 81978,
+   "revision": "sp2-a1",
+   "revision_url": "https://en.wikipedia.org/w/index.php?title=Sputnik_2&oldid=1384930248",
+   "publisher": "Wikipedia contributors",
+   "url": "https://en.wikipedia.org/wiki/Sputnik_2",
+   "license": "CC BY-SA 4.0",
+   "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+   "permission": "CC BY-SA 4.0 permits storage and replay with attribution",
+   "retrieved": "2026-11-26",
+   "bytes": 14445,
+   "sha256": "592b7a277bde03871ad4515d5af40295137b8277de59b2bde86ed9d094e6cf2a",
+   "file": "snapshots/sp2.txt",
+   "family": "sp2"
+  }
+ ]
+}
