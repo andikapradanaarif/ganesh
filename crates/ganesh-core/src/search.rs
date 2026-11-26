@@ -59,6 +59,68 @@ fn raw_tokens(text: &str) -> Vec<String> {
     out
 }
 
+fn is_connector(ch: char) -> bool {
+    matches!(ch, '.' | '#' | '+' | '_' | '-')
+}
+
+/// Additional canonical tokens for symbolic or punctuation-bearing
+/// identifiers. The component tokens remain indexed as well; these aliases
+/// make forms such as `C#`, `C Sharp`, `c++`, `Node.js`, and `.NET`
+/// retrievable without depending on one exact surface punctuation style.
+fn identifier_alias_tokens(text: &str) -> Vec<String> {
+    let chars: Vec<char> = text.chars().collect();
+    let mut aliases = Vec::new();
+    let mut i = 0usize;
+    while i < chars.len() {
+        if !(chars[i].is_alphanumeric() || is_connector(chars[i])) {
+            i += 1;
+            continue;
+        }
+        let start = i;
+        while i < chars.len() && (chars[i].is_alphanumeric() || is_connector(chars[i])) {
+            i += 1;
+        }
+        let mut span: String = chars[start..i].iter().collect();
+        while span.ends_with(['.', '_', '-']) {
+            span.pop();
+        }
+        while span.starts_with(['.', '_', '-']) {
+            span.remove(0);
+        }
+        if !span.chars().any(|c| c.is_alphabetic()) || !span.chars().any(is_connector) {
+            continue;
+        }
+        let mut canonical = String::new();
+        for ch in span.chars() {
+            if ch.is_alphanumeric() {
+                canonical.push(ch.to_ascii_lowercase());
+            } else if ch == '#' {
+                canonical.push_str("sharp");
+            } else if ch == '+' {
+                canonical.push_str("plus");
+            }
+        }
+        if canonical.len() >= 2 {
+            aliases.push(canonical);
+        }
+    }
+
+    // Written-out forms separated by spaces: a single letter followed by
+    // "sharp" or by "plus plus" denotes the same symbolic identifier.
+    let toks = raw_tokens(text);
+    for w in toks.windows(2) {
+        if w[0].len() == 1 && w[0].chars().next().is_some_and(|c| c.is_alphabetic()) && w[1] == "sharp" {
+            aliases.push(format!("{}sharp", w[0]));
+        }
+    }
+    for w in toks.windows(3) {
+        if w[0].len() == 1 && w[0].chars().next().is_some_and(|c| c.is_alphabetic()) && w[1] == "plus" && w[2] == "plus" {
+            aliases.push(format!("{}plusplus", w[0]));
+        }
+    }
+    aliases
+}
+
 fn keep_token(t: &str) -> bool {
     (t.len() >= 2 || t.bytes().any(|b| b.is_ascii_digit())) && !STOPWORDS.contains(&t)
 }
@@ -78,6 +140,7 @@ fn stem_token(token: &str) -> String {
 pub fn stemmed_tokens(text: &str) -> Vec<String> {
     raw_tokens(text)
         .into_iter()
+        .chain(identifier_alias_tokens(text))
         .filter(|t| keep_token(t))
         .map(|t| stem_token(&t))
         .collect()
@@ -305,4 +368,30 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
         query: query.to_string(),
         passages: hits,
     }, debug)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn symbolic_identifier_aliases_are_generated_consistently() {
+        for text in ["C#", "c#", "C Sharp", "c sharp"] {
+            assert!(stemmed_tokens(text).contains(&stem_token("csharp")), "{text}");
+        }
+        for text in ["C++", "c++", "C plus plus"] {
+            assert!(stemmed_tokens(text).contains(&stem_token("cplusplus")), "{text}");
+        }
+        assert!(stemmed_tokens("Node.js").contains(&stem_token("nodejs")));
+        assert!(stemmed_tokens(".NET").contains(&stem_token("net")));
+    }
+
+    #[test]
+    fn ordinary_words_and_versions_survive_identifier_aliasing() {
+        let toks = stemmed_tokens("end-user version 1.18");
+        assert!(toks.contains(&stem_token("end")));
+        assert!(toks.contains(&stem_token("user")));
+        assert!(toks.iter().any(|t| t == "1"));
+        assert!(toks.iter().any(|t| t == "18"));
+    }
 }

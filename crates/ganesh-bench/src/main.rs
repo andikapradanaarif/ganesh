@@ -758,11 +758,11 @@ fn probe(questions_path: &str, corpus_dir: &str) {
     store.rebuild_index().expect("rebuild");
     let key_text = std::fs::read_to_string(questions_path).expect("questions");
     let key: KeyFile = serde_json::from_str(&key_text).expect("parse questions");
-    let cfg = RetrievalConfig::default();
+    let cfg = RetrievalConfig { candidate_limit: 20, ..RetrievalConfig::default() };
     println!("id    expected             union  top    terms  top-candidates");
     for q in &key.questions {
         let (_resp, dbg) = search_debug(&store, &q.question, "probe", &cfg);
-        let cands: Vec<String> = dbg.candidates.iter().take(3).map(|(id, s)| format!("{id}({s:.3})")).collect();
+        let cands: Vec<String> = dbg.candidates.iter().map(|(id, s)| format!("{id}({s:.3})")).collect();
         println!("{:<5} {:<20} u:{:.2} iu:{:.2} i2:{:.2}  {}",
             q.id, q.expected_status, dbg.union_coverage,
             dbg.idf_union_coverage, dbg.idf2_union_coverage, cands.join(" "));
