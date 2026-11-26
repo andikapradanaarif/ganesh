@@ -1,0 +1,45 @@
+{
+ "version": "rr-xfer",
+ "created": "2026-11-26",
+ "frame": "frozen reranker transfer packet: Brooklyn/Manhattan Bridge sibling pair",
+ "seed": 0,
+ "exclusions": [],
+ "sampling": "hand-selected public documents",
+ "snapshot_format": "clean plaintext",
+ "articles": [
+  {
+   "article_id": "bb",
+   "title": "Brooklyn Bridge",
+   "pageid": 47742,
+   "revision": "bb-a1",
+   "revision_url": "https://en.wikipedia.org/w/index.php?title=Brooklyn_Bridge&oldid=1387385570",
+   "publisher": "Wikipedia contributors",
+   "url": "https://en.wikipedia.org/wiki/Brooklyn_Bridge",
+   "license": "CC BY-SA 4.0",
+   "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+   "permission": "CC BY-SA 4.0 permits storage and replay with attribution",
+   "retrieved": "2026-11-26",
+   "bytes": 77050,
+   "sha256": "d05f921825d889dfa2f7e3e81b363e4129295fa76e5f6ba323eeb0895f7eab47",
+   "file": "snapshots/bb.txt",
+   "family": "bb"
+  },
+  {
+   "article_id": "mb",
+   "title": "Manhattan Bridge",
+   "pageid": 384805,
+   "revision": "mb-a1",
+   "revision_url": "https://en.wikipedia.org/w/index.php?title=Manhattan_Bridge&oldid=1384235448",
+   "publisher": "Wikipedia contributors",
+   "url": "https://en.wikipedia.org/wiki/Manhattan_Bridge",
+   "license": "CC BY-SA 4.0",
+   "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+   "permission": "CC BY-SA 4.0 permits storage and replay with attribution",
+   "retrieved": "2026-11-26",
+   "bytes": 66461,
+   "sha256": "8411cfc059f0e72a58694dffec672d2601887a97a5911091b3ef40d61e9dbfd1",
+   "file": "snapshots/mb.txt",
+   "family": "mb"
+  }
+ ]
+}
