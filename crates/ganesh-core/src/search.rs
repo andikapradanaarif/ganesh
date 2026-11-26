@@ -834,7 +834,89 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
         action_check: cfg.action_check,
     };
     let trace = accept::decide(&input);
-    let abstain = trace.decision != "ok";
+    // Precision-aware factual acceptance (issue #187). For questions inside
+    // the declared factual scope — date-precision questions and quantity
+    // questions — the coverage decision is replaced by evidence verification:
+    // a selected passage must tie the requested value, at the required
+    // precision, to the queried event/property and subject in one sentence.
+    // This both withholds unsupported answers (right topic, missing detail)
+    // and delivers supported answers the lexical-coverage layer rejected.
+    let mut factual_override: Option<bool> = None;
+    let mut factual_note = String::new();
+    if let Some(prec) = date_activation(query) {
+        let mut subject_vocab2: std::collections::BTreeSet<String> = std::collections::BTreeSet::new();
+        let mut all_title_tokens2: std::collections::BTreeSet<String> = std::collections::BTreeSet::new();
+        if let Ok(mut stmt) = store.conn.prepare("SELECT article_id, title FROM sources") {
+            if let Ok(source_rows) = stmt.query_map([], |row| Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?))) {
+                for row in source_rows.flatten() {
+                    let (aid, title) = row;
+                    for tok in title.to_lowercase().split(|c: char| !c.is_ascii_alphanumeric()) {
+                        if !tok.is_empty() { all_title_tokens2.insert(tok.to_string()); }
+                    }
+                    if mentioned_subjects.contains(&aid) {
+                        for t in title_subject_terms(&title) { subject_vocab2.insert(t); }
+                    }
+                }
+            }
+        }
+        let ev_terms: Vec<String> = terms.iter().filter(|t| !subject_vocab2.contains(*t)).cloned().collect();
+        let subj_toks: Vec<String> = query.to_lowercase()
+            .split(|c: char| !c.is_ascii_alphanumeric())
+            .filter(|w| !w.is_empty() && all_title_tokens2.contains(*w))
+            .map(|w| w.to_string())
+            .collect();
+        let mut best = 0.0f64;
+        for (pid, text, _section, _tokens) in &selected_full {
+            let sc = passage_date_score(text, prec, &ev_terms, &subj_toks, &|t| weight_of(t));
+            if sc > best { best = sc; }
+            let _ = pid;
+        }
+        factual_override = Some(best > 0.0);
+        factual_note = format!("factual-date precision={:?} best-score={:.2}", prec, best);
+    } else if quantity {
+        // Quantity verification: some selected sentence must contain a numeric
+        // token together with at least one non-subject property term.
+        let mut subject_vocab3: std::collections::BTreeSet<String> = std::collections::BTreeSet::new();
+        if let Ok(mut stmt) = store.conn.prepare("SELECT article_id, title FROM sources") {
+            if let Ok(source_rows) = stmt.query_map([], |row| Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?))) {
+                for row in source_rows.flatten() {
+                    let (aid, title) = row;
+                    if mentioned_subjects.contains(&aid) {
+                        for t in title_subject_terms(&title) { subject_vocab3.insert(t); }
+                    }
+                }
+            }
+        }
+        let prop_terms: Vec<String> = terms.iter()
+            .filter(|t| !subject_vocab3.contains(*t) && !exact_number_unit(t) && !numeric_token(t))
+            .cloned().collect();
+        let mut verified = false;
+        for (_pid, text, _section, _tokens) in &selected_full {
+            for sent in text.split(|c| c == '.' || c == '\n') {
+                let stoks = stemmed_tokens(sent);
+                let has_num = stoks.iter().any(|t| numeric_token(t));
+                let props = prop_terms.iter().filter(|t| stoks.iter().any(|x| x == *t)).count();
+                if has_num && props >= 1 {
+                    verified = true;
+                    break;
+                }
+            }
+            if verified { break; }
+        }
+        factual_override = Some(verified);
+        factual_note = format!("factual-quantity verified={}", verified);
+    }
+    let abstain = match factual_override {
+        Some(pass) => {
+            if pass && trace.decision != "ok" {
+                debug.trace.reasons.push(format!("{} | override: evidence verified, delivering despite coverage rejection", factual_note));
+            } else if !pass && trace.decision == "ok" {
+                debug.trace.reasons.push(format!("{} | override: required precision/value absent, withholding", factual_note));
+            }
+            !pass
+        }
+        None => trace.decision != "ok",
+    };
     debug.trace = trace;
     if abstain {
         return (empty("insufficient_context"), debug);
