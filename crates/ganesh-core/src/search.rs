@@ -403,6 +403,40 @@ pub fn passage_date_score(
         .fold(0.0, f64::max)
 }
 
+
+/// Best-sentence concentration: the maximum IDF-weighted count of distinct
+/// non-subject query terms co-occurring in a single sentence of the body,
+/// with IDF-weighted subject binding. Measures how directly one sentence in
+/// the passage answers the question, rather than how often the passage echoes
+/// the topic.
+pub fn sentence_concentration_score(
+    body: &str,
+    event_terms: &[String],
+    subject_tokens: &[String],
+    weight_of: &dyn Fn(&str) -> f64,
+) -> f64 {
+    body.split(|c| c == '.' || c == '\n')
+        .map(|sent| {
+            let toks = stemmed_tokens(sent);
+            let ev: f64 = event_terms
+                .iter()
+                .filter(|t| toks.iter().any(|x| x == *t))
+                .map(|t| weight_of(t))
+                .sum();
+            if ev <= 0.0 {
+                return 0.0;
+            }
+            let low = sent.to_lowercase();
+            let subj: f64 = subject_tokens
+                .iter()
+                .filter(|t| low.split(|c: char| !c.is_ascii_alphanumeric()).any(|w| w == t.as_str()))
+                .map(|t| weight_of(t))
+                .sum();
+            ev * (1.0 + subj)
+        })
+        .fold(0.0, f64::max)
+}
+
 pub fn search(store: &Store, query: &str, caller: &str, cfg: &RetrievalConfig) -> SearchResponse {
     search_debug(store, query, caller, cfg).0
 }
@@ -603,6 +637,59 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
             }
         }
         promoted = best.map(|(i, _)| i);
+    } else {
+        // Best-sentence concentration reranker for ordinary factual
+        // wh-questions (issue #191): where/what/who/how questions that are not
+        // date-activated. The candidate whose single best sentence most
+        // directly answers the question is promoted with the same slot rules
+        // and compound protection as the date path. Non-wh queries and queries
+        // without a positive concentration score fall back to exact #178/#188.
+        let qlc2 = query.to_lowercase();
+        let wh = qlc2.starts_with("where") || qlc2.starts_with("what") || qlc2.starts_with("who")
+            || qlc2.starts_with("which") || qlc2.starts_with("how") || qlc2.contains("when")
+            || qlc2.contains("where") || qlc2.contains(" what ") || qlc2.contains(" who ");
+        if wh {
+            let mut subject_vocab4: std::collections::BTreeSet<String> = std::collections::BTreeSet::new();
+            let mut all_title_tokens4: std::collections::BTreeSet<String> = std::collections::BTreeSet::new();
+            if let Ok(mut stmt) = store.conn.prepare("SELECT article_id, title FROM sources") {
+                if let Ok(source_rows) = stmt.query_map([], |row| Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?))) {
+                    for row in source_rows.flatten() {
+                        let (article_id, title) = row;
+                        for tok in title.to_lowercase().split(|c: char| !c.is_ascii_alphanumeric()) {
+                            if !tok.is_empty() { all_title_tokens4.insert(tok.to_string()); }
+                        }
+                        if mentioned_subjects.contains(&article_id) {
+                            for t in title_subject_terms(&title) { subject_vocab4.insert(t); }
+                        }
+                    }
+                }
+            }
+            let ev_terms: Vec<String> = terms.iter().filter(|t| !subject_vocab4.contains(*t)).cloned().collect();
+            let subj_toks: Vec<String> = query.to_lowercase()
+                .split(|c: char| !c.is_ascii_alphanumeric())
+                .filter(|w| !w.is_empty() && all_title_tokens4.contains(*w))
+                .map(|w| w.to_string())
+                .collect();
+            for (idx, cand) in rows.iter().enumerate() {
+                let body: String = store
+                    .conn
+                    .query_row(
+                        "SELECT text FROM passages WHERE id = ?1",
+                        rusqlite::params![cand.passage_id],
+                        |row| row.get(0),
+                    )
+                    .unwrap_or_default();
+                date_scores[idx] = sentence_concentration_score(&body, &ev_terms, &subj_toks, &|t| weight_of(t));
+            }
+            let mut best: Option<(usize, f64)> = None;
+            for &i in &eligible {
+                let sc = date_scores[i];
+                if sc > 0.0 && best.map(|(_, b)| sc > b).unwrap_or(true) {
+                    best = Some((i, sc));
+                }
+            }
+            promoted = best.map(|(i, _)| i);
+        }
     }
 
     // Complementary selection: keep the best BM25 candidate, then add the
