@@ -403,6 +403,17 @@ pub fn passage_date_score(
         .fold(0.0, f64::max)
 }
 
+
+/// Whitespace-token Jaccard overlap between two token lists (predeclared
+/// diversity threshold 0.7 for the cross-encoder selection rule).
+fn token_jaccard(a: &[String], b: &[String]) -> f64 {
+    let sa: std::collections::BTreeSet<&String> = a.iter().collect();
+    let sb: std::collections::BTreeSet<&String> = b.iter().collect();
+    let inter = sa.intersection(&sb).count() as f64;
+    let union = sa.union(&sb).count() as f64;
+    if union == 0.0 { 0.0 } else { inter / union }
+}
+
 pub fn search(store: &Store, query: &str, caller: &str, cfg: &RetrievalConfig) -> SearchResponse {
     search_debug(store, query, caller, cfg).0
 }
@@ -605,13 +616,66 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
         promoted = best.map(|(i, _)| i);
     }
 
+    // Cross-encoder reranking (predeclared, frozen before outcomes): when the
+    // local model is present, every eligible candidate is scored as a
+    // question-passage pair and selection order comes from those scores alone.
+    // bm25 ordering, the #188 date promotion, and the marginal-coverage walk
+    // are bypassed for selection; candidate generation, eligibility,
+    // acceptance, and the three-passage limit are unchanged. Ties keep the
+    // better bm25 rank via stable sort over eligible order.
+    let mut rerank_order: Option<Vec<usize>> = None;
+    if crate::rerank::available() {
+        let mut scored: Vec<(usize, f32)> = Vec::new();
+        for &i in &eligible {
+            let body: String = store
+                .conn
+                .query_row(
+                    "SELECT text FROM passages WHERE id = ?1",
+                    rusqlite::params![rows[i].passage_id],
+                    |row| row.get(0),
+                )
+                .unwrap_or_default();
+            let sc = crate::rerank::score_pair(query, &body).unwrap_or(f32::MIN);
+            scored.push((i, sc));
+        }
+        scored.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
+        rerank_order = Some(scored.into_iter().map(|(i, _)| i).collect());
+    }
+
     // Complementary selection: keep the best BM25 candidate, then add the
     // candidate with the largest weighted marginal coverage of query terms not
     // already covered. When no candidate adds a term, fill by original rank.
     // Final display order remains the original BM25 order of the selected set.
     let want = cfg.top_k.min(eligible.len());
     let mut selected: Vec<usize> = Vec::new();
-    if want > 0 {
+    if let Some(order) = &rerank_order {
+        // Greedy selection in cross-encoder order, skipping a candidate whose
+        // token Jaccard overlap with any already-selected passage is >= 0.7.
+        // This is the predeclared compound-preservation rule: near-duplicate
+        // statements of one fact cannot starve a complementary passage.
+        for &idx in order.iter() {
+            if selected.len() >= want {
+                break;
+            }
+            let dup = selected
+                .iter()
+                .any(|&sel| token_jaccard(&candidate_texts[sel].1, &candidate_texts[idx].1) >= 0.7);
+            if !dup {
+                selected.push(idx);
+            }
+        }
+        // Diversity-filtered shortfall refills in reranker order so the
+        // three-passage limit is always exercised identically across arms.
+        for &idx in order.iter() {
+            if selected.len() >= want {
+                break;
+            }
+            if !selected.contains(&idx) {
+                selected.push(idx);
+            }
+        }
+        selected.sort_unstable();
+    } else if want > 0 {
         match promoted {
             Some(idx) if date_scores[eligible[0]] <= 0.0 && idx != eligible[0] => {
                 selected.push(idx);
