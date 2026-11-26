@@ -1,0 +1,460 @@
+Lua  is a lightweight, high-level, multi-paradigm programming language designed mainly for embedded use in applications. Lua is cross-platform software, since the interpreter of compiled bytecode is written in ANSI C, and Lua has a relatively simple C application programming interface (API) to embed it into applications.
+
+Lua originated in 1993 as a language for extending software applications to meet the increasing demand for customization at the time. It provided the basic facilities of most procedural programming languages, but more complicated or domain-specific features were not included; rather, it included mechanisms for extending the language, allowing programmers to implement such features. As Lua was intended to be a general embeddable extension language, the designers of Lua focused on improving its speed, portability, extensibility and ease-of-use in development.
+
+== History ==
+Lua was created in 1993 by Roberto Ierusalimschy, Luiz Henrique de Figueiredo, and Waldemar Celes, members of the Computer Graphics Technology Group (Tecgraf) at the Pontifical Catholic University of Rio de Janeiro, in Brazil.
+
+From 1977 until 1992, Brazil had a policy of strong trade barriers (called a market reserve) for computer hardware and software, believing that Brazil could and should produce its own hardware and software. In that climate, Tecgraf's clients could not afford, either politically or financially, to buy customized software from abroad; under the market reserve, clients would have to go through a complex bureaucratic process to prove their needs couldn't be met by Brazilian companies. Those reasons led Tecgraf to implement the basic tools it needed from scratch.
+
+Lua's predecessors were the data-description and configuration languages Simple Object Language (SOL) and Data-Entry Language (DEL). They had been independently developed at Tecgraf in 1992–1993 to add some flexibility into two different projects (both were interactive graphical programs for engineering applications at Petrobras company). There was a lack of any flow-control structures in SOL and DEL, and Petrobras felt a growing need to add full programming power to them.
+
+In The Evolution of Lua, the language's authors wrote:
+
+Lua 1.0 was designed in such a way that its object constructors, being then slightly different from the current light and flexible style, incorporated the data-description syntax of SOL (hence the name Lua: in Portuguese, Sol means "Sun", Lua means "Moon"). Lua syntax for control structures was mostly borrowed from Modula (if, while, repeat/until), but also had taken influence from CLU (multiple assignments and multiple returns from function calls, as a simpler alternative to reference parameters or explicit pointers), C++ ("neat idea of allowing a local variable to be declared only where we need it"), SNOBOL and AWK (associative arrays). In an article published in Dr. Dobb's Journal, Lua's creators also state that LISP and Scheme with their single, ubiquitous data-structure mechanism (the list) were a major influence on their decision to develop the table as the primary data structure of Lua.
+
+Lua semantics have been increasingly influenced by Scheme over time, especially with the introduction of anonymous functions and full lexical scoping. Several features were added in new Lua versions.
+
+Versions of Lua before version 5.0 were released under a license similar to a BSD license. From version 5.0 onward, Lua has been licensed under an MIT License. Both are permissive software licenses for free software and are almost identical.
+
+== Features ==
+Lua is commonly described as a "multi-paradigm" language, providing a small set of general features that can be extended to fit different problem types. Lua does not contain explicit support for inheritance, but allows it to be implemented with metatables. Similarly, Lua allows programmers to implement namespaces, classes and other related features using its single table implementation; first-class functions allow the employment of many techniques from functional programming and full lexical scoping allows fine-grained information hiding to enforce the principle of least privilege.
+
+In general, Lua strives to provide simple, flexible meta-features that can be extended as needed, rather than supply a feature-set specific to one programming paradigm. As a result, the base language is light; the full reference interpreter is only about 293&nbsp;kB compiled and easily adaptable to a broad range of applications.
+
+As a dynamically typed language intended for use as an extension language or scripting language, Lua is compact enough to fit on a variety of host platforms. It supports only a small number of atomic data structures such as Boolean values, numbers (double-precision floating point and 64-bit integers by default) and strings. Typical data structures such as arrays, sets, lists and records can be represented using Lua's single native data structure, the table, which is essentially a heterogeneous associative array.
+
+Lua implements a small set of advanced features such as first-class functions, garbage collection, closures, proper tail calls, coercion (automatic conversion between string and number values at run time), coroutines (cooperative multitasking) and dynamic module loading.
+
+=== Syntax ===
+The classic "Hello, world!" program can be written as follows, with or without parentheses:
+
+print("Hello, world!")
+
+print "Hello, world!"
+
+The declaration of a variable, without a value.
+
+local variable
+
+The declaration of a variable with a value of 1000 (one thousand)
+
+local students = 1000
+
+A comment in Lua starts with a double-hyphen and runs to the end of the line, similar to Ada, Eiffel, Haskell, SQL and VHDL. Multi-line strings and comments are marked with double square brackets.
+
+-- Single line comment
+--
+Multi-line comment
+
+The factorial function is implemented in this example:
+
+function factorial(n)
+  local x = 1
+  for i = 2, n do
+    x = x * i
+  end
+  return x
+end
+
+=== Control flow ===
+Lua has one type of conditional test: if then end with optional else and elseif then execution control constructs.
+
+The generic if then end statement requires all three keywords:
+
+if condition then
+	--statement body
+end
+
+An example of an if statement
+
+if x ~= 10 then
+	print(x)
+end
+
+The else keyword may be added with an accompanying statement block to control execution when the if condition evaluates to false:
+
+if condition then
+	--statement body
+else
+	--statement body
+end
+
+An example of an if else statement
+
+if x == 10 then
+	print(10)
+else
+	print(x)
+end
+
+Execution may also be controlled according to multiple conditions using the elseif then keywords:
+
+if condition then
+	--statement body
+elseif condition then
+	--statement body
+else -- optional
+	--optional default statement body
+end
+
+An example of an if elseif else statement
+
+if x == y then
+	print("x = y")
+elseif x == z then
+	print("x = z")
+else -- optional
+	print("x does not equal any other variable")
+end
+
+Lua has four types of conditional loops: the while loop, the repeat loop (similar to a do while loop), the numeric for loop and the generic for loop.
+
+--condition = true
+
+while condition do
+  --statements
+end
+
+repeat
+  --statements
+until condition
+
+for i = first, last, delta do  --delta may be negative, allowing the for loop to count down or up
+  --statements
+  --example: print(i)
+end
+
+This generic for loop would iterate over the table _G using the standard iterator function pairs, until it returns nil:
+
+for key, value in pairs(_G) do
+  print(key, value)
+end
+
+Loops can also be nested (put inside of other loops).
+
+local grid = {
+  { 11, 12, 13 },
+  { 21, 22, 23 },
+  { 31, 32, 33 }
+}
+
+for y, row in pairs(grid) do
+  for x, value in pairs(row) do
+    print(x, y, value)
+  end
+end
+
+=== Functions ===
+Lua's treatment of functions as first-class values is shown in the following example, where the print function's behavior is modified:
+
+do
+  local oldprint = print
+  -- Store current print function as oldprint
+  function print(s)
+    -- Redefine print function. The usual print function can still be used
+      through oldprint. The new one has only one argument.
+    oldprint(s == "foo" and "bar" or s)
+  end
+end
+
+Any future calls to print will now be routed through the new function, and because of Lua's lexical scoping, the old print function will only be accessible by the new, modified print.
+
+Lua also supports closures, as demonstrated below:
+
+function addto(x)
+  -- Return a new function that adds x to the argument
+  return function(y)
+    -- When we refer to the variable x, which is outside the current
+      scope and whose lifetime would be shorter than that of this anonymous
+      function, Lua creates a closure.
+    return x + y
+  end
+end
+fourplus = addto(4)
+print(fourplus(3)) -- Prints 7
+
+--This can also be achieved by calling the function in the following way:
+print(addto(4)(3))
+-- This is because we are calling the returned function from 'addto(4)' with the argument '3' directly.
+  This also helps to reduce data cost and up performance if being called iteratively.
+
+A new closure for the variable x is created every time addto is called, so that each new anonymous function returned will always access its own x parameter. The closure is managed by Lua's garbage collector, just like any other object.
+
+=== Tables ===
+Tables are the most important data structures (and, by design, the only built-in composite data type) in Lua and are the foundation of all user-created types. They are associative arrays with addition of automatic numeric key and special syntax.
+
+A table is a set of key and data pairs, where the data is referenced by key; in other words, it is a hashed heterogeneous associative array.
+
+Tables are created using the {} constructor syntax.
+
+a_table = {} -- Creates a new, empty table
+
+Tables are always passed by reference (see Call by sharing).
+
+A key (index) can be any value except nil and NaN, including functions.
+
+a_table = {x = 10}  -- Creates a new table, with one entry mapping "x" to the number 10.
+print(a_table["x"]) -- Prints the value associated with the string key, in this case 10.
+b_table = a_table
+b_table["x"] = 20   -- The value in the table has been changed to 20.
+print(b_table["x"]) -- Prints 20.
+print(a_table["x"]) -- Also prints 20, because a_table and b_table both refer to the same table.
+
+A table is often used as structure (or record) by using strings as keys. Because such use is very common, Lua features a special syntax for accessing such fields.
+
+point = { x = 10, y = 20 }   -- Create new table
+print(point["x"])            -- Prints 10
+print(point.x)               -- Has exactly the same meaning as line above. The easier-to-read dot notation is just syntactic sugar.
+
+By using a table to store related functions, it can act as a namespace.
+
+Point = {}
+
+Point.new = function(x, y)
+  return {x = x, y = y}  --  return {["x"] = x, ["y"] = y}
+end
+
+Point.set_x = function(point, x)
+  point.x = x  --  point["x"] = x;
+end
+
+Tables are automatically assigned a numerical key, enabling them to be used as an array data type. The first automatic index is 1 rather than 0 as it is for many other programming languages (though an explicit index of 0 is allowed).
+
+A numeric key 1 is distinct from a string key "1".
+
+array = { "a", "b", "c", "d" }   -- Indices are assigned automatically.
+print(array[2])                  -- Prints "b". Automatic indexing in Lua starts at 1.
+print(#array)                    -- Prints 4.  # is the length operator for tables and strings.
+array[0] = "z"                   -- Zero is a legal index.
+print(#array)                    -- Still prints 4, as Lua arrays are 1-based.
+
+The length of a table t is defined to be any integer index n such that t[n] is not nil and t[n+1] is nil; moreover, if t[1] is nil, n can be zero. For a regular array, with non-nil values from 1 to a given n, its length is exactly that n, the index of its last value. If the array has "holes" (that is, nil values between other non-nil values), then #t can be any of the indices that directly precedes a nil value (that is, it may consider any such nil value as the end of the array).
+
+ExampleTable =
+{
+  {1, 2, 3, 4},
+  {5, 6, 7, 8}
+}
+print(ExampleTable[1][3]) -- Prints "3"
+print(ExampleTable[2][4]) -- Prints "8"
+
+A table can be an array of objects.
+
+function Point(x, y)        -- "Point" object constructor
+  return { x = x, y = y }   -- Creates and returns a new object (table)
+end
+array = { Point(10, 20), Point(30, 40), Point(50, 60) }   -- Creates array of points
+                        -- array = { { x = 10, y = 20 }, { x = 30, y = 40 }, { x = 50, y = 60 } };
+print(array[2].y)                                         -- Prints 40
+
+Using a hash map to emulate an array is normally slower than using an actual array; however, Lua tables are optimized for use as arrays to help avoid this issue.
+
+=== Metatables ===
+Extensible semantics is a key feature of Lua, and the metatable allows powerful customization of tables. The following example demonstrates an "infinite" table. For any n, fibs[n] will give the n-th Fibonacci number using dynamic programming and memoization.
+
+fibs = { 1, 1 }                                -- Initial values for fibs[1] and fibs[2].
+setmetatable(fibs, {
+  __index = function(values, n)                --__index is a function predefined by Lua, 
+                                                   it is called if key "n" does not exist.
+    values[n] = values[n - 1] + values[n - 2]  -- Calculate and memoize fibs[n].
+    return values[n]
+  end
+})
+
+=== Object-oriented programming ===
+Although Lua does not have a built-in concept of classes, object-oriented programming can be emulated using functions and tables. An object is formed by putting methods and fields in a table. Inheritance (both single and multiple) can be implemented with metatables, delegating nonexistent methods and fields to a parent object.
+
+There is no such concept as "class" with these techniques; rather, prototypes are used, similar to Self or JavaScript. New objects are created either with a factory method (that constructs new objects from scratch) or by cloning an existing object.
+
+Creating a basic vector object:
+
+local Vector = {}
+local VectorMeta = { __index = Vector}
+
+function Vector.new(x, y, z)    -- The constructor
+  return setmetatable({x = x, y = y, z = z}, VectorMeta)
+end
+
+function Vector.magnitude(self)     -- Another method
+  return math.sqrt(self.x^2 + self.y^2 + self.z^2)
+end
+
+local vec = Vector.new(0, 1, 0) -- Create a vector
+print(vec.magnitude(vec))       -- Call a method (output: 1)
+print(vec.x)                    -- Access a member variable (output: 0)
+
+Here,  tells Lua to look for an element in the  table if it is not present in the  table. , which is equivalent to , first looks in the  table for the  element. The  table does not have a  element, but its metatable delegates to the  table for the  element when it's not found in the  table.
+
+Lua provides some syntactic sugar to facilitate object orientation. To declare member functions inside a prototype table, one can use , which is equivalent to . Calling class methods also makes use of the colon:  is equivalent to .
+
+That in mind, here is a corresponding class with  syntactic sugar:
+
+local Vector = {}
+Vector.__index = Vector
+
+function Vector:new(x, y, z)    -- The constructor
+  -- Since the function definition uses a colon, 
+  -- its first argument is "self" which refers
+  -- to "Vector"
+  return setmetatable({x = x, y = y, z = z}, self)
+end
+
+function Vector:magnitude()     -- Another method
+  -- Reference the implicit object using self
+  return math.sqrt(self.x^2 + self.y^2 + self.z^2)
+end
+
+local vec = Vector:new(0, 1, 0) -- Create a vector
+print(vec:magnitude())          -- Call a method (output: 1)
+print(vec.x)                    -- Access a member variable (output: 0)
+
+==== Inheritance ====
+It is possible to use metatables to mimic the behavior of class inheritance in Lua. In this example, we allow vectors to have their values multiplied by a constant in a derived class.
+
+local Vector = {}
+Vector.__index = Vector
+
+function Vector:new(x, y, z)    -- The constructor
+  -- Here, self refers to whatever class's "new"
+  -- method we call.  In a derived class, self will
+  -- be the derived class; in the Vector class, self
+  -- will be Vector
+  return setmetatable({x = x, y = y, z = z}, self)
+end
+
+function Vector:magnitude()     -- Another method
+  -- Reference the implicit object using self
+  return math.sqrt(self.x^2 + self.y^2 + self.z^2)
+end
+
+-- Example of pseudo class inheritance
+local VectorMult = {}
+VectorMult.__index = VectorMult
+setmetatable(VectorMult, Vector) -- Make VectorMult a child of Vector
+
+function VectorMult:multiply(value) 
+  self.x = self.x * value
+  self.y = self.y * value
+  self.z = self.z * value
+  return self
+end
+
+local vec = VectorMult:new(0, 1, 0) -- Create a vector
+print(vec:magnitude())          -- Call a method (output: 1)
+print(vec.y)                    -- Access a member variable (output: 1)
+vec:multiply(2)                 -- Multiply all components of vector by 2
+print(vec.y)                    -- Access member again (output: 2)
+
+It is also possible to implement multiple inheritance;  can either be a function or a table. Operator overloading can also be done; Lua metatables can have elements such as ,  and so on.
+
+== Implementation ==
+Lua programs are not interpreted directly from the textual Lua file, but are compiled into bytecode, which is then run on the Lua virtual machine (VM). The compiling process is typically invisible to the user and is performed during run-time, especially when a just-in-time compilation (JIT) compiler is used, but it can be done offline to increase loading performance or reduce the memory footprint of the host environment by leaving out the compiler. Lua bytecode can also be produced and executed from within Lua, using the dump function from the string library and the load/loadstring/loadfile functions. Lua version 5.5.0 is implemented in approximately 32,000 lines of C code.
+
+Like most CPUs, and unlike most virtual machines (which are stack-based), the Lua VM is register-based, and therefore more closely resembles most hardware design. The register architecture both avoids excessive copying of values, and reduces the total number of instructions per function. The virtual machine of Lua 5 is one of the first register-based pure VMs to have a wide use. Parrot and Android's Dalvik are two other well-known register-based VMs. PCScheme's VM was also register-based.
+
+This example is the bytecode listing of the factorial function defined above (as shown by the luac 5.1 compiler):
+
+ function  (9 instructions, 36 bytes at 0x8063c60)
+ 1 param, 6 slots, 0 upvalues, 6 locals, 2 constants, 0 functions
+ 	1	[2]	LOADK    	1 -1	; 1
+ 	2	[3]	LOADK    	2 -2	; 2
+ 	3	[3]	MOVE     	3 0
+ 	4	[3]	LOADK    	4 -1	; 1
+ 	5	[3]	FORPREP  	2 1	; to 7
+ 	6	[4]	MUL      	1 1 5
+ 	7	[3]	FORLOOP  	2 -2	; to 6
+ 	8	[6]	RETURN   	1 2
+ 	9	[7]	RETURN   	0 1
+
+== C API ==
+Lua is intended to be embedded into other applications, and provides a C API for this purpose. The API is divided into two parts: the Lua core and the Lua auxiliary library. The Lua API's design eliminates the need for manual reference counting (management) in C code, unlike Python's API. The API, like the language, is minimalist. Advanced functions are provided by the auxiliary library, which consists largely of preprocessor macros which assist with complex table operations.
+
+The Lua C API is stack based. Lua provides functions to push and pop most simple C data types (integers, floats, etc.) to and from the stack, and functions to manipulate tables through the stack. The Lua stack is somewhat different from a traditional stack; the stack can be indexed directly, for example. Negative indices indicate offsets from the top of the stack. For example, −1 is the top (most recently pushed value), while positive indices indicate offsets from the bottom (oldest value). Marshalling data between C and Lua functions is also done using the stack. To call a Lua function, arguments are pushed onto the stack, and then the lua_call is used to call the actual function. When writing a C function to be directly called from Lua, the arguments are read from the stack.
+
+Here is an example of calling a Lua function from C:
+
+#include 
+#include  // Lua main library (lua_*)
+#include  // Lua auxiliary library (luaL_*)
+
+int main(void)
+{
+    // create a Lua state
+    lua_State *L = luaL_newstate();
+
+    // load and execute a string
+    if (luaL_dostring(L, "function foo (x,y) return x+y end")) {
+        lua_close(L);
+        return -1;
+    }
+
+    // push value of global "foo" (the function defined above)
+    // to the stack, followed by integers 5 and 3
+    lua_getglobal(L, "foo");
+    lua_pushinteger(L, 5);
+    lua_pushinteger(L, 3);
+    lua_call(L, 2, 1); // call a function with two arguments and one return value
+    printf("Result: %d\n", lua_tointeger(L, -1)); // print integer value of item at stack top
+    lua_pop(L, 1); // return stack to original state
+    lua_close(L); // close Lua state
+    return 0;
+}
+
+Running this example gives:
+
+$ cc -o example example.c -llua
+$ ./example
+Result: 8
+
+The C API also provides some special tables, located at various "pseudo-indices" in the Lua stack. At LUA_GLOBALSINDEX before Lua 5.2 is the globals table, _G from within Lua, which is the main namespace. There is also a registry located at LUA_REGISTRYINDEX where C programs can store Lua values for later retrieval.
+
+=== Modules ===
+Besides standard library (core) modules it is possible to write extensions using the Lua API. Extension modules are shared objects which can be used to extend the functions of the interpreter by providing native facilities to Lua scripts. Lua scripts may load extension modules using require, just like modules written in Lua itself, or with package.loadlib. When a C library is loaded via  Lua will look for the function luaopen_foo and call it, which acts as any C function callable from Lua and generally returns a table filled with methods. A growing set of modules termed rocks are available through a package management system named LuaRocks, in the spirit of CPAN, RubyGems and Python eggs. Prewritten Lua bindings exist for most popular programming languages, including other scripting languages. For C++, there are a number of template-based approaches and some automatic binding generators.
+
+== Applications ==
+
+In video game development, Lua is widely used as a scripting language, mainly due to its perceived ease of embedding, fast execution, and short learning curve. Notable games which use Lua include Roblox, Garry's Mod, World of Warcraft, Payday 2, Project Zomboid, Phantasy Star Online 2, Dota 2, Crysis, Balatro, and many others. Lua is also used in non-video game software, such as Adobe Lightroom, Moho, iClone, Aerospike, and some system software in FreeBSD and NetBSD, and used as a template scripting language on MediaWiki using the Scribunto extension.
+
+In 2003, a poll conducted by GameDev.net showed that Lua was the most popular scripting language for game programming. On 12 January 2012, Lua was announced as a winner of the Front Line Award 2011 from the magazine Game Developer in the category Programming Tools.
+
+Many non-game applications also use Lua for extensibility, such as LuaTeX, an implementation of the TeX type-setting language; Redis, a key-value database; ScyllaDB, a wide-column store; Neovim, a text editor; Nginx, a web server; Wireshark, a network packet analyzer; Discordia, a Discord API library; and Pure Data, a visual audio programming language (through the pdlua extension).
+
+== Derived languages ==
+
+===Languages that compile to Lua===
+
+=== Dialects ===
+
+In addition, the Lua users community provides some power patches on top of the reference C implementation.
+
+== See also ==
+
+== Notes ==
+
+== References ==
+
+== Further reading ==
+
+== External links ==
+
+ 
+Category:Brazilian inventions
+Category:Cross-platform free software
+Category:Cross-platform software
+Category:Dynamic programming languages
+Category:Dynamically typed programming languages
+Category:Embedded systems
+Category:Free and open source interpreters
+Category:Free computer libraries
+Category:Free software programmed in C
+Category:Object-oriented programming languages
+Category:Pontifical Catholic University of Rio de Janeiro
+Category:Programming languages
+Category:Programming languages created in 1993
+Category:Prototype-based programming languages
+Category:Register-based virtual machines
+Category:Scripting languages
+Category:Software using the MIT license
+
+Category:Articles with example C code

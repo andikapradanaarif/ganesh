@@ -1,0 +1,21 @@
+The Halley ground station is a fictional polar satellite facility used as labeled synthetic material in the v3 evaluation packet. This is its pass log.
+
+== Pass March 10 ==
+
+Contact with satellite K3 was scheduled for 08:00 UTC. Acquisition occurred at 08:03 UTC. The downlink completed at 08:41 UTC and the telemetry verification passed.
+
+== Pass March 11 ==
+
+Contact with satellite K3 was scheduled for 08:00 UTC. Acquisition occurred at 08:05 UTC. The downlink did not complete before the pass window closed.
+
+== Pass March 12 ==
+
+Contact with satellite K4 was scheduled for 08:30 UTC. Acquisition occurred at 08:34 UTC. No further entries mention satellite K4 that day.
+
+== Pass March 13 ==
+
+Contact with satellite K3 was scheduled for 08:00 UTC. Contact with satellite K4 was scheduled for 09:00 UTC. The downlink completed at 09:12 UTC.
+
+== Pass March 14 ==
+
+Contact with satellite K3 was scheduled for 08:00 UTC. Acquisition occurred at 08:04 UTC. The telemetry verification was not performed.

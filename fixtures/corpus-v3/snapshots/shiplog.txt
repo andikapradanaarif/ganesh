@@ -1,0 +1,13 @@
+The Northwind is a fictional lighthouse supply vessel used as labeled synthetic material in the v3 evaluation packet. This is its voyage log.
+
+== Voyage June 3 ==
+
+The supply vessel Northwind departed Kirkwall at 06:00 UTC. The vessel arrived at the lighthouse platform at 09:15 UTC. The cargo inspection passed.
+
+== Voyage June 4 ==
+
+The supply vessel Northwind departed Kirkwall at 06:00 UTC. Heavy fog was reported in the channel. The vessel did not arrive at the platform before the weather window closed.
+
+== Voyage June 5 ==
+
+The supply vessel Northwind departed Kirkwall at 06:00 UTC. The cargo inspection was not carried out. The vessel returned by evening.
