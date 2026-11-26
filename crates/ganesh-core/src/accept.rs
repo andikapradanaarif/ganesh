@@ -68,9 +68,14 @@ fn action_group(stem: &str) -> Option<&'static str> {
 pub fn clauses(sentence: &str) -> Vec<String> {
     let mut out = Vec::new();
     let lowered = format!(" {}", sentence.replace("While ", "while "));
+    let has_while = lowered.contains("while");
     for part in lowered.split(';') {
         for sub in part.split(" while ") {
-            for piece in sub.split(", ") {
+            // The comma is an activity boundary only in while-constructions
+            // (the inverted 'While X, Y' form); elsewhere it is an
+            // introductory phrase or clause-internal punctuation.
+            let pieces: Vec<&str> = if has_while { sub.split(", ").collect() } else { vec![sub] };
+            for piece in pieces {
                 let t = piece.trim();
                 if !t.is_empty() { out.push(t.to_string()); }
             }
@@ -650,16 +655,28 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
                             if cls.len() <= 1 {
                                 cue_in_own
                             } else {
+                                // Invariant: a claimed outcome must belong to the
+                                // asked activity — explicitly in its clause, or
+                                // through inheritance when the sentence never
+                                // names the activity elsewhere. If the sentence's
+                                // own text places the queried activity (subject OR
+                                // object terms) in a clause that carries no outcome
+                                // cue, the outcome belongs to a different activity
+                                // and inherited context cannot override that
+                                // attribution. Pure continuations — the activity
+                                // absent from every clause — still inherit.
                                 let stem_cls: Vec<Vec<String>> = cls.iter().map(|c| stemmed_query_like(c)).collect();
-                                let cue_clause_has_obj = stem_cls.iter().any(|sc| {
-                                    sc.iter().any(|t| action_supports(&qp, t))
-                                        && qobj.iter().any(|o| sc.contains(*o))
-                                });
-                                let obj_only_elsewhere = qobj.iter().any(|o| {
+                                let act_terms: Vec<&String> = input.terms.iter()
+                                    .filter(|t| !t.chars().any(|c| c.is_ascii_digit())
+                                        && action_group(t).is_none()
+                                        && !ENV_STEMS.contains(&t.as_str()))
+                                    .collect();
+                                let act_only_elsewhere = act_terms.iter().any(|o| {
                                     stem_cls.iter().any(|sc| sc.contains(*o))
                                         && !stem_cls.iter().any(|sc2| sc2.iter().any(|t| action_supports(&qp, t)) && sc2.contains(*o))
                                 });
-                                cue_in_own && (cue_clause_has_obj || !obj_only_elsewhere)
+                                let _ = &qobj;
+                                cue_in_own && !act_only_elsewhere
                             }
                         }).unwrap_or(false)
                     } else {

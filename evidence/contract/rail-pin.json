@@ -1,0 +1,220 @@
+{
+  "evidence_correct_answerable": 5,
+  "outcomes": [
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "r01",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 4.963595000000001,
+      "latency_rest_ms": 3.622713,
+      "mcp_ids": [
+        "raillog-a1#p2",
+        "raillog-a1#p3",
+        "raillog-a1#p5"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "raillog-a1#p2",
+        "raillog-a1#p3",
+        "raillog-a1#p5"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "r02",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.051777,
+      "latency_rest_ms": 0.9960749999999999,
+      "mcp_ids": [
+        "raillog-a1#p3",
+        "raillog-a1#p2",
+        "raillog-a1#p5"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "raillog-a1#p3",
+        "raillog-a1#p2",
+        "raillog-a1#p5"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "r03",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 0.968639,
+      "latency_rest_ms": 0.957932,
+      "mcp_ids": [
+        "raillog-a1#p4",
+        "raillog-a1#p6",
+        "raillog-a1#p2"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "raillog-a1#p4",
+        "raillog-a1#p6",
+        "raillog-a1#p2"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "r04",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 0.912475,
+      "latency_rest_ms": 0.857602,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "r05",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.030617,
+      "latency_rest_ms": 0.981352,
+      "mcp_ids": [
+        "raillog-a1#p4",
+        "raillog-a1#p6",
+        "raillog-a1#p5"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "raillog-a1#p4",
+        "raillog-a1#p6",
+        "raillog-a1#p5"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "r06",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 0.91085,
+      "latency_rest_ms": 0.885605,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "r07",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 0.926318,
+      "latency_rest_ms": 0.82976,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "r08",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.024063,
+      "latency_rest_ms": 1.00115,
+      "mcp_ids": [
+        "raillog-a1#p6",
+        "raillog-a1#p4",
+        "raillog-a1#p5"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "raillog-a1#p6",
+        "raillog-a1#p4",
+        "raillog-a1#p5"
+      ],
+      "rest_status": "ok"
+    }
+  ],
+  "questions": "fixtures/rail-probe/key.json",
+  "result": {
+    "checks": {
+      "adapter_agreement": {
+        "agree": 8,
+        "pass": true,
+        "total": 8
+      },
+      "citation_integrity": {
+        "checked": 30,
+        "ok": 30,
+        "pass": true
+      },
+      "evidence_coverage": {
+        "answerable": 5,
+        "hits": 5,
+        "pass": true
+      },
+      "insufficient_evidence": {
+        "correct": 3,
+        "pass": true,
+        "total": 3
+      },
+      "provider_calls": {
+        "count": 0,
+        "pass": true
+      }
+    },
+    "corpus": "fixtures/rail-probe",
+    "incomplete": false,
+    "mode": "development",
+    "questions": "fixtures/rail-probe/key.json",
+    "reasons": [],
+    "verdict": "DEVELOPMENT",
+    "version": "bench-result.v1"
+  },
+  "summary": {
+    "adapter_agree": 8,
+    "answerable": 5,
+    "citations_checked": 30,
+    "citations_ok": 30,
+    "hits": 5,
+    "incomplete": false,
+    "insufficient": 3,
+    "insufficient_correct": 3,
+    "total": 8
+  }
+}

@@ -1,0 +1,308 @@
+{
+  "evidence_correct_answerable": 8,
+  "outcomes": [
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "v01",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.5888950000000002,
+      "latency_rest_ms": 1.995184,
+      "mcp_ids": [
+        "pumplog-a1#p2",
+        "pumplog-a1#p6",
+        "pumplog-a1#p3"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "pumplog-a1#p2",
+        "pumplog-a1#p6",
+        "pumplog-a1#p3"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "v02",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 1.30952,
+      "latency_rest_ms": 1.120041,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "v03",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.31759,
+      "latency_rest_ms": 1.29323,
+      "mcp_ids": [
+        "pumplog-a1#p2",
+        "pumplog-a1#p3",
+        "pumplog-a1#p4"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "pumplog-a1#p2",
+        "pumplog-a1#p3",
+        "pumplog-a1#p4"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "v04",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.180113,
+      "latency_rest_ms": 1.069265,
+      "mcp_ids": [
+        "pumplog-a1#p3",
+        "pumplog-a1#p6",
+        "pumplog-a1#p2"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "pumplog-a1#p3",
+        "pumplog-a1#p6",
+        "pumplog-a1#p2"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "v05",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 1.208699,
+      "latency_rest_ms": 1.1330660000000001,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "v06",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.300816,
+      "latency_rest_ms": 1.161038,
+      "mcp_ids": [
+        "pumplog-a1#p4",
+        "pumplog-a1#p8",
+        "pumplog-a1#p2"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "pumplog-a1#p4",
+        "pumplog-a1#p8",
+        "pumplog-a1#p2"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "v07",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 1.10463,
+      "latency_rest_ms": 1.048778,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "v08",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.301359,
+      "latency_rest_ms": 1.28353,
+      "mcp_ids": [
+        "pumplog-a1#p5",
+        "pumplog-a1#p6",
+        "pumplog-a1#p2"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "pumplog-a1#p5",
+        "pumplog-a1#p6",
+        "pumplog-a1#p2"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "v09",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.279813,
+      "latency_rest_ms": 1.116301,
+      "mcp_ids": [
+        "pumplog-a1#p6",
+        "pumplog-a1#p2",
+        "pumplog-a1#p3"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "pumplog-a1#p6",
+        "pumplog-a1#p2",
+        "pumplog-a1#p3"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "v10",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 1.100931,
+      "latency_rest_ms": 1.020986,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "v11",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.176309,
+      "latency_rest_ms": 1.216647,
+      "mcp_ids": [
+        "pumplog-a1#p8",
+        "pumplog-a1#p2",
+        "pumplog-a1#p3"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "pumplog-a1#p8",
+        "pumplog-a1#p2",
+        "pumplog-a1#p3"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "v12",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.160031,
+      "latency_rest_ms": 1.134362,
+      "mcp_ids": [
+        "pumplog-a1#p8",
+        "pumplog-a1#p6",
+        "pumplog-a1#p2"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "pumplog-a1#p8",
+        "pumplog-a1#p6",
+        "pumplog-a1#p2"
+      ],
+      "rest_status": "ok"
+    }
+  ],
+  "questions": "fixtures/event-probe/key.json",
+  "result": {
+    "checks": {
+      "adapter_agreement": {
+        "agree": 12,
+        "pass": true,
+        "total": 12
+      },
+      "citation_integrity": {
+        "checked": 48,
+        "ok": 48,
+        "pass": true
+      },
+      "evidence_coverage": {
+        "answerable": 8,
+        "hits": 8,
+        "pass": true
+      },
+      "insufficient_evidence": {
+        "correct": 4,
+        "pass": true,
+        "total": 4
+      },
+      "provider_calls": {
+        "count": 0,
+        "pass": true
+      }
+    },
+    "corpus": "fixtures/event-probe",
+    "incomplete": false,
+    "mode": "development",
+    "questions": "fixtures/event-probe/key.json",
+    "reasons": [],
+    "verdict": "DEVELOPMENT",
+    "version": "bench-result.v1"
+  },
+  "summary": {
+    "adapter_agree": 12,
+    "answerable": 8,
+    "citations_checked": 48,
+    "citations_ok": 48,
+    "hits": 8,
+    "incomplete": false,
+    "insufficient": 4,
+    "insufficient_correct": 4,
+    "total": 12
+  }
+}
