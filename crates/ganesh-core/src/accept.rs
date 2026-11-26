@@ -565,6 +565,138 @@ pub fn exact_date_query(query: &str) -> bool {
     TRIGGERS.iter().any(|t| q.contains(t))
 }
 
+
+/// Strict decimal-measurement test: the pure digits.digits token must be
+/// immediately followed (within 1–2 surface tokens) by an explicit measurement
+/// unit, and not immediately preceded by version/release/v/in or a capitalized
+/// software/standard name token.
+pub fn unit_adjacent_decimal(sentence: &str, token: &str) -> bool {
+    if !token.chars().all(|c| c.is_ascii_digit() || c == '.') || !token.contains('.') {
+        return false;
+    }
+    const UNITS: &[&str] = &[
+        "m", "meter", "meters", "metre", "metres", "km", "kilometer", "kilometers",
+        "kilometre", "kilometres", "cm", "mm", "mile", "miles", "ft", "feet", "foot",
+        "in", "inch", "inches", "kg", "kilogram", "kilograms", "g", "gram", "grams",
+        "lb", "lbs", "ton", "tons", "tonne", "tonnes", "w", "watt", "watts", "kw",
+        "mw", "hz", "ghz", "mhz", "mb", "gb", "kb", "byte", "bytes", "%", "percent",
+        "million", "billion", "trillion", "celsius", "fahrenheit",
+    ];
+    const PRE_BLOCKS: &[&str] = &["version", "v", "in", "release", "edition"];
+    let toks: Vec<String> = sentence
+        .split_whitespace()
+        .map(|t| t.trim_matches(|c: char| !c.is_alphanumeric() && c != '.' && c != '%').to_ascii_lowercase())
+        .collect();
+    for (i, t) in toks.iter().enumerate() {
+        let bare = t.trim_matches(|c: char| !c.is_ascii_digit() && c != '.');
+        if bare != token {
+            continue;
+        }
+        // preceded by blocking token or capitalized name directly glued?
+        if i > 0 && PRE_BLOCKS.contains(&toks[i - 1].as_str()) {
+            continue;
+        }
+        if i > 0 {
+            let prev = &toks[i - 1];
+            let raw_prev_capitalized = sentence
+                .split_whitespace()
+                .nth(i - 1)
+                .map(|w| w.chars().next().map(|c| c.is_ascii_uppercase()).unwrap_or(false))
+                .unwrap_or(false);
+            if raw_prev_capitalized && !prev.chars().any(|c| c.is_ascii_digit()) && prev.len() > 2 {
+                continue;
+            }
+        }
+        // followed within 1–2 tokens by a unit
+        for j in i + 1..=(i + 2).min(toks.len().saturating_sub(1)) {
+            if j < toks.len() {
+                let uj = toks[j].trim_end_matches(|c: char| !c.is_alphanumeric());
+                if UNITS.contains(&uj) {
+                    return true;
+                }
+            }
+        }
+    }
+    false
+}
+
+/// Canonical irregular-verb forms: map base/past/participle variants of common
+/// English irregular verbs to one shared key so event terms match across
+/// morphology. General English, zero fixture vocabulary.
+pub fn irregular_canon(form: &str) -> &str {
+    const GROUPS: &[&[&str]] = &[
+        &["sink", "sank", "sunk"],
+        &["begin", "began", "begun"],
+        &["fly", "flew", "flown"],
+        &["build", "built"],
+        &["write", "wrote", "written"],
+        &["break", "broke", "broken"],
+        &["fall", "fell", "fallen"],
+        &["win", "won"],
+        &["make", "made"],
+        &["take", "took", "taken"],
+        &["find", "found"],
+        &["leave", "left"],
+        &["lose", "lost"],
+        &["draw", "drew", "drawn"],
+        &["strike", "struck"],
+        &["burn", "burnt", "burned"],
+        &["rise", "rose", "risen"],
+        &["hold", "held"],
+        &["lead", "led"],
+        &["send", "sent"],
+        &["spend", "spent"],
+        &["run", "ran"],
+        &["go", "went", "gone"],
+        &["come", "came"],
+        &["see", "saw", "seen"],
+        &["give", "gave", "given"],
+        &["know", "knew", "known"],
+        &["grow", "grew", "grown"],
+        &["throw", "threw", "thrown"],
+        &["speak", "spoke", "spoken"],
+        &["choose", "chose", "chosen"],
+        &["drive", "drove", "driven"],
+        &["wear", "wore", "worn"],
+        &["tear", "tore", "torn"],
+        &["bear", "bore", "born", "borne"],
+    ];
+    for g in GROUPS {
+        if g.contains(&form) {
+            return g[0];
+        }
+    }
+    form
+}
+
+/// True when the stemmed token matches another through irregular-verb canon:
+/// compare canonical forms of both surface-level stems.
+pub fn stem_matches_eventually(query_stem: &str, sent_stem: &str) -> bool {
+    query_stem == sent_stem || irregular_canon(query_stem) == irregular_canon(sent_stem)
+}
+
+/// Future/planning cues that prevent a dated sentence from settling a
+/// past-tense "did" question.
+pub const FUTURE_CUES: &[&str] = &[
+    "planned", "plan", "plans", "scheduled", "expected", "projected", "slated",
+    "intended", "proposed", "targeted", "aiming", "will", "would", "tentatively",
+];
+
+pub fn sentence_is_planned(sentence: &str) -> bool {
+    let low = sentence.to_lowercase();
+    let toks: Vec<&str> = low.split(|c: char| !c.is_alphabetic()).filter(|w| !w.is_empty()).collect();
+    toks.iter().any(|w| FUTURE_CUES.contains(w)) || low.contains("set to") || low.contains("due to")
+}
+
+/// Past-tense occurrence question: did-shaped date/year question.
+pub fn past_tense_date_query(query: &str) -> bool {
+    let q = query.to_lowercase();
+    (q.starts_with("when did") || q.contains("in what year did") || q.contains("in which year did")
+        || q.contains("on what date did") || q.contains("on what exact date did")
+        || q.contains("on what day did") || q.contains("what year did"))
+        || exact_date_query(query) && q.contains(" did ")
+}
+
 pub fn decide(input: &DecideInput) -> AcceptanceTrace {
     let mut trace = AcceptanceTrace::default();
     let qenv_stems = query_env_stems(input.query);
@@ -638,7 +770,8 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
                         // 8-token window of the measured property or unit.
                         let version_override = exclusion.as_deref() == Some("version or identifier token")
                             && !measured_terms.is_empty()
-                            && quantifying_window(sentence, &token, &measured_terms, 8);
+                            && unit_adjacent_decimal(sentence, &token)
+                            && !q_versions.contains(&token);
                         let tightened_exclusion = if exclusion.is_some() && !version_override {
                             exclusion.clone()
                         } else if token == "one" && pronominal_one(sentence) {
@@ -706,9 +839,10 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
         'outer: for (_pid, verbatim, section, _) in input.passages {
             for sentence in &sentences(verbatim) {
                 let ss = stemmed_query_like(sentence);
-                if crate::search::date_tier(sentence) >= 2.5
-                    && event_terms.iter().any(|t| ss.contains(*t))
-                {
+                let event_hit = event_terms.iter().any(|t| {
+                    ss.iter().any(|st| stem_matches_eventually(t, st))
+                });
+                if crate::search::date_tier(sentence) >= 2.5 && event_hit && !sentence_is_planned(sentence) {
                     tied = true;
                     break 'outer;
                 }
@@ -716,7 +850,10 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
             if crate::search::date_tier(section) >= 2.5 {
                 for sentence in &sentences(verbatim) {
                     let ss = stemmed_query_like(sentence);
-                    if event_terms.iter().any(|t| ss.contains(*t)) {
+                    let event_hit = event_terms.iter().any(|t| {
+                        ss.iter().any(|st| stem_matches_eventually(t, st))
+                    });
+                    if event_hit && !sentence_is_planned(sentence) {
                         tied = true;
                         break 'outer;
                     }
@@ -726,6 +863,59 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
         if !tied {
             trace.reasons.push(
                 "exact-date-precision: no adjacent month-day calendar date tied to the queried event in the selected passages"
+                    .to_string(),
+            );
+        }
+    }
+
+    // ---- past-tense occurrence guard -----------------------------------------
+    // A past-tense "did" date/year question is not settled by planned or
+    // future-modal date mentions. Scan for any realized (non-planned) dated
+    // sentence tied to the event; if every dated event mention is planned or
+    // future-modal, abstain with a typed reason.
+    if past_tense_date_query(input.query) {
+        let framing = crate::search::framing_stems();
+        let event_terms: Vec<&String> = input
+            .terms
+            .iter()
+            .filter(|t| {
+                !input.subject_terms.contains(*t)
+                    && !framing.contains(*t)
+                    && !VERIFY_CUES.contains(&t.as_str())
+                    && !PROPOSE_CUES.contains(&t.as_str())
+                    && !ATTEMPT_CUES.contains(&t.as_str())
+                    && !TRANSITION_CUES.contains(&t.as_str())
+            })
+            .collect();
+        let mut realized = false;
+        let mut planned_only = false;
+        for (_pid, verbatim, _section, _) in input.passages {
+            for sentence in &sentences(verbatim) {
+                let ss = stemmed_query_like(sentence);
+                let event_hit = event_terms.iter().any(|t| {
+                    ss.iter().any(|st| stem_matches_eventually(t, st))
+                });
+                if !event_hit {
+                    continue;
+                }
+                let has_year = sentence.split_whitespace().any(|w| {
+                    let b = w.trim_matches(|c: char| !c.is_ascii_digit());
+                    b.len() == 4 && b.chars().all(|c| c.is_ascii_digit())
+                });
+                let dated = has_year || crate::search::date_tier(sentence) >= 1.0;
+                if !dated {
+                    continue;
+                }
+                if sentence_is_planned(sentence) {
+                    planned_only = true;
+                } else {
+                    realized = true;
+                }
+            }
+        }
+        if planned_only && !realized {
+            trace.reasons.push(
+                "date-occurrence: only planned/future-modal date mentions found for past-tense event query"
                     .to_string(),
             );
         }
@@ -1127,6 +1317,44 @@ mod sufficiency_tests {
             let stemmed: Vec<String> = crate::search::stemmed_tokens(w);
             assert!(stemmed.iter().any(|t| fs.contains(t)), "{w} must be a framing stem");
         }
+    }
+}
+
+#[cfg(test)]
+mod surgical_fix_tests {
+    use super::*;
+
+    #[test]
+    fn versions_stay_excluded_decimals_with_units_pass() {
+        // qA06/v28 class: version-adjacent decimals never un-excluded.
+        assert!(!unit_adjacent_decimal("In 2021, the Novolang 3.0 keyword list was revised.", "3.0"));
+        assert!(!unit_adjacent_decimal("New features in 2.0 included static member functions.", "2.0"));
+        // supported measurement class: unit-adjacent decimals un-excluded.
+        assert!(unit_adjacent_decimal("with the proposed mirror diameter reduced from 3 m to 2.4 m", "2.4"));
+        assert!(unit_adjacent_decimal("a height of 5.895 km above sea level", "5.895"));
+        assert!(unit_adjacent_decimal("averaging 21.3 million km from Jupiter", "21.3"));
+    }
+
+    #[test]
+    fn irregular_verbs_canonicalize() {
+        assert_eq!(irregular_canon("sank"), "sink");
+        assert_eq!(irregular_canon("sunk"), "sink");
+        assert_eq!(irregular_canon("flew"), "fly");
+        assert_eq!(irregular_canon("began"), "begin");
+        assert_eq!(irregular_canon("built"), "build");
+        assert!(stem_matches_eventually("sink", "sank"));
+        assert!(stem_matches_eventually("fly", "flew"));
+        assert!(!stem_matches_eventually("sink", "swam"));
+    }
+
+    #[test]
+    fn planned_future_guard() {
+        assert!(sentence_is_planned("NASA plans to deorbit the station in 2030."));
+        assert!(sentence_is_planned("Artemis III, scheduled for late 2027, is planned to test a lander."));
+        assert!(!sentence_is_planned("The station deorbited in March 2001."));
+        assert!(past_tense_date_query("In what year did the station deorbit?"));
+        assert!(past_tense_date_query("In what year did Artemis III land astronauts on the Moon?"));
+        assert!(!past_tense_date_query("What kind of planet is Jupiter?"));
     }
 }
 
