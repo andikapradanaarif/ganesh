@@ -1,0 +1,191 @@
+{
+ "version": "date-xfer-v1",
+ "scoring": "scoring.v2",
+ "questions": [
+  {
+   "id": "z01",
+   "question": "On what exact date did Apollo 11 launch?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "July 16, 1969",
+     "acceptable": [
+      "ap11-a1#p49"
+     ],
+     "spans": [
+      "July 16, 1969"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "z02",
+   "question": "In what year did Apollo 8 orbit the Moon?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "year-only"
+   ],
+   "required_facts": [
+    {
+     "fact": "December 1968",
+     "acceptable": [
+      "ap8-a1#p25"
+     ],
+     "spans": [
+      "December 1968"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "z03",
+   "question": "On what date did the Apollo 11 lunar module land on the Moon?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "multi-date-passage"
+   ],
+   "required_facts": [
+    {
+     "fact": "July 20, 1969",
+     "acceptable": [
+      "ap11-a1#p1"
+     ],
+     "spans": [
+      "July 20, 1969"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "z04",
+   "question": "When did the Apollo 11 mission lift off?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "wrong-subject-distractor"
+   ],
+   "required_facts": [
+    {
+     "fact": "July 16, 1969",
+     "acceptable": [
+      "ap11-a1#p49"
+     ],
+     "spans": [
+      "July 16, 1969"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "z05",
+   "question": "On what date did the Apollo 11 crew splash down on their return to Earth?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "deep"
+   ],
+   "required_facts": [
+    {
+     "fact": "July 24",
+     "acceptable": [
+      "ap11-a1#p103"
+     ],
+     "spans": [
+      "July 24"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "z06",
+   "question": "On what exact date did Apollo 11 launch, and who commanded the mission?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "compound"
+   ],
+   "required_facts": [
+    {
+     "fact": "July 16, 1969",
+     "acceptable": [
+      "ap11-a1#p49"
+     ],
+     "spans": [
+      "July 16, 1969"
+     ],
+     "answer_polarity": "affirmative"
+    },
+    {
+     "fact": "Neil Armstrong",
+     "acceptable": [
+      "ap11-a1#p1"
+     ],
+     "spans": [
+      "Neil Armstrong"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "z07",
+   "question": "Who commanded the Apollo 8 mission?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "non-date"
+   ],
+   "required_facts": [
+    {
+     "fact": "Frank Borman",
+     "acceptable": [
+      "ap8-a1#p3"
+     ],
+     "spans": [
+      "Frank Borman"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "z08",
+   "question": "On what exact day was the Apollo 8 backup crew announced?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient"
+   ],
+   "required_facts": [],
+   "unresolved_detail": "backup crew announcement exact day never given in source"
+  },
+  {
+   "id": "z09",
+   "question": "On what exact date in early 1969 did NASA officially decide Apollo 11 would attempt the first landing?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient"
+   ],
+   "required_facts": [],
+   "unresolved_detail": "source gives decision context at most by month or year"
+  }
+ ]
+}
