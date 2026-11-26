@@ -1,0 +1,631 @@
+{
+ "version": "heldout.v4",
+ "notes": "Fresh M1 v4 packet: 24 answerable (16 wiki CC BY-SA + 8 labeled synthetic) + 6 insufficient. Frame: robotic space exploration articles, seed 20261128, disjoint by domain from v1/v2/v3 and dev probes. Frozen before either arm ran.",
+ "questions": [
+  {
+   "id": "w01",
+   "question": "When was the Curiosity rover launched?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "launched from Cape Canaveral, Florida, on November 26, 2011",
+     "acceptable": [
+      "curiosity-a1#p2"
+     ],
+     "spans": [
+      "launched from Cape Canaveral, Florida, on November 26, 2011"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w02",
+   "question": "When did Curiosity land on Mars?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "landed on Aeolis Palus inside Gale crater on Mars on August 6, 2012",
+     "acceptable": [
+      "curiosity-a1#p2"
+     ],
+     "spans": [
+      "landed on Aeolis Palus inside Gale crater on Mars on August 6, 2012"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w03",
+   "question": "Where on Mars did Curiosity land?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "landed on Aeolis Palus inside Gale crater",
+     "acceptable": [
+      "curiosity-a1#p2"
+     ],
+     "spans": [
+      "landed on Aeolis Palus inside Gale crater"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w04",
+   "question": "How much electrical power is the Curiosity rover's MMRTG designed to produce at the start of the mission?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "produce 110 watts of electrical power",
+     "acceptable": [
+      "curiosity-a1#p22"
+     ],
+     "spans": [
+      "produce 110 watts of electrical power"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w05",
+   "question": "When did Voyager 1 cross the heliopause?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "crossed the heliopause and entered interstellar space on August 25, 20",
+     "acceptable": [
+      "voyager-a1#p4"
+     ],
+     "spans": [
+      "crossed the heliopause and entered interstellar space on August 25, 2012"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w06",
+   "question": "When was Voyager 1 launched?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "launched by NASA on September 5, 1977",
+     "acceptable": [
+      "voyager-a1#p1"
+     ],
+     "spans": [
+      "launched by NASA on September 5, 1977"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w07",
+   "question": "When was Voyager 2 launched?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "Voyager 2 probe had been launched two weeks earlier, on August 20, 197",
+     "acceptable": [
+      "voyager-a1#p35"
+     ],
+     "spans": [
+      "Voyager 2 probe had been launched two weeks earlier, on August 20, 1977"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w08",
+   "question": "In which year was the Hubble Space Telescope launched?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "launched into low Earth orbit in 1990",
+     "acceptable": [
+      "hubble-a1#p1"
+     ],
+     "spans": [
+      "launched into low Earth orbit in 1990"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w09",
+   "question": "When was the James Webb Space Telescope launched?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "James Webb Space Telescope (JWST), which was launched on December 25, ",
+     "acceptable": [
+      "hubble-a1#p4"
+     ],
+     "spans": [
+      "James Webb Space Telescope (JWST), which was launched on December 25, 2021"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w10",
+   "question": "In which year was the telescope named after Edwin Hubble?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "In 1983, the telescope was named after Edwin Hubble",
+     "acceptable": [
+      "hubble-a1#p15"
+     ],
+     "spans": [
+      "In 1983, the telescope was named after Edwin Hubble"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w11",
+   "question": "When was the Perseverance rover launched?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "launched on July 30, 2020",
+     "acceptable": [
+      "perseverance-a1#p1"
+     ],
+     "spans": [
+      "launched on July 30, 2020"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w12",
+   "question": "In which crater did Perseverance land?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "landed in Jezero Crater",
+     "acceptable": [
+      "perseverance-a1#p1"
+     ],
+     "spans": [
+      "landed in Jezero Crater"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w13",
+   "question": "When did Ingenuity perform its first flight on Mars?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "first flight was April 19, 2021",
+     "acceptable": [
+      "perseverance-a1#p21"
+     ],
+     "spans": [
+      "first flight was April 19, 2021"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w14",
+   "question": "How many flights did Ingenuity make in total?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "made 72 flights in nearly three years",
+     "acceptable": [
+      "perseverance-a1#p21"
+     ],
+     "spans": [
+      "made 72 flights in nearly three years"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w15",
+   "question": "Approximately how much electricity does Perseverance's power source produce at launch?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "approximately 110 watts at launch",
+     "acceptable": [
+      "perseverance-a1#p16"
+     ],
+     "spans": [
+      "approximately 110 watts at launch"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w16",
+   "question": "When did Voyager 1 transmit the first detailed image of the Great Red Spot?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "date + transmission fact",
+     "acceptable": [
+      "voyager-a1#p44"
+     ],
+     "spans": [
+      "February 25, 1979",
+      "first detailed image of the Great Red Spot"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "s01",
+   "question": "Did the germination test of seed lot G11 finish on January 5?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "synthetic",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "The test finished at 16:00 UTC",
+     "acceptable": [
+      "seedlog-a1#p2"
+     ],
+     "spans": [
+      "The test finished at 16:00 UTC"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "s02",
+   "question": "Did the viability count pass for the January 5 test of seed lot G11?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "synthetic",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "viability count passed",
+     "acceptable": [
+      "seedlog-a1#p2"
+     ],
+     "spans": [
+      "viability count passed"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "s03",
+   "question": "Did the germination test of seed lot G11 finish on January 6?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "synthetic",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "The test did not finish",
+     "acceptable": [
+      "seedlog-a1#p3"
+     ],
+     "spans": [
+      "The test did not finish"
+     ],
+     "answer_polarity": "negative"
+    }
+   ]
+  },
+  {
+   "id": "s04",
+   "question": "Did the moisture reading finish on January 7?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "synthetic",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "moisture reading finished at 09:00 UTC",
+     "acceptable": [
+      "seedlog-a1#p4"
+     ],
+     "spans": [
+      "moisture reading finished at 09:00 UTC"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "s05",
+   "question": "Was the germination test of seed lot G12 underway at 09:00 on January 7?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "synthetic",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "test continued",
+     "acceptable": [
+      "seedlog-a1#p4"
+     ],
+     "spans": [
+      "test continued"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "s06",
+   "question": "Did the germination test of seed lot G12 finish on January 9?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "synthetic",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "test finished at 14:30 UTC",
+     "acceptable": [
+      "seedlog-a1#p6"
+     ],
+     "spans": [
+      "test finished at 14:30 UTC"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "s07",
+   "question": "Did the moisture reading finish on January 9?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "synthetic",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "moisture reading finished at 09:00 UTC",
+     "acceptable": [
+      "seedlog-a1#p4"
+     ],
+     "spans": [
+      "moisture reading finished at 09:00 UTC"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "s08",
+   "question": "Did the germination test of seed lot G13 finish on January 10?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "synthetic",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "germination test of seed lot G13 finished at 12:00 UTC",
+     "acceptable": [
+      "seedlog-a1#p7"
+     ],
+     "spans": [
+      "germination test of seed lot G13 finished at 12:00 UTC"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "i01",
+   "question": "Did the germination test of seed lot G12 finish on January 7?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient"
+   ],
+   "required_facts": [
+    {
+     "fact": "missing: the moisture reading finished while the test continued \u2014 the test's outcome is never recorded for January 7",
+     "acceptable": [],
+     "spans": []
+    }
+   ]
+  },
+  {
+   "id": "i02",
+   "question": "Did the germination test of seed lot G11 finish on January 8?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient"
+   ],
+   "required_facts": [
+    {
+     "fact": "missing: bare 'It finished' after two started tests \u2014 ambiguous which lot",
+     "acceptable": [],
+     "spans": []
+    }
+   ]
+  },
+  {
+   "id": "i03",
+   "question": "Did the viability count pass for the January 6 test of seed lot G11?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient"
+   ],
+   "required_facts": [
+    {
+     "fact": "missing: the test did not finish \u2014 no count was possible, outcome unknown",
+     "acceptable": [],
+     "spans": []
+    }
+   ]
+  },
+  {
+   "id": "i04",
+   "question": "On what exact calendar date did Congress approve funding for the Large Space Telescope?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient"
+   ],
+   "required_facts": [
+    {
+     "fact": "missing: corpus records approval 'for 1978' \u2014 no exact date; a different date (mirror completion 1981) is nearby",
+     "acceptable": [],
+     "spans": []
+    }
+   ]
+  },
+  {
+   "id": "i05",
+   "question": "What is the diameter of Hubble's main mirror in meters?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient"
+   ],
+   "required_facts": [
+    {
+     "fact": "missing: the value was in a template stripped from the snapshot \u2014 the passage mentions the mirror but not the number",
+     "acceptable": [],
+     "spans": []
+    }
+   ]
+  },
+  {
+   "id": "i06",
+   "question": "On what date did the Curiosity rover's mission end?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient"
+   ],
+   "required_facts": [
+    {
+     "fact": "missing: rover continues to operate \u2014 no end date exists; 'original two-year mission' is nearby but is not an end",
+     "acceptable": [],
+     "spans": []
+    }
+   ]
+  }
+ ]
+}
