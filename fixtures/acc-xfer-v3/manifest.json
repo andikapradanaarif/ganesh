@@ -21,7 +21,9 @@
       "retrieved": "2025-11-27",
       "bytes": 24802,
       "sha256": "26b84104d1993476eb541a3e676f6b458c5290c4d1847993d9ad98c334fc5751",
-      "file": "snapshots/greatwall.txt"
+      "file": "snapshots/greatwall.txt",
+      "family": "acc-xfer-v3",
+      "exclusions": []
     },
     {
       "article_id": "amazon",
@@ -37,7 +39,9 @@
       "retrieved": "2025-11-27",
       "bytes": 71219,
       "sha256": "94b22f1e55adb502d435405d38ca8a4e63a7e805934581057f34cb26afa2944e",
-      "file": "snapshots/amazon.txt"
+      "file": "snapshots/amazon.txt",
+      "family": "acc-xfer-v3",
+      "exclusions": []
     },
     {
       "article_id": "jupiter",
@@ -53,7 +57,9 @@
       "retrieved": "2025-11-27",
       "bytes": 51153,
       "sha256": "c05397f9abb918a94d55435d643a92fe8f57431a6f7b26446776b1c2be6561fb",
-      "file": "snapshots/jupiter.txt"
+      "file": "snapshots/jupiter.txt",
+      "family": "acc-xfer-v3",
+      "exclusions": []
     },
     {
       "article_id": "leonardo",
@@ -69,7 +75,9 @@
       "retrieved": "2025-11-27",
       "bytes": 60551,
       "sha256": "fd81f10c6da910f217e1b8eddd2bc3342ffb41839d3d5ab6af90cbba322a0ce0",
-      "file": "snapshots/leonardo.txt"
+      "file": "snapshots/leonardo.txt",
+      "family": "acc-xfer-v3",
+      "exclusions": []
     },
     {
       "article_id": "frenchrev",
@@ -85,7 +93,9 @@
       "retrieved": "2025-11-27",
       "bytes": 85685,
       "sha256": "35a75baf5d0c3f1e2c696e3bd5179970bd981b8374b425833b540d87a6f6959f",
-      "file": "snapshots/frenchrev.txt"
+      "file": "snapshots/frenchrev.txt",
+      "family": "acc-xfer-v3",
+      "exclusions": []
     },
     {
       "article_id": "artemis",
@@ -101,7 +111,9 @@
       "retrieved": "2025-11-27",
       "bytes": 30521,
       "sha256": "5dfc12b3b0be9ea869fb0ee410cb8c925fdc3b7609198ed95f8b370e277a0e23",
-      "file": "snapshots/artemis.txt"
+      "file": "snapshots/artemis.txt",
+      "family": "acc-xfer-v3",
+      "exclusions": []
     },
     {
       "article_id": "cablelog",
@@ -117,7 +129,9 @@
       "retrieved": "2025-11-27",
       "bytes": 431,
       "sha256": "e7c02b07440c6e691747e06457c3a04b04ab7209b6835c613eb9f60f3aebc6c9",
-      "file": "snapshots/cablelog.txt"
+      "file": "snapshots/cablelog.txt",
+      "family": "acc-xfer-v3",
+      "exclusions": []
     }
   ]
 }
