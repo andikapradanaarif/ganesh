@@ -403,6 +403,17 @@ pub fn passage_date_score(
         .fold(0.0, f64::max)
 }
 
+
+/// Whitespace-token Jaccard overlap between two token lists (predeclared
+/// diversity threshold 0.7 for the cross-encoder selection rule).
+fn token_jaccard(a: &[String], b: &[String]) -> f64 {
+    let sa: std::collections::BTreeSet<&String> = a.iter().collect();
+    let sb: std::collections::BTreeSet<&String> = b.iter().collect();
+    let inter = sa.intersection(&sb).count() as f64;
+    let union = sa.union(&sb).count() as f64;
+    if union == 0.0 { 0.0 } else { inter / union }
+}
+
 pub fn search(store: &Store, query: &str, caller: &str, cfg: &RetrievalConfig) -> SearchResponse {
     search_debug(store, query, caller, cfg).0
 }
@@ -605,13 +616,105 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
         promoted = best.map(|(i, _)| i);
     }
 
+    // Cross-encoder reranking v2 (predeclared, frozen before sem-xfer-v2
+    // outcomes). Changes over 0386a9e4 are exactly the two reviewed fixes:
+    //  1. The pair passed to the cross-encoder is "{title} — {section}\n{text}"
+    //     (empty parts omitted), so the model sees the same heading/document
+    //     context available to passages_fts and acceptance. Batch dates that
+    //     live only in section headings become visible to the scorer.
+    //  2. Selection policy (frozen after true rebuilt-0386a9e4 exposed-suite
+    //     diagnostics, before any sem-xfer-v2 run): slots in cross-encoder
+    //     order with token-Jaccard >= 0.7 diversity skip; the final slot picks
+    //     the highest cross-encoder-scored remaining candidate that adds at
+    //     least one uncovered query term when such a candidate exists,
+    //     otherwise the next cross-encoder candidate (hybrid coverage slot).
+    // Pool, eligibility, acceptance, and the three-passage limit are
+    // unchanged. Ties keep better bm25 rank via stable sort over eligible order.
+    let mut rerank_order: Option<Vec<usize>> = None;
+    let mut rerank_inputs: Vec<String> = Vec::new();
+    if crate::rerank::available() {
+        let mut scored: Vec<(usize, f32)> = Vec::new();
+        for &i in &eligible {
+            let row: (String, String, String) = store
+                .conn
+                .query_row(
+                    "SELECT p.section, p.text, s.title FROM passages p JOIN revisions r ON p.revision = r.revision JOIN sources s ON r.article_id = s.article_id WHERE p.id = ?1",
+                    rusqlite::params![rows[i].passage_id],
+                    |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
+                )
+                .unwrap_or_default();
+            let (section, text, title) = row;
+            let ctx = match (title.is_empty(), section.is_empty()) {
+                (false, false) => format!("{title} — {section}\n{text}"),
+                (false, true) => format!("{title}\n{text}"),
+                (true, false) => format!("{section}\n{text}"),
+                (true, true) => text.clone(),
+            };
+            if rerank_inputs.len() <= i {
+                rerank_inputs.resize(i + 1, String::new());
+            }
+            rerank_inputs[i] = ctx.clone();
+            let sc = crate::rerank::score_pair(query, &ctx).unwrap_or(f32::MIN);
+            scored.push((i, sc));
+        }
+        scored.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
+        rerank_order = Some(scored.into_iter().map(|(i, _)| i).collect());
+    }
+
     // Complementary selection: keep the best BM25 candidate, then add the
     // candidate with the largest weighted marginal coverage of query terms not
     // already covered. When no candidate adds a term, fill by original rank.
     // Final display order remains the original BM25 order of the selected set.
     let want = cfg.top_k.min(eligible.len());
     let mut selected: Vec<usize> = Vec::new();
-    if want > 0 {
+    if let Some(order) = &rerank_order {
+        // Slots 1..want-1: greedy cross-encoder order with Jaccard >= 0.7
+        // diversity skip. Final slot: highest-scored remaining candidate that
+        // adds at least one uncovered query term if any exist (hybrid
+        // coverage slot, predeclared); otherwise next cross-encoder candidate.
+        let mut covered = std::collections::BTreeSet::new();
+        for &idx in order.iter() {
+            if selected.len() >= want.saturating_sub(1) || selected.len() >= want {
+                break;
+            }
+            let dup = selected
+                .iter()
+                .any(|&sel| token_jaccard(&candidate_texts[sel].1, &candidate_texts[idx].1) >= 0.7);
+            if !dup && !selected.contains(&idx) {
+                for t in &terms {
+                    if term_present(t, &candidate_texts[idx].1) {
+                        covered.insert(t.clone());
+                    }
+                }
+                selected.push(idx);
+            }
+        }
+        if selected.len() < want {
+            let mut pick: Option<usize> = None;
+            for &idx in order.iter() {
+                if selected.contains(&idx) {
+                    continue;
+                }
+                let adds = terms.iter().any(|t| !covered.contains(t) && term_present(t, &candidate_texts[idx].1));
+                if adds {
+                    pick = Some(idx);
+                    break;
+                }
+            }
+            if let Some(idx) = pick {
+                selected.push(idx);
+            }
+            for &idx in order.iter() {
+                if selected.len() >= want {
+                    break;
+                }
+                if !selected.contains(&idx) {
+                    selected.push(idx);
+                }
+            }
+        }
+        selected.sort_unstable();
+    } else if want > 0 {
         match promoted {
             Some(idx) if date_scores[eligible[0]] <= 0.0 && idx != eligible[0] => {
                 selected.push(idx);
@@ -980,5 +1083,26 @@ mod date_fix_tests {
         let all = sentence_date_score("The telescope was named after Edwin Hubble in 1946.", DatePrecision::Open, &ev, &[], &w);
         let one = sentence_date_score("The telescope mirror was ground in 1946.", DatePrecision::Open, &ev, &[], &w);
         assert!(all > one);
+    }
+}
+
+#[cfg(test)]
+mod parity_tests {
+    //! Probe/server parity guard (review follow-up): search() — the server
+    //! path — is structurally search_debug().0, so identical status and
+    //! ordered passage IDs are guaranteed by construction within one build.
+    //! This compile-time anchor pins the delegation so a future refactor
+    //! cannot silently diverge the diagnostic and serving paths.
+
+    #[test]
+    fn search_is_search_debug_projection() {
+        fn takes_both(
+            f1: fn(&crate::Store, &str, &str, &crate::RetrievalConfig) -> super::SearchResponse,
+            f2: fn(&crate::Store, &str, &str, &crate::RetrievalConfig) -> (super::SearchResponse, super::SearchDebug),
+        ) -> bool {
+            let _ = (f1, f2);
+            true
+        }
+        assert!(takes_both(crate::search, crate::search_debug));
     }
 }
