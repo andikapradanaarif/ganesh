@@ -1,0 +1,909 @@
+[
+ {
+  "id": "w01",
+  "question": "When was the Curiosity rover launched?",
+  "expected": "ok",
+  "scope": "public",
+  "tags": [
+   "wiki",
+   "answerable"
+  ],
+  "required_evidence": [
+   {
+    "fact": "launched from Cape Canaveral, Florida, on November 26, 2011",
+    "acceptable": [
+     "curiosity-a1#p2"
+    ],
+    "spans": [
+     "launched from Cape Canaveral, Florida, on November 26, 2011"
+    ]
+   }
+  ],
+  "pool_ceiling": true,
+  "selected_settles": false,
+  "api_status": "ok",
+  "hit_credited": false,
+  "selected": [
+   "curiosity-a1#p19",
+   "curiosity-a1#p86",
+   "perseverance-a1#p28"
+  ],
+  "first_failure": "top-three selection",
+  "pool_ranks": {
+   "curiosity-a1#p2": 6
+  }
+ },
+ {
+  "id": "w02",
+  "question": "When did Curiosity land on Mars?",
+  "expected": "ok",
+  "scope": "public",
+  "tags": [
+   "wiki",
+   "answerable"
+  ],
+  "required_evidence": [
+   {
+    "fact": "landed on Aeolis Palus inside Gale crater on Mars on August 6, 2012",
+    "acceptable": [
+     "curiosity-a1#p2"
+    ],
+    "spans": [
+     "landed on Aeolis Palus inside Gale crater on Mars on August 6, 2012"
+    ]
+   }
+  ],
+  "pool_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "hit_credited": true,
+  "selected": [
+   "curiosity-a1#p16",
+   "curiosity-a1#p34",
+   "curiosity-a1#p2"
+  ],
+  "first_failure": "none \u2014 selected evidence sufficient",
+  "pool_ranks": {
+   "curiosity-a1#p2": 6
+  }
+ },
+ {
+  "id": "w03",
+  "question": "Where on Mars did Curiosity land?",
+  "expected": "ok",
+  "scope": "public",
+  "tags": [
+   "wiki",
+   "answerable"
+  ],
+  "required_evidence": [
+   {
+    "fact": "landed on Aeolis Palus inside Gale crater",
+    "acceptable": [
+     "curiosity-a1#p2"
+    ],
+    "spans": [
+     "landed on Aeolis Palus inside Gale crater"
+    ]
+   }
+  ],
+  "pool_ceiling": true,
+  "selected_settles": false,
+  "api_status": "ok",
+  "hit_credited": false,
+  "selected": [
+   "curiosity-a1#p16",
+   "curiosity-a1#p34",
+   "curiosity-a1#p80"
+  ],
+  "first_failure": "top-three selection",
+  "pool_ranks": {
+   "curiosity-a1#p2": 6
+  }
+ },
+ {
+  "id": "w04",
+  "question": "How much electrical power is the Curiosity rover's MMRTG designed to produce at the start of the mission?",
+  "expected": "ok",
+  "scope": "public",
+  "tags": [
+   "wiki",
+   "answerable"
+  ],
+  "required_evidence": [
+   {
+    "fact": "produce 110 watts of electrical power",
+    "acceptable": [
+     "curiosity-a1#p22"
+    ],
+    "spans": [
+     "produce 110 watts of electrical power"
+    ]
+   }
+  ],
+  "pool_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "hit_credited": true,
+  "selected": [
+   "curiosity-a1#p22",
+   "perseverance-a1#p16",
+   "curiosity-a1#p21"
+  ],
+  "first_failure": "none \u2014 selected evidence sufficient",
+  "pool_ranks": {
+   "curiosity-a1#p22": 1
+  }
+ },
+ {
+  "id": "w05",
+  "question": "When did Voyager 1 cross the heliopause?",
+  "expected": "ok",
+  "scope": "public",
+  "tags": [
+   "wiki",
+   "answerable"
+  ],
+  "required_evidence": [
+   {
+    "fact": "crossed the heliopause and entered interstellar space on August 25, 20",
+    "acceptable": [
+     "voyager-a1#p4"
+    ],
+    "spans": [
+     "crossed the heliopause and entered interstellar space on August 25, 2012"
+    ]
+   }
+  ],
+  "pool_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "hit_credited": true,
+  "selected": [
+   "voyager-a1#p70",
+   "voyager-a1#p81",
+   "voyager-a1#p4"
+  ],
+  "first_failure": "none \u2014 selected evidence sufficient",
+  "pool_ranks": {
+   "voyager-a1#p4": 4
+  }
+ },
+ {
+  "id": "w06",
+  "question": "When was Voyager 1 launched?",
+  "expected": "ok",
+  "scope": "public",
+  "tags": [
+   "wiki",
+   "answerable"
+  ],
+  "required_evidence": [
+   {
+    "fact": "launched by NASA on September 5, 1977",
+    "acceptable": [
+     "voyager-a1#p1"
+    ],
+    "spans": [
+     "launched by NASA on September 5, 1977"
+    ]
+   }
+  ],
+  "pool_ceiling": true,
+  "selected_settles": false,
+  "api_status": "ok",
+  "hit_credited": false,
+  "selected": [
+   "voyager-a1#p35",
+   "voyager-a1#p37",
+   "voyager-a1#p34"
+  ],
+  "first_failure": "top-three selection",
+  "pool_ranks": {
+   "voyager-a1#p1": 6
+  }
+ },
+ {
+  "id": "w07",
+  "question": "When was Voyager 2 launched?",
+  "expected": "ok",
+  "scope": "public",
+  "tags": [
+   "wiki",
+   "answerable"
+  ],
+  "required_evidence": [
+   {
+    "fact": "Voyager 2 probe had been launched two weeks earlier, on August 20, 197",
+    "acceptable": [
+     "voyager-a1#p35"
+    ],
+    "spans": [
+     "Voyager 2 probe had been launched two weeks earlier, on August 20, 1977"
+    ]
+   }
+  ],
+  "pool_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "hit_credited": true,
+  "selected": [
+   "voyager-a1#p35",
+   "voyager-a1#p37",
+   "voyager-a1#p2"
+  ],
+  "first_failure": "none \u2014 selected evidence sufficient",
+  "pool_ranks": {
+   "voyager-a1#p35": 1
+  }
+ },
+ {
+  "id": "w08",
+  "question": "In which year was the Hubble Space Telescope launched?",
+  "expected": "ok",
+  "scope": "public",
+  "tags": [
+   "wiki",
+   "answerable"
+  ],
+  "required_evidence": [
+   {
+    "fact": "launched into low Earth orbit in 1990",
+    "acceptable": [
+     "hubble-a1#p1"
+    ],
+    "spans": [
+     "launched into low Earth orbit in 1990"
+    ]
+   }
+  ],
+  "pool_ceiling": false,
+  "selected_settles": false,
+  "api_status": "ok",
+  "hit_credited": false,
+  "selected": [
+   "hubble-a1#p39",
+   "hubble-a1#p10",
+   "hubble-a1#p170"
+  ],
+  "first_failure": "candidate retrieval or key",
+  "pool_ranks": {
+   "hubble-a1#p1": null
+  }
+ },
+ {
+  "id": "w09",
+  "question": "When was the James Webb Space Telescope launched?",
+  "expected": "ok",
+  "scope": "public",
+  "tags": [
+   "wiki",
+   "answerable"
+  ],
+  "required_evidence": [
+   {
+    "fact": "James Webb Space Telescope (JWST), which was launched on December 25, ",
+    "acceptable": [
+     "hubble-a1#p4"
+    ],
+    "spans": [
+     "James Webb Space Telescope (JWST), which was launched on December 25, 2021"
+    ]
+   }
+  ],
+  "pool_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "hit_credited": true,
+  "selected": [
+   "hubble-a1#p4",
+   "hubble-a1#p132",
+   "hubble-a1#p169"
+  ],
+  "first_failure": "none \u2014 selected evidence sufficient",
+  "pool_ranks": {
+   "hubble-a1#p4": 1
+  }
+ },
+ {
+  "id": "w10",
+  "question": "In which year was the telescope named after Edwin Hubble?",
+  "expected": "ok",
+  "scope": "public",
+  "tags": [
+   "wiki",
+   "answerable"
+  ],
+  "required_evidence": [
+   {
+    "fact": "In 1983, the telescope was named after Edwin Hubble",
+    "acceptable": [
+     "hubble-a1#p15"
+    ],
+    "spans": [
+     "In 1983, the telescope was named after Edwin Hubble"
+    ]
+   }
+  ],
+  "pool_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "hit_credited": true,
+  "selected": [
+   "hubble-a1#p1",
+   "hubble-a1#p10",
+   "hubble-a1#p15"
+  ],
+  "first_failure": "none \u2014 selected evidence sufficient",
+  "pool_ranks": {
+   "hubble-a1#p15": 3
+  }
+ },
+ {
+  "id": "w11",
+  "question": "When was the Perseverance rover launched?",
+  "expected": "ok",
+  "scope": "public",
+  "tags": [
+   "wiki",
+   "answerable"
+  ],
+  "required_evidence": [
+   {
+    "fact": "launched on July 30, 2020",
+    "acceptable": [
+     "perseverance-a1#p1"
+    ],
+    "spans": [
+     "launched on July 30, 2020"
+    ]
+   }
+  ],
+  "pool_ceiling": true,
+  "selected_settles": false,
+  "api_status": "ok",
+  "hit_credited": false,
+  "selected": [
+   "perseverance-a1#p28",
+   "perseverance-a1#p27",
+   "perseverance-a1#p7"
+  ],
+  "first_failure": "top-three selection",
+  "pool_ranks": {
+   "perseverance-a1#p1": 5
+  }
+ },
+ {
+  "id": "w12",
+  "question": "In which crater did Perseverance land?",
+  "expected": "ok",
+  "scope": "public",
+  "tags": [
+   "wiki",
+   "answerable"
+  ],
+  "required_evidence": [
+   {
+    "fact": "landed in Jezero Crater",
+    "acceptable": [
+     "perseverance-a1#p1"
+    ],
+    "spans": [
+     "landed in Jezero Crater"
+    ]
+   }
+  ],
+  "pool_ceiling": true,
+  "selected_settles": false,
+  "api_status": "ok",
+  "hit_credited": false,
+  "selected": [
+   "perseverance-a1#p10",
+   "perseverance-a1#p29",
+   "perseverance-a1#p36"
+  ],
+  "first_failure": "top-three selection",
+  "pool_ranks": {
+   "perseverance-a1#p1": 7
+  }
+ },
+ {
+  "id": "w13",
+  "question": "When did Ingenuity perform its first flight on Mars?",
+  "expected": "ok",
+  "scope": "public",
+  "tags": [
+   "wiki",
+   "answerable"
+  ],
+  "required_evidence": [
+   {
+    "fact": "first flight was April 19, 2021",
+    "acceptable": [
+     "perseverance-a1#p21"
+    ],
+    "spans": [
+     "first flight was April 19, 2021"
+    ]
+   }
+  ],
+  "pool_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "hit_credited": true,
+  "selected": [
+   "perseverance-a1#p3",
+   "perseverance-a1#p21",
+   "perseverance-a1#p52"
+  ],
+  "first_failure": "none \u2014 selected evidence sufficient",
+  "pool_ranks": {
+   "perseverance-a1#p21": 2
+  }
+ },
+ {
+  "id": "w14",
+  "question": "How many flights did Ingenuity make in total?",
+  "expected": "ok",
+  "scope": "public",
+  "tags": [
+   "wiki",
+   "answerable"
+  ],
+  "required_evidence": [
+   {
+    "fact": "made 72 flights in nearly three years",
+    "acceptable": [
+     "perseverance-a1#p21"
+    ],
+    "spans": [
+     "made 72 flights in nearly three years"
+    ]
+   }
+  ],
+  "pool_ceiling": true,
+  "selected_settles": false,
+  "api_status": "ok",
+  "hit_credited": false,
+  "selected": [
+   "perseverance-a1#p39",
+   "perseverance-a1#p3",
+   "hubble-a1#p37"
+  ],
+  "first_failure": "top-three selection",
+  "pool_ranks": {
+   "perseverance-a1#p21": 3
+  }
+ },
+ {
+  "id": "w15",
+  "question": "Approximately how much electricity does Perseverance's power source produce at launch?",
+  "expected": "ok",
+  "scope": "public",
+  "tags": [
+   "wiki",
+   "answerable"
+  ],
+  "required_evidence": [
+   {
+    "fact": "approximately 110 watts at launch",
+    "acceptable": [
+     "perseverance-a1#p16"
+    ],
+    "spans": [
+     "approximately 110 watts at launch"
+    ]
+   }
+  ],
+  "pool_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "hit_credited": true,
+  "selected": [
+   "perseverance-a1#p16",
+   "perseverance-a1#p2",
+   "perseverance-a1#p21"
+  ],
+  "first_failure": "none \u2014 selected evidence sufficient",
+  "pool_ranks": {
+   "perseverance-a1#p16": 1
+  }
+ },
+ {
+  "id": "w16",
+  "question": "When did Voyager 1 transmit the first detailed image of the Great Red Spot?",
+  "expected": "ok",
+  "scope": "public",
+  "tags": [
+   "wiki",
+   "answerable"
+  ],
+  "required_evidence": [
+   {
+    "fact": "date + transmission fact",
+    "acceptable": [
+     "voyager-a1#p44"
+    ],
+    "spans": [
+     "February 25, 1979",
+     "first detailed image of the Great Red Spot"
+    ]
+   }
+  ],
+  "pool_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "hit_credited": true,
+  "selected": [
+   "voyager-a1#p44",
+   "voyager-a1#p45",
+   "voyager-a1#p54"
+  ],
+  "first_failure": "none \u2014 selected evidence sufficient",
+  "pool_ranks": {
+   "voyager-a1#p44": 1
+  }
+ },
+ {
+  "id": "s01",
+  "question": "Did the germination test of seed lot G11 finish on January 5?",
+  "expected": "ok",
+  "scope": "public",
+  "tags": [
+   "synthetic",
+   "answerable"
+  ],
+  "required_evidence": [
+   {
+    "fact": "The test finished at 16:00 UTC",
+    "acceptable": [
+     "seedlog-a1#p2"
+    ],
+    "spans": [
+     "The test finished at 16:00 UTC"
+    ]
+   }
+  ],
+  "pool_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "hit_credited": true,
+  "selected": [
+   "seedlog-a1#p2",
+   "seedlog-a1#p5",
+   "seedlog-a1#p3"
+  ],
+  "first_failure": "none \u2014 selected evidence sufficient",
+  "pool_ranks": {
+   "seedlog-a1#p2": 1
+  }
+ },
+ {
+  "id": "s02",
+  "question": "Did the viability count pass for the January 5 test of seed lot G11?",
+  "expected": "ok",
+  "scope": "public",
+  "tags": [
+   "synthetic",
+   "answerable"
+  ],
+  "required_evidence": [
+   {
+    "fact": "viability count passed",
+    "acceptable": [
+     "seedlog-a1#p2"
+    ],
+    "spans": [
+     "viability count passed"
+    ]
+   }
+  ],
+  "pool_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "hit_credited": true,
+  "selected": [
+   "seedlog-a1#p2",
+   "seedlog-a1#p5",
+   "seedlog-a1#p3"
+  ],
+  "first_failure": "none \u2014 selected evidence sufficient",
+  "pool_ranks": {
+   "seedlog-a1#p2": 1
+  }
+ },
+ {
+  "id": "s03",
+  "question": "Did the germination test of seed lot G11 finish on January 6?",
+  "expected": "ok",
+  "scope": "public",
+  "tags": [
+   "synthetic",
+   "answerable"
+  ],
+  "required_evidence": [
+   {
+    "fact": "The test did not finish",
+    "acceptable": [
+     "seedlog-a1#p3"
+    ],
+    "spans": [
+     "The test did not finish"
+    ]
+   }
+  ],
+  "pool_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "hit_credited": true,
+  "selected": [
+   "seedlog-a1#p3",
+   "seedlog-a1#p5",
+   "seedlog-a1#p2"
+  ],
+  "first_failure": "none \u2014 selected evidence sufficient",
+  "pool_ranks": {
+   "seedlog-a1#p3": 1
+  }
+ },
+ {
+  "id": "s04",
+  "question": "Did the moisture reading finish on January 7?",
+  "expected": "ok",
+  "scope": "public",
+  "tags": [
+   "synthetic",
+   "answerable"
+  ],
+  "required_evidence": [
+   {
+    "fact": "moisture reading finished at 09:00 UTC",
+    "acceptable": [
+     "seedlog-a1#p4"
+    ],
+    "spans": [
+     "moisture reading finished at 09:00 UTC"
+    ]
+   }
+  ],
+  "pool_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "hit_credited": true,
+  "selected": [
+   "seedlog-a1#p4",
+   "seedlog-a1#p6",
+   "seedlog-a1#p7"
+  ],
+  "first_failure": "none \u2014 selected evidence sufficient",
+  "pool_ranks": {
+   "seedlog-a1#p4": 1
+  }
+ },
+ {
+  "id": "s05",
+  "question": "Was the germination test of seed lot G12 underway at 09:00 on January 7?",
+  "expected": "ok",
+  "scope": "public",
+  "tags": [
+   "synthetic",
+   "answerable"
+  ],
+  "required_evidence": [
+   {
+    "fact": "test continued",
+    "acceptable": [
+     "seedlog-a1#p4"
+    ],
+    "spans": [
+     "test continued"
+    ]
+   }
+  ],
+  "pool_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "hit_credited": true,
+  "selected": [
+   "seedlog-a1#p4",
+   "seedlog-a1#p6",
+   "seedlog-a1#p5"
+  ],
+  "first_failure": "none \u2014 selected evidence sufficient",
+  "pool_ranks": {
+   "seedlog-a1#p4": 1
+  }
+ },
+ {
+  "id": "s06",
+  "question": "Did the germination test of seed lot G12 finish on January 9?",
+  "expected": "ok",
+  "scope": "public",
+  "tags": [
+   "synthetic",
+   "answerable"
+  ],
+  "required_evidence": [
+   {
+    "fact": "test finished at 14:30 UTC",
+    "acceptable": [
+     "seedlog-a1#p6"
+    ],
+    "spans": [
+     "test finished at 14:30 UTC"
+    ]
+   }
+  ],
+  "pool_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "hit_credited": true,
+  "selected": [
+   "seedlog-a1#p6",
+   "seedlog-a1#p5",
+   "seedlog-a1#p4"
+  ],
+  "first_failure": "none \u2014 selected evidence sufficient",
+  "pool_ranks": {
+   "seedlog-a1#p6": 1
+  }
+ },
+ {
+  "id": "s07",
+  "question": "Did the moisture reading finish on January 9?",
+  "expected": "ok",
+  "scope": "public",
+  "tags": [
+   "synthetic",
+   "answerable"
+  ],
+  "required_evidence": [
+   {
+    "fact": "moisture reading finished at 09:00 UTC",
+    "acceptable": [
+     "seedlog-a1#p4"
+    ],
+    "spans": [
+     "moisture reading finished at 09:00 UTC"
+    ]
+   }
+  ],
+  "pool_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "hit_credited": true,
+  "selected": [
+   "seedlog-a1#p6",
+   "seedlog-a1#p4",
+   "seedlog-a1#p7"
+  ],
+  "first_failure": "none \u2014 selected evidence sufficient",
+  "pool_ranks": {
+   "seedlog-a1#p4": 2
+  }
+ },
+ {
+  "id": "s08",
+  "question": "Did the germination test of seed lot G13 finish on January 10?",
+  "expected": "ok",
+  "scope": "public",
+  "tags": [
+   "synthetic",
+   "answerable"
+  ],
+  "required_evidence": [
+   {
+    "fact": "germination test of seed lot G13 finished at 12:00 UTC",
+    "acceptable": [
+     "seedlog-a1#p7"
+    ],
+    "spans": [
+     "germination test of seed lot G13 finished at 12:00 UTC"
+    ]
+   }
+  ],
+  "pool_ceiling": true,
+  "selected_settles": true,
+  "api_status": "ok",
+  "hit_credited": true,
+  "selected": [
+   "seedlog-a1#p7",
+   "seedlog-a1#p5",
+   "seedlog-a1#p6"
+  ],
+  "first_failure": "none \u2014 selected evidence sufficient",
+  "pool_ranks": {
+   "seedlog-a1#p7": 1
+  }
+ },
+ {
+  "id": "i01",
+  "question": "Did the germination test of seed lot G12 finish on January 7?",
+  "expected": "insufficient_context",
+  "scope": "public",
+  "tags": [
+   "insufficient"
+  ],
+  "api_status": "ok",
+  "unresolved_detail": "missing: the moisture reading finished while the test continued \u2014 the test's outcome is never recorded for January 7",
+  "strongest_misleading": [
+   "seedlog-a1#p4"
+  ],
+  "first_failure": "n/a"
+ },
+ {
+  "id": "i02",
+  "question": "Did the germination test of seed lot G11 finish on January 8?",
+  "expected": "insufficient_context",
+  "scope": "public",
+  "tags": [
+   "insufficient"
+  ],
+  "api_status": "insufficient_context",
+  "unresolved_detail": "missing: bare 'It finished' after two started tests \u2014 ambiguous which lot",
+  "strongest_misleading": [
+   "seedlog-a1#p5"
+  ],
+  "first_failure": "n/a"
+ },
+ {
+  "id": "i03",
+  "question": "Did the viability count pass for the January 6 test of seed lot G11?",
+  "expected": "insufficient_context",
+  "scope": "public",
+  "tags": [
+   "insufficient"
+  ],
+  "api_status": "insufficient_context",
+  "unresolved_detail": "missing: the test did not finish \u2014 no count was possible, outcome unknown",
+  "strongest_misleading": [
+   "seedlog-a1#p2"
+  ],
+  "first_failure": "n/a"
+ },
+ {
+  "id": "i04",
+  "question": "On what exact calendar date did Congress approve funding for the Large Space Telescope?",
+  "expected": "insufficient_context",
+  "scope": "public",
+  "tags": [
+   "insufficient"
+  ],
+  "api_status": "ok",
+  "unresolved_detail": "missing: corpus records approval 'for 1978' \u2014 no exact date; a different date (mirror completion 1981) is nearby",
+  "strongest_misleading": [
+   "hubble-a1#p15"
+  ],
+  "first_failure": "n/a"
+ },
+ {
+  "id": "i05",
+  "question": "What is the diameter of Hubble's main mirror in meters?",
+  "expected": "insufficient_context",
+  "scope": "public",
+  "tags": [
+   "insufficient"
+  ],
+  "api_status": "ok",
+  "unresolved_detail": "missing: the value was in a template stripped from the snapshot \u2014 the passage mentions the mirror but not the number",
+  "strongest_misleading": [
+   "hubble-a1#p53"
+  ],
+  "first_failure": "n/a"
+ },
+ {
+  "id": "i06",
+  "question": "On what date did the Curiosity rover's mission end?",
+  "expected": "insufficient_context",
+  "scope": "public",
+  "tags": [
+   "insufficient"
+  ],
+  "api_status": "ok",
+  "unresolved_detail": "missing: rover continues to operate \u2014 no end date exists; 'original two-year mission' is nearby but is not an end",
+  "strongest_misleading": [
+   "curiosity-a1#p43"
+  ],
+  "first_failure": "n/a"
+ }
+]
