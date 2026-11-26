@@ -1,0 +1,716 @@
+{
+  "evidence_correct_answerable": 21,
+  "outcomes": [
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "w01",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 13.046218,
+      "latency_rest_ms": 13.106523,
+      "mcp_ids": [
+        "perl-a1#p28",
+        "perl-a1#p2",
+        "perl-a1#p40"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "perl-a1#p28",
+        "perl-a1#p2",
+        "perl-a1#p40"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "w02",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 8.828238,
+      "latency_rest_ms": 8.97008,
+      "mcp_ids": [
+        "perl-a1#p10",
+        "perl-a1#p31",
+        "perl-a1#p27"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "perl-a1#p10",
+        "perl-a1#p31",
+        "perl-a1#p27"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "w03",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 9.025498,
+      "latency_rest_ms": 8.780956,
+      "mcp_ids": [
+        "perl-a1#p11",
+        "perl-a1#p24",
+        "perl-a1#p19"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "perl-a1#p11",
+        "perl-a1#p24",
+        "perl-a1#p19"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "w04",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 11.258858,
+      "latency_rest_ms": 10.936195,
+      "mcp_ids": [
+        "perl-a1#p14",
+        "perl-a1#p15",
+        "perl-a1#p28"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "perl-a1#p14",
+        "perl-a1#p15",
+        "perl-a1#p28"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "w05",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 9.044371,
+      "latency_rest_ms": 9.063685999999999,
+      "mcp_ids": [
+        "perl-a1#p2",
+        "perl-a1#p43",
+        "perl-a1#p110"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "perl-a1#p2",
+        "perl-a1#p43",
+        "perl-a1#p110"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "w06",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 9.040064000000001,
+      "latency_rest_ms": 9.306788,
+      "mcp_ids": [
+        "ruby-a1#p6",
+        "ruby-a1#p12",
+        "ruby-a1#p8"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "ruby-a1#p6",
+        "ruby-a1#p12",
+        "ruby-a1#p8"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "w07",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 9.153679,
+      "latency_rest_ms": 8.976747,
+      "mcp_ids": [
+        "ruby-a1#p13",
+        "ruby-a1#p44",
+        "ruby-a1#p15"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "ruby-a1#p13",
+        "ruby-a1#p44",
+        "ruby-a1#p15"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "w08",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 9.409875999999999,
+      "latency_rest_ms": 9.158316999999998,
+      "mcp_ids": [
+        "ruby-a1#p16",
+        "ruby-a1#p17",
+        "ruby-a1#p24"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "ruby-a1#p16",
+        "ruby-a1#p17",
+        "ruby-a1#p24"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": false,
+      "expected": "ok",
+      "hit": false,
+      "id": "w09",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 9.73075,
+      "latency_rest_ms": 9.552662999999999,
+      "mcp_ids": [
+        "lua-a1#p57",
+        "lua-a1#p58",
+        "lua-a1#p108"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "lua-a1#p57",
+        "lua-a1#p58",
+        "lua-a1#p108"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "ok",
+      "hit": false,
+      "id": "w10",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 9.425237,
+      "latency_rest_ms": 9.311936,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "w11",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 8.975195,
+      "latency_rest_ms": 9.052499000000001,
+      "mcp_ids": [
+        "lua-a1#p9",
+        "lua-a1#p100",
+        "lua-a1#p103"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "lua-a1#p9",
+        "lua-a1#p100",
+        "lua-a1#p103"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "w12",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 9.66622,
+      "latency_rest_ms": 9.328394,
+      "mcp_ids": [
+        "kotlin-a1#p7",
+        "kotlin-a1#p2",
+        "kotlin-a1#p3"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "kotlin-a1#p7",
+        "kotlin-a1#p2",
+        "kotlin-a1#p3"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "w13",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 10.762939,
+      "latency_rest_ms": 10.454538,
+      "mcp_ids": [
+        "kotlin-a1#p8",
+        "kotlin-a1#p2",
+        "kotlin-a1#p45"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "kotlin-a1#p8",
+        "kotlin-a1#p2",
+        "kotlin-a1#p45"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "w14",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 9.805366,
+      "latency_rest_ms": 9.639185999999999,
+      "mcp_ids": [
+        "kotlin-a1#p5",
+        "kotlin-a1#p7",
+        "kotlin-a1#p16"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "kotlin-a1#p5",
+        "kotlin-a1#p7",
+        "kotlin-a1#p16"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "ok",
+      "hit": false,
+      "id": "w15",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 9.548770999999999,
+      "latency_rest_ms": 9.174996,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "w16",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 10.377165000000002,
+      "latency_rest_ms": 10.139461,
+      "mcp_ids": [
+        "kotlin-a1#p38",
+        "kotlin-a1#p41",
+        "kotlin-a1#p6"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "kotlin-a1#p38",
+        "kotlin-a1#p41",
+        "kotlin-a1#p6"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "w17",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 9.585998,
+      "latency_rest_ms": 9.565607,
+      "mcp_ids": [
+        "kotlin-a1#p2",
+        "kotlin-a1#p6",
+        "kotlin-a1#p10"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "kotlin-a1#p2",
+        "kotlin-a1#p6",
+        "kotlin-a1#p10"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "w18",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 8.97076,
+      "latency_rest_ms": 8.83612,
+      "mcp_ids": [
+        "ruby-a1#p6",
+        "ruby-a1#p8",
+        "ruby-a1#p16"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "ruby-a1#p6",
+        "ruby-a1#p8",
+        "ruby-a1#p16"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "s01",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 8.884442,
+      "latency_rest_ms": 7.883750999999999,
+      "mcp_ids": [
+        "satlog-a1#p2",
+        "satlog-a1#p5",
+        "satlog-a1#p3"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "satlog-a1#p2",
+        "satlog-a1#p5",
+        "satlog-a1#p3"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "s02",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 8.180406,
+      "latency_rest_ms": 8.06866,
+      "mcp_ids": [
+        "satlog-a1#p2",
+        "satlog-a1#p6",
+        "satlog-a1#p5"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "satlog-a1#p2",
+        "satlog-a1#p6",
+        "satlog-a1#p5"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "s03",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 7.743507999999999,
+      "latency_rest_ms": 7.857615,
+      "mcp_ids": [
+        "satlog-a1#p3",
+        "satlog-a1#p5",
+        "satlog-a1#p2"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "satlog-a1#p3",
+        "satlog-a1#p5",
+        "satlog-a1#p2"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "s04",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 7.497041,
+      "latency_rest_ms": 7.286269,
+      "mcp_ids": [
+        "satlog-a1#p2",
+        "satlog-a1#p6",
+        "satlog-a1#p3"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "satlog-a1#p2",
+        "satlog-a1#p6",
+        "satlog-a1#p3"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "h01",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 9.280783000000001,
+      "latency_rest_ms": 8.930382,
+      "mcp_ids": [
+        "shiplog-a1#p2",
+        "shiplog-a1#p3",
+        "shiplog-a1#p1"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "shiplog-a1#p2",
+        "shiplog-a1#p3",
+        "shiplog-a1#p1"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "h02",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 8.511725,
+      "latency_rest_ms": 8.508028000000001,
+      "mcp_ids": [
+        "shiplog-a1#p2",
+        "shiplog-a1#p3",
+        "shiplog-a1#p1"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "shiplog-a1#p2",
+        "shiplog-a1#p3",
+        "shiplog-a1#p1"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "i01",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 7.806925000000001,
+      "latency_rest_ms": 7.600855,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "i02",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 7.635376,
+      "latency_rest_ms": 7.466172,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": null,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "i03",
+      "insufficient_correct": false,
+      "latency_mcp_ms": 7.742884,
+      "latency_rest_ms": 7.6577779999999995,
+      "mcp_ids": [
+        "satlog-a1#p6",
+        "satlog-a1#p2",
+        "satlog-a1#p5"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "satlog-a1#p6",
+        "satlog-a1#p2",
+        "satlog-a1#p5"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "i04",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 9.120389,
+      "latency_rest_ms": 9.141105999999999,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "i05",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 9.165914,
+      "latency_rest_ms": 9.160807,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "i06",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 9.850952,
+      "latency_rest_ms": 9.762181,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    }
+  ],
+  "questions": "fixtures/corpus-v3/key.v3.json",
+  "result": {
+    "checks": {
+      "adapter_agreement": {
+        "agree": 30,
+        "pass": true,
+        "total": 30
+      },
+      "citation_integrity": {
+        "checked": 138,
+        "ok": 138,
+        "pass": true
+      },
+      "evidence_coverage": {
+        "answerable": 24,
+        "hits": 21,
+        "pass": true
+      },
+      "insufficient_evidence": {
+        "correct": 5,
+        "pass": false,
+        "total": 6
+      },
+      "provider_calls": {
+        "count": 0,
+        "pass": true
+      }
+    },
+    "corpus": "fixtures/corpus-v3",
+    "incomplete": false,
+    "mode": "gate",
+    "questions": "fixtures/corpus-v3/key.v3.json",
+    "reasons": [],
+    "verdict": "FAIL",
+    "version": "bench-result.v1"
+  },
+  "summary": {
+    "adapter_agree": 30,
+    "answerable": 24,
+    "citations_checked": 138,
+    "citations_ok": 138,
+    "hits": 21,
+    "incomplete": false,
+    "insufficient": 6,
+    "insufficient_correct": 5,
+    "total": 30
+  }
+}
