@@ -950,9 +950,9 @@ fn probe(questions_path: &str, corpus_dir: &str) {
         }
         if !acceptable.is_empty() {
             for a in &acceptable {
-                let in_pool = dbg.candidates.iter().any(|(id, _)| id == a);
+                let rank = dbg.candidates.iter().position(|(id, _)| id == a).map(|i| i + 1);
                 let in_sel = dbg.selected.iter().any(|id| id == a);
-                println!("   key {}: in-pool={} in-selection={}", a, in_pool, in_sel);
+                println!("   key {}: pool-rank={} in-selection={}", a, rank.map(|r| r.to_string()).unwrap_or_else(|| "ABSENT".into()), in_sel);
             }
         }
     }
