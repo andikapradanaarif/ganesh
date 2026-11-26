@@ -1,0 +1,230 @@
+{
+ "version": "rank-xfer.v1",
+ "notes": "Frozen transfer group for the selection experiment, frozen before implementation.",
+ "questions": [
+  {
+   "id": "x01",
+   "question": "Who designed and built the Eiffel Tower?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "whose company designed and built the tower from 1887 to 1889",
+     "acceptable": [
+      "eiffel-a1#p4"
+     ],
+     "spans": [
+      "whose company designed and built the tower from 1887 to 1889"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "x02",
+   "question": "When was the critical stage of joining the Eiffel Tower's legs at the first level completed?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "deep"
+   ],
+   "required_facts": [
+    {
+     "fact": "completed by the end of March 1888",
+     "acceptable": [
+      "eiffel-a1#p24"
+     ],
+     "spans": [
+      "completed by the end of March 1888"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "x03",
+   "question": "In what year did the Eiffel Tower become part of the International Time Service?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "International Time Service in 1910",
+     "acceptable": [
+      "eiffel-a1#p36"
+     ],
+     "spans": [
+      "International Time Service in 1910"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "x04",
+   "question": "Who died jumping from the first level of the Eiffel Tower to demonstrate a parachute design?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "deep"
+   ],
+   "required_facts": [
+    {
+     "fact": "Franz Reichelt died after jumping",
+     "acceptable": [
+      "eiffel-a1#p42"
+     ],
+     "spans": [
+      "Franz Reichelt died after jumping"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "x05",
+   "question": "Which Nobel Prize did Marie Curie win in 1911?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "1911 Nobel Prize in Chemistry",
+     "acceptable": [
+      "curie-a1#p1"
+     ],
+     "spans": [
+      "1911 Nobel Prize in Chemistry"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "x06",
+   "question": "With whom did Marie Curie share the 1903 Nobel Prize in Physics?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "with her husband, Pierre Curie",
+     "acceptable": [
+      "curie-a1#p1"
+     ],
+     "spans": [
+      "with her husband, Pierre Curie"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "x07",
+   "question": "In what year did Marie Curie become the first woman professor at the University of Paris?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "in 1906, the first woman to become a professor",
+     "acceptable": [
+      "curie-a1#p2"
+     ],
+     "spans": [
+      "in 1906, the first woman to become a professor"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "x08",
+   "question": "When did Pierre Curie die?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "Pierre died in 1906",
+     "acceptable": [
+      "curie-a1#p3"
+     ],
+     "spans": [
+      "Pierre died in 1906"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "x09",
+   "question": "What prize amount did Alberto Santos-Dumont win for his 1901 airship flight?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "deep"
+   ],
+   "required_facts": [
+    {
+     "fact": "100,000-franc prize",
+     "acceptable": [
+      "eiffel-a1#p39"
+     ],
+     "spans": [
+      "100,000-franc prize"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "i21",
+   "question": "On what exact day and month did construction of the Eiffel Tower begin?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "missing-detail"
+   ],
+   "required_facts": [
+    {
+     "fact": "missing: corpus gives years 1887-1889 but no exact start date",
+     "acceptable": [],
+     "spans": []
+    }
+   ]
+  },
+  {
+   "id": "i22",
+   "question": "In which year did Marie Curie first move to Paris?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "missing-detail"
+   ],
+   "required_facts": [
+    {
+     "fact": "missing: corpus does not state the year of her move in keyable form",
+     "acceptable": [],
+     "spans": []
+    }
+   ]
+  }
+ ]
+}

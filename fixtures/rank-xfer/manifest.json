@@ -1,0 +1,45 @@
+{
+ "version": "rank-xfer",
+ "created": "2026-11-28",
+ "frame": "frozen transfer group: two public articles unused in any prior packet",
+ "seed": 0,
+ "exclusions": [],
+ "sampling": "hand-selected public documents",
+ "snapshot_format": "plaintext with wiki-style section headings",
+ "articles": [
+  {
+   "article_id": "eiffel",
+   "title": "Eiffel Tower",
+   "pageid": 0,
+   "revision": "eiffel-a1",
+   "revision_url": "https://example.invalid/eiffel",
+   "publisher": "Wikipedia contributors",
+   "url": "https://en.wikipedia.org/wiki/Eiffel_Tower",
+   "license": "CC BY-SA 4.0",
+   "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+   "permission": "CC BY-SA 4.0 permits storage and replay with attribution",
+   "retrieved": "2026-11-28",
+   "bytes": 49000,
+   "sha256": "11a29675dcc81931c206b32c6970ecdda97d8ab49606526ced7456d9e2acc0e7",
+   "file": "snapshots/eiffel.txt",
+   "family": "eiffel"
+  },
+  {
+   "article_id": "curie",
+   "title": "Marie Curie",
+   "pageid": 0,
+   "revision": "curie-a1",
+   "revision_url": "https://example.invalid/curie",
+   "publisher": "Wikipedia contributors",
+   "url": "https://en.wikipedia.org/wiki/Marie_Curie",
+   "license": "CC BY-SA 4.0",
+   "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+   "permission": "CC BY-SA 4.0 permits storage and replay with attribution",
+   "retrieved": "2026-11-28",
+   "bytes": 40304,
+   "sha256": "217c515d66e88e2790e4b5c5055127613fcc052a6f1ed9dede293705d5ee2be1",
+   "file": "snapshots/curie.txt",
+   "family": "curie"
+  }
+ ]
+}
