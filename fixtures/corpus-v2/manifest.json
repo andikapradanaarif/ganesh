@@ -1,0 +1,82 @@
+{
+  "articles": [
+    {
+      "article_id": "cplusplus",
+      "bytes": 18057,
+      "family": "heldout-v2",
+      "file": "snapshots/cplusplus.txt",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "pageid": 72038,
+      "permission": "Text of English Wikipedia articles is licensed under CC BY-SA 4.0, which permits storage and redistribution with attribution; attribution via publisher, article URL and revision URL recorded here.",
+      "publisher": "Wikipedia contributors, English Wikipedia",
+      "retrieved": "2026-11-26",
+      "revision": "1387610051",
+      "revision_url": "https://en.wikipedia.org/wiki/C++?oldid=1387610051",
+      "sha256": "cf5ac66418280b1e5d7a2f5deebb8047d5007b1871e16b0b9ad7ef5932f05cbf",
+      "title": "C++",
+      "url": "https://en.wikipedia.org/wiki/C++"
+    },
+    {
+      "article_id": "python",
+      "bytes": 40207,
+      "family": "heldout-v2",
+      "file": "snapshots/python.txt",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "pageid": 23862,
+      "permission": "Text of English Wikipedia articles is licensed under CC BY-SA 4.0, which permits storage and redistribution with attribution; attribution via publisher, article URL and revision URL recorded here.",
+      "publisher": "Wikipedia contributors, English Wikipedia",
+      "retrieved": "2026-11-26",
+      "revision": "1386984050",
+      "revision_url": "https://en.wikipedia.org/wiki/Python_(programming_language)?oldid=1386984050",
+      "sha256": "5606519cb48108effe47e56a0f80fe6a728fb9ffdb12a8b6610180cd423bc223",
+      "title": "Python (programming language)",
+      "url": "https://en.wikipedia.org/wiki/Python_(programming_language)"
+    },
+    {
+      "article_id": "haskell",
+      "bytes": 20776,
+      "family": "heldout-v2",
+      "file": "snapshots/haskell.txt",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "pageid": 27404990,
+      "permission": "Text of English Wikipedia articles is licensed under CC BY-SA 4.0, which permits storage and redistribution with attribution; attribution via publisher, article URL and revision URL recorded here.",
+      "publisher": "Wikipedia contributors, English Wikipedia",
+      "retrieved": "2026-11-26",
+      "revision": "1387873129",
+      "revision_url": "https://en.wikipedia.org/wiki/Haskell?oldid=1387873129",
+      "sha256": "2d93e2c23f1f31f3b23d45aa898b2bf0267d7d77e24a114c9761a371d4fd9d81",
+      "title": "Haskell",
+      "url": "https://en.wikipedia.org/wiki/Haskell"
+    },
+    {
+      "article_id": "c",
+      "bytes": 56170,
+      "family": "heldout-v2",
+      "file": "snapshots/c.txt",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "pageid": 6021,
+      "permission": "Text of English Wikipedia articles is licensed under CC BY-SA 4.0, which permits storage and redistribution with attribution; attribution via publisher, article URL and revision URL recorded here.",
+      "publisher": "Wikipedia contributors, English Wikipedia",
+      "retrieved": "2026-11-26",
+      "revision": "1387656235",
+      "revision_url": "https://en.wikipedia.org/wiki/C_(programming_language)?oldid=1387656235",
+      "sha256": "af8ee99adc60310c8b156fbb44e71c9fe667a4345388d63cdbf46511041b2cf3",
+      "title": "C (programming language)",
+      "url": "https://en.wikipedia.org/wiki/C_(programming_language)"
+    }
+  ],
+  "created": "2026-11-26",
+  "exclusions": [
+    "Articles with plaintext extracts shorter than 15000 bytes are excluded",
+    "Sections titled 'See also', 'References', 'Notes', 'Further reading', 'External links' and their subsections are excluded from passage segmentation"
+  ],
+  "frame": "unexposed members of the corpus.v1 14-language frame after applying the 15000-byte exclusion to TypeScript and Kotlin",
+  "sampling": "remaining unexposed members of the corpus.v1 seeded frame; C++, Python, TypeScript and Kotlin selected as disjoint v2 families",
+  "seed": 20261126,
+  "snapshot_format": "Verbatim plaintext bytes of the English Wikipedia API plaintext extract (action=query, prop=extracts, explaintext=true, exsectionformat=wiki) for the recorded revision. Section headings appear as lines like '== Heading ==' / '=== Subheading ==='.",
+  "version": "corpus.v2"
+}

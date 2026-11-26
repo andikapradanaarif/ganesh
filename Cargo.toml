@@ -5,6 +5,7 @@ members = [
     "crates/ganesh-server",
     "crates/ganesh-mcp",
     "crates/ganesh-bench",
+    "crates/ganesh-corpus-tool",
 ]
 
 [workspace.package]
