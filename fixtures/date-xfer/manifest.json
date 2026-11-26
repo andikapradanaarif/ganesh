@@ -1,0 +1,45 @@
+{
+ "version": "date-xfer",
+ "created": "2026-11-26",
+ "frame": "frozen transfer group: date-aware selection, unused public sources (Apollo 11, Apollo 8); predeclared mix: exact-date, year-only, multi-date passage, wrong-subject-right-event, deep answer, compound, non-date fallback, 2 insufficient exact-day traps",
+ "seed": 0,
+ "exclusions": [],
+ "sampling": "hand-selected public documents",
+ "snapshot_format": "plaintext with wiki-style section headings",
+ "articles": [
+  {
+   "article_id": "ap11",
+   "title": "Apollo 11",
+   "pageid": 0,
+   "revision": "ap11-a1",
+   "revision_url": "https://example.invalid/ap11",
+   "publisher": "Wikipedia contributors",
+   "url": "https://en.wikipedia.org/wiki/Apollo_11",
+   "license": "CC BY-SA 4.0",
+   "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+   "permission": "CC BY-SA 4.0 permits storage and replay with attribution",
+   "retrieved": "2026-11-26",
+   "bytes": 84683,
+   "sha256": "6ad77170a82b31ea7f097b27aedd0697fa37f8afc66e5b5f0874a37fa6553e89",
+   "file": "snapshots/ap11.txt",
+   "family": "ap11"
+  },
+  {
+   "article_id": "ap8",
+   "title": "Apollo 8",
+   "pageid": 0,
+   "revision": "ap8-a1",
+   "revision_url": "https://example.invalid/ap8",
+   "publisher": "Wikipedia contributors",
+   "url": "https://en.wikipedia.org/wiki/Apollo_8",
+   "license": "CC BY-SA 4.0",
+   "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+   "permission": "CC BY-SA 4.0 permits storage and replay with attribution",
+   "retrieved": "2026-11-26",
+   "bytes": 51890,
+   "sha256": "3ab3eb58727de9c89355e3768c07053d2bbf67dc5e52694ec0a6dcfccc0d732e",
+   "file": "snapshots/ap8.txt",
+   "family": "ap8"
+  }
+ ]
+}
