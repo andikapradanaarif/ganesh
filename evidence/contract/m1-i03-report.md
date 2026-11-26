@@ -22,7 +22,8 @@ Fix: action support and contradiction matching use **only the sentence's own ste
 
 | Input | pinned #170 | revision |
 |---|---|---|
-| exposed v3 (development evidence now) | 24/30, 3 unsupported-ok | **27/30, 0 unsupported-ok** — i03 fixed, no regressions |
+| exposed v3 — #168 reference (development evidence) | 24/30, 3 unsupported-ok (i01,i02,i03) | — |
+| exposed v3 — #170 pinned candidate | 26/30, 1 unsupported-ok (i03) | **27/30, 0 unsupported-ok** — i03 fixed, no regressions |
 | activity-probe (frozen pre-implementation) | 7/10, leak a08 | 7/10, leak a08 — **identical** |
 
 Decision-rule evaluation: i03 fixed with correct trace ✓; v3 preserved with zero unsupported-ok ✓; **but no improvement on the frozen fixture** (7/10 = 7/10) and **the competing-activity control a08 leaks in both arms** ("the inspection finished while the repair continued" still lets the repair borrow the inspection's outcome — the e08 class, reported separately as required). a03/a06 false-abstain in both arms: "cancelled before execution"/"never took place" should settle "did it take place" negatively but no cue chain connects activity-verbs to take-place phrasing.

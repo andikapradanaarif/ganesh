@@ -1,0 +1,29 @@
+The Hartwell waterworks is a fictional pumping station used as the frozen event-identity fixture. This is its maintenance log.
+
+== Shift October 3 ==
+
+At 09:30 the flushing of the intake pipe finished while the sealing of the valve continued.
+
+== Shift October 4 ==
+
+At 09:30 the sealing of the valve continued while the flushing of the intake pipe finished.
+
+== Shift October 5 ==
+
+While the flushing of the intake pipe continued, the sealing of the valve finished at 09:30.
+
+== Shift October 6 ==
+
+The flushing of the intake pipe started at 09:00 UTC. The flushing finished at 09:45 UTC and the pressure test passed.
+
+== Shift October 7 ==
+
+The flushing of the intake pipe did not finish before the shift ended.
+
+== Shift October 8 ==
+
+The flushing of the intake pipe started at 09:00 UTC. The sealing of the valve started at 09:10 UTC. It finished at 11:00 UTC.
+
+== Shift October 9 ==
+
+At 09:30 the flushing of the intake pipe finished while the sealing of the valve continued. The sealing finished at 14:00 UTC.
