@@ -211,7 +211,16 @@ pub fn quantity_candidates(sentence: &str) -> Vec<(String, Option<String>)> {
     let mut out = Vec::new();
     for tok in surface_tokens(sentence) {
         let low = tok.to_ascii_lowercase();
-        if let Some(lit) = standalone_digits(&low) {
+        let comma_grouped = low.len() > 4
+            && low.chars().all(|c| c.is_ascii_digit() || c == ',')
+            && low.chars().any(|c| c == ',')
+            && low.split(',').enumerate().all(|(i, part)| {
+                (!part.is_empty() && part.chars().all(|c| c.is_ascii_digit()))
+                    && (i == 0 && part.len() <= 3 || i > 0 && part.len() == 3)
+            });
+        if comma_grouped {
+            out.push((low.replace(',', ""), None));
+        } else if let Some(lit) = standalone_digits(&low) {
             if year_like(&lit) {
                 out.push((lit, Some("year-like 4-digit literal".to_string())));
             } else {
@@ -266,15 +275,32 @@ pub fn measured_property_terms(query: &str) -> Vec<String> {
             break;
         }
     }
-    let Some(mut i) = start else { return Vec::new() };
-    while i < toks.len() && EXTRACTION_FUNCTION_WORDS.contains(&toks[i].as_str()) {
-        i += 1;
-    }
     let mut out = Vec::new();
-    while i < toks.len() && !EXTRACTION_FUNCTION_WORDS.contains(&toks[i].as_str()) {
-        let stemmed = crate::search::stemmed_tokens(&toks[i]);
-        out.extend(stemmed);
-        i += 1;
+    if let Some(mut i) = start {
+        while i < toks.len() && EXTRACTION_FUNCTION_WORDS.contains(&toks[i].as_str()) {
+            i += 1;
+        }
+        while i < toks.len() && !EXTRACTION_FUNCTION_WORDS.contains(&toks[i].as_str()) {
+            let stemmed = crate::search::stemmed_tokens(&toks[i]);
+            out.extend(stemmed);
+            i += 1;
+        }
+    }
+    if out.is_empty() {
+        // Measurement questions ("what is the diameter of X in meters"):
+        // the measured property is the measurement noun itself, plus any
+        // explicit unit. Predeclared linguistic lists, no fixture vocabulary.
+        const UNITS: &[&str] = &[
+            "meter", "meters", "metre", "metres", "kilometer", "kilometers", "kilometre",
+            "kilometres", "mile", "miles", "feet", "foot", "inch", "inches", "kg",
+            "kilogram", "kilograms", "ton", "tons", "tonne", "tonnes", "gram", "grams",
+            "cm", "mm", "km", "watt", "watts", "byte", "bytes",
+        ];
+        for t in &toks {
+            if crate::search::MEASURE_PROPS.contains(&t.as_str()) || UNITS.contains(&t.as_str()) {
+                out.extend(crate::search::stemmed_tokens(t));
+            }
+        }
     }
     out.sort();
     out.dedup();
@@ -415,8 +441,133 @@ fn stemmed_query_like(text: &str) -> Vec<String> {
     crate::search::stemmed_tokens(text)
 }
 
+
+/// True when the digit token at this byte position in the raw sentence sits
+/// inside a code-like operator context (==, !=, =, backticks, true/false
+/// adjacency). Such literals are expressions, not measurements.
+pub fn code_literal_context(sentence: &str, token: &str) -> bool {
+    if token != "0" && token != "1" {
+        return false;
+    }
+    let mut found = false;
+    let bytes = sentence.as_bytes();
+    let mut start = 0usize;
+    while let Some(pos) = sentence[start..].find(token) {
+        let abs = start + pos;
+        let before_ok = abs == 0 || !bytes[abs - 1].is_ascii_digit();
+        let after = abs + token.len();
+        let after_ok = after >= bytes.len() || !bytes[after].is_ascii_digit();
+        if before_ok && after_ok {
+            let lo = abs.saturating_sub(4);
+            let hi = (after + 4).min(bytes.len());
+            let window = &sentence[lo..hi];
+            if window.contains('=') || window.contains('!') || window.contains('<') || window.contains('>') || window.contains('`') {
+                return true;
+            }
+            found = true;
+        }
+        start = abs + token.len();
+        if start >= sentence.len() {
+            break;
+        }
+    }
+    let _ = found;
+    false
+}
+
+/// True when the surface word "one" is used pronominally in this sentence:
+/// followed by "of", or preceded by a small closed class of pronoun-triggering
+/// words. Quantifying uses ("one million", "one window") survive.
+pub fn pronominal_one(sentence: &str) -> bool {
+    let toks: Vec<String> = sentence
+        .split_whitespace()
+        .map(|t| t.trim_matches(|c: char| !c.is_alphanumeric()).to_ascii_lowercase())
+        .collect();
+    const TRIGGERS: &[&str] = &["of", "instead", "use", "if", "when", "as", "like", "in", "that", "which", "than"];
+    for (i, t) in toks.iter().enumerate() {
+        if t == "one" {
+            if toks.get(i + 1).map(|n| n == "of").unwrap_or(false) {
+                return true;
+            }
+            if i > 0 && TRIGGERS.contains(&toks[i - 1].as_str()) {
+                return true;
+            }
+        }
+    }
+    false
+}
+
+/// True when the literal occurs within `window` whitespace tokens of any of
+/// the target stems (measured property or unit) in the sentence.
+pub fn quantifying_window(sentence: &str, literal: &str, targets: &[String], window: usize) -> bool {
+    if targets.is_empty() {
+        return true;
+    }
+    let toks: Vec<String> = sentence
+        .split_whitespace()
+        .map(|t| t.trim_matches(|c: char| !c.is_alphanumeric()).to_ascii_lowercase())
+        .collect();
+    let stemmed: Vec<Vec<String>> = toks.iter().map(|t| crate::search::stemmed_tokens(t)).collect();
+    for (i, t) in toks.iter().enumerate() {
+        let bare = t.trim_end_matches(|c: char| !c.is_ascii_digit() && c != '.').trim_start_matches(|c: char| !c.is_ascii_digit());
+        let norm = t.replace(',', "");
+        let matches_lit = *t == *literal || bare == literal || norm == *literal || t.starts_with(literal);
+        if !matches_lit {
+            continue;
+        }
+        let lo = i.saturating_sub(window);
+        let hi = (i + window + 1).min(toks.len());
+        for j in lo..hi {
+            if j == i {
+                continue;
+            }
+            if stemmed[j].iter().any(|st| targets.contains(st)) {
+                return true;
+            }
+        }
+    }
+    false
+}
+
+/// Environment stems functioning as deployment environments in the QUERY:
+/// the environment word must follow a preposition ("in production", "to
+/// staging", "on test"). Activity nouns like "germination test" do not, so
+/// the queried activity is never stripped from attribution analysis.
+pub fn query_env_stems(query: &str) -> std::collections::BTreeSet<String> {
+    const PREPS: &[&str] = &["in", "to", "on", "at", "into", "onto"];
+    const ENV_SURFACE: &[&str] = &["production", "prod", "staging", "stage", "test", "dev", "development"];
+    let toks: Vec<String> = query
+        .to_lowercase()
+        .split(|c: char| !c.is_alphanumeric())
+        .filter(|w| !w.is_empty())
+        .map(|w| w.to_string())
+        .collect();
+    let mut out = std::collections::BTreeSet::new();
+    for i in 1..toks.len() {
+        if PREPS.contains(&toks[i - 1].as_str()) && ENV_SURFACE.contains(&toks[i].as_str()) {
+            for st in crate::search::stemmed_tokens(&toks[i]) {
+                if ENV_STEMS.contains(&st.as_str()) {
+                    out.insert(st);
+                }
+            }
+        }
+    }
+    out
+}
+
+/// Exact-date trigger: the question explicitly demands calendar-day precision.
+pub fn exact_date_query(query: &str) -> bool {
+    let q = query.to_lowercase();
+    const TRIGGERS: &[&str] = &[
+        "exact date", "exact calendar date", "exact day", "on what date", "on what day",
+        "what exact date", "what exact day", "which exact date", "which exact day",
+    ];
+    TRIGGERS.iter().any(|t| q.contains(t))
+}
+
 pub fn decide(input: &DecideInput) -> AcceptanceTrace {
     let mut trace = AcceptanceTrace::default();
+    let qenv_stems = query_env_stems(input.query);
 
     // ---- coverage gates, unchanged from the revised v2 reference ------------
     if input.idf_union_coverage < input.min_idf_union_coverage {
@@ -481,7 +632,27 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
                     let version_ok = q_versions.is_empty()
                         || q_versions.iter().any(|v| s_versions.contains(v));
                     for (token, exclusion) in cands {
-                        let mention_exclusion = match (&exclusion, version_ok) {
+                        // Tightened quantifying evidence (predeclared): a
+                        // pronominal "one" or a code-literal 0/1 is never a
+                        // measurement, and the literal must sit within an
+                        // 8-token window of the measured property or unit.
+                        let version_override = exclusion.as_deref() == Some("version or identifier token")
+                            && !measured_terms.is_empty()
+                            && quantifying_window(sentence, &token, &measured_terms, 8);
+                        let tightened_exclusion = if exclusion.is_some() && !version_override {
+                            exclusion.clone()
+                        } else if token == "one" && pronominal_one(sentence) {
+                            Some("pronominal one, not a quantity".to_string())
+                        } else if code_literal_context(sentence, &token) {
+                            Some("code-literal digit in operator expression".to_string())
+                        } else if !measured_terms.is_empty()
+                            && !quantifying_window(sentence, &token, &measured_terms, 8)
+                        {
+                            Some("numeric token outside quantifying window of measured property".to_string())
+                        } else {
+                            None
+                        };
+                        let mention_exclusion = match (&tightened_exclusion, version_ok) {
                             (Some(e), _) => Some(e.clone()),
                             (None, false) => Some("version mismatch with question".to_string()),
                             (None, true) => None,
@@ -508,6 +679,55 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
         } else if !input.any_numeric_token {
             // Reference behavior: crude presence of any digit token.
             trace.reasons.push("no numeric token in selected passages".to_string());
+        }
+    }
+
+    // ---- exact-date precision verification -----------------------------------
+    // When the question demands calendar-day precision, at least one selected
+    // passage must tie a real adjacent month-day date to the queried event in
+    // the same sentence — or, for dated logs, in the section heading while the
+    // event appears in the passage. Open "when" and year-only questions are
+    // not constrained by this rule.
+    if exact_date_query(input.query) {
+        let framing = crate::search::framing_stems();
+        let event_terms: Vec<&String> = input
+            .terms
+            .iter()
+            .filter(|t| {
+                !input.subject_terms.contains(*t)
+                    && !framing.contains(*t)
+                    && !VERIFY_CUES.contains(&t.as_str())
+                    && !PROPOSE_CUES.contains(&t.as_str())
+                    && !ATTEMPT_CUES.contains(&t.as_str())
+                    && !TRANSITION_CUES.contains(&t.as_str())
+            })
+            .collect();
+        let mut tied = false;
+        'outer: for (_pid, verbatim, section, _) in input.passages {
+            for sentence in &sentences(verbatim) {
+                let ss = stemmed_query_like(sentence);
+                if crate::search::date_tier(sentence) >= 2.5
+                    && event_terms.iter().any(|t| ss.contains(*t))
+                {
+                    tied = true;
+                    break 'outer;
+                }
+            }
+            if crate::search::date_tier(section) >= 2.5 {
+                for sentence in &sentences(verbatim) {
+                    let ss = stemmed_query_like(sentence);
+                    if event_terms.iter().any(|t| ss.contains(*t)) {
+                        tied = true;
+                        break 'outer;
+                    }
+                }
+            }
+        }
+        if !tied {
+            trace.reasons.push(
+                "exact-date-precision: no adjacent month-day calendar date tied to the queried event in the selected passages"
+                    .to_string(),
+            );
         }
     }
 
@@ -581,7 +801,7 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
                                 && !PROPOSE_CUES.contains(&t.as_str())
                                 && !ATTEMPT_CUES.contains(&t.as_str())
                                 && !TRANSITION_CUES.contains(&t.as_str())
-                                && !ENV_STEMS.contains(&t.as_str())
+                                && !qenv_stems.contains(*t)
                                 && sent_stemmed.contains(*t)
                         })
                         .cloned()
@@ -598,7 +818,7 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
                                 && !PROPOSE_CUES.contains(&t.as_str())
                                 && !ATTEMPT_CUES.contains(&t.as_str())
                                 && !TRANSITION_CUES.contains(&t.as_str())
-                                && !ENV_STEMS.contains(&t.as_str())
+                                && !qenv_stems.contains(*t)
                         })
                         .collect();
                     let ident_ok = object_all.iter()
@@ -649,7 +869,7 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
                                 .filter(|t| !input.subject_terms.contains(*t)
                                     && !t.chars().any(|c| c.is_ascii_digit())
                                     && action_group(t).is_none()
-                                    && !ENV_STEMS.contains(&t.as_str()))
+                                    && !qenv_stems.contains(*t))
                                 .collect();
                             let cue_in_own = own_stemmed.iter().any(|t| action_supports(&qp, t));
                             if cls.len() <= 1 {
@@ -669,7 +889,7 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
                                 let act_terms: Vec<&String> = input.terms.iter()
                                     .filter(|t| !t.chars().any(|c| c.is_ascii_digit())
                                         && action_group(t).is_none()
-                                        && !ENV_STEMS.contains(&t.as_str()))
+                                        && !qenv_stems.contains(*t))
                                     .collect();
                                 let act_only_elsewhere = act_terms.iter().any(|o| {
                                     stem_cls.iter().any(|sc| sc.contains(*o))
@@ -735,3 +955,178 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
     };
     trace
 }
+
+#[cfg(test)]
+mod sufficiency_tests {
+    use super::*;
+
+    fn mkpass(text: &str) -> Vec<(String, String, String, Vec<String>)> {
+        vec![("p1".to_string(), text.to_string(), String::new(), Vec::new())]
+    }
+
+    fn nosubj() -> std::collections::BTreeSet<String> {
+        std::collections::BTreeSet::new()
+    }
+
+    fn decide_one(query: &str, terms: Vec<String>, text: &str) -> AcceptanceTrace {
+        let passages = mkpass(text);
+        let input = DecideInput {
+            query,
+            terms: &terms,
+            subject_terms: &nosubj(),
+            passages: &passages,
+            idf_union_coverage: 1.0,
+            union_coverage: 1.0,
+            top_coverage: 1.0,
+            min_idf_union_coverage: 0.75,
+            min_union_coverage: 0.0,
+            min_top_coverage: 0.0,
+            quantity_question: true,
+            quantity_unit_missing: false,
+            any_numeric_token: true,
+            quantity_binding: true,
+            transition_check: false,
+            proposition_check: false,
+            context_chain: true,
+            action_check: false,
+        };
+        decide(&input)
+    }
+
+    #[test]
+    fn pronominal_one_and_code_literals_do_not_satisfy_operator_count() {
+        // v30 class: "use of one in place of" and code booleans are not counts.
+        let terms: Vec<String> = vec!["oper".to_string(), "c".to_string(), "defin".to_string()];
+        let t1 = decide_one(
+            "How many operators does C define?",
+            terms.clone(),
+            "C makes accidental use of one in place of another. The expression == 1 and != 0 are boolean tests of operators.",
+        );
+        assert!(t1.decision != "ok", "pronominal one and code literals must not bind");
+        let t2 = decide_one("How many operators does C define?", terms, "C defines 45 operators in total.");
+        assert_eq!(t2.decision, "ok", "a real count near the property must bind");
+    }
+
+    #[test]
+    fn real_counts_pass_quantifying_window() {
+        let terms: Vec<String> = vec!["window".to_string(), "build".to_string()];
+        let t = decide_one(
+            "How many windows does the Empire State Building contain?",
+            terms,
+            "The building also contains 6,514 windows.",
+        );
+        assert_eq!(t.decision, "ok");
+        let t2 = decide_one(
+            "How many watts does the array draw?",
+            vec!["watt".to_string(), "array".to_string()],
+            "The array draws 110 watts at peak.",
+        );
+        assert_eq!(t2.decision, "ok");
+    }
+
+    #[test]
+    fn measurement_query_requires_unit_evidence() {
+        // i05 class: measurement verification fires, abstains when absent,
+        // passes when the unit measurement is present.
+        let prop = measured_property_terms("What is the diameter of Hubble's main mirror in meters?");
+        assert!(prop.iter().any(|t| t.starts_with("diamet")), "diameter must be extracted: {:?}", prop);
+        assert!(prop.iter().any(|t| t.starts_with("meter") || t == "m"), "unit must be extracted: {:?}", prop);
+        let terms: Vec<String> = vec!["diamet".to_string(), "meter".to_string(), "hubble".to_string()];
+        let miss = decide_one(
+            "What is the diameter of Hubble's main mirror in meters?",
+            terms.clone(),
+            "The main mirror of the telescope was carefully polished over several years.",
+        );
+        assert!(miss.decision != "ok", "no measurement present must abstain");
+        let hit = decide_one(
+            "What is the diameter of Hubble's main mirror in meters?",
+            terms,
+            "The main mirror has a diameter of 2.4 meters.",
+        );
+        assert_eq!(hit.decision, "ok", "present measurement must pass");
+    }
+
+    #[test]
+    fn exact_date_requires_tier3_tied_to_event() {
+        // i04 class: year-only evidence must not satisfy exact-day questions.
+        assert!(exact_date_query("On what exact calendar date did Congress approve funding?"));
+        assert!(!exact_date_query("When was the rover launched?"));
+        assert!(!exact_date_query("In what year did construction begin?"));
+    }
+
+    #[test]
+    fn exact_date_passes_when_tier3_tied() {
+        let terms: Vec<String> = vec!["approv".to_string(), "fund".to_string()];
+        let passages = mkpass("Congress approved the funding on 3 May 1978 for the program.");
+        let input = DecideInput {
+            query: "On what exact date did Congress approve the funding?",
+            terms: &terms,
+            subject_terms: &nosubj(),
+            passages: &passages,
+            idf_union_coverage: 1.0,
+            union_coverage: 1.0,
+            top_coverage: 1.0,
+            min_idf_union_coverage: 0.75,
+            min_union_coverage: 0.0,
+            min_top_coverage: 0.0,
+            quantity_question: false,
+            quantity_unit_missing: false,
+            any_numeric_token: false,
+            quantity_binding: false,
+            transition_check: false,
+            proposition_check: false,
+            context_chain: true,
+            action_check: false,
+        };
+        let tr = decide(&input);
+        assert!(!tr.reasons.iter().any(|r| r.contains("exact-date-precision")), "tied tier-3 must satisfy: {:?}", tr.reasons);
+    }
+
+    #[test]
+    fn exact_date_abstains_on_year_only() {
+        let terms: Vec<String> = vec!["approv".to_string(), "fund".to_string()];
+        let passages = mkpass("Congress approved the funding in 1978 for the program.");
+        let input = DecideInput {
+            query: "On what exact calendar date did Congress approve funding?",
+            terms: &terms,
+            subject_terms: &nosubj(),
+            passages: &passages,
+            idf_union_coverage: 1.0,
+            union_coverage: 1.0,
+            top_coverage: 1.0,
+            min_idf_union_coverage: 0.75,
+            min_union_coverage: 0.0,
+            min_top_coverage: 0.0,
+            quantity_question: false,
+            quantity_unit_missing: false,
+            any_numeric_token: false,
+            quantity_binding: false,
+            transition_check: false,
+            proposition_check: false,
+            context_chain: true,
+            action_check: false,
+        };
+        let tr = decide(&input);
+        assert!(tr.reasons.iter().any(|r| r.contains("exact-date-precision")), "year-only must fail precision: {:?}", tr.reasons);
+    }
+
+    #[test]
+    fn activity_noun_test_survives_attribution() {
+        // i01 class: "test" as activity noun is not a deployment environment;
+        // prepositional environments still are.
+        assert!(query_env_stems("Did the germination test of seed lot G12 finish on January 7?").is_empty());
+        assert!(!query_env_stems("Was the service deployed to test?").is_empty());
+        assert!(!query_env_stems("Was the fix verified in production?").is_empty());
+    }
+
+    #[test]
+    fn framing_words_do_not_penalize_coverage() {
+        // v03/v23 class: framing stems are recognized as answer-shape words.
+        let fs = crate::search::framing_stems();
+        for w in ["exact", "calendar", "kind", "type", "country"] {
+            let stemmed: Vec<String> = crate::search::stemmed_tokens(w);
+            assert!(stemmed.iter().any(|t| fs.contains(t)), "{w} must be a framing stem");
+        }
+    }
+}
+

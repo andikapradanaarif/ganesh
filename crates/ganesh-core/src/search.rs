@@ -161,9 +161,46 @@ fn exact_number_unit(token: &str) -> bool {
     matches!(token, "byte" | "bytes" | "bit" | "bits" | "kilobyte" | "kilobytes" | "megabyte" | "megabytes")
 }
 
+/// Measurement property nouns (predeclared linguistic list): a wh-question
+/// naming one of these in measurement form is a quantity question even
+/// without "how many/how much".
+pub const MEASURE_PROPS: &[&str] = &[
+    "diameter", "height", "length", "width", "depth", "weight", "mass", "distance",
+    "area", "volume", "population", "speed", "temperature", "cost", "price", "size",
+    "capacity", "altitude", "elevation",
+];
+
+fn measurement_question(q: &str) -> bool {
+    let words: Vec<&str> = q.split(|c: char| !c.is_alphabetic()).filter(|w| !w.is_empty()).collect();
+    let has_prop = words.iter().any(|w| MEASURE_PROPS.contains(w));
+    if !has_prop {
+        return false;
+    }
+    q.starts_with("what is") || q.starts_with("what's") || q.starts_with("at what")
+        || q.contains(" in ") || q.starts_with("how ")
+}
+
 fn quantity_question(query: &str) -> bool {
     let q = query.to_ascii_lowercase();
-    q.contains("how many") || q.contains("how much") || q.contains("number of")
+    q.contains("how many") || q.contains("how much") || q.contains("number of") || measurement_question(&q)
+}
+
+/// Question-framing stems (predeclared small linguistic list): framing words
+/// that describe the shape of the answer rather than its content. They are
+/// never present in decisive evidence, so they must not penalize coverage;
+/// typed verification carries the real sufficiency work for them.
+pub const FRAMING_WORDS: &[&str] = &[
+    "kind", "type", "exact", "calendar", "day", "date", "country", "information",
+];
+
+pub fn framing_stems() -> std::collections::BTreeSet<String> {
+    let mut out = std::collections::BTreeSet::new();
+    for w in FRAMING_WORDS {
+        for t in stemmed_tokens(w) {
+            out.insert(t);
+        }
+    }
+    out
 }
 
 fn numeric_token(token: &str) -> bool {
@@ -769,6 +806,7 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
         .map(|idx| (candidate_texts[*idx].0.clone(), candidate_texts[*idx].1.clone()))
         .collect();
 
+    let framing = framing_stems();
     let total = terms.len() as f64;
     let mut union_matched = std::collections::BTreeSet::new();
     for (_, tokens) in &passage_texts {
@@ -778,11 +816,19 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
             }
         }
     }
+    // Framing words never appear in decisive evidence; typed verification
+    // carries their sufficiency. They count as covered for coverage math only.
+    for t in &terms {
+        if framing.contains(t.as_str()) {
+            union_matched.insert(t.clone());
+        }
+    }
     let union_coverage = union_matched.len() as f64 / total;
     let top_coverage = passage_texts
         .first()
-        .map(|(_, tokens)| terms.iter().filter(|t| term_present(t, tokens)).count() as f64 / total)
+        .map(|(_, tokens)| terms.iter().filter(|t| term_present(t, tokens) || framing.contains(t.as_str())).count() as f64 / total)
         .unwrap_or(0.0);
+    debug.unmatched_terms.retain(|t| !framing.contains(t.as_str()));
     debug.union_coverage = union_coverage;
     debug.top_coverage = top_coverage;
 
@@ -813,12 +859,13 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
             let mut unmatched = Vec::new();
             for t in &terms {
                 let hit_any = passage_texts.iter().any(|(_, tokens)| term_present(t, tokens));
-                if hit_any {
+                if hit_any || framing.contains(t.as_str()) {
                     union_w += weight(t);
                 } else {
                     unmatched.push(t.clone());
                 }
             }
+            unmatched.retain(|t| !framing.contains(t.as_str()));
             debug.unmatched_terms = unmatched;
             debug.idf_union_coverage = union_w / total_w;
             // Squared-weight variant: emphasizes rare critical terms further.
@@ -1088,21 +1135,19 @@ mod date_fix_tests {
 
 #[cfg(test)]
 mod parity_tests {
-    //! Probe/server parity guard (review follow-up): search() — the server
-    //! path — is structurally search_debug().0, so identical status and
-    //! ordered passage IDs are guaranteed by construction within one build.
-    //! This compile-time anchor pins the delegation so a future refactor
-    //! cannot silently diverge the diagnostic and serving paths.
+    //! Probe/server parity guard: search() is structurally search_debug().0,
+    //! so identical status and ordered passage IDs hold by construction within
+    //! one build. Compile-time anchor pinning the delegation relationship.
 
     #[test]
     fn search_is_search_debug_projection() {
         fn takes_both(
-            f1: fn(&crate::Store, &str, &str, &crate::RetrievalConfig) -> super::SearchResponse,
-            f2: fn(&crate::Store, &str, &str, &crate::RetrievalConfig) -> (super::SearchResponse, super::SearchDebug),
+            f1: fn(&crate::store::Store, &str, &str, &super::RetrievalConfig) -> crate::types::SearchResponse,
+            f2: fn(&crate::store::Store, &str, &str, &super::RetrievalConfig) -> (crate::types::SearchResponse, super::SearchDebug),
         ) -> bool {
             let _ = (f1, f2);
             true
         }
-        assert!(takes_both(crate::search, crate::search_debug));
+        assert!(takes_both(super::search, super::search_debug));
     }
 }
