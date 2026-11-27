@@ -5,7 +5,7 @@ use axum::{
     routing::{get, post},
     Router,
 };
-use ganesh_core::search::{search, RetrievalConfig};
+use ganesh_core::search::RetrievalConfig;
 use ganesh_core::store::Store;
 use ganesh_core::types::{ErrorBody, SearchRequest};
 use std::net::SocketAddr;
@@ -58,8 +58,28 @@ async fn search_handler(
     Json(req): Json<SearchRequest>,
 ) -> Json<ganesh_core::types::SearchResponse> {
     let caller = req.caller.clone().unwrap_or_else(|| "anonymous".to_string());
-    let store = state.store.lock().unwrap();
-    Json(search(&store, &req.query, &caller, &state.config))
+    // The SQLite mutex is held only for the snapshot fetch (fast indexed
+    // reads). Cross-encoder reranking, acceptance, and QA verification run
+    // lock-free on the materialized view, so concurrent inference neither
+    // blocks nor is blocked by other readers, citations, or health checks.
+    let view = {
+        let store = state.store.lock().unwrap();
+        let terms = ganesh_core::search::query_terms(&req.query);
+        if terms.is_empty() {
+            None
+        } else {
+            ganesh_core::search::CorpusView::fetch(&store, &terms, &state.config)
+        }
+    };
+    let response = match view {
+        Some(view) => ganesh_core::search::evaluate_view(&view, &req.query, &caller, &state.config).0,
+        None => ganesh_core::types::SearchResponse {
+            status: "insufficient_context".to_string(),
+            query: req.query.clone(),
+            passages: vec![],
+        },
+    };
+    Json(response)
 }
 
 async fn citation_handler(

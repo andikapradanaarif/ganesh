@@ -167,14 +167,43 @@ fn exact_number_unit(token: &str) -> bool {
 pub const MEASURE_PROPS: &[&str] = &[
     "diameter", "height", "length", "width", "depth", "weight", "mass", "distance",
     "area", "volume", "population", "speed", "temperature", "cost", "price", "size",
-    "capacity", "altitude", "elevation",
+    "capacity", "altitude", "elevation", "tension",
+];
+
+/// Physical-unit vocabulary for the explicit `"in <unit>"` framing check.
+/// Mirrors the acceptance-side alias table's canonical surface forms.
+const KNOWN_UNITS: &[&str] = &[
+    "m", "meter", "meters", "metre", "metres", "km", "kilometer", "kilometers",
+    "kilometre", "kilometres", "cm", "mm", "mile", "miles", "ft", "feet", "foot",
+    "in", "inch", "inches", "yd", "yard", "yards", "nm", "kg", "kilogram",
+    "kilograms", "g", "gram", "grams", "mg", "lb", "lbs", "pound", "pounds",
+    "oz", "ounce", "ounces", "t", "ton", "tons", "tonne", "tonnes", "l",
+    "liter", "liters", "litre", "litres", "ml", "s", "sec", "seconds", "min",
+    "minutes", "hr", "hours", "w", "kw", "mw", "watt", "watts", "hz", "khz",
+    "mhz", "ghz", "deg", "degree", "degrees", "byte", "bytes", "bit", "bits",
+    "km/h", "m/s", "mph",
 ];
 
 fn measurement_question(q: &str) -> bool {
-    let words: Vec<&str> = q.split(|c: char| !c.is_alphabetic()).filter(|w| !w.is_empty()).collect();
+    // Hyphenated compound adjectives ("low-cost", "high-speed") stay whole:
+    // splitting them would false-match standalone measure-property nouns.
+    let words: Vec<&str> = q
+        .split(|c: char| !c.is_alphabetic() && c != '-')
+        .filter(|w| !w.is_empty())
+        .collect();
     let has_prop = words.iter().any(|w| MEASURE_PROPS.contains(w));
     if !has_prop {
         return false;
+    }
+    // Entity/location questions ("which/who/where …") are not measurement
+    // questions merely for containing " in " ("in current production"); they
+    // trigger only on explicit unit framing ("in inches") or count/mass
+    // framing ("how many/how much").
+    if q.starts_with("which ") || q.starts_with("who ") || q.starts_with("where ") {
+        let in_unit = words
+            .windows(2)
+            .any(|w| w[0] == "in" && KNOWN_UNITS.contains(&w[1]));
+        return in_unit || q.contains("how many") || q.contains("how much");
     }
     q.starts_with("what is") || q.starts_with("what's") || q.starts_with("at what")
         || q.contains(" in ") || q.starts_with("how ")
@@ -451,11 +480,173 @@ fn token_jaccard(a: &[String], b: &[String]) -> f64 {
     if union == 0.0 { 0.0 } else { inter / union }
 }
 
+/// Everything the retrieval pipeline reads from SQLite for one query,
+/// materialized up front. The server holds its store mutex only while this
+/// snapshot is built; cross-encoder reranking, acceptance, and QA verification
+/// then run lock-free on plain memory. All field values are byte-identical to
+/// what the interleaved implementation read: the same queries, the same
+/// `unwrap_or_default` semantics for missing rows.
+pub struct CorpusView {
+    /// FTS-matched candidates in bm25 rank order.
+    pub candidates: Vec<CandidateRow>,
+    /// (article_id, title) rows of the sources table.
+    pub sources: Vec<(String, String)>,
+    /// Document frequency per stemmed token over the whole corpus.
+    pub df: std::collections::HashMap<String, usize>,
+    /// Total passage count backing `df`.
+    pub npass: usize,
+}
+
+pub struct CandidateRow {
+    pub passage_id: String,
+    pub score: f64,
+    pub index_text: String,
+    pub article_id: String,
+    pub revision: String,
+    pub section: String,
+    pub text: String,
+    pub title: String,
+}
+
+impl CorpusView {
+    /// Runs every SQLite read the pipeline needs. `terms` are the already-
+    /// normalized query terms (the FTS MATCH expression derives from them).
+    pub fn fetch(store: &Store, terms: &[String], cfg: &RetrievalConfig) -> Option<CorpusView> {
+        let q = fts_query(terms);
+        let mut stmt = store.conn.prepare(
+            "SELECT passage_id, bm25(passages_fts) AS score FROM passages_fts
+             WHERE passages_fts MATCH ?1
+             ORDER BY score ASC, passage_id ASC
+             LIMIT ?2",
+        ).ok()?;
+        let rows = stmt
+            .query_map(rusqlite::params![q, cfg.candidate_limit as i64], |row| {
+                Ok((row.get::<_, String>(0)?, row.get::<_, f64>(1)?))
+            })
+            .map(|r| r.filter_map(|x| x.ok()).collect::<Vec<_>>())
+            .unwrap_or_default();
+        if rows.is_empty() {
+            return None;
+        }
+        let mut candidates = Vec::new();
+        for (passage_id, score) in rows {
+            let index_text: String = store
+                .conn
+                .query_row(
+                    "SELECT index_text FROM passages_fts WHERE passage_id = ?1",
+                    rusqlite::params![passage_id],
+                    |row| row.get(0),
+                )
+                .unwrap_or_default();
+            let article_id: String = store
+                .conn
+                .query_row(
+                    "SELECT r.article_id FROM passages p JOIN revisions r ON p.revision = r.revision WHERE p.id = ?1",
+                    rusqlite::params![passage_id],
+                    |row| row.get(0),
+                )
+                .unwrap_or_default();
+            let body_text: String = store
+                .conn
+                .query_row(
+                    "SELECT text FROM passages WHERE id = ?1",
+                    rusqlite::params![passage_id],
+                    |row| row.get(0),
+                )
+                .unwrap_or_default();
+            let ctx_row: (String, String, String) = store
+                .conn
+                .query_row(
+                    "SELECT p.section, p.text, s.title FROM passages p JOIN revisions r ON p.revision = r.revision JOIN sources s ON r.article_id = s.article_id WHERE p.id = ?1",
+                    rusqlite::params![passage_id],
+                    |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
+                )
+                .unwrap_or_default();
+            let revision: String = store
+                .conn
+                .query_row(
+                    "SELECT p.revision FROM passages p WHERE p.id = ?1",
+                    rusqlite::params![passage_id],
+                    |row| row.get(0),
+                )
+                .unwrap_or_default();
+            candidates.push(CandidateRow {
+                passage_id,
+                score,
+                index_text,
+                article_id,
+                revision,
+                section: ctx_row.0,
+                text: body_text,
+                title: ctx_row.2,
+            });
+        }
+        let mut sources = Vec::new();
+        if let Ok(mut stmt) = store.conn.prepare("SELECT article_id, title FROM sources") {
+            if let Ok(source_rows) = stmt.query_map([], |row| Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?))) {
+                for row in source_rows.flatten() {
+                    sources.push(row);
+                }
+            }
+        }
+        let mut df: std::collections::HashMap<String, usize> = std::collections::HashMap::new();
+        let mut npass = 0usize;
+        if let Ok(mut stmt) = store.conn.prepare("SELECT index_text FROM passages_fts") {
+            if let Ok(rows) = stmt.query_map([], |row| row.get::<_, String>(0)) {
+                for row in rows.flatten() {
+                    npass += 1;
+                    let mut seen = std::collections::BTreeSet::new();
+                    for t in row.split_whitespace() {
+                        if seen.insert(t.to_string()) {
+                            *df.entry(t.to_string()).or_insert(0) += 1;
+                        }
+                    }
+                }
+            }
+        }
+        Some(CorpusView { candidates, sources, df, npass })
+    }
+}
+
+/// Evaluate a query against a pre-fetched corpus view. Pure compute: no
+/// SQLite access, safe to run outside any store lock.
+pub fn evaluate_view(view: &CorpusView, query: &str, caller: &str, cfg: &RetrievalConfig) -> (SearchResponse, SearchDebug) {
+    evaluate(view, query, caller, cfg)
+}
+
 pub fn search(store: &Store, query: &str, caller: &str, cfg: &RetrievalConfig) -> SearchResponse {
     search_debug(store, query, caller, cfg).0
 }
 
 pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalConfig) -> (SearchResponse, SearchDebug) {
+    let terms = query_terms(query);
+    let empty_debug = |terms: &[String]| SearchDebug {
+        union_coverage: 0.0,
+        top_coverage: 0.0,
+        idf_union_coverage: 0.0,
+        idf_top_coverage: 0.0,
+        idf2_union_coverage: 0.0,
+        terms: terms.to_vec(),
+        unmatched_terms: vec![],
+        candidates: vec![],
+        selected: vec![],
+        trace: AcceptanceTrace::default(),
+    };
+    let empty = SearchResponse {
+        status: "insufficient_context".to_string(),
+        query: query.to_string(),
+        passages: vec![],
+    };
+    if terms.is_empty() || !permitted(caller, "public") {
+        return (empty, empty_debug(&terms));
+    }
+    match CorpusView::fetch(store, &terms, cfg) {
+        Some(view) => evaluate(&view, query, caller, cfg),
+        None => (empty, empty_debug(&terms)),
+    }
+}
+
+fn evaluate(view: &CorpusView, query: &str, caller: &str, cfg: &RetrievalConfig) -> (SearchResponse, SearchDebug) {
     let mut debug = SearchDebug {
         union_coverage: 0.0,
         top_coverage: 0.0,
@@ -483,29 +674,11 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
         return (empty("insufficient_context"), debug);
     }
 
-    let q = fts_query(&terms);
-    let mut stmt = match store.conn.prepare(
-        "SELECT passage_id, bm25(passages_fts) AS score FROM passages_fts
-         WHERE passages_fts MATCH ?1
-         ORDER BY score ASC, passage_id ASC
-         LIMIT ?2",
-    ) {
-        Ok(s) => s,
-        Err(_) => return (empty("insufficient_context"), debug),
-    };
-    let rows = stmt
-        .query_map(rusqlite::params![q, cfg.candidate_limit as i64], |row| {
-            Ok(Candidate {
-                passage_id: row.get(0)?,
-                score: row.get(1)?,
-            })
-        })
-        .map(|r| r.filter_map(|x| x.ok()).collect::<Vec<_>>())
-        .unwrap_or_default();
-
-    if rows.is_empty() {
-        return (empty("insufficient_context"), debug);
-    }
+    let rows: Vec<Candidate> = view
+        .candidates
+        .iter()
+        .map(|c| Candidate { passage_id: c.passage_id.clone(), score: c.score })
+        .collect();
     debug.candidates = rows.iter().map(|c| (c.passage_id.clone(), c.score)).collect();
 
     // Coverage analysis over distinct stemmed terms. The public response is
@@ -513,24 +686,12 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
     // passage covering a different facet of a compound question can be chosen
     // instead of a near-duplicate of the first hit.
     let mut candidate_texts: Vec<(String, Vec<String>, String)> = Vec::new();
-    for cand in &rows {
-        let stemmed: String = store
-            .conn
-            .query_row(
-                "SELECT index_text FROM passages_fts WHERE passage_id = ?1",
-                rusqlite::params![cand.passage_id],
-                |row| row.get(0),
-            )
-            .unwrap_or_default();
-        let article_id: String = store
-            .conn
-            .query_row(
-                "SELECT r.article_id FROM passages p JOIN revisions r ON p.revision = r.revision WHERE p.id = ?1",
-                rusqlite::params![cand.passage_id],
-                |row| row.get(0),
-            )
-            .unwrap_or_default();
-        candidate_texts.push((cand.passage_id.clone(), stemmed.split_whitespace().map(String::from).collect(), article_id));
+    for cand in &view.candidates {
+        candidate_texts.push((
+            cand.passage_id.clone(),
+            cand.index_text.split_whitespace().map(String::from).collect(),
+            cand.article_id.clone(),
+        ));
     }
 
     // Source titles define the subject vocabulary known to the service. If the
@@ -538,15 +699,10 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
     // from that subject when any are present. Queries naming zero or multiple
     // subjects remain unrestricted, preserving legitimate comparisons.
     let mut mentioned_subjects = std::collections::BTreeSet::new();
-    if let Ok(mut stmt) = store.conn.prepare("SELECT article_id, title FROM sources") {
-        if let Ok(source_rows) = stmt.query_map([], |row| Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?))) {
-            for row in source_rows.flatten() {
-                let (article_id, title) = row;
-                let subject_terms = title_subject_terms(&title);
-                if terms.iter().any(|t| subject_terms.contains(t)) {
-                    mentioned_subjects.insert(article_id);
-                }
-            }
+    for (article_id, title) in &view.sources {
+        let subject_terms = title_subject_terms(title);
+        if terms.iter().any(|t| subject_terms.contains(t)) {
+            mentioned_subjects.insert(article_id.clone());
         }
     }
     let restricted_article = if mentioned_subjects.len() == 1 {
@@ -566,24 +722,9 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
     // Document-frequency weights for query terms, computed once per query.
     let mut term_weights: std::collections::HashMap<String, f64> = std::collections::HashMap::new();
     {
-        let mut df: std::collections::HashMap<String, usize> = std::collections::HashMap::new();
-        let mut npass = 0usize;
-        if let Ok(mut stmt) = store.conn.prepare("SELECT index_text FROM passages_fts") {
-            if let Ok(rows) = stmt.query_map([], |row| row.get::<_, String>(0)) {
-                for row in rows.flatten() {
-                    npass += 1;
-                    let mut seen = std::collections::BTreeSet::new();
-                    for t in row.split_whitespace() {
-                        if seen.insert(t.to_string()) {
-                            *df.entry(t.to_string()).or_insert(0) += 1;
-                        }
-                    }
-                }
-            }
-        }
         for t in &terms {
-            let d = df.get(t).copied().unwrap_or(0) as f64;
-            term_weights.insert(t.clone(), ((npass as f64 + 1.0) / (d + 0.5)).ln() + 1.0);
+            let d = view.df.get(t).copied().unwrap_or(0) as f64;
+            term_weights.insert(t.clone(), ((view.npass as f64 + 1.0) / (d + 0.5)).ln() + 1.0);
         }
     }
     let weight_of = |t: &str| term_weights.get(t).copied().unwrap_or(1.0);
@@ -600,20 +741,15 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
     if let Some(prec) = precision {
         let mut subject_vocab: std::collections::BTreeSet<String> = std::collections::BTreeSet::new();
         let mut all_title_tokens: std::collections::BTreeSet<String> = std::collections::BTreeSet::new();
-        if let Ok(mut stmt) = store.conn.prepare("SELECT article_id, title FROM sources") {
-            if let Ok(source_rows) = stmt.query_map([], |row| Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?))) {
-                for row in source_rows.flatten() {
-                    let (article_id, title) = row;
-                    for tok in title.to_lowercase().split(|c: char| !c.is_ascii_alphanumeric()) {
-                        if !tok.is_empty() {
-                            all_title_tokens.insert(tok.to_string());
-                        }
-                    }
-                    if mentioned_subjects.contains(&article_id) {
-                        for t in title_subject_terms(&title) {
-                            subject_vocab.insert(t);
-                        }
-                    }
+        for (article_id, title) in &view.sources {
+            for tok in title.to_lowercase().split(|c: char| !c.is_ascii_alphanumeric()) {
+                if !tok.is_empty() {
+                    all_title_tokens.insert(tok.to_string());
+                }
+            }
+            if mentioned_subjects.contains(article_id) {
+                for t in title_subject_terms(title) {
+                    subject_vocab.insert(t);
                 }
             }
         }
@@ -630,16 +766,8 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
             .filter(|w| !w.is_empty() && all_title_tokens.contains(*w))
             .map(|w| w.to_string())
             .collect();
-        for (idx, cand) in rows.iter().enumerate() {
-            let body: String = store
-                .conn
-                .query_row(
-                    "SELECT text FROM passages WHERE id = ?1",
-                    rusqlite::params![cand.passage_id],
-                    |row| row.get(0),
-                )
-                .unwrap_or_default();
-            date_scores[idx] = passage_date_score(&body, prec, &event_terms, &subject_tokens, &|t| weight_of(t));
+        for (idx, _) in rows.iter().enumerate() {
+            date_scores[idx] = passage_date_score(&view.candidates[idx].text, prec, &event_terms, &subject_tokens, &|t| weight_of(t));
         }
         // Strictly-higher wins; iteration order is eligible (bm25 rank order),
         // so equal scores keep the better-ranked candidate.
@@ -673,15 +801,9 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
         let mut scored: Vec<(usize, f32)> = Vec::new();
         let mut contexts: Vec<(usize, String)> = Vec::new();
         for &i in &eligible {
-            let row: (String, String, String) = store
-                .conn
-                .query_row(
-                    "SELECT p.section, p.text, s.title FROM passages p JOIN revisions r ON p.revision = r.revision JOIN sources s ON r.article_id = s.article_id WHERE p.id = ?1",
-                    rusqlite::params![rows[i].passage_id],
-                    |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
-                )
-                .unwrap_or_default();
-            let (section, text, title) = row;
+            let section = view.candidates[i].section.clone();
+            let text = view.candidates[i].text.clone();
+            let title = view.candidates[i].title.clone();
             let ctx = match (title.is_empty(), section.is_empty()) {
                 (false, false) => format!("{title} — {section}\n{text}"),
                 (false, true) => format!("{title}\n{text}"),
@@ -849,21 +971,6 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
     // questions hinge on critical detail terms the corpus does not contain, so
     // their weighted coverage stays low.
     {
-        let mut df: std::collections::HashMap<String, usize> = std::collections::HashMap::new();
-        let mut npass = 0usize;
-        if let Ok(mut stmt) = store.conn.prepare("SELECT index_text FROM passages_fts") {
-            if let Ok(rows) = stmt.query_map([], |row| row.get::<_, String>(0)) {
-                for row in rows.flatten() {
-                    npass += 1;
-                    let mut seen = std::collections::BTreeSet::new();
-                    for t in row.split_whitespace() {
-                        if seen.insert(t.to_string()) {
-                            *df.entry(t.to_string()).or_insert(0) += 1;
-                        }
-                    }
-                }
-            }
-        }
         let weight = |t: &str| -> f64 { weight_of(t) };
         let total_w: f64 = terms.iter().map(|t| weight(t)).sum();
         if total_w > 0.0 {
@@ -901,11 +1008,12 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
     // ranking and selection above are unaffected.
     let mut verbatim_by_id: std::collections::HashMap<String, (String, String)> = std::collections::HashMap::new();
     for (pid, _) in &passage_texts {
-        let row: (String, String) = store.conn.query_row(
-            "SELECT text, section FROM passages WHERE id = ?1",
-            rusqlite::params![pid],
-            |row| Ok((row.get(0)?, row.get(1)?)),
-        ).unwrap_or_default();
+        let row: (String, String) = view
+            .candidates
+            .iter()
+            .find(|c| &c.passage_id == pid)
+            .map(|c| (c.text.clone(), c.section.clone()))
+            .unwrap_or_default();
         verbatim_by_id.insert(pid.clone(), row);
     }
     let selected_full: Vec<(String, String, String, Vec<String>)> = passage_texts.iter()
@@ -918,14 +1026,10 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
 
     // Query terms that name a source subject are not measured properties.
     let mut subject_query_terms = std::collections::BTreeSet::new();
-    if let Ok(mut stmt) = store.conn.prepare("SELECT title FROM sources") {
-        if let Ok(rows) = stmt.query_map([], |row| row.get::<_, String>(0)) {
-            for title in rows.flatten() {
-                for t in title_subject_terms(&title) {
-                    if terms.contains(&t) {
-                        subject_query_terms.insert(t);
-                    }
-                }
+    for (_, title) in &view.sources {
+        for t in title_subject_terms(title) {
+            if terms.contains(&t) {
+                subject_query_terms.insert(t);
             }
         }
     }
@@ -1004,20 +1108,12 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
 
     let mut hits = Vec::new();
     for (i, (pid, _)) in passage_texts.iter().enumerate().take(cfg.top_k) {
-        let row = store.conn.query_row(
-            "SELECT p.revision, p.section, p.text, r.article_id
-             FROM passages p JOIN revisions r ON p.revision = r.revision WHERE p.id = ?1",
-            rusqlite::params![pid],
-            |row| {
-                Ok((
-                    row.get::<_, String>(0)?,
-                    row.get::<_, String>(1)?,
-                    row.get::<_, String>(2)?,
-                    row.get::<_, String>(3)?,
-                ))
-            },
-        );
-        if let Ok((revision, section, text, article_id)) = row {
+        let row = view
+            .candidates
+            .iter()
+            .find(|c| &c.passage_id == pid)
+            .map(|c| (c.revision.clone(), c.section.clone(), c.text.clone(), c.article_id.clone()));
+        if let Some((revision, section, text, article_id)) = row {
             hits.push(PassageHit {
                 rank: i as u32 + 1,
                 passage_id: pid.clone(),
@@ -1073,6 +1169,38 @@ mod quantity_unit_tests {
         assert!(stemmed_tokens("byte").contains(&"byte".to_string()));
         assert!(!stemmed_tokens("bytes").contains(&"byte".to_string()));
         assert!(!stemmed_tokens("byte").contains(&"bytes".to_string()));
+    }
+
+    #[test]
+    fn measurement_question_hyphenated_compounds_do_not_split() {
+        // acc-xfer-v6 q06 root cause: "low-cost" split into "cost" and the
+        // " in " inside "in current production" falsely armed quantity binding.
+        assert!(!measurement_question(
+            "which polycarbonate saxophone is in current production as a low-cost alternative to metal saxophones?"
+        ));
+        assert!(!measurement_question("which train is in high-speed operation in japan?"));
+    }
+
+    #[test]
+    fn measurement_question_entity_frames_need_explicit_units() {
+        assert!(!measurement_question("which bridge is in current operation in italy?"));
+        assert!(!measurement_question("who is the scientist in charge of cost estimates?"));
+        // explicit "in <unit>" framing still triggers on entity questions
+        assert!(measurement_question("which mirror is the largest in diameter in inches?"));
+    }
+
+    #[test]
+    fn measurement_question_real_measurement_questions_still_trigger() {
+        for q in [
+            "what is the depth in meters of the caldera floor of mauna loa below its rim?", // v5/i02
+            "what is the diameter of the james webb primary mirror in inches?",             // ax4/q09
+            "what is the mass of the leaning tower of pisa in tonnes?",                     // ax5/q10
+            "what is the weight of a typical harpsichord in kilograms?",                    // ax6/q10
+            "what is the total string tension of a modern grand piano in kilograms?",       // ax6/q11
+            "what is the diameter of hubble's main mirror in meters?",                      // v4/i05
+        ] {
+            assert!(measurement_question(q), "must trigger: {q}");
+        }
     }
 }
 

@@ -1,5 +1,4 @@
 pub mod accept;
-pub mod factcheck;
 pub mod citation;
 pub mod rerank;
 pub mod qa_verify;

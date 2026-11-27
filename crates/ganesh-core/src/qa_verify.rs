@@ -56,7 +56,72 @@ pub fn verify_pair(question: &str, passage: &str) -> Option<QaVerdict> {
     score_with(m, question, passage).ok()
 }
 
+/// SQuAD 2.0 sliding-window scoring: passages of at most 300 whitespace words
+/// score in a single pass. Longer passages are scored over 300-word windows
+/// with a 150-word stride, taking the maximum margin (and its span) across
+/// windows. To bound worst-case CPU latency on huge passages, at most 4
+/// windows run: window 0 always, then the windows with the largest query-term
+/// overlap. This replaces blind front-truncation, which silently discarded
+/// evidence past word 384 (the acc-xfer-v6 q06 root cause).
 fn score_with(m: &QaModel, question: &str, passage: &str) -> ort::Result<QaVerdict> {
+    const WIN: usize = 300;
+    const STRIDE: usize = 150;
+    const MAX_WINDOWS: usize = 4;
+    let words: Vec<&str> = passage.split_whitespace().collect();
+    if words.len() <= WIN {
+        return score_window(m, question, passage);
+    }
+    let mut starts: Vec<usize> = Vec::new();
+    let mut s = 0usize;
+    loop {
+        starts.push(s);
+        if s + WIN >= words.len() {
+            break;
+        }
+        s += STRIDE;
+        if starts.len() > 64 {
+            break;
+        }
+    }
+    let qterms: std::collections::BTreeSet<String> = question
+        .to_lowercase()
+        .split(|c: char| !c.is_alphanumeric())
+        .filter(|w| !w.is_empty())
+        .map(|w| w.to_string())
+        .collect();
+    let overlap = |start: usize| -> usize {
+        let end = (start + WIN).min(words.len());
+        let mut seen = std::collections::BTreeSet::new();
+        let mut n = 0;
+        for w in &words[start..end] {
+            let lw = w.to_lowercase();
+            if qterms.contains(&lw) && seen.insert(lw) {
+                n += 1;
+            }
+        }
+        n
+    };
+    // Window 0 always first; the rest ordered by descending query-term overlap
+    // (stable: ties keep document order). Capped at MAX_WINDOWS.
+    let mut rest: Vec<usize> = starts.iter().skip(1).copied().collect();
+    rest.sort_by_key(|&st| std::cmp::Reverse(overlap(st)));
+    let mut order: Vec<usize> = vec![starts[0]];
+    order.extend(rest);
+    order.truncate(MAX_WINDOWS);
+    let mut best: Option<QaVerdict> = None;
+    for start in order {
+        let end = (start + WIN).min(words.len());
+        let window_text = words[start..end].join(" ");
+        let v = score_window(m, question, &window_text)?;
+        let better = best.as_ref().map(|b| v.margin > b.margin).unwrap_or(true);
+        if better {
+            best = Some(v);
+        }
+    }
+    Ok(best.expect("at least one window"))
+}
+
+fn score_window(m: &QaModel, question: &str, passage: &str) -> ort::Result<QaVerdict> {
     let q_trunc: String = question.split_whitespace().take(64).collect::<Vec<_>>().join(" ");
     let p_trunc: String = passage.split_whitespace().take(384).collect::<Vec<_>>().join(" ");
     let encoding = m
@@ -182,5 +247,22 @@ Curiosity was launched from Cape Canaveral on November 26, 2011.").unwrap();
             "JWST — Mirror
 Webb's primary mirror consists of 18 hexagonal mirror segments made of gold-plated beryllium.").unwrap();
         assert!(unsup.margin < 0.0, "missing-unit margin {}", unsup.margin);
+    }
+    #[test]
+    fn sliding_window_finds_answer_past_word_400() {
+        if !crate::qa_verify::available() { return; }
+        // 420 filler words push the answer sentence beyond the old 384-word
+        // blind truncation boundary; the sliding window must still extract it.
+        let filler = "the instrument workshop produced many parts over the years ".repeat(60);
+        let passage = format!(
+            "Saxophone — Unusual variants\n{filler}The Vibratosax is in current production as a low-cost alternative to metal saxophones."
+        );
+        assert!(passage.split_whitespace().count() > 400, "test passage must exceed 400 words");
+        let v = crate::qa_verify::verify_pair(
+            "Which polycarbonate saxophone is in current production as a low-cost alternative to metal saxophones?",
+            &passage,
+        ).unwrap();
+        assert!(v.margin > 0.0, "past-word-400 margin {}", v.margin);
+        assert!(!v.span.is_empty(), "past-word-400 span empty");
     }
 }

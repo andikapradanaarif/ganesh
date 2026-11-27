@@ -96,25 +96,6 @@ pub fn action_supports(q_pred: &str, evidence_stem: &str) -> bool {
     }
 }
 
-/// Predicate groups for contradiction matching. A negated statement only
-/// contradicts the asked proposition when the negated predicate is the same
-/// one — "did not confirm" contradicts confirmed(R6) but says nothing about
-/// deployed(R6). Support may use the looser class hierarchy; contradiction
-/// may not.
-const PREDICATE_GROUPS: &[&[&str]] = &[
-    &["verifi", "confirm", "unverifi", "unconfirm"],
-    &["deploy", "run", "live"],
-    &["start"],
-    &["pass", "succeed", "complet"],
-    &["propos", "plan", "intend", "suggest", "consider"],
-    &["attempt", "tri", "effort"],
-    &["becam", "becom", "option", "mandatori", "deprecat", "drop", "adopt"],
-];
-
-fn predicate_group(stem: &str) -> Option<usize> {
-    PREDICATE_GROUPS.iter().position(|g| g.contains(&stem))
-}
-
 /// The dominant predicate stem of a question: the first cue-class term in
 /// the question's stemmed terms that belongs to an action group.
 pub fn question_predicate(terms: &[String]) -> Option<String> {
@@ -129,8 +110,6 @@ pub struct AcceptanceTrace {
     pub state_spans: Vec<StateSpan>,
     pub qa_margin: Option<f32>,
     pub qa_span: String,
-    pub fc_entailment: Option<f32>,
-    pub fc_claim: String,
 }
 
 const NUMBER_WORDS: &[&str] = &[
@@ -671,7 +650,11 @@ pub fn adjacent_unit(sentence: &str, token: &str) -> Option<&'static str> {
         }
         for j in 1..=2usize {
             if let Some(next) = toks.get(i + j) {
-                if let Some(u) = canonical_unit(next) {
+                // Sentence-final units carry their period ("meters.") — the
+                // dot-preserving trim above must keep dots for digit tokens
+                // but no canonical unit contains one.
+                let unit_surface = next.trim_end_matches('.');
+                if let Some(u) = canonical_unit(unit_surface) {
                     return Some(u);
                 }
                 if next.chars().any(|c| c.is_ascii_digit()) {
@@ -1367,41 +1350,6 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
             ));
         }
 
-        // ---- fact-checking encoder: declarative-claim entailment -----------
-        // Runs ONLY when QA extraction succeeded (margin >= 0) — there is no
-        // claim to check otherwise. The extracted span is verbalized into a
-        // declarative claim; at least one selected passage must entail it.
-        let fc_enabled = std::env::var("GANESH_FACTCHECK").map(|v| v != "0").unwrap_or(true);
-        if fc_enabled
-            && max_margin.is_finite()
-            && max_margin >= 0.0
-            && !best_span.is_empty()
-            && crate::factcheck::available()
-        {
-            let claim = crate::factcheck::to_declarative_claim(input.query, &best_span);
-            let mut max_entail = f32::NEG_INFINITY;
-            for (pid, verbatim, section, _) in input.passages {
-                let article = pid.split('-').next().unwrap_or("");
-                let prem = format!("{article} — {section}
-{verbatim}");
-                if let Some(v) = crate::factcheck::verify_pair(&prem, &claim) {
-                    if v.entailment > max_entail {
-                        max_entail = v.entailment;
-                    }
-                }
-            }
-            trace.fc_entailment = Some(max_entail);
-            trace.fc_claim = claim.clone();
-            let tau: f32 = std::env::var("GANESH_FACTCHECK_TAU")
-                .ok()
-                .and_then(|v| v.parse().ok())
-                .unwrap_or(0.5);
-            if max_entail.is_finite() && max_entail < tau {
-                trace.reasons.push(format!(
-                    "factcheck-unentailed: max entailment {max_entail:.3} below threshold {tau:.2} (claim `{claim}`)"
-                ));
-            }
-        }
     }
 
     // ---- state/transition evidence --------------------------------------------
