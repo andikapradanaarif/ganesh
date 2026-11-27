@@ -1,0 +1,3 @@
+== Power capacity lesson ==
+
+Lesson for expansion planning: the basement rack power shelf uses a 16 amp circuit, so total rack draw must stay below that ceiling.

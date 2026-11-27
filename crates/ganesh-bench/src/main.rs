@@ -66,10 +66,42 @@ struct StructuralFinding {
     problem: String,
 }
 
+mod lifecycle;
+mod lifecheck;
+
 fn main() {
     ganesh_core::rerank::enforce_requirement("ganesh-bench");
+    ganesh_core::embed::enforce_requirement("ganesh-bench");
     ganesh_core::qa_verify::enforce_requirement("ganesh-bench");
     let args: Vec<String> = std::env::args().collect();
+    if args.len() >= 2 && args[1] == "lifecycle" {
+        // ganesh-bench lifecycle --corpus fixtures/m2-lifecycle
+        // M2 lifecycle replay gate (roadmap section 7): drives a live server
+        // through all five lifecycle scenarios over REST and MCP.
+        let mut cdir = "fixtures/m2-lifecycle".to_string();
+        let mut j = 2;
+        while j < args.len() {
+            match args[j].as_str() {
+                "--corpus" => { cdir = args.get(j + 1).cloned().unwrap(); j += 2; }
+                other => { eprintln!("unknown argument: {other}"); std::process::exit(2); }
+            }
+        }
+        std::process::exit(lifecycle::run_lifecycle(&cdir));
+    }
+    if args.len() >= 2 && args[1] == "lifecheck" {
+        // ganesh-bench lifecheck --corpus <dir> --scenario <scenario.json>
+        let mut cdir = String::new();
+        let mut scen = String::new();
+        let mut j = 2;
+        while j < args.len() {
+            match args[j].as_str() {
+                "--corpus" => { cdir = args.get(j + 1).cloned().unwrap(); j += 2; }
+                "--scenario" => { scen = args.get(j + 1).cloned().unwrap(); j += 2; }
+                other => { eprintln!("unknown argument: {other}"); std::process::exit(2); }
+            }
+        }
+        std::process::exit(lifecheck::run_scenario(&cdir, &scen));
+    }
     let mut questions_path = None;
     let mut report_path = None;
     let mut corpus_dir = "fixtures/corpus".to_string();
@@ -222,6 +254,12 @@ struct McpClient {
 }
 
 impl McpClient {
+    fn spawn_with_key(rest_url: &str, key: Option<&str>) -> McpClient {
+        if let Some(k) = key {
+            std::env::set_var("GANESH_API_KEY", k);
+        }
+        Self::spawn(rest_url)
+    }
     fn spawn(rest_url: &str) -> McpClient {
         let bin = sibling_binary("ganesh-mcp");
         let mut child = Command::new(bin)
@@ -487,13 +525,20 @@ fn run(questions_path: &str, report_path: &str, corpus_dir: &str, details_path: 
 
     // 4. Start REST service.
     let server_bin = sibling_binary("ganesh-server");
-    let mut server = Command::new(server_bin)
+    let policy_path = std::path::PathBuf::from(format!("{corpus_dir}/policy.json"));
+    let gate_key: Option<String> = std::fs::read_to_string(&policy_path).ok()
+        .and_then(|s| serde_json::from_str::<Value>(&s).ok())
+        .and_then(|v| v["keys"].as_object().and_then(|o| o.keys().next().cloned()));
+    let mut server_cmd = Command::new(server_bin);
+    server_cmd
         .arg("--db").arg(&db_path)
         .arg("--bind").arg("127.0.0.1:0")
         .stdout(Stdio::piped())
-        .stderr(Stdio::null())
-        .spawn()
-        .expect("spawn server");
+        .stderr(Stdio::null());
+    if policy_path.exists() {
+        server_cmd.arg("--policy").arg(&policy_path);
+    }
+    let mut server = server_cmd.spawn().expect("spawn server");
     let mut stdout = BufReader::new(server.stdout.take().unwrap());
     let mut line = String::new();
     stdout.read_line(&mut line).expect("server readiness line");
@@ -501,7 +546,7 @@ fn run(questions_path: &str, report_path: &str, corpus_dir: &str, details_path: 
     let rest = format!("http://{rest_addr}");
 
     // 5. MCP handshake.
-    let mut mcp = McpClient::spawn(&rest);
+    let mut mcp = McpClient::spawn_with_key(&rest, gate_key.as_deref());
     let init = mcp.call("initialize", json!({
         "protocolVersion": "2024-11-05",
         "capabilities": {},
@@ -567,7 +612,10 @@ fn run(questions_path: &str, report_path: &str, corpus_dir: &str, details_path: 
 
         // REST search.
         let t = Instant::now();
-        let rest_resp = ureq::post(&format!("{rest}/v1/search")).send_json(json!({ "query": q.question }));
+        let rest_resp = match gate_key.as_deref() {
+            Some(k) => ureq::post(&format!("{rest}/v1/search")).send_json(json!({ "query": q.question, "key": k })),
+            None => ureq::post(&format!("{rest}/v1/search")).send_json(json!({ "query": q.question })),
+        };
         oc.latency_rest_ms = t.elapsed().as_secs_f64() * 1000.0;
         let rest_json: Value = match rest_resp {
             Ok(r) => {
@@ -586,7 +634,10 @@ fn run(questions_path: &str, report_path: &str, corpus_dir: &str, details_path: 
         let t = Instant::now();
         let mcp_result = mcp.call("tools/call", json!({
             "name": "search_context",
-            "arguments": { "query": q.question }
+            "arguments": match gate_key.as_deref() {
+                Some(k) => json!({ "query": q.question, "key": k }),
+                None => json!({ "query": q.question }),
+            }
         }));
         oc.latency_mcp_ms = t.elapsed().as_secs_f64() * 1000.0;
         let mcp_json: Value = match mcp_result {
@@ -610,7 +661,11 @@ fn run(questions_path: &str, report_path: &str, corpus_dir: &str, details_path: 
         // Citation opening through both adapters. Every returned passage
         // contributes one expected opening before its token is inspected.
         let (rest_checked, rest_opened) = citation_openings(&rest_json, |token| {
-            ureq::get(&format!("{rest}/v1/citations/{token}")).call().ok()
+            let url = match gate_key.as_deref() {
+                Some(k) => format!("{rest}/v1/citations/{token}?key={k}"),
+                None => format!("{rest}/v1/citations/{token}"),
+            };
+            ureq::get(&url).call().ok()
                 .and_then(|r| r.into_json::<Value>().ok())
         });
         oc.citations_checked += rest_checked;
@@ -771,6 +826,7 @@ fn run(questions_path: &str, report_path: &str, corpus_dir: &str, details_path: 
     }
     r.push('\n');
     r.push_str(&format!("- {}\n", ganesh_core::rerank::status_summary()));
+    r.push_str(&format!("- {}\n", ganesh_core::embed::status_summary()));
     r.push_str(&format!("- {}\n", ganesh_core::qa_verify::status_summary()));
     r.push_str("## Summary\n\n");
     r.push_str(&format!("| Check | Result |\n| --- | --- |\n"));

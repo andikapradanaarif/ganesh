@@ -1,0 +1,3 @@
+== Deployment approval rules (staging update) ==
+
+Staging deployments are automatic and no longer require manual approval by the release captain.

@@ -1,0 +1,3 @@
+== Cache fleet capacity note (second source) ==
+
+The cache fleet in the primary region runs c7i instances, confirmed independently in the fleet inventory export.

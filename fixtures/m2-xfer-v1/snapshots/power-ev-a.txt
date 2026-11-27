@@ -1,0 +1,3 @@
+== Power shelf inventory (first source) ==
+
+The rack power shelf in the basement rack uses a 16 amp circuit, confirmed in the September electrical inspection.

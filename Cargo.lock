@@ -489,6 +489,7 @@ name = "ganesh-bench"
 version = "0.1.0"
 dependencies = [
  "ganesh-core",
+ "rusqlite",
  "serde",
  "serde_json",
  "tempfile",

@@ -1,0 +1,3 @@
+== Incident 77 root cause report (platform team) ==
+
+After investigation, the root cause of incident 77 was a misconfigured load balancer health check in the production environment, which blackholed healthy backends.

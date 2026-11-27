@@ -1,0 +1,9 @@
+== Garden greenhouse project notes ==
+
+The greenhouse monitoring project uses the spare raspberry pi. The sensors report soil moisture and temperature every five minutes.
+
+Decided: the greenhouse watering pump runs on a soil moisture threshold, not a timer. Chosen threshold: pump activates below 30 percent moisture.
+
+The greenhouse plants include tomatoes and basil. Monitors in the greenhouse are cheap e-ink displays, not studio monitors.
+
+Budget note: the e-ink display cost 42 euros. The pump relay cost 18 euros.

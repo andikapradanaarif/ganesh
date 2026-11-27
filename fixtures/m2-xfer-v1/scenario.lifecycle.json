@@ -1,0 +1,25 @@
+{
+  "steps": [
+    {"import": ["vaultrules-r1", "powerev-a", "powerev-b", "powerclaim-r1", "powerpriv-r1"]},
+    {"start_server": true},
+    {"expect_search": {"name": "L1.initial-rule-visible", "key": "key-alpha", "query": "vault access break-glass approval", "status": "ok", "must_include_rev": ["vaultrules-r1"]}},
+    {"import": ["vaultrules-r2"]},
+    {"expect_search": {"name": "L1.may-asof-old-rule", "key": "key-alpha", "query": "does staging vault access require break-glass approval", "as_of": "2026-05-15", "status": "ok", "must_include_rev": ["vaultrules-r1"], "must_exclude_rev": ["vaultrules-r2"]}},
+    {"expect_search": {"name": "L1.june-staging-new-rule", "key": "key-alpha", "query": "does staging vault access require break-glass approval", "as_of": "2026-06-10", "status": "ok", "must_include_rev": ["vaultrules-r2"], "must_exclude_rev": ["vaultrules-r1"]}},
+    {"expect_search": {"name": "L1.june-production-old-rule", "key": "key-alpha", "query": "does production vault access require break-glass approval", "as_of": "2026-06-10", "status": "ok", "must_include_rev": ["vaultrules-r1"]}},
+    {"expect_search": {"name": "L2.beta-sees-power-claim", "key": "key-beta", "query": "basement rack power capacity expansion planning", "status": "ok"}},
+    {"expect_citation": {"name": "L2.beta-claim-citation-open", "key": "key-beta", "revision": "powerclaim-r1", "openable": true}},
+    {"revoke": {"revision": "powerev-a", "project": "alpha"}},
+    {"revoke": {"revision": "powerev-a", "project": "beta"}},
+    {"expect_search": {"name": "L2.claim-survives-one-removal", "key": "key-beta", "query": "basement rack power capacity expansion planning", "status": "ok"}},
+    {"revoke": {"revision": "powerev-b", "project": "beta"}},
+    {"expect_search": {"name": "L2.beta-withheld-after-last-support", "key": "key-beta", "query": "basement rack power capacity expansion planning", "status": "insufficient_context"}},
+    {"expect_search": {"name": "L2.beta-asof-also-withheld", "key": "key-beta", "query": "basement rack power capacity expansion planning", "as_of": "2026-09-20", "status": "insufficient_context"}},
+    {"expect_citation": {"name": "L2.beta-claim-citation-dead", "key": "key-beta", "revision": "powerclaim-r1", "openable": false}},
+    {"expect_search": {"name": "L2.alpha-still-resolves", "key": "key-alpha", "query": "basement rack power capacity expansion planning", "status": "ok"}},
+    {"expect_no_leak": {"name": "L2.zero-leak", "key": "key-beta", "query": "basement rack power capacity expansion planning", "strings": ["16 amp", "XVPRIVATE", "ZYQW", "/private/power-node"]}},
+    {"restart": true},
+    {"expect_search": {"name": "L2.restart-beta-still-withheld", "key": "key-beta", "query": "basement rack power capacity expansion planning", "status": "insufficient_context"}},
+    {"expect_citation": {"name": "L2.restart-citation-still-dead", "key": "key-beta", "revision": "powerclaim-r1", "openable": false}}
+  ]
+}

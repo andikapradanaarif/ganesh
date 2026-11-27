@@ -1,0 +1,3 @@
+== Basement rack private note ==
+
+XVPRIVATE-3110 secret: the basement rack also hosts the personal archive node at /private/power-node/path with credential hint ZYQW-8842.

@@ -2,3 +2,4 @@
 /out
 fixtures/qa-verifier-model/
 fixtures/reranker-model/
+embedder-model/model-int8.onnx

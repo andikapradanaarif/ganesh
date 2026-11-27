@@ -1,0 +1,432 @@
+{
+ "version": "key.v1",
+ "questions": [
+  {
+   "id": "x01",
+   "question": "When did the owner decide to hold mixing desk sessions?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "journal",
+    "paraphrased-lookup",
+    "time"
+   ],
+   "required_facts": [
+    {
+     "fact": "mixing sessions moved to 06:00",
+     "acceptable": [
+      "studio-journal-a1#p1"
+     ],
+     "spans": [
+      "06:00"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "x02",
+   "question": "Which audio experiment did the owner give up on?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "journal",
+    "paraphrased-lookup"
+   ],
+   "required_facts": [
+    {
+     "fact": "analog summing experiment abandoned",
+     "acceptable": [
+      "studio-journal-a1#p2"
+     ],
+     "spans": [
+      "analog summing experiment"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "x03",
+   "question": "On what date is the acoustics consultant booked?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "journal",
+    "exact-date"
+   ],
+   "required_facts": [
+    {
+     "fact": "consultant booked 17 November 2026",
+     "acceptable": [
+      "studio-journal-a1#p3"
+     ],
+     "spans": [
+      "17 November 2026"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "x04",
+   "question": "Which diffuser panels did the owner choose for the back wall?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "journal",
+    "paraphrased-lookup"
+   ],
+   "required_facts": [
+    {
+     "fact": "oak diffuser panels chosen",
+     "acceptable": [
+      "studio-journal-a1#p5"
+     ],
+     "spans": [
+      "oak diffuser panels"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "x05",
+   "question": "How long are studio sessions capped, according to the doctor?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "journal",
+    "count",
+    "paraphrased-lookup"
+   ],
+   "required_facts": [
+    {
+     "fact": "sessions capped at four hours",
+     "acceptable": [
+      "studio-journal-a1#p4"
+     ],
+     "spans": [
+      "four hours"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "x06",
+   "question": "What was the approved limit for jellyfin transcode jobs?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "meeting",
+    "meeting-decision",
+    "count"
+   ],
+   "required_facts": [
+    {
+     "fact": "cap at 2 concurrent approved",
+     "acceptable": [
+      "ops-chat-a1#p1"
+     ],
+     "spans": [
+      "2 concurrent"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "x07",
+   "question": "Which namespace is frozen on weekends according to the standing rule?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "meeting",
+    "scoped-qualifier",
+    "production-scope"
+   ],
+   "required_facts": [
+    {
+     "fact": "production frozen on weekends",
+     "acceptable": [
+      "ops-chat-a1#p1"
+     ],
+     "spans": [
+      "production namespace is frozen on weekends"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "x08",
+   "question": "What error code does the controller exit with when a sealed secret certificate is expired?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "runbook",
+    "exact-symbol",
+    "error-code"
+   ],
+   "required_facts": [
+    {
+     "fact": "ESEALEXP",
+     "acceptable": [
+      "homelab-runbook-a1#p4"
+     ],
+     "spans": [
+      "ESEALEXP"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "x09",
+   "question": "What is the exact deployctl command for a production rollout?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "runbook",
+    "exact-symbol",
+    "command",
+    "scoped-qualifier",
+    "production-scope"
+   ],
+   "required_facts": [
+    {
+     "fact": "production deployctl command",
+     "acceptable": [
+      "homelab-runbook-a1#p2"
+     ],
+     "spans": [
+      "deployctl apply --cluster homelab --namespace production --approve manual"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "x10",
+   "question": "At what time do nightly backups run?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "runbook",
+    "time"
+   ],
+   "required_facts": [
+    {
+     "fact": "backups at 03:00",
+     "acceptable": [
+      "homelab-runbook-a1#p5"
+     ],
+     "spans": [
+      "03:00"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "x11",
+   "question": "How many consecutive days must the renewal comparison check run green in staging before production?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "postmortem",
+    "long-passage",
+    "scoped-qualifier",
+    "count"
+   ],
+   "required_facts": [
+    {
+     "fact": "seven consecutive days",
+     "acceptable": [
+      "incident-12-a1#p2"
+     ],
+     "spans": [
+      "seven consecutive days"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "x12",
+   "question": "Why was switching to cert-manager operator mode rejected?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "postmortem",
+    "compound",
+    "root-cause"
+   ],
+   "required_facts": [
+    {
+     "fact": "team prefers static manifest workflow",
+     "acceptable": [
+      "incident-12-a1#p3"
+     ],
+     "spans": [
+      "static manifest workflow"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "x13",
+   "question": "How long was the total customer-visible ingress impact?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "postmortem",
+    "long-passage",
+    "count"
+   ],
+   "required_facts": [
+    {
+     "fact": "forty minutes impact",
+     "acceptable": [
+      "incident-12-a1#p2"
+     ],
+     "spans": [
+      "forty minutes"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "x14",
+   "question": "Below what moisture threshold does the greenhouse watering pump activate?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "project",
+    "paraphrased-lookup",
+    "count",
+    "near-neighbor"
+   ],
+   "required_facts": [
+    {
+     "fact": "below 30 percent",
+     "acceptable": [
+      "garden-project-a1#p2"
+     ],
+     "spans": [
+      "30 percent"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "x15",
+   "question": "What kind of displays are the greenhouse monitors?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "project",
+    "near-neighbor",
+    "paraphrased-lookup"
+   ],
+   "required_facts": [
+    {
+     "fact": "e-ink displays",
+     "acceptable": [
+      "garden-project-a1#p3"
+     ],
+     "spans": [
+      "e-ink"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "x16",
+   "question": "How much did the greenhouse e-ink display and the pump relay each cost?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "project",
+    "compound",
+    "cost"
+   ],
+   "required_facts": [
+    {
+     "fact": "display 42 euros",
+     "acceptable": [
+      "garden-project-a1#p4"
+     ],
+     "spans": [
+      "42 euros"
+     ]
+    },
+    {
+     "fact": "relay 18 euros",
+     "acceptable": [
+      "garden-project-a1#p4"
+     ],
+     "spans": [
+      "18 euros"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "xi01",
+   "question": "Is the ingress migration to traefik complete?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "meeting",
+    "started-not-verified"
+   ],
+   "required_facts": []
+  },
+  {
+   "id": "xi02",
+   "question": "What time was the backup window moved to?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "meeting",
+    "unmade-decision"
+   ],
+   "required_facts": []
+  },
+  {
+   "id": "xi03",
+   "question": "Is cert-manager operator mode now used for renewals?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "postmortem",
+    "proposed-not-applied"
+   ],
+   "required_facts": []
+  },
+  {
+   "id": "xi04",
+   "question": "What airline did the owner book for the acoustics consultant trip?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "journal",
+    "absent-detail"
+   ],
+   "required_facts": []
+  },
+  {
+   "id": "xi05",
+   "question": "What is the amperage of the greenhouse pump circuit?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "project",
+    "missing-measurement"
+   ],
+   "required_facts": []
+  },
+  {
+   "id": "xi06",
+   "question": "What error code does deployctl exit with in the staging weekend freeze?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "runbook",
+    "wrong-environment"
+   ],
+   "required_facts": []
+  }
+ ]
+}

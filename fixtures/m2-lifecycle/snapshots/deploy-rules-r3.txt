@@ -1,0 +1,3 @@
+== Deployment approval rules (weekend update) ==
+
+Staging deployments are automatic on weekdays, but weekend staging deployments require manual approval by the on-call captain.
