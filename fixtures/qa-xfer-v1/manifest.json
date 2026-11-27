@@ -21,7 +21,8 @@
       "retrieved": "2025-11-28",
       "file": "snapshots/cheetah.txt",
       "sha256": "9cfc6581f8af52350ae7359e86419f8c6e8625fcc420cc961d6a6f07fd523380",
-      "family": "qa-xfer-v1"
+      "family": "qa-xfer-v1",
+      "bytes": 61794
     },
     {
       "article_id": "danube",
@@ -37,7 +38,8 @@
       "retrieved": "2025-11-28",
       "file": "snapshots/danube.txt",
       "sha256": "9493432ff354f9ea1bc7e1608b75c2f018d638a439beff5958fc41f73d78a8d7",
-      "family": "qa-xfer-v1"
+      "family": "qa-xfer-v1",
+      "bytes": 60380
     },
     {
       "article_id": "curie",
@@ -53,7 +55,8 @@
       "retrieved": "2025-11-28",
       "file": "snapshots/curie.txt",
       "sha256": "f791ea0dc2878ad73a2b135ba55b4ba791eb9bfe71acbdfad78cadf8e941bcb4",
-      "family": "qa-xfer-v1"
+      "family": "qa-xfer-v1",
+      "bytes": 44847
     },
     {
       "article_id": "transsib",
@@ -69,7 +72,8 @@
       "retrieved": "2025-11-28",
       "file": "snapshots/transsib.txt",
       "sha256": "323c9e7bffad7adeec1f64e3fd0973d770b07c5d6a34ec8e324a8b892512c766",
-      "family": "qa-xfer-v1"
+      "family": "qa-xfer-v1",
+      "bytes": 29872
     },
     {
       "article_id": "goldengate",
@@ -85,7 +89,8 @@
       "retrieved": "2025-11-28",
       "file": "snapshots/goldengate.txt",
       "sha256": "5d43ed534f6a71152033550392ccf654c3cbc5c35d2f189b83a356c43b68348c",
-      "family": "qa-xfer-v1"
+      "family": "qa-xfer-v1",
+      "bytes": 46865
     },
     {
       "article_id": "dna",
@@ -101,7 +106,8 @@
       "retrieved": "2025-11-28",
       "file": "snapshots/dna.txt",
       "sha256": "7d2b2e537eecfe86e8ccab279dabe9e353ffd6174afdfc1c427f0165f3f557a3",
-      "family": "qa-xfer-v1"
+      "family": "qa-xfer-v1",
+      "bytes": 65186
     }
   ]
 }
