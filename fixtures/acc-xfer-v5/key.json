@@ -1,0 +1,273 @@
+{
+  "version": "acc-xfer-v5",
+  "scoring": "hit requires ok status plus evidence credit; insufficient correct when status insufficient_context",
+  "questions": [
+    {
+      "id": "q01",
+      "question": "On what exact date was the Leaning Tower of Pisa reopened to the public?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [
+        "answerable",
+        "exact-date"
+      ],
+      "required_facts": [
+        {
+          "fact": "reopened 15 December 2001",
+          "acceptable": [
+            "pisa-a1#p18"
+          ],
+          "spans": [
+            "15 December 2001"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "q02",
+      "question": "On what date did construction of the Leaning Tower of Pisa begin?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [
+        "answerable",
+        "irregular-verb"
+      ],
+      "required_facts": [
+        {
+          "fact": "began 14 August 1173",
+          "acceptable": [
+            "pisa-a1#p8"
+          ],
+          "spans": [
+            "14 August 1173"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "q03",
+      "question": "What is the height of the tallest tower of the Sagrada Fam\u00edlia in meters?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [
+        "answerable",
+        "decimal-unit"
+      ],
+      "required_facts": [
+        {
+          "fact": "172.5 m",
+          "acceptable": [
+            "sagrada-a1#p4",
+            "sagrada-a1#p18"
+          ],
+          "spans": [
+            "172.5 m"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "q04",
+      "question": "How many identically sized pieces compose the window in Cologne Cathedral designed by Gerhard Richter?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [
+        "answerable",
+        "count"
+      ],
+      "required_facts": [
+        {
+          "fact": "11,500 pieces",
+          "acceptable": [
+            "cologne-a1#p25"
+          ],
+          "spans": [
+            "11,500"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "q05",
+      "question": "Which architect designed the new bridge to Mont Saint-Michel opened in 2014?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [
+        "answerable",
+        "entity"
+      ],
+      "required_facts": [
+        {
+          "fact": "Dietmar Feichtinger",
+          "acceptable": [
+            "montsm-a1#p13"
+          ],
+          "spans": [
+            "Feichtinger"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "q06",
+      "question": "In what year was Cologne Cathedral completed to its original medieval plan?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [
+        "answerable",
+        "realized-sibling-of-failed-attempt"
+      ],
+      "required_facts": [
+        {
+          "fact": "completed 1880",
+          "acceptable": [
+            "cologne-a1#p2",
+            "cologne-a1#p33"
+          ],
+          "spans": [
+            "1880"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "q07",
+      "question": "In what month and year did the fire seriously damage Notre-Dame, and in what month and year did the cathedral reopen?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [
+        "answerable",
+        "compound"
+      ],
+      "required_facts": [
+        {
+          "fact": "fire April 2019",
+          "acceptable": [
+            "notredame-a1#p3",
+            "notredame-a1#p58",
+            "notredame-a1#p119"
+          ],
+          "spans": [
+            "April 2019"
+          ],
+          "answer_polarity": "affirmative"
+        },
+        {
+          "fact": "reopened December 2024",
+          "acceptable": [
+            "notredame-a1#p3"
+          ],
+          "spans": [
+            "December 2024"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "q08",
+      "question": "On what exact date was the Sagrada Fam\u00edlia consecrated, and which architect designed it?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [
+        "answerable",
+        "compound"
+      ],
+      "required_facts": [
+        {
+          "fact": "consecrated 7 November 2010",
+          "acceptable": [
+            "sagrada-a1#p1",
+            "sagrada-a1#p13"
+          ],
+          "spans": [
+            "7 November 2010"
+          ],
+          "answer_polarity": "affirmative"
+        },
+        {
+          "fact": "designed by Gaud\u00ed",
+          "acceptable": [
+            "sagrada-a1#p1"
+          ],
+          "spans": [
+            "Gaud\u00ed"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "q09",
+      "question": "On what exact calendar date was Cologne Cathedral completed?",
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "tags": [
+        "insufficient",
+        "year-only-exact-date"
+      ],
+      "required_facts": []
+    },
+    {
+      "id": "q10",
+      "question": "What is the mass of the Leaning Tower of Pisa in tonnes?",
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "tags": [
+        "insufficient",
+        "missing-measurement"
+      ],
+      "required_facts": []
+    },
+    {
+      "id": "q11",
+      "question": "What is the height of the tallest tower of the Sagrada Fam\u00edlia in inches?",
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "tags": [
+        "insufficient",
+        "wrong-unit"
+      ],
+      "required_facts": []
+    },
+    {
+      "id": "q12",
+      "question": "In what year did the first attempt to complete the construction of Cologne Cathedral succeed?",
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "tags": [
+        "insufficient",
+        "inverted-outcome"
+      ],
+      "required_facts": []
+    },
+    {
+      "id": "q13",
+      "question": "In what year did Antoni Gaud\u00ed begin the construction of the Sagrada Fam\u00edlia?",
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "tags": [
+        "insufficient",
+        "entity-swap"
+      ],
+      "required_facts": []
+    },
+    {
+      "id": "q14",
+      "question": "In what year was the Sagrada Fam\u00edlia completed?",
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "tags": [
+        "insufficient",
+        "planned-future"
+      ],
+      "required_facts": []
+    }
+  ]
+}
