@@ -35,7 +35,7 @@ Selection rule: smallest pool with zero coverage loss vs pool-50 across all expo
 
 ## 3. Exposed retention matrix
 
-Final frozen configuration (pool 40, 6 intra-op threads, batched QA, sliding window):
+Final frozen configuration (pool 40, 6 intra-op threads, sequential QA (batched QA reverted in 81a0f315), sliding window):
 
 | suite | candidate | gate | verdict |
 |---|---|---|---|
