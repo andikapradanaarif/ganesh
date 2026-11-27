@@ -1,0 +1,267 @@
+{
+ "version": "questions.v1",
+ "scoring": {
+  "coverage_min": 6,
+  "coverage_total": 8,
+  "insufficient_min": 5,
+  "insufficient_total": 6
+ },
+ "questions": [
+  {
+   "id": "q01",
+   "question": "On what exact date was HMS Beagle launched?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "exact-date"
+   ],
+   "required_facts": [
+    {
+     "fact": "launched 11 may 1820",
+     "acceptable": [
+      "beagle-a1#p1"
+     ],
+     "spans": [
+      "launched on 11 May 1820"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "q02",
+   "question": "In what year did the City of Long Beach buy the Queen Mary?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "irregular-verb"
+   ],
+   "required_facts": [
+    {
+     "fact": "bought 1967",
+     "acceptable": [
+      "queenmary-a1#p8"
+     ],
+     "spans": [
+      "bought by Long Beach in 1967"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "q03",
+   "question": "What speed in knots did Queen Mary achieve during her sea trials?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "decimal-measurement"
+   ],
+   "required_facts": [
+    {
+     "fact": "32.84 knots",
+     "acceptable": [
+      "queenmary-a1#p2"
+     ],
+     "spans": [
+      "32.84 knots"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "q04",
+   "question": "How many men made up the full complement of HMS Victory?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "count"
+   ],
+   "required_facts": [
+    {
+     "fact": "850 men",
+     "acceptable": [
+      "hmsvictory-a1#p2"
+     ],
+     "spans": [
+      "complement of 850 men"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "q05",
+   "question": "At whose shipyard was USS Constitution built?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "entity"
+   ],
+   "required_facts": [
+    {
+     "fact": "edmund hartt shipyard",
+     "acceptable": [
+      "ussconstitution-a1#p1"
+     ],
+     "spans": [
+      "built at Edmund Hartt's shipyard"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "q06",
+   "question": "On what exact date was Cutty Sark reopened to the public after its restoration?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "long-passage",
+    "exact-date"
+   ],
+   "required_facts": [
+    {
+     "fact": "reopened 25 april 2012",
+     "acceptable": [
+      "cuttysark-a1#p1"
+     ],
+     "spans": [
+      "reopened to the public on 25 April 2012"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "q07",
+   "question": "On what exact date did Queen Mary sail on her maiden voyage, and what speed did she achieve during her sea trials?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "compound",
+    "split-vocabulary",
+    "exact-date"
+   ],
+   "required_facts": [
+    {
+     "fact": "maiden 27 may 1936",
+     "acceptable": [
+      "queenmary-a1#p1"
+     ],
+     "spans": [
+      "maiden voyage on 27 May 1936"
+     ]
+    },
+    {
+     "fact": "32.84 knots",
+     "acceptable": [
+      "queenmary-a1#p2"
+     ],
+     "spans": [
+      "32.84 knots"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "q08",
+   "question": "Who designed SS Great Britain, and for which company\u2019s transatlantic service?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "compound"
+   ],
+   "required_facts": [
+    {
+     "fact": "brunel",
+     "acceptable": [
+      "greatbritain-a1#p1"
+     ],
+     "spans": [
+      "designed by Isambard Kingdom Brunel"
+     ]
+    },
+    {
+     "fact": "great western steamship company",
+     "acceptable": [
+      "greatbritain-a1#p1"
+     ],
+     "spans": [
+      "Great Western Steamship Company"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "q09",
+   "question": "On what exact calendar date was the keel of HMS Beagle laid?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient",
+    "year-only-exact-date"
+   ],
+   "required_facts": []
+  },
+  {
+   "id": "q10",
+   "question": "What is the beam of HMS Beagle in feet?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient",
+    "missing-measurement"
+   ],
+   "required_facts": []
+  },
+  {
+   "id": "q11",
+   "question": "What speed in miles per hour did Queen Mary achieve during her sea trials?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient",
+    "wrong-unit"
+   ],
+   "required_facts": []
+  },
+  {
+   "id": "q12",
+   "question": "In what year will Queen Mary return to transatlantic passenger service?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient",
+    "future-unoccurred"
+   ],
+   "required_facts": []
+  },
+  {
+   "id": "q13",
+   "question": "In what year was HMS Victory converted into a prison hulk?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient",
+    "planned-unrealized"
+   ],
+   "required_facts": []
+  },
+  {
+   "id": "q14",
+   "question": "In what year did Isambard Kingdom Brunel design HMS Victory?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient",
+    "entity-swap",
+    "hard-semantic"
+   ],
+   "required_facts": []
+  }
+ ]
+}

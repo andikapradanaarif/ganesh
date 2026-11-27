@@ -1,0 +1,218 @@
+{
+  "evidence_correct_answerable": 5,
+  "outcomes": [
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "t01",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.434506,
+      "latency_rest_ms": 2.1272420000000003,
+      "mcp_ids": [
+        "meridian-t1#p3",
+        "meridian-t1#p4",
+        "meridian-t1#p5"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "meridian-t1#p3",
+        "meridian-t1#p4",
+        "meridian-t1#p5"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "t02",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.2369620000000001,
+      "latency_rest_ms": 1.07,
+      "mcp_ids": [
+        "meridian-t1#p4",
+        "meridian-t1#p3",
+        "meridian-t1#p5"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "meridian-t1#p4",
+        "meridian-t1#p3",
+        "meridian-t1#p5"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "t03",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 0.983079,
+      "latency_rest_ms": 0.983998,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "t04",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.0961670000000001,
+      "latency_rest_ms": 1.00563,
+      "mcp_ids": [
+        "meridian-t1#p5",
+        "meridian-t1#p4",
+        "meridian-t1#p3"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "meridian-t1#p5",
+        "meridian-t1#p4",
+        "meridian-t1#p3"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "t05",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 0.786195,
+      "latency_rest_ms": 0.699826,
+      "mcp_ids": [
+        "meridian-t1#p2",
+        "meridian-t1#p5",
+        "meridian-t1#p3"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "meridian-t1#p2",
+        "meridian-t1#p5",
+        "meridian-t1#p3"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "t06",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 0.8231160000000001,
+      "latency_rest_ms": 0.759666,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 4,
+      "citations_ok": 4,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "t07",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 0.926531,
+      "latency_rest_ms": 0.882044,
+      "mcp_ids": [
+        "ferretlang-t1#p2",
+        "ferretlang-t1#p1"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "ferretlang-t1#p2",
+        "ferretlang-t1#p1"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "t08",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 0.86778,
+      "latency_rest_ms": 0.806921,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    }
+  ],
+  "questions": "fixtures/transfer-check/key.json",
+  "result": {
+    "checks": {
+      "adapter_agreement": {
+        "agree": 8,
+        "pass": true,
+        "total": 8
+      },
+      "citation_integrity": {
+        "checked": 28,
+        "ok": 28,
+        "pass": true
+      },
+      "evidence_coverage": {
+        "answerable": 5,
+        "hits": 5,
+        "pass": true
+      },
+      "insufficient_evidence": {
+        "correct": 3,
+        "pass": true,
+        "total": 3
+      },
+      "provider_calls": {
+        "count": 0,
+        "pass": true
+      }
+    },
+    "corpus": "fixtures/transfer-check",
+    "incomplete": false,
+    "mode": "development",
+    "questions": "fixtures/transfer-check/key.json",
+    "reasons": [],
+    "verdict": "DEVELOPMENT",
+    "version": "bench-result.v1"
+  },
+  "summary": {
+    "adapter_agree": 8,
+    "answerable": 5,
+    "citations_checked": 28,
+    "citations_ok": 28,
+    "hits": 5,
+    "incomplete": false,
+    "insufficient": 3,
+    "insufficient_correct": 3,
+    "total": 8
+  }
+}

@@ -1,0 +1,11 @@
+{
+ "version": "scoring.gate-fixture.v1",
+ "evidence_coverage_min": 1,
+ "evidence_coverage_total": 1,
+ "insufficient_min": 1,
+ "insufficient_total": 1,
+ "adapter_agreement_total": 2,
+ "citation_integrity_min_fraction": 1.0,
+ "top_k": 3,
+ "provider_calls_max": 0
+}

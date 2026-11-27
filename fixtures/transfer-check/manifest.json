@@ -1,0 +1,45 @@
+{
+ "version": "transfer-check.v1",
+ "created": "2026-11-27",
+ "frame": "synthetic transfer check, frozen before candidate tuning (issue #165)",
+ "seed": 0,
+ "exclusions": [],
+ "sampling": "hand-authored minimal passages; not sampled",
+ "snapshot_format": "plaintext with wiki-style section headings",
+ "articles": [
+  {
+   "article_id": "meridian",
+   "title": "Meridian backup operations log",
+   "pageid": 0,
+   "revision": "meridian-t1",
+   "revision_url": "https://example.invalid/meridian/t1",
+   "publisher": "Ganesh fixture authors",
+   "url": "https://example.invalid/meridian",
+   "license": "CC0 1.0",
+   "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "permission": "Synthetic fixture text written for this project; no external content.",
+   "retrieved": "2026-11-27",
+   "bytes": 569,
+   "sha256": "1dd2fa9aa3b298aafd705ab783640c1a882a6472188662f4dc59d7d06892ec19",
+   "file": "snapshots/meridian.txt",
+   "family": "transfer"
+  },
+  {
+   "article_id": "ferretlang",
+   "title": "Ferretlang release notes",
+   "pageid": 0,
+   "revision": "ferretlang-t1",
+   "revision_url": "https://example.invalid/ferretlang/t1",
+   "publisher": "Ganesh fixture authors",
+   "url": "https://example.invalid/ferretlang",
+   "license": "CC0 1.0",
+   "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "permission": "Synthetic fixture text written for this project; no external content.",
+   "retrieved": "2026-11-27",
+   "bytes": 333,
+   "sha256": "2bebb7a8c136781dccc637f0ee89575986071cdd9e3d12e51c1b9d381a0fec22",
+   "file": "snapshots/ferretlang.txt",
+   "family": "transfer"
+  }
+ ]
+}

@@ -1,0 +1,25 @@
+The Kestrel archive system is a fictional backup target used for chain-probe diagnostics. This is its operations log.
+
+== March 3 ==
+
+The backup of archive volume V21 started at 03:00 UTC. The transfer completed at 03:39 UTC and the integrity check passed.
+
+== March 4 ==
+
+The backup of archive volume V21 started at 03:00 UTC. The transfer to the secondary site did not complete.
+
+== March 5 ==
+
+Archive volume V21 was mounted for verification. Archive volume V22 was also mounted. The transfer completed at 04:10 UTC.
+
+== March 6 ==
+
+The backup of archive volume V21 started at 03:00 UTC. Archive volume V22 completed its transfer at 03:55 UTC.
+
+== March 7 ==
+
+The backup of archive volume V21 started at 03:00 UTC. The integrity check failed during verification.
+
+== March 8 ==
+
+The backup of archive volume V21 started at 03:00 UTC. The integrity check was not run before the rotation.

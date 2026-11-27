@@ -1,0 +1,4 @@
+{
+  "scoring": "hit requires ok status plus evidence credit on keyed facts; insufficient correct when status is insufficient_context",
+  "note": "acceptable passages are the prose spans containing each keyed fact"
+}

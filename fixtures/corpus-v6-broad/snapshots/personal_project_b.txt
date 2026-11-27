@@ -1,0 +1,16 @@
+Project B notes, home sensor network. Fictional personal project fixture for evaluation use.
+
+== Overview ==
+Project B is my home sensor network: a raspberry pi controller in the hallway closet reading temperature and humidity sensors in three rooms. It shares nothing with the balcony irrigation except the raspberry pi parts bin and my limited free time.
+
+== Hardware October 3 ==
+The hallway controller is a raspberry pi 4 with a relay hat that switches the fan in the storage room. The north relay channel drives the storage fan; the second channel is unused. Flashed the controller firmware to version 1.6.2 in the evening.
+
+== Sensor placement October 6 ==
+Bedroom sensor mounted above the wardrobe, hallway sensor near the controller, storage room sensor clipped to the middle shelf. The storage room sensor keeps losing pairing; moving it thirty centimetres away from the metal shelf fixed the dropouts.
+
+== Software October 9 ==
+The controller logs readings every five minutes to a sqlite file on the sd card. Wrote a small dashboard script that shows the last reading per room. The storage fan relay switches on when the storage humidity exceeds 65 percent for three consecutive readings.
+
+== Open items October 12 ==
+Still want to add a water leak sensor under the washing machine, but the part has not been ordered yet. Also considering whether the controller should poll every two minutes instead of five; undecided because of sd card wear.

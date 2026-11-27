@@ -1,0 +1,45 @@
+{
+ "version": "chain-probe.v1",
+ "created": "2026-11-27",
+ "frame": "diagnostic contrasts + frozen transfer group, frozen before tuning (issue #167)",
+ "seed": 0,
+ "exclusions": [],
+ "sampling": "hand-authored; not sampled",
+ "snapshot_format": "plaintext with wiki-style section headings",
+ "articles": [
+  {
+   "article_id": "chaintest",
+   "title": "Kestrel archive operations log",
+   "pageid": 0,
+   "revision": "chaintest-c1",
+   "revision_url": "https://example.invalid/chaintest/c1",
+   "publisher": "Ganesh fixture authors",
+   "url": "https://example.invalid/chaintest",
+   "license": "CC0 1.0",
+   "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "permission": "Synthetic fixture text written for this project; no external content.",
+   "retrieved": "2026-11-27",
+   "bytes": 890,
+   "sha256": "14ec0f55f08c7c73a1864b6841aaff6bff68a4c3f1ca1fb70e4d7b9436fc1fef",
+   "file": "snapshots/chaintest.txt",
+   "family": "chainprobe"
+  },
+  {
+   "article_id": "restorelog",
+   "title": "Tundra restore job log",
+   "pageid": 0,
+   "revision": "restorelog-c1",
+   "revision_url": "https://example.invalid/restorelog/c1",
+   "publisher": "Ganesh fixture authors",
+   "url": "https://example.invalid/restorelog",
+   "license": "CC0 1.0",
+   "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "permission": "Synthetic fixture text written for this project; no external content.",
+   "retrieved": "2026-11-27",
+   "bytes": 479,
+   "sha256": "037892e8b9151fc35175b41f36de879f40172f3361faf386e0b2008b5e210dde",
+   "file": "snapshots/restorelog.txt",
+   "family": "chainprobe"
+  }
+ ]
+}

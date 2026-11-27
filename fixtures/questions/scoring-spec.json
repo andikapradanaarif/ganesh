@@ -1,0 +1,11 @@
+{
+  "version": "scoring.v1",
+  "evidence_coverage_min": 20,
+  "evidence_coverage_total": 24,
+  "insufficient_min": 6,
+  "insufficient_total": 6,
+  "adapter_agreement_total": 30,
+  "citation_integrity_min_fraction": 1.0,
+  "top_k": 3,
+  "provider_calls_max": 0
+}

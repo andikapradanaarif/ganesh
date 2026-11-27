@@ -1,0 +1,313 @@
+{
+  "version": "acc-xfer-v3",
+  "scoring": "scoring.v2",
+  "questions": [
+    {
+      "id": "q01",
+      "question": "What is the average distance of the retrograde-orbiting moons from Jupiter in million km?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [
+        "answerable",
+        "quantity",
+        "measurement",
+        "decimal"
+      ],
+      "required_facts": [
+        {
+          "fact": "averaging 21.3 million km",
+          "acceptable": [
+            "jupiter-a1#p53"
+          ],
+          "spans": [
+            "21.3 million km"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "q02",
+      "question": "How many watchtowers are estimated to have been constructed along the Great Wall?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [
+        "answerable",
+        "quantity",
+        "count"
+      ],
+      "required_facts": [
+        {
+          "fact": "25,000 watchtowers",
+          "acceptable": [
+            "greatwall-a1#p18"
+          ],
+          "spans": [
+            "25,000 watchtowers"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "q03",
+      "question": "How many bright flashes are regularly observed in the upper atmosphere of Jupiter?",
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "tags": [
+        "insufficient",
+        "quantity",
+        "decimal-adjacent"
+      ],
+      "required_facts": []
+    },
+    {
+      "id": "q04",
+      "question": "What is the height of the Great Wall of China in meters?",
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "tags": [
+        "insufficient",
+        "measurement",
+        "absent"
+      ],
+      "required_facts": []
+    },
+    {
+      "id": "q05",
+      "question": "On what exact date did Artemis I fly?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [
+        "answerable",
+        "date",
+        "irregular-verb"
+      ],
+      "required_facts": [
+        {
+          "fact": "flew on November 16, 2022",
+          "acceptable": [
+            "artemis-a1#p6",
+            "artemis-a1#p7",
+            "artemis-a1#p35",
+            "artemis-a1#p42"
+          ],
+          "spans": [
+            "November 16, 2022"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "q06",
+      "question": "On what exact date did the French Revolution end with the Coup of 18 Brumaire?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [
+        "answerable",
+        "date",
+        "regular"
+      ],
+      "required_facts": [
+        {
+          "fact": "9 November 1799",
+          "acceptable": [
+            "frenchrev-a1#p1",
+            "frenchrev-a1#p94"
+          ],
+          "spans": [
+            "9 November 1799"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "q07",
+      "question": "On what exact calendar date did construction of the Great Wall begin?",
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "tags": [
+        "insufficient",
+        "date",
+        "precision"
+      ],
+      "required_facts": []
+    },
+    {
+      "id": "q08",
+      "question": "In what year did Artemis III land astronauts on the Moon?",
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "tags": [
+        "insufficient",
+        "planned-future"
+      ],
+      "required_facts": []
+    },
+    {
+      "id": "q09",
+      "question": "What kind of planet is Jupiter?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [
+        "answerable",
+        "framing",
+        "kind"
+      ],
+      "required_facts": [
+        {
+          "fact": "gas giant",
+          "acceptable": [
+            "jupiter-a1#p1",
+            "jupiter-a1#p14",
+            "jupiter-a1#p16"
+          ],
+          "spans": [
+            "gas giant"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "q10",
+      "question": "In which country is Manaus, the largest city on the Amazon?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [
+        "answerable",
+        "framing",
+        "country"
+      ],
+      "required_facts": [
+        {
+          "fact": "Manaus in Brazil",
+          "acceptable": [
+            "amazon-a1#p2",
+            "amazon-a1#p27",
+            "amazon-a1#p31",
+            "amazon-a1#p43",
+            "amazon-a1#p54"
+          ],
+          "spans": [
+            "Manaus"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "q11",
+      "question": "On what exact date did the Brazilian decree take effect, and about how many men did Orellana take with him?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [
+        "answerable",
+        "compound"
+      ],
+      "required_facts": [
+        {
+          "fact": "7 September 1867",
+          "acceptable": [
+            "amazon-a1#p31"
+          ],
+          "spans": [
+            "7 September 1867"
+          ],
+          "answer_polarity": "affirmative"
+        },
+        {
+          "fact": "about 57 men",
+          "acceptable": [
+            "amazon-a1#p16"
+          ],
+          "spans": [
+            "57 men"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "q12",
+      "question": "Which spacecraft is paired with the European Service Module?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [
+        "answerable",
+        "entity"
+      ],
+      "required_facts": [
+        {
+          "fact": "Orion spacecraft",
+          "acceptable": [
+            "artemis-a1#p2",
+            "artemis-a1#p41"
+          ],
+          "spans": [
+            "European Service Module"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "q13",
+      "question": "Did the tension test of cable C7 finish on April 4?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [
+        "answerable",
+        "dated-log"
+      ],
+      "required_facts": [
+        {
+          "fact": "finished at 14:15 UTC",
+          "acceptable": [
+            "cablelog-a1#p3"
+          ],
+          "spans": [
+            "finished at 14:15 UTC"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "q14",
+      "question": "Did the tension test of cable C7 finish on April 3?",
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "tags": [
+        "insufficient",
+        "dated-log",
+        "activity-attribution"
+      ],
+      "required_facts": []
+    },
+    {
+      "id": "q15",
+      "question": "In what year did the Great Wall of China collapse?",
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "tags": [
+        "insufficient",
+        "non-occurrence"
+      ],
+      "required_facts": []
+    },
+    {
+      "id": "q16",
+      "question": "In what year did the Coup of 18 Brumaire fail?",
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "tags": [
+        "insufficient",
+        "false-premise"
+      ],
+      "required_facts": []
+    }
+  ]
+}

@@ -1,0 +1,636 @@
+{
+ "version": "heldout.v3",
+ "notes": "Fresh paired M1 v3 evaluation packet. 24 answerable (18 wiki CC BY-SA + 6 labeled synthetic) + 6 insufficient. Frozen before either arm ran.",
+ "questions": [
+  {
+   "id": "w01",
+   "question": "Who developed the Perl programming language?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "Perl was developed by Larry Wall",
+     "acceptable": [
+      "perl-a1#p2"
+     ],
+     "spans": [
+      "Perl was developed by Larry Wall"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w02",
+   "question": "When was Perl version 1.0 released?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "released version 1.0 on December 18, 1987",
+     "acceptable": [
+      "perl-a1#p10"
+     ],
+     "spans": [
+      "released version 1.0 on December 18, 1987"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w03",
+   "question": "Which release of Perl added support for binary data streams?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "Perl 3, released in October 1989, added support for binary d",
+     "acceptable": [
+      "perl-a1#p11"
+     ],
+     "spans": [
+      "Perl 3, released in October 1989, added support for binary data streams"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w04",
+   "question": "When was Perl 5.000 released?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "Perl 5.000 was released on October 17, 1994",
+     "acceptable": [
+      "perl-a1#p14"
+     ],
+     "spans": [
+      "Perl 5.000 was released on October 17, 1994"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w05",
+   "question": "What was the sixth version of Perl renamed to?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "name was changed to Raku",
+     "acceptable": [
+      "perl-a1#p2"
+     ],
+     "spans": [
+      "name was changed to Raku"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w06",
+   "question": "When was the first public release of Ruby announced?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "first public release of Ruby 0.95 was announced",
+     "acceptable": [
+      "ruby-a1#p6"
+     ],
+     "spans": [
+      "first public release of Ruby 0.95 was announced"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w07",
+   "question": "When was Ruby 1.8 retired?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "retired in June 2013",
+     "acceptable": [
+      "ruby-a1#p13"
+     ],
+     "spans": [
+      "retired in June 2013"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w08",
+   "question": "How many known incompatibilities were there as of the official Ruby 2.0.0 release?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "only five known incompatibilities",
+     "acceptable": [
+      "ruby-a1#p16"
+     ],
+     "spans": [
+      "only five known incompatibilities"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w09",
+   "question": "Who created the Lua programming language?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "Lua was created in 1993 by Roberto Ierusalimschy",
+     "acceptable": [
+      "lua-a1#p3"
+     ],
+     "spans": [
+      "Lua was created in 1993 by Roberto Ierusalimschy"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w10",
+   "question": "Approximately how many lines of C code implement Lua version 5.5.0?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "implemented in approximately 32,000 lines of C code",
+     "acceptable": [
+      "lua-a1#p100"
+     ],
+     "spans": [
+      "implemented in approximately 32,000 lines of C code"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w11",
+   "question": "Under which license has Lua been released from version 5.0 onward?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "From version 5.0 onward, Lua has been licensed under an MIT ",
+     "acceptable": [
+      "lua-a1#p9"
+     ],
+     "spans": [
+      "From version 5.0 onward, Lua has been licensed under an MIT License"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w12",
+   "question": "When was Kotlin 1.0 released?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "Kotlin 1.0 was released on 15 February 2016",
+     "acceptable": [
+      "kotlin-a1#p7"
+     ],
+     "spans": [
+      "Kotlin 1.0 was released on 15 February 2016"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w13",
+   "question": "When did Google announce that Kotlin had become its preferred language for Android app developers?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "7 May 2019, Google announced Kotlin had become its preferred",
+     "acceptable": [
+      "kotlin-a1#p2"
+     ],
+     "spans": [
+      "7 May 2019, Google announced Kotlin had become its preferred language"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w14",
+   "question": "When was the first commit to the Kotlin Git repository made?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "first commit to the Kotlin Git repository was on 8 November ",
+     "acceptable": [
+      "kotlin-a1#p5"
+     ],
+     "spans": [
+      "first commit to the Kotlin Git repository was on 8 November 2010"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w15",
+   "question": "In which year was the Lua programming language created?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "Lua was created in 1993",
+     "acceptable": [
+      "lua-a1#p3"
+     ],
+     "spans": [
+      "Lua was created in 1993"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w16",
+   "question": "In which year was Kotlin the fastest-growing language on GitHub?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "In 2018, Kotlin was the fastest-growing language on GitHub",
+     "acceptable": [
+      "kotlin-a1#p38"
+     ],
+     "spans": [
+      "In 2018, Kotlin was the fastest-growing language on GitHub"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w17",
+   "question": "Which compiler did Kotlin 2.0 feature?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "featuring the new K2 compiler",
+     "acceptable": [
+      "kotlin-a1#p2"
+     ],
+     "spans": [
+      "featuring the new K2 compiler"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w18",
+   "question": "When was Ruby 0.95 first publicly released?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "wiki",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "first public release of Ruby 0.95 was announced on Japanese ",
+     "acceptable": [
+      "ruby-a1#p6"
+     ],
+     "spans": [
+      "first public release of Ruby 0.95 was announced on Japanese domestic newsgroups on 21 December 1995"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "s01",
+   "question": "Did the downlink of satellite K3 complete on March 10?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "synthetic",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "The downlink completed at 08:41 UTC",
+     "acceptable": [
+      "satlog-a1#p2"
+     ],
+     "spans": [
+      "The downlink completed at 08:41 UTC"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "s02",
+   "question": "Did the telemetry verification pass for the March 10 pass of satellite K3?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "synthetic",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "telemetry verification passed",
+     "acceptable": [
+      "satlog-a1#p2"
+     ],
+     "spans": [
+      "telemetry verification passed"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "s03",
+   "question": "Did the downlink of satellite K3 complete on March 11?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "synthetic",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "The downlink did not complete",
+     "acceptable": [
+      "satlog-a1#p3"
+     ],
+     "spans": [
+      "The downlink did not complete"
+     ],
+     "answer_polarity": "negative"
+    }
+   ]
+  },
+  {
+   "id": "s04",
+   "question": "Did acquisition occur for satellite K3 on March 10?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "synthetic",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "Acquisition occurred at 08:03 UTC",
+     "acceptable": [
+      "satlog-a1#p2"
+     ],
+     "spans": [
+      "Acquisition occurred at 08:03 UTC"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "h01",
+   "question": "Did the supply vessel Northwind arrive at the lighthouse platform on June 3?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "synthetic",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "arrived at the lighthouse platform at 09:15 UTC",
+     "acceptable": [
+      "shiplog-a1#p2"
+     ],
+     "spans": [
+      "arrived at the lighthouse platform at 09:15 UTC"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "h02",
+   "question": "Did the supply vessel Northwind arrive at the lighthouse platform on June 4?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "synthetic",
+    "answerable"
+   ],
+   "required_facts": [
+    {
+     "fact": "did not arrive at the platform",
+     "acceptable": [
+      "shiplog-a1#p3"
+     ],
+     "spans": [
+      "did not arrive at the platform"
+     ],
+     "answer_polarity": "negative"
+    }
+   ]
+  },
+  {
+   "id": "i01",
+   "question": "Did the downlink of satellite K4 complete on March 12?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient"
+   ],
+   "required_facts": [
+    {
+     "fact": "missing: K4 downlink outcome never recorded on March 12 \u2014 acquisition only",
+     "acceptable": [],
+     "spans": []
+    }
+   ],
+   "plausible_misleading": "satlog-a1#p3"
+  },
+  {
+   "id": "i02",
+   "question": "Did the downlink of satellite K4 complete on March 13?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient"
+   ],
+   "required_facts": [
+    {
+     "fact": "missing: two contacts scheduled (K3, K4); the completion sentence does not identify which satellite",
+     "acceptable": [],
+     "spans": []
+    }
+   ],
+   "plausible_misleading": "satlog-a1#p4"
+  },
+  {
+   "id": "i03",
+   "question": "Did the telemetry verification pass for the March 14 pass of satellite K3?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient"
+   ],
+   "required_facts": [
+    {
+     "fact": "missing: verification was not performed \u2014 outcome unknown",
+     "acceptable": [],
+     "spans": []
+    }
+   ],
+   "plausible_misleading": "satlog-a1#p5"
+  },
+  {
+   "id": "i04",
+   "question": "Did the cargo inspection pass for the Northwind voyage on June 5?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient"
+   ],
+   "required_facts": [
+    {
+     "fact": "missing: inspection was not carried out \u2014 outcome unknown",
+     "acceptable": [],
+     "spans": []
+    }
+   ],
+   "plausible_misleading": "shiplog-a1#p3"
+  },
+  {
+   "id": "i05",
+   "question": "How many lines of C code implement Lua version 5.3?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient"
+   ],
+   "required_facts": [
+    {
+     "fact": "missing: the 32,000-line figure applies to version 5.5.0, not 5.3",
+     "acceptable": [],
+     "spans": []
+    }
+   ],
+   "plausible_misleading": "lua-a1#p11"
+  },
+  {
+   "id": "i06",
+   "question": "On which exact date at Google I/O 2017 did Google announce first-class support for Kotlin on Android?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient"
+   ],
+   "required_facts": [
+    {
+     "fact": "missing: corpus says only 'At Google I/O 2017' \u2014 no exact date; the 7 May 2019 date concerns a different announcement",
+     "acceptable": [],
+     "spans": []
+    }
+   ],
+   "plausible_misleading": "kotlin-a1#p1"
+  }
+ ]
+}

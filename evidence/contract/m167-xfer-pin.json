@@ -1,0 +1,194 @@
+{
+  "evidence_correct_answerable": 2,
+  "outcomes": [
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "ok",
+      "hit": false,
+      "id": "t01",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.4898019999999998,
+      "latency_rest_ms": 2.0235000000000003,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "ok",
+      "hit": false,
+      "id": "t02",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.439766,
+      "latency_rest_ms": 1.171778,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "t03",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 1.213319,
+      "latency_rest_ms": 1.163275,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "ok",
+      "hit": false,
+      "id": "t04",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.271405,
+      "latency_rest_ms": 1.1762759999999999,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "t05",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.0463950000000002,
+      "latency_rest_ms": 0.9881340000000001,
+      "mcp_ids": [
+        "meridian-t1#p2",
+        "meridian-t1#p5",
+        "meridian-t1#p3"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "meridian-t1#p2",
+        "meridian-t1#p5",
+        "meridian-t1#p3"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "t06",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 1.201398,
+      "latency_rest_ms": 1.0745850000000001,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 4,
+      "citations_ok": 4,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "t07",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.211265,
+      "latency_rest_ms": 1.111802,
+      "mcp_ids": [
+        "ferretlang-t1#p2",
+        "ferretlang-t1#p1"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "ferretlang-t1#p2",
+        "ferretlang-t1#p1"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "t08",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 1.00986,
+      "latency_rest_ms": 0.9998349999999999,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    }
+  ],
+  "questions": "fixtures/transfer-check/key.json",
+  "result": {
+    "checks": {
+      "adapter_agreement": {
+        "agree": 8,
+        "pass": true,
+        "total": 8
+      },
+      "citation_integrity": {
+        "checked": 10,
+        "ok": 10,
+        "pass": true
+      },
+      "evidence_coverage": {
+        "answerable": 5,
+        "hits": 2,
+        "pass": true
+      },
+      "insufficient_evidence": {
+        "correct": 3,
+        "pass": true,
+        "total": 3
+      },
+      "provider_calls": {
+        "count": 0,
+        "pass": true
+      }
+    },
+    "corpus": "fixtures/transfer-check",
+    "incomplete": false,
+    "mode": "development",
+    "questions": "fixtures/transfer-check/key.json",
+    "reasons": [],
+    "verdict": "DEVELOPMENT",
+    "version": "bench-result.v1"
+  },
+  "summary": {
+    "adapter_agree": 8,
+    "answerable": 5,
+    "citations_checked": 10,
+    "citations_ok": 10,
+    "hits": 2,
+    "incomplete": false,
+    "insufficient": 3,
+    "insufficient_correct": 3,
+    "total": 8
+  }
+}

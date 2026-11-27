@@ -1,0 +1,274 @@
+{
+ "version": "chain-probe.v1",
+ "notes": "Frozen before tuning. c01-c08 diagnostic contrasts; x01-x05 frozen transfer group (different subject/wording). If x-group outcomes influence later edits they become exposed from that point.",
+ "questions": [
+  {
+   "id": "c01",
+   "question": "Did the backup of archive volume V21 complete on March 3?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "same-subject-dates",
+    "group:diag"
+   ],
+   "required_facts": [
+    {
+     "fact": "V21 transfer completed March 3",
+     "acceptable": [
+      "chaintest-c1#p2"
+     ],
+     "spans": [
+      "transfer completed at 03:39"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "c02",
+   "question": "Did the backup of archive volume V21 complete on March 4?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "same-subject-dates",
+    "group:diag"
+   ],
+   "required_facts": [
+    {
+     "fact": "V21 transfer did not complete March 4 \u2014 explicit negative",
+     "acceptable": [
+      "chaintest-c1#p3"
+     ],
+     "spans": [
+      "did not complete"
+     ],
+     "answer_polarity": "negative"
+    }
+   ]
+  },
+  {
+   "id": "c03",
+   "question": "Did archive volume V22 complete its transfer on March 5?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "two-subjects",
+    "group:diag"
+   ],
+   "required_facts": [
+    {
+     "fact": "missing: the completion is unattributed \u2014 V21 and V22 both mounted, wording does not distinguish",
+     "acceptable": [],
+     "spans": [],
+     "answer_polarity": "affirmative"
+    }
+   ],
+   "plausible_misleading": "chaintest-c1#p4"
+  },
+  {
+   "id": "c04",
+   "question": "Did the backup of archive volume V21 complete on March 6?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "subject-switch",
+    "group:diag"
+   ],
+   "required_facts": [
+    {
+     "fact": "missing: V22 completed, not V21 \u2014 subject switch must not transfer outcome",
+     "acceptable": [],
+     "spans": [],
+     "answer_polarity": "affirmative"
+    }
+   ],
+   "plausible_misleading": "chaintest-c1#p5"
+  },
+  {
+   "id": "c05",
+   "question": "Did the integrity check pass for the March 7 backup of archive volume V21?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "explicit-negative-vs-notrun",
+    "group:diag"
+   ],
+   "required_facts": [
+    {
+     "fact": "the integrity check failed \u2014 explicit negative answers whether it passed",
+     "acceptable": [
+      "chaintest-c1#p6"
+     ],
+     "spans": [
+      "integrity check failed"
+     ],
+     "answer_polarity": "negative"
+    }
+   ]
+  },
+  {
+   "id": "c06",
+   "question": "Did the integrity check run for the March 8 backup of archive volume V21?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "explicit-negative-vs-notrun",
+    "group:diag"
+   ],
+   "required_facts": [
+    {
+     "fact": "the integrity check was not run \u2014 settles whether it ran, negative",
+     "acceptable": [
+      "chaintest-c1#p7"
+     ],
+     "spans": [
+      "was not run"
+     ],
+     "answer_polarity": "negative"
+    }
+   ]
+  },
+  {
+   "id": "c07",
+   "question": "Did the integrity check pass for the March 8 backup of archive volume V21?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "unknown-outcome",
+    "group:diag"
+   ],
+   "required_facts": [
+    {
+     "fact": "missing: not run is neither pass nor fail",
+     "acceptable": [],
+     "spans": [],
+     "answer_polarity": "affirmative"
+    }
+   ],
+   "plausible_misleading": "chaintest-c1#p7"
+  },
+  {
+   "id": "c08",
+   "question": "Did the backup of archive volume V21 complete on March 4 according to the March 5 entry?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "heading-boundary",
+    "group:diag"
+   ],
+   "required_facts": [
+    {
+     "fact": "missing: the March 5 entry is about March 5; heading boundary",
+     "acceptable": [],
+     "spans": [],
+     "answer_polarity": "affirmative"
+    }
+   ],
+   "plausible_misleading": "chaintest-c1#p4"
+  },
+  {
+   "id": "x01",
+   "question": "Did the restore of snapshot S4 finish on June 10?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "transfer-affirmative",
+    "group:xfer"
+   ],
+   "required_facts": [
+    {
+     "fact": "copy finished and checksum passed June 10",
+     "acceptable": [
+      "restorelog-c1#p2"
+     ],
+     "spans": [
+      "copy finished at 12:52"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "x02",
+   "question": "Did the restore of snapshot S4 finish on June 11?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "transfer-negative",
+    "group:xfer"
+   ],
+   "required_facts": [
+    {
+     "fact": "copy did not finish \u2014 explicit negative",
+     "acceptable": [
+      "restorelog-c1#p3"
+     ],
+     "spans": [
+      "did not finish"
+     ],
+     "answer_polarity": "negative"
+    }
+   ]
+  },
+  {
+   "id": "x03",
+   "question": "Did the checksum verification pass for the June 11 restore of snapshot S4?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "transfer-unknown",
+    "group:xfer"
+   ],
+   "required_facts": [
+    {
+     "fact": "missing: copy never finished; nothing settles checksum outcome",
+     "acceptable": [],
+     "spans": [],
+     "answer_polarity": "affirmative"
+    }
+   ],
+   "plausible_misleading": "restorelog-c1#p3"
+  },
+  {
+   "id": "x04",
+   "question": "Was the checksum verification performed for the June 12 restore of snapshot S5?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "transfer-negative",
+    "group:xfer"
+   ],
+   "required_facts": [
+    {
+     "fact": "checksum verification was not performed \u2014 settles negative",
+     "acceptable": [
+      "restorelog-c1#p4"
+     ],
+     "spans": [
+      "was not performed"
+     ],
+     "answer_polarity": "negative"
+    }
+   ]
+  },
+  {
+   "id": "x05",
+   "question": "Did the restore of snapshot S5 finish on June 12?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "transfer-unknown",
+    "group:xfer"
+   ],
+   "required_facts": [
+    {
+     "fact": "missing: the log records only the start and the unperformed check",
+     "acceptable": [],
+     "spans": [],
+     "answer_polarity": "affirmative"
+    }
+   ],
+   "plausible_misleading": "restorelog-c1#p4"
+  }
+ ]
+}

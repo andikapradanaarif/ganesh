@@ -1,0 +1,249 @@
+{
+ "version": "event-probe.v1",
+ "notes": "Frozen before implementing clause linking. Paired passages where only the finisher changes; clause order, subject swap, ambiguous/valid continuation, later-outcome settlement.",
+ "questions": [
+  {
+   "id": "v01",
+   "question": "Did the flushing of the intake pipe finish on October 3?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "affirmative",
+    "clause"
+   ],
+   "required_facts": [
+    {
+     "fact": "flushing clause establishes finish",
+     "acceptable": [
+      "pumplog-a1#p2"
+     ],
+     "spans": [
+      "flushing of the intake pipe finished"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "v02",
+   "question": "Did the sealing of the valve finish on October 3?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "competing-activity"
+   ],
+   "required_facts": [
+    {
+     "fact": "sealing continued at 09:30 \u2014 finish not recorded",
+     "acceptable": [],
+     "spans": []
+    }
+   ],
+   "plausible_misleading": "pumplog-a1#p2"
+  },
+  {
+   "id": "v03",
+   "question": "Was the sealing of the valve still underway at 09:30 on October 3?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "affirmative",
+    "underway"
+   ],
+   "required_facts": [
+    {
+     "fact": "the sealing clause says it continued",
+     "acceptable": [
+      "pumplog-a1#p2"
+     ],
+     "spans": [
+      "sealing of the valve continued"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "v04",
+   "question": "Did the flushing of the intake pipe finish on October 4?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "affirmative",
+    "clause-order"
+   ],
+   "required_facts": [
+    {
+     "fact": "clause-order reversed, flushing still the finisher",
+     "acceptable": [
+      "pumplog-a1#p3"
+     ],
+     "spans": [
+      "flushing of the intake pipe finished"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "v05",
+   "question": "Did the sealing of the valve finish on October 4?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "competing-activity"
+   ],
+   "required_facts": [
+    {
+     "fact": "same: sealing continued",
+     "acceptable": [],
+     "spans": []
+    }
+   ],
+   "plausible_misleading": "pumplog-a1#p3"
+  },
+  {
+   "id": "v06",
+   "question": "Did the sealing of the valve finish on October 5?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "affirmative",
+    "subject-swap"
+   ],
+   "required_facts": [
+    {
+     "fact": "sealing clause establishes finish",
+     "acceptable": [
+      "pumplog-a1#p4"
+     ],
+     "spans": [
+      "sealing of the valve finished at 09:30"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "v07",
+   "question": "Did the flushing of the intake pipe finish on October 5?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "competing-activity"
+   ],
+   "required_facts": [
+    {
+     "fact": "flushing continued \u2014 finish not recorded",
+     "acceptable": [],
+     "spans": []
+    }
+   ],
+   "plausible_misleading": "pumplog-a1#p4"
+  },
+  {
+   "id": "v08",
+   "question": "Did the flushing of the intake pipe finish on October 6?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "affirmative",
+    "ordinary"
+   ],
+   "required_facts": [
+    {
+     "fact": "ordinary single-activity completion",
+     "acceptable": [
+      "pumplog-a1#p5"
+     ],
+     "spans": [
+      "flushing finished at 09:45"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "v09",
+   "question": "Did the flushing of the intake pipe finish on October 7?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "explicit-negative",
+    "neg"
+   ],
+   "required_facts": [
+    {
+     "fact": "explicit negative",
+     "acceptable": [
+      "pumplog-a1#p6"
+     ],
+     "spans": [
+      "did not finish"
+     ],
+     "answer_polarity": "negative"
+    }
+   ]
+  },
+  {
+   "id": "v10",
+   "question": "Did the sealing of the valve finish on October 8?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "ambiguous-continuation"
+   ],
+   "required_facts": [
+    {
+     "fact": "bare 'It finished' after two activities \u2014 ambiguous reference",
+     "acceptable": [],
+     "spans": []
+    }
+   ],
+   "plausible_misleading": "pumplog-a1#p7"
+  },
+  {
+   "id": "v11",
+   "question": "Did the sealing of the valve finish on October 9?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "affirmative",
+    "later-outcome"
+   ],
+   "required_facts": [
+    {
+     "fact": "later sentence explicitly settles it",
+     "acceptable": [
+      "pumplog-a1#p8"
+     ],
+     "spans": [
+      "sealing finished at 14:00"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "v12",
+   "question": "Did the flushing of the intake pipe finish on October 9?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "affirmative"
+   ],
+   "required_facts": [
+    {
+     "fact": "flushing clause plus valid single-activity completion",
+     "acceptable": [
+      "pumplog-a1#p8"
+     ],
+     "spans": [
+      "flushing of the intake pipe finished"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  }
+ ]
+}

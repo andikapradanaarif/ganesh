@@ -1,0 +1,164 @@
+{
+ "version": "contrast-quantity.v1",
+ "notes": "Experiment A contrast cases, authored before implementation. Controls: genuine keyword count, bit width, counts for two versions, version+bare year near 'keyword' with no count, meetings-vs-membership binding, count belonging to a different language.",
+ "questions": [
+  {
+   "id": "qA01",
+   "question": "How many keywords did Novolang 1.0 define?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "quantity",
+    "digit-count"
+   ],
+   "required_facts": [
+    {
+     "fact": "Novolang 1.0 defined 12 keywords",
+     "acceptable": [
+      "novolang-r1#p2"
+     ],
+     "spans": [
+      "defined 12 keywords"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "qA02",
+   "question": "How many keywords does Novolang 2.0 have?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "quantity",
+    "number-word"
+   ],
+   "required_facts": [
+    {
+     "fact": "Novolang 2.0 expanded to eighteen keywords",
+     "acceptable": [
+      "novolang-r1#p2"
+     ],
+     "spans": [
+      "eighteen keywords"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "qA03",
+   "question": "How many bits is the Novolang int32 type?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "quantity",
+    "hyphenated-unit"
+   ],
+   "required_facts": [
+    {
+     "fact": "int32 is a 32-bit signed integer",
+     "acceptable": [
+      "novolang-r1#p2"
+     ],
+     "spans": [
+      "32-bit"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "qA04",
+   "question": "How many meetings did the Novolang committee hold?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "quantity",
+    "measured-property-control"
+   ],
+   "required_facts": [
+    {
+     "fact": "the committee held 12 meetings",
+     "acceptable": [
+      "novolang-r1#p3"
+     ],
+     "spans": [
+      "holds 12 meetings"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "qA05",
+   "question": "How many members does the Novolang committee have?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "quantity",
+    "measured-property-negative"
+   ],
+   "required_facts": [
+    {
+     "fact": "no member count is stated; 12 measures meetings, not members",
+     "acceptable": []
+    }
+   ]
+  },
+  {
+   "id": "qA06",
+   "question": "How many keywords does Novolang 3.0 have?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "quantity",
+    "version-mismatch-negative"
+   ],
+   "required_facts": [
+    {
+     "fact": "the 3.0 revision mentions keywords but states no count; 12 and eighteen measure other versions; 2021 is a year",
+     "acceptable": []
+    }
+   ]
+  },
+  {
+   "id": "qA07",
+   "question": "How many keywords does Zetalang have?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "quantity",
+    "other-project-count"
+   ],
+   "required_facts": [
+    {
+     "fact": "Zetalang has 40 keywords",
+     "acceptable": [
+      "novolang-r1#p3"
+     ],
+     "spans": [
+      "Zetalang has 40 keywords"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "qA08",
+   "question": "How many bits does the Novolang int64 type use?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "quantity",
+    "digit-count"
+   ],
+   "required_facts": [
+    {
+     "fact": "int64 uses 64 bits",
+     "acceptable": [
+      "novolang-r1#p2"
+     ],
+     "spans": [
+      "64 bits"
+     ]
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,4 @@
+/target
+/out
+fixtures/qa-verifier-model/
+fixtures/reranker-model/

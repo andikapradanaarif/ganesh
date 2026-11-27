@@ -1,0 +1,16 @@
+{
+ "version": "contrast-transition.v1",
+ "notes": "Experiment B contrast cases, authored before implementation. Proposed vs attempted vs verified; wrong-environment; negation; paraphrase; transition (v27-style) positive and negative.",
+ "questions": [
+  {"id": "qB01", "question": "Was the deployment of revision R9 of Northstar proposed?", "expected_status": "ok", "scope": "public", "tags": ["state", "propose"], "required_facts": [{"fact": "the team proposed deploying revision R9", "acceptable": []}]},
+  {"id": "qB02", "question": "Was revision R9 of Northstar verified as deployed?", "expected_status": "insufficient_context", "scope": "public", "tags": ["state", "verify-negative", "embedded-cue"], "required_facts": [{"fact": "R9 was proposed and attempted but the outcome was unverified; proposing to deploy is not verifying a deployment", "acceptable": []}]},
+  {"id": "qB03", "question": "Was revision R8 of Northstar verified running in production?", "expected_status": "insufficient_context", "scope": "public", "tags": ["state", "wrong-environment"], "required_facts": [{"fact": "R8 was confirmed running in staging only, not production", "acceptable": []}]},
+  {"id": "qB04", "question": "Was revision R8 of Northstar verified running in staging?", "expected_status": "ok", "scope": "public", "tags": ["state", "verify", "environment-control"], "required_facts": [{"fact": "the deployment check confirmed R8 running in staging", "acceptable": []}]},
+  {"id": "qB05", "question": "Was revision R7 of Northstar verified running in production?", "expected_status": "ok", "scope": "public", "tags": ["state", "verify"], "required_facts": [{"fact": "R7 was deployed to production after the checklist passed", "acceptable": []}]},
+  {"id": "qB06", "question": "Was revision R6 of Northstar confirmed?", "expected_status": "insufficient_context", "scope": "public", "tags": ["state", "negation"], "required_facts": [{"fact": "the team did not confirm R6", "acceptable": []}]},
+  {"id": "qB07", "question": "Did the Northstar team verify revision R7 in production?", "expected_status": "ok", "scope": "public", "tags": ["state", "paraphrase"], "required_facts": [{"fact": "same evidence as qB05 expressed in different words", "acceptable": []}]},
+  {"id": "qB08", "question": "Did lazy evaluation become optional in Lazylang?", "expected_status": "insufficient_context", "scope": "public", "tags": ["transition", "v27-style-negative"], "required_facts": [{"fact": "lazy evaluation is discussed but never said to become optional; optional attaches to type annotations and eager evaluation", "acceptable": []}]},
+  {"id": "qB09", "question": "Did eager evaluation become optional in Lazylang?", "expected_status": "ok", "scope": "public", "tags": ["transition", "positive-control"], "required_facts": [{"fact": "since version 2.0 eager evaluation became optional through strictness annotations", "acceptable": []}]},
+  {"id": "qB10", "question": "Are type annotations optional in Lazylang?", "expected_status": "ok", "scope": "public", "tags": ["state", "ordinary-control"], "required_facts": [{"fact": "type annotations are optional in Lazylang", "acceptable": []}]}
+ ]
+}

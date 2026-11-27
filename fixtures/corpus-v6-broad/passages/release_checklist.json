@@ -1,0 +1,42 @@
+{
+  "article_id": "release_checklist",
+  "family": "corpus-v6-broad",
+  "passages": [
+    {
+      "chars": 90,
+      "id": "release_checklist-a1#p1",
+      "section": "(lead)",
+      "seq": 1,
+      "text": "Release checklist REL-2026-Q4. Fictional operational checklist fixture for evaluation use."
+    },
+    {
+      "chars": 418,
+      "id": "release_checklist-a1#p2",
+      "section": "Verified complete",
+      "seq": 2,
+      "text": "REL-101 verify staging canary bake — verified complete on 2 October 2026 at 14:20 UTC by Priya, bake passed 30 minutes with zero errors.\nREL-102 database migration dry-run — verified complete on 3 October 2026 at 09:45 UTC by Marco, dry-run finished in 12 minutes on the staging copy.\nREL-106 bake metrics review — verified complete on 5 October 2026 at 16:10 UTC by June, metrics attached to the release ticket."
+    },
+    {
+      "chars": 119,
+      "id": "release_checklist-a1#p3",
+      "section": "Started not verified",
+      "seq": 3,
+      "text": "REL-103 update the runbook — started by Sam on 4 October 2026, draft exists but verification review has not happened."
+    },
+    {
+      "chars": 110,
+      "id": "release_checklist-a1#p4",
+      "section": "Blocked",
+      "seq": 4,
+      "text": "REL-104 load-test the production mirror — blocked waiting for the mirror environment rebuild, no start date."
+    },
+    {
+      "chars": 87,
+      "id": "release_checklist-a1#p5",
+      "section": "Proposed not started",
+      "seq": 5,
+      "text": "REL-105 certificate rotation — proposed by Priya, not started, no owner assigned yet."
+    }
+  ],
+  "revision": "release_checklist-a1"
+}

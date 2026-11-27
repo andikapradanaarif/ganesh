@@ -1,0 +1,13 @@
+The Tundra restore service is a fictional recovery system used as the frozen transfer group. This is its job log.
+
+== June 10 ==
+
+The restore of snapshot S4 began at 12:00 UTC. The copy finished at 12:52 UTC and the checksum verification passed.
+
+== June 11 ==
+
+The restore of snapshot S4 began at 12:00 UTC. The copy did not finish before the maintenance window closed.
+
+== June 12 ==
+
+The restore of snapshot S5 began at 12:00 UTC. The checksum verification was not performed.

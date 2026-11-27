@@ -1,0 +1,162 @@
+{
+ "version": "rail-probe.v1",
+ "notes": "Frozen transfer group before implementing the inheritance-attribution fix. Four behaviors: direct completion, valid continuation, validator-finishes-while-main-continues, ambiguous continuation, later explicit outcome.",
+ "questions": [
+  {
+   "id": "r01",
+   "question": "Did the shunting of wagon W3 finish on November 3?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "direct-completion"
+   ],
+   "required_facts": [
+    {
+     "fact": "explicit completion record",
+     "acceptable": [
+      "raillog-a1#p2"
+     ],
+     "spans": [
+      "shunting of wagon W3 finished at 10:15"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "r02",
+   "question": "Did the shunting of wagon W3 finish on November 4?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "valid-continuation"
+   ],
+   "required_facts": [
+    {
+     "fact": "continuation unambiguously records completion",
+     "acceptable": [
+      "raillog-a1#p3"
+     ],
+     "spans": [
+      "shunting finished at 10:40"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "r03",
+   "question": "Did the brake test finish on November 5?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "validator-completion"
+   ],
+   "required_facts": [
+    {
+     "fact": "brake test clause owns the finish",
+     "acceptable": [
+      "raillog-a1#p4"
+     ],
+     "spans": [
+      "brake test finished at 10:30"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "r04",
+   "question": "Did the coupling of wagon W5 finish on November 5?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "main-activity-unresolved"
+   ],
+   "required_facts": [
+    {
+     "fact": "coupling continued at 10:30 \u2014 outcome unresolved",
+     "acceptable": [],
+     "spans": []
+    }
+   ],
+   "plausible_misleading": "raillog-a1#p4"
+  },
+  {
+   "id": "r05",
+   "question": "Was the coupling of wagon W5 underway at 10:30 on November 5?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "underway"
+   ],
+   "required_facts": [
+    {
+     "fact": "the coupling clause says continued",
+     "acceptable": [
+      "raillog-a1#p4"
+     ],
+     "spans": [
+      "coupling continued"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "r06",
+   "question": "Did the coupling of wagon W5 finish on November 6?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "ambiguous-continuation"
+   ],
+   "required_facts": [
+    {
+     "fact": "bare 'It finished' after two activities \u2014 ambiguous",
+     "acceptable": [],
+     "spans": []
+    }
+   ],
+   "plausible_misleading": "raillog-a1#p5"
+  },
+  {
+   "id": "r07",
+   "question": "Did the loading of wagon W7 finish on November 6?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "ambiguous-continuation"
+   ],
+   "required_facts": [
+    {
+     "fact": "same ambiguity \u2014 neither activity identifiable",
+     "acceptable": [],
+     "spans": []
+    }
+   ],
+   "plausible_misleading": "raillog-a1#p5"
+  },
+  {
+   "id": "r08",
+   "question": "Did the coupling of wagon W5 finish on November 7?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "later-outcome"
+   ],
+   "required_facts": [
+    {
+     "fact": "later sentence explicitly settles the outcome",
+     "acceptable": [
+      "raillog-a1#p6"
+     ],
+     "spans": [
+      "coupling finished at 13:45"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  }
+ ]
+}

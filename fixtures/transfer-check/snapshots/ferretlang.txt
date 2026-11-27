@@ -1,0 +1,7 @@
+Ferretlang is a fictional programming language used for transfer testing. These are its release notes.
+
+== Release 4.0 ==
+
+In release 4.0, tail-call optimization became optional through compiler flags.
+Pattern matching remained the default dispatch mechanism in release 4.0.
+Type inference, optional since release 2.0, is unchanged.

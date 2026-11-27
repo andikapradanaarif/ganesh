@@ -1,0 +1,19 @@
+RFC-0142: deployctl rollout tooling and environment policy. Fictional engineering RFC fixture for evaluation use.
+
+== Summary ==
+This RFC specifies the deployctl command line tool, its configuration surface, and the staging and production rollout rules for the relay service. It was accepted on 21 September 2026 and supersedes the ad-hoc migration notes in the old operations wiki.
+
+== Command line interface ==
+The primary rollout command is deployctl rollout --env staging --canary 5, which shifts five percent of traffic to the new revision. The flag --env accepts exactly the values staging or production; any other value exits with error ENOINVENV. The flag --canary accepts integer percentages from 1 to 50. The rollback command is deployctl rollback --to-revision followed by the revision id, and it is the only supported rollback path.
+
+== Environment variables ==
+DEPLOYCTL_TOKEN is required for all commands and must be present in the environment; the tool refuses to read tokens from files. DEPLOYCTL_MAX_PARALLEL controls how many replicas are updated concurrently and defaults to 4 when unset. DEPLOYCTL_BAKE_MINUTES overrides the minimum canary bake time and defaults to 30.
+
+== Version constraints ==
+The controller component must be at version 2.7.0 or newer before any production rollout. Staging rollouts are permitted with controller 2.6.x for compatibility testing. The deployctl binary itself must match the controller minor version exactly.
+
+== Staging rules ==
+In staging, a canary must bake for at least 30 minutes with error rates below 0.5 percent before promotion. There is no approval requirement in staging; any engineer may roll out or roll back at any time, including weekends.
+
+== Production rules ==
+In production, every rollout requires two-person approval recorded in the change log. Production deploys are frozen from Friday 18:00 UTC until Monday 06:00 UTC; the freeze does not apply to staging. Emergency fixes during the freeze window require the incident commander to approve in writing, and the rollback command must be rehearsed in staging first.

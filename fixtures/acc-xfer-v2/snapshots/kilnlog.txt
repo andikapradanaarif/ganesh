@@ -1,0 +1,17 @@
+The Emberline kiln hall is a fictional artisan ceramics facility used as labeled synthetic material in the acc-xfer-v2 evaluation packet. This is its firing log.
+
+== Firing April 2 ==
+
+The glaze firing of batch K3 started at 06:00 UTC. The firing finished at 18:30 UTC and the kiln was unloaded.
+
+== Firing April 3 ==
+
+The glaze firing of batch K4 started at 06:00 UTC. The cooling measurement finished at 09:15 UTC while the firing continued.
+
+== Firing April 4 ==
+
+The glaze firing of batch K4 started at 06:00 UTC. The firing did not finish before the power fault halted work.
+
+== Firing April 5 ==
+
+The glaze firing of batch K5 started at 06:00 UTC. The firing finished at 17:45 UTC.

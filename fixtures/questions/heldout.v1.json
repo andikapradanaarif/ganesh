@@ -1,0 +1,628 @@
+{
+  "version": "heldout.v1",
+  "corpus_version": "corpus.v1",
+  "split": "held-out",
+  "note": "Held-out questions target only articles in the held-out family (c-sharp, go, javascript, ruby). 24 answerable + 6 insufficient-evidence. Frozen before the held-out run; not used for tuning.",
+  "questions": [
+    {
+      "id": "h01",
+      "question": "Who originally designed the Go programming language, and in which month and year was Go version 1.0 released?",
+      "tags": [
+        "multi"
+      ],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": [
+        "1386442349"
+      ],
+      "required_facts": [
+        {
+          "fact": "Go was originally designed in 2007 by Robert Griesemer, Rob Pike, and Ken Thompson",
+          "acceptable": [
+            "1386442349#p1"
+          ]
+        },
+        {
+          "fact": "Go version 1.0 was released in March 2012",
+          "acceptable": [
+            "1386442349#p4"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "h02",
+      "question": "Which release of Go first added support for generic programming?",
+      "tags": [
+        "paraphrase"
+      ],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": [
+        "1386442349"
+      ],
+      "required_facts": [
+        {
+          "fact": "Generics were added to Go in version 1.18 (March 15, 2022)",
+          "acceptable": [
+            "1386442349#p7",
+            "1386442349#p20"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "h03",
+      "question": "If two Go goroutines access shared data without explicit synchronization, is the visibility of writes guaranteed?",
+      "tags": [
+        "scope",
+        "near-neighbour"
+      ],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": [
+        "1386442349"
+      ],
+      "required_facts": [
+        {
+          "fact": "There are no restrictions on how goroutines access shared data, making data races possible; writes from one goroutine might be partly, entirely, or not at all visible to another with no ordering guarantees",
+          "acceptable": [
+            "1386442349#p25"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "h04",
+      "question": "In a Go version string such as go1.26.0, what does the second number (26) represent?",
+      "tags": [
+        "single"
+      ],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": [
+        "1386442349"
+      ],
+      "required_facts": [
+        {
+          "fact": "Go calls the second number in a version the major version, because Go plans to never reach 2.0",
+          "acceptable": [
+            "1386442349#p8"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "h05",
+      "question": "Who adapted the gopher mascot for Go's open source launch, and who closed the Go! naming dispute issue?",
+      "tags": [
+        "multi"
+      ],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": [
+        "1386442349"
+      ],
+      "required_facts": [
+        {
+          "fact": "Ren\u00e9e French adapted the gopher mascot (introduced in 2009 for the open source launch)",
+          "acceptable": [
+            "1386442349#p6"
+          ]
+        },
+        {
+          "fact": "Russ Cox closed the naming dispute issue on October 12, 2010 with the label Unfortunate",
+          "acceptable": [
+            "1386442349#p46"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "h06",
+      "question": "In which years did the TIOBE index name Go its Programming Language of the Year?",
+      "tags": [
+        "single"
+      ],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": [
+        "1386442349"
+      ],
+      "required_facts": [
+        {
+          "fact": "Go was named TIOBE Programming Language of the Year in 2009 and again in 2016",
+          "acceptable": [
+            "1386442349#p41"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "h07",
+      "question": "Who created Node.js, and which corporation holds the JavaScript trademark in the United States?",
+      "tags": [
+        "multi"
+      ],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": [
+        "1387609285"
+      ],
+      "required_facts": [
+        {
+          "fact": "Node.js was created in 2009 by Ryan Dahl",
+          "acceptable": [
+            "1387609285#p6"
+          ]
+        },
+        {
+          "fact": "JavaScript is a trademark of Oracle Corporation in the United States",
+          "acceptable": [
+            "1387609285#p7"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "h08",
+      "question": "What proportion of websites rely on JavaScript for their client-side behavior?",
+      "tags": [
+        "paraphrase"
+      ],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": [
+        "1387609285"
+      ],
+      "required_facts": [
+        {
+          "fact": "98.9% of all websites use JavaScript as the dominant client-side scripting language",
+          "acceptable": [
+            "1387609285#p8"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "h09",
+      "question": "Which two restrictions do browser authors use to minimize the risk of malicious JavaScript running on a client computer?",
+      "tags": [
+        "single"
+      ],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": [
+        "1387609285"
+      ],
+      "required_facts": [
+        {
+          "fact": "Scripts run in a sandbox in which they can only perform Web-related actions",
+          "acceptable": [
+            "1387609285#p43"
+          ]
+        },
+        {
+          "fact": "Scripts are constrained by the same-origin policy",
+          "acceptable": [
+            "1387609285#p43"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "h10",
+      "question": "In JavaScript's type system, is a type associated with a value or with an expression?",
+      "tags": [
+        "scope",
+        "near-neighbour"
+      ],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": [
+        "1387609285"
+      ],
+      "required_facts": [
+        {
+          "fact": "JavaScript is dynamically typed: a type is associated with a value rather than an expression",
+          "acceptable": [
+            "1387609285#p19"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "h11",
+      "question": "Which ECMAScript edition first introduced the class keyword into JavaScript?",
+      "tags": [
+        "paraphrase"
+      ],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": [
+        "1387609285"
+      ],
+      "required_facts": [
+        {
+          "fact": "ECMAScript version 6 (released June 2015) introduced the keywords class, extends and super",
+          "acceptable": [
+            "1387609285#p24"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "h12",
+      "question": "In what year was ECMAScript 6 published, and who originally created JavaScript?",
+      "tags": [
+        "multi"
+      ],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": [
+        "1387609285"
+      ],
+      "required_facts": [
+        {
+          "fact": "ECMAScript 6 was published in 2015",
+          "acceptable": [
+            "1387609285#p6",
+            "1387609285#p24"
+          ]
+        },
+        {
+          "fact": "JavaScript was created by Brendan Eich in 1995",
+          "acceptable": [
+            "1387609285#p1",
+            "1387609285#p2",
+            "1387609285#p55"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "h13",
+      "question": "What did C#'s original name COOL stand for, and which body first approved C# as an international standard?",
+      "tags": [
+        "multi"
+      ],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": [
+        "1387643334"
+      ],
+      "required_facts": [
+        {
+          "fact": "COOL stood for C-like Object Oriented Language",
+          "acceptable": [
+            "1387643334#p4"
+          ]
+        },
+        {
+          "fact": "C# was approved as an international standard by Ecma (ECMA-334) in 2002",
+          "acceptable": [
+            "1387643334#p1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "h14",
+      "question": "How does a C# program release memory that is no longer needed?",
+      "tags": [
+        "paraphrase"
+      ],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": [
+        "1387643334"
+      ],
+      "required_facts": [
+        {
+          "fact": "Managed memory cannot be explicitly freed; it is automatically garbage collected",
+          "acceptable": [
+            "1387643334#p18"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "h15",
+      "question": "Can a C# class inherit from multiple base classes?",
+      "tags": [
+        "scope",
+        "near-neighbour"
+      ],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": [
+        "1387643334"
+      ],
+      "required_facts": [
+        {
+          "fact": "C# does not support multiple inheritance, although a class can implement any number of interfaces",
+          "acceptable": [
+            "1387643334#p21"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "h16",
+      "question": "Which C# keyword marks the blocks within which memory address pointers may be used?",
+      "tags": [
+        "single"
+      ],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": [
+        "1387643334"
+      ],
+      "required_facts": [
+        {
+          "fact": "Memory address pointers can only be used within blocks specifically marked as unsafe",
+          "acceptable": [
+            "1387643334#p18"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "h17",
+      "question": "Does C# have checked exceptions?",
+      "tags": [
+        "near-neighbour"
+      ],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": [
+        "1387643334"
+      ],
+      "required_facts": [
+        {
+          "fact": "Checked exceptions are not present in C# (in contrast to Java), a conscious decision based on scalability and version management",
+          "acceptable": [
+            "1387643334#p20"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "h18",
+      "question": "Since which version does C# offer parametric polymorphism, and what is the name of its unified type system?",
+      "tags": [
+        "multi"
+      ],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": [
+        "1387643334"
+      ],
+      "required_facts": [
+        {
+          "fact": "Since version 2.0, C# offers parametric polymorphism (generics)",
+          "acceptable": [
+            "1387643334#p21"
+          ]
+        },
+        {
+          "fact": "The unified type system is called the Common Type System (CTS)",
+          "acceptable": [
+            "1387643334#p25"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "h19",
+      "question": "Who developed Ruby, and which two names were initially proposed for the language?",
+      "tags": [
+        "multi"
+      ],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": [
+        "1387629546"
+      ],
+      "required_facts": [
+        {
+          "fact": "Ruby development began in the mid-1990s by Yukihiro \"Matz\" Matsumoto in Japan",
+          "acceptable": [
+            "1387629546#p1"
+          ]
+        },
+        {
+          "fact": "The two names initially proposed were Coral and Ruby",
+          "acceptable": [
+            "1387629546#p3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "h20",
+      "question": "When was the first public release of Ruby announced?",
+      "tags": [
+        "single"
+      ],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": [
+        "1387629546"
+      ],
+      "required_facts": [
+        {
+          "fact": "The first public release of Ruby 0.95 was announced on Japanese domestic newsgroups on 21 December 1995",
+          "acceptable": [
+            "1387629546#p4"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "h21",
+      "question": "What performance goal does the name Ruby 3x3 refer to?",
+      "tags": [
+        "paraphrase"
+      ],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": [
+        "1387629546"
+      ],
+      "required_facts": [
+        {
+          "fact": "Ruby 3x3 signifies that programs would run three times faster in Ruby 3.0 compared to Ruby 2.0",
+          "acceptable": [
+            "1387629546#p10"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "h22",
+      "question": "Does Ruby support multiple inheritance?",
+      "tags": [
+        "scope",
+        "near-neighbour"
+      ],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": [
+        "1387629546"
+      ],
+      "required_facts": [
+        {
+          "fact": "Ruby does not support multiple inheritance, though classes can import modules as mixins",
+          "acceptable": [
+            "1387629546#p16"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "h23",
+      "question": "Starting with which Ruby version has the official Ruby interpreter used the YARV virtual machine?",
+      "tags": [
+        "single"
+      ],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": [
+        "1387629546"
+      ],
+      "required_facts": [
+        {
+          "fact": "Starting with Ruby 1.9, the official Ruby interpreter has been YARV (Yet Another Ruby VM)",
+          "acceptable": [
+            "1387629546#p19"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "h24",
+      "question": "Under which two licenses is Ruby distributed effective with Ruby 1.9.3, and what is ZJIT in Ruby 4.0?",
+      "tags": [
+        "multi"
+      ],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": [
+        "1387629546"
+      ],
+      "required_facts": [
+        {
+          "fact": "Effective with Ruby 1.9.3, Ruby is dual-licensed under the Ruby License and the two-clause BSD license",
+          "acceptable": [
+            "1387629546#p6"
+          ]
+        },
+        {
+          "fact": "ZJIT is an experimental JIT written in Rust added in Ruby 4.0",
+          "acceptable": [
+            "1387629546#p11"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "h25",
+      "question": "How many reserved keywords does the C# language define?",
+      "tags": [
+        "missing",
+        "plausible"
+      ],
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "revisions": [],
+      "required_facts": [],
+      "missing_detail": "The C# article uses the word keyword many times but never counts the reserved keywords. Near-neighbour evidence exists in other articles (Go has 25 keywords, JavaScript 50-60), which makes this plausible but unanswerable from the corpus."
+    },
+    {
+      "id": "h26",
+      "question": "How many bytes of stack memory is a new goroutine initially allocated in Go?",
+      "tags": [
+        "missing",
+        "plausible"
+      ],
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "revisions": [],
+      "required_facts": [],
+      "missing_detail": "The Go article discusses goroutine implementation and multiplexing onto OS threads but never states an initial stack size."
+    },
+    {
+      "id": "h27",
+      "question": "What licensing fee does Oracle charge for commercial use of the JavaScript trademark?",
+      "tags": [
+        "missing",
+        "plausible"
+      ],
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "revisions": [],
+      "required_facts": [],
+      "missing_detail": "The JavaScript article documents the trademark owner and the 2024 letter campaign but never mentions any fee."
+    },
+    {
+      "id": "h28",
+      "question": "How many core committers maintain the reference Ruby interpreter?",
+      "tags": [
+        "missing",
+        "plausible"
+      ],
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "revisions": [],
+      "required_facts": [],
+      "missing_detail": "The Ruby article discusses implementations and maintainership history but never states a committer count."
+    },
+    {
+      "id": "h29",
+      "question": "What percentage of GitHub projects use C# as their primary language?",
+      "tags": [
+        "missing",
+        "plausible"
+      ],
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "revisions": [],
+      "required_facts": [],
+      "missing_detail": "GitHub is mentioned for C# only as the host of standards text development. The corpus records a GitHub popularity claim for JavaScript but none for C#, making this a plausible near-neighbour that the corpus cannot answer."
+    },
+    {
+      "id": "h30",
+      "question": "In which Ruby version did pattern matching first become a stable, non-experimental feature?",
+      "tags": [
+        "missing",
+        "plausible"
+      ],
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "revisions": [],
+      "required_facts": [],
+      "missing_detail": "The Ruby article records pattern matching as experimental in Ruby 2.7.0 but never states a version in which it became stable."
+    }
+  ]
+}

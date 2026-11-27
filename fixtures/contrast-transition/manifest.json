@@ -1,0 +1,45 @@
+{
+ "version": "contrast-transition.v1",
+ "created": "2026-11-27",
+ "frame": "synthetic contrast fixture, authored for issue #163 experiment B",
+ "seed": 0,
+ "exclusions": [],
+ "sampling": "hand-authored minimal passages; not sampled",
+ "snapshot_format": "plaintext with wiki-style section headings",
+ "articles": [
+  {
+   "article_id": "northstar",
+   "title": "Northstar service handoff log",
+   "pageid": 0,
+   "revision": "northstar-r1",
+   "revision_url": "https://example.invalid/northstar/r1",
+   "publisher": "Ganesh fixture authors",
+   "url": "https://example.invalid/northstar",
+   "license": "CC0 1.0",
+   "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "permission": "Synthetic fixture text written for this project; no external content.",
+   "retrieved": "2026-11-27",
+   "bytes": 538,
+   "sha256": "785d06bf3cd11c83596eed142e0bff4f18620dff7ddaa2983ddacfbf5ecaeb94",
+   "file": "snapshots/northstar.txt",
+   "family": "contrast"
+  },
+  {
+   "article_id": "lazylang",
+   "title": "Lazylang (programming language)",
+   "pageid": 0,
+   "revision": "lazylang-r1",
+   "revision_url": "https://example.invalid/lazylang/r1",
+   "publisher": "Ganesh fixture authors",
+   "url": "https://example.invalid/lazylang",
+   "license": "CC0 1.0",
+   "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "permission": "Synthetic fixture text written for this project; no external content.",
+   "retrieved": "2026-11-27",
+   "bytes": 517,
+   "sha256": "6fae078039d06bfa6d1218511d71ead1a9813ce89ce893cef1f79b9eaca94003",
+   "file": "snapshots/lazylang.txt",
+   "family": "contrast"
+  }
+ ]
+}

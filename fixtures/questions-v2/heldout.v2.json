@@ -1,0 +1,602 @@
+{
+ "version": "heldout.v2",
+ "questions": [
+  {
+   "id": "v01",
+   "question": "Who conceived Python, and at which research institute in the Netherlands did that happen?",
+   "tags": [
+    "single-passage",
+    "ordinary-subject"
+   ],
+   "expected_status": "ok",
+   "scope": "public",
+   "required_facts": [
+    {
+     "fact": "Python was conceived by Guido van Rossum at Centrum Wiskunde & Informatica (CWI) in the Netherlands",
+     "acceptable": [
+      "1386984050#p2"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "v02",
+   "question": "What does Python use instead of curly brackets or keywords to delimit blocks?",
+   "tags": [
+    "single-passage",
+    "ordinary-subject"
+   ],
+   "expected_status": "ok",
+   "scope": "public",
+   "required_facts": [
+    {
+     "fact": "Python uses whitespace indentation to delimit blocks",
+     "acceptable": [
+      "1386984050#p7"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "v03",
+   "question": "Since Python 3.0, what kind of division does the single slash operator always represent?",
+   "tags": [
+    "single-passage",
+    "ordinary-subject"
+   ],
+   "expected_status": "ok",
+   "scope": "public",
+   "required_facts": [
+    {
+     "fact": "Since Python 3.0, / always represents floating-point division",
+     "acceptable": [
+      "1386984050#p15"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "v04",
+   "question": "What is the reference implementation of Python, and in which language is that implementation written?",
+   "tags": [
+    "single-passage",
+    "ordinary-subject"
+   ],
+   "expected_status": "ok",
+   "scope": "public",
+   "required_facts": [
+    {
+     "fact": "CPython is the reference implementation of Python",
+     "acceptable": [
+      "1386984050#p23"
+     ]
+    },
+    {
+     "fact": "CPython is written in C",
+     "acceptable": [
+      "1386984050#p23"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "v05",
+   "question": "Which Python implementation uses a just-in-time compiler, and which transpiler compiles a superset of Python to C?",
+   "tags": [
+    "multi-passage",
+    "ordinary-subject"
+   ],
+   "expected_status": "ok",
+   "scope": "public",
+   "required_facts": [
+    {
+     "fact": "PyPy uses a just-in-time compiler",
+     "acceptable": [
+      "1386984050#p25"
+     ]
+    },
+    {
+     "fact": "Cython compiles a superset of Python to C",
+     "acceptable": [
+      "1386984050#p29"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "v06",
+   "question": "What is Python's reference implementation, and what is commonly cited as one of the greatest strengths of Python?",
+   "tags": [
+    "multi-passage",
+    "ordinary-subject"
+   ],
+   "expected_status": "ok",
+   "scope": "public",
+   "required_facts": [
+    {
+     "fact": "CPython is the reference implementation of Python",
+     "acceptable": [
+      "1386984050#p23"
+     ]
+    },
+    {
+     "fact": "Python's large standard library is commonly cited as one of its greatest strengths",
+     "acceptable": [
+      "1386984050#p20"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "v07",
+   "question": "Who created C++, and in what year was it first released?",
+   "tags": [
+    "single-passage",
+    "symbolic-subject"
+   ],
+   "expected_status": "ok",
+   "scope": "public",
+   "required_facts": [
+    {
+     "fact": "C++ was created by Bjarne Stroustrup",
+     "acceptable": [
+      "1387610051#p1"
+     ]
+    },
+    {
+     "fact": "C++ was first released in 1985",
+     "acceptable": [
+      "1387610051#p1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "v08",
+   "question": "In what year did Bjarne Stroustrup begin work on the C++ predecessor \"C with Classes\"?",
+   "tags": [
+    "single-passage",
+    "symbolic-subject"
+   ],
+   "expected_status": "ok",
+   "scope": "public",
+   "required_facts": [
+    {
+     "fact": "Stroustrup began work on C with Classes in 1979",
+     "acceptable": [
+      "1387610051#p2"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "v09",
+   "question": "What does the C++ name signify, and who is credited with that name?",
+   "tags": [
+    "single-passage",
+    "symbolic-subject"
+   ],
+   "expected_status": "ok",
+   "scope": "public",
+   "required_facts": [
+    {
+     "fact": "The C++ name signifies the evolutionary nature of the changes from C",
+     "acceptable": [
+      "1387610051#p4"
+     ]
+    },
+    {
+     "fact": "Rick Mascitti is credited with the C++ name",
+     "acceptable": [
+      "1387610051#p4"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "v10",
+   "question": "In what year was C++ first standardized by ISO, and what was that standard informally called?",
+   "tags": [
+    "single-passage",
+    "symbolic-subject"
+   ],
+   "expected_status": "ok",
+   "scope": "public",
+   "required_facts": [
+    {
+     "fact": "C++ was first standardized by ISO in 1998",
+     "acceptable": [
+      "1387610051#p8"
+     ]
+    },
+    {
+     "fact": "The first ISO C++ standard was informally known as C++98",
+     "acceptable": [
+      "1387610051#p8"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "v11",
+   "question": "What are the two main components of the C++ language?",
+   "tags": [
+    "single-passage",
+    "symbolic-subject"
+   ],
+   "expected_status": "ok",
+   "scope": "public",
+   "required_facts": [
+    {
+     "fact": "C++ has a direct mapping of hardware features provided primarily by the C subset",
+     "acceptable": [
+      "1387610051#p10"
+     ]
+    },
+    {
+     "fact": "C++ has zero-overhead abstractions based on those mappings",
+     "acceptable": [
+      "1387610051#p10"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "v12",
+   "question": "Is C++ strictly a superset of C?",
+   "tags": [
+    "single-passage",
+    "comparison",
+    "two-subjects",
+    "symbolic-subject"
+   ],
+   "expected_status": "ok",
+   "scope": "public",
+   "required_facts": [
+    {
+     "fact": "C++ is often considered a superset of C but this is not strictly true",
+     "acceptable": [
+      "1387610051#p15"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "v13",
+   "question": "Which kind of programming language is Haskell, and after whom is it named?",
+   "tags": [
+    "single-passage",
+    "ordinary-subject"
+   ],
+   "expected_status": "ok",
+   "scope": "public",
+   "required_facts": [
+    {
+     "fact": "Haskell is a statically typed, purely functional programming language with type inference and lazy evaluation",
+     "acceptable": [
+      "1387873129#p1"
+     ]
+    },
+    {
+     "fact": "Haskell is named after logician Haskell Curry",
+     "acceptable": [
+      "1387873129#p1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "v14",
+   "question": "What did the Haskell standardization series culminate in during late 1997?",
+   "tags": [
+    "single-passage",
+    "ordinary-subject"
+   ],
+   "expected_status": "ok",
+   "scope": "public",
+   "required_facts": [
+    {
+     "fact": "In late 1997 the series culminated in Haskell 98",
+     "acceptable": [
+      "1387873129#p4"
+     ]
+    },
+    {
+     "fact": "Haskell 98 was intended to specify a stable, minimal, portable version of the language and accompanying standard library",
+     "acceptable": [
+      "1387873129#p4"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "v15",
+   "question": "On what date was the GHC2021 language edition released, and with which GHC version?",
+   "tags": [
+    "single-passage",
+    "ordinary-subject"
+   ],
+   "expected_status": "ok",
+   "scope": "public",
+   "required_facts": [
+    {
+     "fact": "GHC2021 was released on 29 October 2021",
+     "acceptable": [
+      "1387873129#p7"
+     ]
+    },
+    {
+     "fact": "GHC2021 was released with GHC version 9.2.1",
+     "acceptable": [
+      "1387873129#p7"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "v16",
+   "question": "Does Haskell provide lazy evaluation and pattern matching?",
+   "tags": [
+    "single-passage",
+    "ordinary-subject"
+   ],
+   "expected_status": "ok",
+   "scope": "public",
+   "required_facts": [
+    {
+     "fact": "Haskell features lazy evaluation",
+     "acceptable": [
+      "1387873129#p8"
+     ]
+    },
+    {
+     "fact": "Haskell features pattern matching",
+     "acceptable": [
+      "1387873129#p8"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "v17",
+   "question": "To what two kinds of output does the Glasgow Haskell Compiler compile?",
+   "tags": [
+    "single-passage",
+    "ordinary-subject"
+   ],
+   "expected_status": "ok",
+   "scope": "public",
+   "required_facts": [
+    {
+     "fact": "GHC compiles to native code on many processor architectures",
+     "acceptable": [
+      "1387873129#p15"
+     ]
+    },
+    {
+     "fact": "GHC compiles to ANSI C",
+     "acceptable": [
+      "1387873129#p15"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "v18",
+   "question": "Which Haskell implementation is a bytecode interpreter, and which two Haskell dialects target the Java virtual machine?",
+   "tags": [
+    "multi-passage",
+    "ordinary-subject"
+   ],
+   "expected_status": "ok",
+   "scope": "public",
+   "required_facts": [
+    {
+     "fact": "Hugs is a bytecode interpreter",
+     "acceptable": [
+      "1387873129#p16"
+     ]
+    },
+    {
+     "fact": "Eta and Frege are Haskell dialects targeting the Java virtual machine",
+     "acceptable": [
+      "1387873129#p17"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "v19",
+   "question": "Who created the C programming language, and in what year?",
+   "tags": [
+    "single-passage",
+    "symbolic-subject"
+   ],
+   "expected_status": "ok",
+   "scope": "public",
+   "required_facts": [
+    {
+     "fact": "C was created in 1972 by Dennis Ritchie",
+     "acceptable": [
+      "1387656235#p1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "v20",
+   "question": "Who published the first edition of The C Programming Language, and in what year?",
+   "tags": [
+    "single-passage",
+    "symbolic-subject"
+   ],
+   "expected_status": "ok",
+   "scope": "public",
+   "required_facts": [
+    {
+     "fact": "Brian Kernighan and Dennis Ritchie published the first edition in 1978",
+     "acceptable": [
+      "1387656235#p10"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "v21",
+   "question": "When was C17 published, and did it introduce new language features?",
+   "tags": [
+    "single-passage",
+    "symbolic-subject"
+   ],
+   "expected_status": "ok",
+   "scope": "public",
+   "required_facts": [
+    {
+     "fact": "C17 was published in June 2018",
+     "acceptable": [
+      "1387656235#p17"
+     ]
+    },
+    {
+     "fact": "C17 introduces no new language features, only technical corrections and clarifications",
+     "acceptable": [
+      "1387656235#p17"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "v22",
+   "question": "How many reserved words did C89 have, and how many more words did C23 reserve?",
+   "tags": [
+    "multi-passage",
+    "quantity-supported",
+    "symbolic-subject"
+   ],
+   "expected_status": "ok",
+   "scope": "public",
+   "required_facts": [
+    {
+     "fact": "C89 has 32 reserved words",
+     "acceptable": [
+      "1387656235#p24"
+     ]
+    },
+    {
+     "fact": "C23 reserved fifteen more words",
+     "acceptable": [
+      "1387656235#p27"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "v23",
+   "question": "In C, what kind of information does a pointer record?",
+   "tags": [
+    "single-passage",
+    "symbolic-subject"
+   ],
+   "expected_status": "ok",
+   "scope": "public",
+   "required_facts": [
+    {
+     "fact": "A pointer records the address or location of an object or function in memory",
+     "acceptable": [
+      "1387656235#p32"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "v24",
+   "question": "Which three memory allocation approaches does C distinguish, and what can improper use of malloc and free lead to?",
+   "tags": [
+    "multi-passage",
+    "symbolic-subject"
+   ],
+   "expected_status": "ok",
+   "scope": "public",
+   "required_facts": [
+    {
+     "fact": "C distinguishes static, automatic, and dynamic memory allocation",
+     "acceptable": [
+      "1387656235#p37"
+     ]
+    },
+    {
+     "fact": "Improper use of malloc and free can lead to memory leaks and dangling pointers",
+     "acceptable": [
+      "1387656235#p51"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "v25",
+   "question": "How many keywords did C++23 add to the C++ language?",
+   "tags": [
+    "insufficient"
+   ],
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "required_facts": [],
+   "missing_detail": "The C++ article discusses standards and mentions keywords in compatibility text, but never counts the keywords added by C++23. Near-neighbour counts exist in the C article, making the question plausible but unsupported."
+  },
+  {
+   "id": "v26",
+   "question": "How many bits wide is the default integer type in Python?",
+   "tags": [
+    "insufficient"
+   ],
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "required_facts": [],
+   "missing_detail": "The Python article discusses arbitrary-precision decimals and machine integers in implementations, but never states a default integer bit width for Python integers."
+  },
+  {
+   "id": "v27",
+   "question": "In which Haskell version did lazy evaluation become optional rather than the default?",
+   "tags": [
+    "insufficient"
+   ],
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "required_facts": [],
+   "missing_detail": "The Haskell article describes lazy evaluation as a defining feature and discusses versions/extensions, but never states a version in which lazy evaluation became optional."
+  },
+  {
+   "id": "v28",
+   "question": "How many members serve on the ISO working group that standardizes C++?",
+   "tags": [
+    "insufficient"
+   ],
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "required_facts": [],
+   "missing_detail": "The C++ article names the ISO working group and describes its meetings, but never states its membership count."
+  },
+  {
+   "id": "v29",
+   "question": "What annual licensing fee does the Python Software Foundation charge commercial users of Python?",
+   "tags": [
+    "insufficient"
+   ],
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "required_facts": [],
+   "missing_detail": "The corpus does not state any licensing fee for commercial use of Python; the question is plausible because trademark/licensing questions exist for other languages."
+  },
+  {
+   "id": "v30",
+   "question": "How many operators does the C language define?",
+   "tags": [
+    "insufficient"
+   ],
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "required_facts": [],
+   "missing_detail": "The C article lists rich operator families but never states a total operator count."
+  }
+ ]
+}

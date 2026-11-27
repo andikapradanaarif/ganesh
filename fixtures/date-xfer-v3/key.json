@@ -1,0 +1,270 @@
+{
+ "version": "date-xfer-v3-v1",
+ "scoring": "scoring.v2",
+ "questions": [
+  {
+   "id": "v01",
+   "question": "When was the Vostok 1 mission launched?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "open-when"
+   ],
+   "required_facts": [
+    {
+     "fact": "12 April 1961",
+     "acceptable": [
+      "vo1-a1#p1"
+     ],
+     "spans": [
+      "12 April 1961"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "v02",
+   "question": "When did the first confirmed ascent of Mount Everest take place?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "open-when"
+   ],
+   "required_facts": [
+    {
+     "fact": "29 May 1953",
+     "acceptable": [
+      "ev-a1#p66"
+     ],
+     "spans": [
+      "29 May 1953"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "v03",
+   "question": "On what exact date did Yuri Gagarin fly into space?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "exact-date"
+   ],
+   "required_facts": [
+    {
+     "fact": "12 April 1961",
+     "acceptable": [
+      "vo1-a1#p1"
+     ],
+     "spans": [
+      "12 April 1961"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "v04",
+   "question": "On what exact date did Gherman Titov launch aboard Vostok 2?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "exact-date",
+    "wrong-subject-distractor"
+   ],
+   "required_facts": [
+    {
+     "fact": "6 August 1961",
+     "acceptable": [
+      "vo2-a1#p12"
+     ],
+     "spans": [
+      "6 August 1961"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "v05",
+   "question": "In what year was Vostok 2 launched?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "year-only"
+   ],
+   "required_facts": [
+    {
+     "fact": "6 August 1961",
+     "acceptable": [
+      "vo2-a1#p12"
+     ],
+     "spans": [
+      "6 August 1961"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "v06",
+   "question": "In what year was Mount Everest first climbed?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "year-only"
+   ],
+   "required_facts": [
+    {
+     "fact": "29 May 1953",
+     "acceptable": [
+      "ev-a1#p66"
+     ],
+     "spans": [
+      "29 May 1953"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "v07",
+   "question": "On what date did Vostok 2 land back on Earth?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "multi-date-passage"
+   ],
+   "required_facts": [
+    {
+     "fact": "7 August 1961",
+     "acceptable": [
+      "vo2-a1#p17"
+     ],
+     "spans": [
+      "7 August 1961"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "v08",
+   "question": "When did the Vostok 2 mission lift off from Baikonur?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "wrong-subject-distractor"
+   ],
+   "required_facts": [
+    {
+     "fact": "6 August 1961",
+     "acceptable": [
+      "vo2-a1#p12"
+     ],
+     "spans": [
+      "6 August 1961"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "v09",
+   "question": "On what date did Gagarin wake on the morning of his flight?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "deep"
+   ],
+   "required_facts": [
+    {
+     "fact": "12 April 1961",
+     "acceptable": [
+      "vo1-a1#p16"
+     ],
+     "spans": [
+      "12 April 1961"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "v10",
+   "question": "On what exact date was Vostok 1 launched, and how long did the flight last?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "compound"
+   ],
+   "required_facts": [
+    {
+     "fact": "12 April 1961",
+     "acceptable": [
+      "vo1-a1#p1"
+     ],
+     "spans": [
+      "12 April 1961"
+     ],
+     "answer_polarity": "affirmative"
+    },
+    {
+     "fact": "108 minutes",
+     "acceptable": [
+      "vo1-a1#p2"
+     ],
+     "spans": [
+      "108 minutes"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "v11",
+   "question": "How long did the Vostok 1 flight last?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "non-date"
+   ],
+   "required_facts": [
+    {
+     "fact": "108 minutes",
+     "acceptable": [
+      "vo1-a1#p2"
+     ],
+     "spans": [
+      "108 minutes"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "v12",
+   "question": "On what exact day did the Soviet leadership approve the Vostok 1 crewed mission plan?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient"
+   ],
+   "required_facts": [],
+   "unresolved_detail": "approval timing given at most by month or year in source, exact day absent"
+  }
+ ]
+}

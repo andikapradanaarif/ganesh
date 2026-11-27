@@ -1,0 +1,292 @@
+{
+  "evidence_correct_answerable": 3,
+  "outcomes": [
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "ok",
+      "hit": false,
+      "id": "c01",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.588227,
+      "latency_rest_ms": 2.068094,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "ok",
+      "hit": false,
+      "id": "c02",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.418307,
+      "latency_rest_ms": 1.321715,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "c03",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 1.255186,
+      "latency_rest_ms": 1.230484,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "c04",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 1.202859,
+      "latency_rest_ms": 1.20627,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "ok",
+      "hit": false,
+      "id": "c05",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.148643,
+      "latency_rest_ms": 1.153135,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "ok",
+      "hit": false,
+      "id": "c06",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.586882,
+      "latency_rest_ms": 1.354243,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "c07",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 1.464252,
+      "latency_rest_ms": 1.396504,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "c08",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 1.452595,
+      "latency_rest_ms": 1.245161,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "x01",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.259298,
+      "latency_rest_ms": 1.3545449999999999,
+      "mcp_ids": [
+        "restorelog-c1#p2",
+        "restorelog-c1#p3",
+        "restorelog-c1#p4"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "restorelog-c1#p2",
+        "restorelog-c1#p3",
+        "restorelog-c1#p4"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "x02",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.117231,
+      "latency_rest_ms": 0.856007,
+      "mcp_ids": [
+        "restorelog-c1#p3",
+        "restorelog-c1#p2",
+        "restorelog-c1#p4"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "restorelog-c1#p3",
+        "restorelog-c1#p2",
+        "restorelog-c1#p4"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 0,
+      "citations_ok": 0,
+      "evidence_correct": null,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "x03",
+      "insufficient_correct": true,
+      "latency_mcp_ms": 1.2512560000000001,
+      "latency_rest_ms": 1.238618,
+      "mcp_ids": [],
+      "mcp_status": "insufficient_context",
+      "rest_ids": [],
+      "rest_status": "insufficient_context"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": true,
+      "expected": "ok",
+      "hit": true,
+      "id": "x04",
+      "insufficient_correct": null,
+      "latency_mcp_ms": 1.153759,
+      "latency_rest_ms": 1.0516150000000002,
+      "mcp_ids": [
+        "restorelog-c1#p4",
+        "restorelog-c1#p2",
+        "restorelog-c1#p3"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "restorelog-c1#p4",
+        "restorelog-c1#p2",
+        "restorelog-c1#p3"
+      ],
+      "rest_status": "ok"
+    },
+    {
+      "adapter_agree": true,
+      "citations_checked": 6,
+      "citations_ok": 6,
+      "evidence_correct": null,
+      "expected": "insufficient_context",
+      "hit": null,
+      "id": "x05",
+      "insufficient_correct": false,
+      "latency_mcp_ms": 0.9594029999999999,
+      "latency_rest_ms": 0.9384060000000001,
+      "mcp_ids": [
+        "restorelog-c1#p4",
+        "restorelog-c1#p2",
+        "restorelog-c1#p3"
+      ],
+      "mcp_status": "ok",
+      "rest_ids": [
+        "restorelog-c1#p4",
+        "restorelog-c1#p2",
+        "restorelog-c1#p3"
+      ],
+      "rest_status": "ok"
+    }
+  ],
+  "questions": "fixtures/chain-probe/key.json",
+  "result": {
+    "checks": {
+      "adapter_agreement": {
+        "agree": 13,
+        "pass": true,
+        "total": 13
+      },
+      "citation_integrity": {
+        "checked": 24,
+        "ok": 24,
+        "pass": true
+      },
+      "evidence_coverage": {
+        "answerable": 7,
+        "hits": 3,
+        "pass": true
+      },
+      "insufficient_evidence": {
+        "correct": 5,
+        "pass": true,
+        "total": 6
+      },
+      "provider_calls": {
+        "count": 0,
+        "pass": true
+      }
+    },
+    "corpus": "fixtures/chain-probe",
+    "incomplete": false,
+    "mode": "development",
+    "questions": "fixtures/chain-probe/key.json",
+    "reasons": [],
+    "verdict": "DEVELOPMENT",
+    "version": "bench-result.v1"
+  },
+  "summary": {
+    "adapter_agree": 13,
+    "answerable": 7,
+    "citations_checked": 24,
+    "citations_ok": 24,
+    "hits": 3,
+    "incomplete": false,
+    "insufficient": 6,
+    "insufficient_correct": 5,
+    "total": 13
+  }
+}

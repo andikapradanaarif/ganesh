@@ -1,0 +1,261 @@
+
+
+Europa Clipper (previously known as the Europa Multiple Flyby Mission) is a mission to send a space probe developed by NASA to study Europa, a Galilean moon of Jupiter. Launched by a Falcon Heavy on October 14, 2024, the probe is planned to enter Jupiter orbit in April 2030 and conduct a series of flybys of Europa from March 2031. Europa Clipper is the largest interplanetary spacecraft ever launched by NASA. The mission used a gravity assist from Mars in March 2025, and will use an assist from Earth in December 2026. 
+
+Europa Clipper will investigate the subsurface ocean below Europa's ice crust, found by the Galileo spacecraft which orbited Jupiter from 1995 to 2003. Cancelled missions such as Europa Orbiter and Jupiter Icy Moons Orbiter had planned to orbit Europa. However, Europa's vicinity experiences extreme radiation, being deep within the magnetosphere of Jupiter. Thus Europa Clipper will enter an elliptical orbit around Jupiter via a gravity assist from Jupiter's largest moon Ganymede, and make 49 close flybys of the moon. At its mission end, planned for 2034 or later, it will be intentionally crashed, likely into Ganymede, to prevent forward contamination of Europa. 
+
+The orbiter aims to analyze the induced magnetic field around Europa. Its Surface Dust Analyzer mass spectrometer aims to detect and directly sample the subsurface ocean via its water vapor plume ejecta from cryovolcanoes; it is capable of identifying a single bacterium.
+
+The mission's name is a reference to the lightweight, fast clipper ships of the 19th century that routinely plied trade routes, since the spacecraft will pass by Europa at a rapid cadence, as frequently as every two weeks. The mission patch, which depicts a sailing ship, references the moniker. Europa Clipper complements the ESA's Jupiter Icy Moons Explorer, launched in 2023, which will attempt to fly past Europa twice and Callisto multiple times before moving into orbit around Ganymede.
+
+== History ==
+
+=== Early proposals and Galileo discoveries ===
+In 1997, a Europa Orbiter mission was proposed by a team for NASA's Discovery Program but was not selected. NASA's JPL announced one month after the selection of Discovery proposals that a NASA Europa orbiter mission would be conducted. JPL then invited the Discovery proposal team to be the Mission Review Committee (MRC).
+
+At the same time as the proposal of the Discovery-class Europa Orbiter, the robotic Galileo spacecraft was already orbiting Jupiter. From December 8, 1995, to December 7, 1997, Galileo conducted the primary mission after entering the orbit of Jupiter. On that final date, the Galileo orbiter commenced an extended mission known as the Galileo Europa Mission (GEM), which ran until December 31, 1999. This was a low-cost mission extension with a budget of only US$30&nbsp;million. The smaller team of about 40–50 people (compared with the primary mission's 200-person team from 1995 to 1997) did not have the resources to deal with problems, but when they arose, it was able to temporarily recall former team members (called "tiger teams") for intensive efforts to solve them. The spacecraft made several flybys of Europa (8), Callisto (4) and Io (2). On each flyby of the three moons it encountered, the spacecraft collected only two days' worth of data instead of the seven it had collected during the primary mission. During GEM's eight flybys of Europa, it ranged from , in two years.
+
+Europa has been identified as one of the locations in the Solar System that could possibly harbor microbial extraterrestrial life. Immediately following the Galileo spacecraft's discoveries and the independent Discovery program proposal for a Europa orbiter, JPL conducted preliminary mission studies that envisioned a capable spacecraft such as the Jupiter Icy Moons Orbiter (a US$16&nbsp;billion mission concept), the Jupiter Europa Orbiter (a US$4.3&nbsp;billion concept), another orbiter (US$2&nbsp;billion concept), and a multi-flyby spacecraft: Europa Clipper.
+
+A mission to Europa was recommended by the National Research Council in 2013. The approximate cost estimate rose from US$2&nbsp;billion in 2013 to US$4.25&nbsp;billion in 2020. The mission is a joint project between the Johns Hopkins University's Applied Physics Laboratory (APL), and the Jet Propulsion Laboratory (JPL).
+
+=== Funding put forward ===
+In March 2013, US$75&nbsp;million was authorized to expand on the formulation of mission activities, mature the proposed science goals, and fund preliminary instrument development, as suggested in 2011 by the Planetary Science Decadal Survey. In May 2014, a House bill substantially increased the Europa Clipper (referred to as Europa Multiple Flyby Mission) funding budget for the 2014 fiscal year from US$15&nbsp;million to US$100&nbsp;million to be applied to pre-formulation work. Following the 2014 election cycle, bipartisan support was pledged to continue funding for the Europa Multiple Flyby Mission project. The executive branch also granted US$30&nbsp;million for preliminary studies.
+
+=== Formulation ===
+In April 2015, NASA invited the ESA to submit concepts for an additional probe to fly together with the Europa Clipper spacecraft, with a mass limit of 250&nbsp;kg. It could be a simple probe, an impactor, or a lander. An internal assessment at ESA considered whether there was interest and funds available, opening a collaboration scheme similar to the very successful Cassini–Huygens approach.
+
+In May 2015, NASA chose nine instruments that would fly on board the orbiter, budgeted to cost about US$110&nbsp;million over the next three years. In June 2015, NASA approved the mission concept, allowing the orbiter to move to its formulation stage. In January 2016, NASA approved the addition of a lander, but this was canceled in 2017 because it was deemed too risky. In May 2016, the Ocean Worlds Exploration Program was approved, of which the Europa mission is part.
+
+In February 2017, the mission moved from Phase A to Phase B (the preliminary design phase). On July 18, 2017, the House Space Subcommittee held hearings on the Europa Clipper as a scheduled Large Strategic Science Missions class, and to discuss a possible follow up mission simply known as the Europa Lander. Phase B continued into 2019. In addition, subsystem vendors were selected, as well as prototype hardware elements for the science instruments. Spacecraft sub-assemblies were built and tested as well.
+
+===Fabrication and assembly===
+thumb|NASA's Europa Clipper, with all of its instruments installed, is visible in the clean room of High Bay 1 at the agency's Jet Propulsion Laboratory.
+On August 19, 2019, the Europa Clipper proceeded to Phase C: final design and fabrication.
+
+On March 3, 2022, the spacecraft moved on to Phase D: assembly, testing, and launch. On June 7, 2022, the main body of the spacecraft was completed. By August 2022, the high-gain antenna had completed its major testing campaigns.
+
+By January 30, 2024, all of the science instruments were added to the spacecraft. In March 2024, it was reported that the spacecraft underwent successful testing and was on track for launch later in the year. In May 2024, the spacecraft arrived at Kennedy Space Center for final launch preparations. In September 2024, final pre-launch review was successfully completed, clearing the way for launch. In early October 2024, due to the incoming Hurricane Milton, the spacecraft was placed in secure storage for safekeeping until the hurricane passed.
+
+=== Launch ===
+In July 2024, the spacecraft faced concerns of delay and missing the launch window because of a discovery in June 2024 that its components were not as radiation-hardened as previously believed. However, over the summer, intensive re-testing of the transistor components in question found that they would likely be annealed enough to 'self-heal'. In September 2024, Europa Clipper was approved for a launch window opening on October 10, 2024; however, on October 6, 2024, NASA announced that it would be standing down from the October 10 launch due to Hurricane Milton. Europa Clipper was finally launched on October 14, 2024.
+
+===End of mission planning===
+The probe is scheduled to be crashed into Jupiter, Ganymede, or Callisto, to prevent it from crashing into Europa. In June 2022, lead project scientist Robert Pappalardo revealed that mission planners for Europa Clipper were considering disposing of the probe by crashing it into the surface of Ganymede in case an extended mission was not approved early in the main science phase. He noted that an impact would help the ESA's Juice mission collect more information about Ganymede's surface chemistry. In a 2024 paper, Pappalardo said the mission would last four years in Jupiter orbit, and that disposal was targeted for September 3, 2034 if NASA did not approve a mission extension.
+
+== Objectives ==
+thumb|upright=1.0|right|The photo composite of suspected water plumes on Europa
+thumb|upright=1.0|right|The concept to achieve global-regional coverage of Europa during successive flybys
+
+The goals of Europa Clipper are to explore Europa, investigate its habitability and aid in the selection of a landing site for the proposed Europa Lander. This exploration is focused on understanding the three main requirements for life: liquid water, chemistry, and energy. Specifically, the objectives are to study:
+
+* Ice shell and ocean: Confirm the existence and characterize the nature of water within or beneath the ice, and study processes of surface-ice-ocean exchange.
+* Composition: Distribution and chemistry of key compounds and the links to ocean composition.
+* Geology: Characteristics and formation of surface features, including sites of recent or current activity.
+The spacecraft carries scientific instruments which will be used to analyze the potential presence of geothermal activity and the moon's induced magnetic field; which in turn will provide an indication to the presence of saline rich subsurface ocean(s).
+
+=== Strategy ===
+thumb|upright=1.1|left|A wide orbit of Jupiter with several flybys of Europa will minimize radiation exposure and increase data transfer speed.
+
+Because Europa lies well within the Magnetosphere of Jupiter even a radiation-hardened spacecraft in near orbit would only remain functional for just a few months. Most instruments can gather data far faster than the communications system can transmit it to Earth due to the limited number of antennas available on Earth to receive the scientific data. Therefore, another key limiting factor on science for a Europa orbiter is the time available to return data to Earth. In contrast, the amount of time during which the instruments can make close-up observations is less important.
+
+Studies by scientists from the Jet Propulsion Laboratory show that by performing several flybys with many months to return data, the Europa Clipper concept will enable a US$2&nbsp;billion mission to conduct the most crucial measurements of the canceled US$4.3&nbsp;billion Jupiter Europa Orbiter concept. Between each of the flybys, the spacecraft will have seven to ten days to transmit data stored during each brief encounter. That will let the spacecraft have up to a year of time to transmit its data compared to just 30 days for an orbiter. The result will be almost three times as much data returned to Earth, while reducing exposure to radiation. Europa Clipper will not orbit Europa, but will instead orbit Jupiter and conduct 49 flybys of Europa, each at altitudes ranging from  during its 3.5-year mission. A key feature of the mission concept is that Europa Clipper would use gravity assists from Europa, Ganymede and Callisto to change its trajectory, allowing the spacecraft to return to a different close approach point with each flyby. Each flyby would cover a different sector of Europa to achieve a medium-quality global topographic survey, including ice thickness. Europa Clipper could conceivably fly by at low altitude through the plumes of water vapor erupting from the moon's ice crust, thus sampling its subsurface ocean without having to land on the surface and drill through the ice.
+
+The spacecraft is expected to receive a total ionizing dose of  during the mission. Shielding from Jupiter's harsh radiation belt will be provided by a radiation vault with  aluminum alloy walls, which enclose the spacecraft electronics. To maximize the effectiveness of this shielding, the electronics are also nested in the core of the spacecraft for additional radiation protection.
+
+== Design and construction ==
+thumb|upright=2.0|Spacecraft diagram
+
+Europa Clipper is a NASA Planetary Science Division mission, designated a Large Strategic Science Mission, and funded under the Planetary Missions Program Office's Solar System Exploration program as its second flight. It is also supported by the new Ocean Worlds Exploration Program.
+
+The spacecraft bus is a 5-meter-long combination of a 150-cm-wide aluminum cylindrical propulsion module and a rectangular box. The electronic components are protected from the intense radiation by a 150-kilogram titanium, zinc and aluminum shielded vault in the box.
+
+=== Power ===
+Both radioisotope thermoelectric generator (RTG) and photovoltaic power sources were assessed as options to power the orbiter. Although solar power is only 4% as intense at Jupiter as it is in Earth's orbit, powering a Jupiter orbital spacecraft with solar panels was demonstrated by the Juno mission. The alternative to solar panels was a multi-mission radioisotope thermoelectric generator (MMRTG), fueled with plutonium-238. The power source had already been demonstrated in the Mars Science Laboratory (MSL) mission. Five units were available, with one reserved for the Mars 2020 rover mission and another as backup. In September 2013, it was decided that the solar array was the less expensive option to power the spacecraft, and on October 3, 2014, it was announced that solar panels were chosen to power Europa Clipper. The mission's designers determined that solar power was both cheaper than plutonium and practical to use on the spacecraft. Despite the increased weight of solar panels compared to plutonium-powered generators, the vehicle's mass was projected to still be within acceptable launch limits.
+
+Each panel has a surface area of  and produces 150 watts continuously when pointed towards the Sun while orbiting Jupiter. When in Europa's shadow, onboard batteries charged by the solar panels will enable the spacecraft to continue gathering data. However, ionizing radiation can damage solar panels. The Europa Clipper's orbit will pass through Jupiter's intense magnetosphere, which is expected to gradually degrade the solar panels as the mission progresses. The solar panels were provided by Airbus Defence and Space, Netherlands.
+
+=== Propulsion ===
+The propulsion subsystem was built by NASA's Goddard Space Flight Center in Greenbelt, Maryland. It is part of the Propulsion Module, delivered by Johns Hopkins Applied Physics Laboratory in Laurel, Maryland. It is  tall,  in diameter and comprises about two-thirds of the spacecraft's main body. The propulsion subsystem carries nearly  of monomethyl hydrazine and dinitrogen tetroxide propellant, 50% to 60% of which will be used for the 6-to-8-hour Jupiter orbit insertion burn. The spacecraft has a total of 24 rocket engines rated at  thrust for attitude control and propulsion.
+
+=== Communication ===
+thumb|Prototype of the high-gain antenna during testing
+The spacecraft includes a suite of antennas for communication and scientific measurements. Chief among them is the high-gain antenna (HGA), which is  in diameter and is capable of both uplink and downlink communications over multiple frequency bands. The HGA operates on X-band frequencies of 7.2 GHz (uplink) and 8.4 GHz (downlink), as well as a Ka-band frequency of 32 GHz, approximately 12 times higher than typical cellular communications.
+
+The communication system includes additional antennas such as low-gain antennas (LGAs), medium-gain antennas (MGAs), and fan-beam antennas (FBAs), which are used for different mission phases depending on orientation and distance from Earth.
+
+The Ka-band is primarily used for high-rate data return, enabling faster transmission of scientific data. Data rates vary depending on antenna alignment, frequency, and ground station availability. Downlink data rates via X-band can reach approximately 16 kilobits per second, while Ka-band transmissions can reach up to 500 kilobits per second under optimal conditions. Uplink rates for command transmission are typically around 2 kilobits per second.
+
+The antenna system supports not only communications but also radio science and gravity science experiments. Using coherent two-way X-band Doppler tracking and radio occultation techniques, researchers will study Europa's internal structure, ice shell thickness, ocean characteristics, and gravity field. Small variations in the spacecraft's velocity—detected via Doppler shifts—will help scientists determine the moon's mass distribution and potential subsurface ocean.
+
+The HGA was designed and developed under the leadership of Matt Bray at the Johns Hopkins Applied Physics Laboratory (APL), and underwent rigorous testing at Langley Research Center and Goddard Space Flight Center in 2022, including beam pattern, thermal vacuum, and vibration testing to ensure precision and reliability.
+
+=== Scientific equipment ===
+The science payload onboard Europa Clipper consists of nine scientific instruments, with a combined mass of . The instruments were announced in May 2015.
+
+==== Europa Thermal Emission Imaging System (E-THEMIS) ====
+The Europa Thermal Emission Imaging System will provide high spatial resolution as well as multi-spectral imaging of the surface of Europa in the mid to far infrared bands to help detect heat which would suggest geologically active sites and areas, such as potential vents erupting plumes of water into space.
+
+The principal investigator is Philip Christensen of Arizona State University. This instrument is derived from the Thermal Emission Imaging System (THEMIS) on the 2001 Mars Odyssey orbiter, also developed by Philip Christensen.
+
+==== Mapping Imaging Spectrometer for Europa (MISE) ====
+thumb|right|upright=0.75|The [[Mapping Imaging Spectrometer for Europa instrument]]
+The Mapping Imaging Spectrometer for Europa is an imaging near infrared spectrometer to probe the surface composition of Europa, identifying and mapping the distributions of organics (including amino acids and tholins), salts, acid hydrates, water ice phases, and other materials.
+
+The principal investigator is Diana Blaney of Jet Propulsion Laboratory and the instrument was built in collaboration with the Johns Hopkins University Applied Physics Laboratory (APL).
+
+==== Europa Imaging System (EIS) ====
+The Europa Imaging System consists of visible spectrum cameras to map Europa's surface and study smaller areas in high resolution, as low as  per pixel. It consists of two cameras, both of which use 2048x4096 pixel CMOS detectors:
+
+* The Wide-angle Camera (WAC) has a field of view of 48° by 24° and a resolution of  from a  altitude. Optically the WAC uses 8 lens refractive optics with an 8&nbsp;mm aperture and a 46&nbsp;mm focal length which give it a f-number of f/5.75. The WAC will obtain stereo imagery swaths throughout the mission.
+* The Narrow-angle Camera (NAC) has a 2.3° by 1.2° field of view, giving it a resolution of  per pixel from a  altitude. Optically the NAC uses a Ritchey Chrétien Cassegrain telescope with a 152&nbsp;mm aperture and a 1000&nbsp;mm focal length which give it a f-number of f/6.58. The NAC is mounted on a 2-axis gimbal, allowing it to point at specific targets regardless of the main spacecraft's orientation. This will allow for mapping of >95% of Europa's surface at a resolution of ≤ per pixel. For reference, only around 14% of Europa's surface has previously been mapped at a resolution of ≤ per pixel.
+The principal investigator is Elizabeth Turtle of the Applied Physics Laboratory.
+
+==== Europa Ultraviolet Spectrograph (Europa-UVS) ====
+The Europa Ultraviolet Spectrograph instrument will be able to detect small erupting plumes, and will provide valuable data about the composition and dynamics of the moon's exosphere.
+
+The principal investigator is Kurt Retherford of Southwest Research Institute. Retherford was previously a member of the group that discovered plumes erupting from Europa while using the Hubble Space Telescope in the UV spectrum.
+
+==== Radar for Europa Assessment and Sounding: Ocean to Near-surface (REASON) ====
+The Radar for Europa Assessment and Sounding: Ocean to Near-surface (REASON) is a dual-frequency ice penetrating radar (9 and 60&nbsp;MHz) instrument that is designed to sound Europa's ice crust from the near-surface to the ocean, revealing the hidden structure of Europa's ice shell and potential water pockets within. REASON will probe the exosphere, surface and near-surface and the full depth of the ice shell to the ice-ocean interface up to 30&nbsp;km.
+
+The principal investigator is Donald Blankenship of the University of Texas at Austin. This instrument was built by Jet Propulsion Laboratory.
+
+==== Europa Clipper Magnetometer (ECM) ====
+The Europa Clipper Magnetometer (ECM) will be used to analyze the magnetic field around Europa. The instrument consists of three flux gates placed along an  boom, which were stowed during launch and deployed afterwards. The magnetic field of Jupiter is thought to induce electric current in a salty ocean beneath Europa's ice, which in turn leads Europa to produce its own magnetic field, therefore by studying the strength and orientation of Europa's magnetic field over multiple flybys, scientists hope to be able to confirm the existence of Europa's subsurface ocean, as well as characterize the thickness of its icy crust and estimate the water's depth and salinity.
+
+The instrument team leader is Margaret Kivelson, University of Michigan.
+
+ECM replaced the proposed Interior Characterization of Europa using Magnetometry (ICEMAG) instrument, which was canceled due to cost overruns. ECM is a simpler and cheaper magnetometer than ICEMAG would have been.
+
+==== Plasma Instrument for Magnetic Sounding (PIMS) ====
+thumb|Two of the [[Faraday cup sensors for the Plasma Instrument for Magnetic Sounding (PIMS) instrument. Left is the final flight configuration and right is at an earlier testing stage.]]
+The Plasma Instrument for Magnetic Sounding (PIMS) measures the plasma surrounding Europa to characterize the magnetic fields generated by plasma currents. These plasma currents mask the magnetic induction response of Europa's subsurface ocean. In conjunction with a magnetometer, it is key to determining Europa's ice shell thickness, ocean depth, and salinity. PIMS will also probe the mechanisms responsible for weathering and releasing material from Europa's surface into the atmosphere and ionosphere and understanding how Europa influences its local space environment and Jupiter's magnetosphere.
+
+The principal investigator is Joseph Westlake of the Applied Physics Laboratory.
+
+==== Mass Spectrometer for Planetary Exploration (MASPEX) ====
+The Mass Spectrometer for Planetary Exploration (MASPEX) will determine the composition of the surface and subsurface ocean by measuring Europa's extremely tenuous atmosphere and any surface materials ejected into space.
+
+Jack Waite, who led development of MASPEX, was also Science Team Lead of the Ion and Neutral Mass Spectrometer (INMS) on the Cassini spacecraft. The principal investigator is Jim Burch of Southwest Research Institute, who was previously the leader of the Magnetospheric Multiscale Mission.
+
+==== Surface Dust Analyzer (SUDA) ====
+thumb|Europa Clipper's Dust Analyzer sensor head
+The SUrface Dust Analyzer (SUDA) is a mass spectrometer that will measure the composition of small solid particles ejected from Europa, providing the opportunity to directly sample the surface and potential plumes on low-altitude flybys. The instrument is capable of identifying traces of organic and inorganic compounds in the ice of ejecta, and is sensitive enough to detect signatures of life even if the sample contains less than a single bacterial cell in a collected ice grain.
+
+The principal investigator is Sascha Kempf of the University of Colorado Boulder.
+
+==== Gravity & Radio Science ====
+Although it was designed primarily for communications, the high-gain radio antenna will be used to perform additional radio observations and investigate Europa's gravitational field, acting as a radio science subsystem. Measuring the Doppler shift in the radio signals between the spacecraft and Earth will allow the spacecraft's motion to be determined in detail. As the spacecraft performs each of its 45 Europa flybys, its trajectory will be altered by the moon's gravitational field. The Doppler data will be used to determine the higher order coefficients of that gravity field, to determine the moon's interior structure, and to examine how Europa is deformed by tidal forces.
+
+The instrument team leader is Erwan Mazarico of NASA's Goddard Space Flight Center.
+
+== Launch and trajectory ==
+thumb|[[Falcon Heavy lifts off with Europa Clipper from Kennedy Space Center Launch Complex 39A on Monday, Oct. 14, 2024; 12:06&nbsp;p.m. EDT. ]]
+thumb|Europa Clipper separates from Falcon Heavy's Second Stage after deployment.
+
+=== Launch preparations ===
+Congress had originally mandated the Europa Clipper to launch on NASA's Space Launch System (SLS) super heavy-lift launch vehicle, but NASA had requested that other vehicles be allowed to launch the spacecraft due to a foreseen lack of available SLS vehicles. The United States Congress's 2021 omnibus spending bill directed the NASA Administrator to conduct a full and open competition to select a commercial launch vehicle if the conditions to launch the probe on a SLS rocket cannot be met.
+
+On January&nbsp;25, 2021, NASA's Planetary Missions Program Office formally directed the mission team to "immediately cease efforts to maintain SLS compatibility" and move forward with a commercial launch vehicle.
+
+On February&nbsp;10, 2021, it was announced that the mission would use a 5.5-year trajectory to the Jovian system, with gravity-assist maneuvers involving Mars (March 1, 2025) and Earth (December 3, 2026). Launch was targeted for a 21-day period between October&nbsp;10 and 30, 2024, giving an arrival date in April 2030, and backup launch dates were identified in 2025 and 2026.
+
+The SLS option would have entailed a direct trajectory to Jupiter taking less than three years. One alternative to the direct trajectory was identified as using a commercial rocket, with a longer 6-year cruise time involving gravity assist maneuvers at Venus, Earth and/or Mars. Additionally, a launch on a Delta IV Heavy with a gravity assist at Venus was considered.
+
+In July 2021, the decision was announced to launch on a Falcon Heavy rocket, in a fully expendable configuration. Three reasons were given: reasonable launch cost (ca. $178 million), questionable SLS availability, and possible damage to the payload due to strong vibrations caused by the solid boosters attached to the SLS launcher. The move to Falcon Heavy saved an estimated US$2 billion in launch costs alone. NASA was not sure an SLS would be available for the mission since the Artemis program would use SLS rockets extensively, and the SLS's use of solid rocket boosters (SRBs) generates more vibrations in the payload than a launcher that does not use SRBs. The cost to redesign Europa Clipper for the SLS vibratory environment was estimated at US$1&nbsp;billion.
+
+=== Launch ===
+Europa Clipper was originally scheduled to launch on October 10, 2024, two days after a Falcon 9 launched the ESA's Hera to 65803 Didymos from Cape Canaveral Space Force Station on a similar interplanetary trajectory. However, this launch attempt was scrubbed due to Hurricane Milton making landfall in Florida the previous day, resulting in the launch being finalized for several days later. Europa Clipper was launched on October 14, 2024, at 12:06&nbsp;p.m. EDT from Launch Complex 39A at NASA's Kennedy Space Center on a Falcon Heavy. The rocket's boosters and first stage were both expended as a result of the spacecraft's mass and trajectory; the boosters were previously flown five times (including on the launch of Psyche for NASA and an X-37B for the United States Space Force), while the center stage was flown for only this mission.
+
+=== Transit and observation ===
+The trajectory of Europa Clipper started with a gravity assist from Mars on March 1, 2025, causing the probe to slow down a little (speed reduced by 2 km/s) and modifying its orbit around the Sun such that it will allow the spacecraft to fly by Earth on December 3, 2026, gaining additional speed. The probe will then arc (reach aphelion) beyond Jupiter's orbit on October 4, 2029 before slowly falling into Jupiter's gravity well and executing its orbital insertion burn in April 2030.
+
+After entry into the Jupiter system, Europa Clipper will perform a flyby of Ganymede at an altitude of , which will reduce the spacecraft velocity by ~. This will be followed by firing the main engine at a distance of 11 RJ (Jovian radii), to provide a further ~ of delta-V, sufficient to insert the spacecraft into a 202-day orbit around Jupiter. Once the spacecraft reaches the apoapsis of that initial orbit, it will perform another engine burn to provide a ~ periapsis raise maneuver (PRM).
+
+{| class="wikitable"
+|+ Europa Clipper flyby timeline
+|-
+! Date !! Location !! Status !! Notes
+|-
+| 2024-10-14|| Earth ||  || Launch
+|-
+| 2025-03-01|| Mars|| || Gravity assist
+|-
+| 2026-12-03|| Earth|| || Places the spacecraft on a transfer orbit to Jupiter
+|-
+| 2030-04-10|| Ganymede|| || Jupiter initial orbit insertion
+|-
+| 2030-10-30|| Ganymede|| || Apojove-lowering maneuver
+|-
+| 2031-01-02|| Ganymede|| || Apojove-lowering maneuver
+|-
+| 2031-02-07|| Ganymede ||  || Final science orbit insertion
+|-
+| 2031-03-06||Europa|| || First science
+|-
+| 2031-03-27|| Europa|| || 21 days after first flyby; First surface evolution science
+|-
+| 2031-04-13|| Ganymede|| || 
+|-
+| 2031-05-01|| Ganymede|| || 
+|-
+| 2031-05-27|| Europa|| || 61 days after previous flyby
+|-
+| 2031-06-17|| Europa|| || 21 days after previous flyby
+|-
+| [...] || [...] || [...] || [...]
+|- style="background-color:darkgray;"
+| 2034-09-02|| Jupiter orbit|| || End of primary mission
+|}
+
+The spacecraft's cruise and science phases will overlap with the ESA's Juice spacecraft, which was launched in April 2023 and will arrive at Jupiter in July 2031. Europa Clipper is due to arrive at Jupiter 15 months prior to Juice, despite launching 18 months later, owing to a more powerful launch vehicle and a faster flight plan with fewer gravity assists.
+
+== Public outreach ==
+To raise public awareness of the Europa Clipper mission, NASA undertook a "Message in a Bottle" campaign, i.e., an actual "Send Your Name to Europa" campaign on June 1, 2023, through which people around the world were invited to send their names as signatories to a poem called "In Praise of Mystery: A Poem for Europa" written by the U.S. Poet Laureate Ada Limón, for the 2.9-billion-kilometer (1.8-billion-mile) voyage to Jupiter. The poem describes the connections between Earth and Europa.
+
+The poem is engraved on Europa Clipper inside a tantalum metal plate, about , that seals an opening into the vault. The inward-facing side of the metal plate is engraved with the poem in the poet's own handwriting. The public participants' names are etched onto a microchip attached to the plate, within an artwork of a wine bottle surrounded by the four Galilean moons. After registering their names, participants received a digital ticket with details of the mission's launch and destination. According to NASA, 2,620,861 people signed their names to Europa Clipper's Message in a Bottle, most of whom were from the United States. Other elements etched on the inwards side together with the poem and names are the Drake equation, representations of the spectral lines of a hydrogen atom and the hydroxyl radical, together known as the water hole, and a portrait of planetary scientist Ron Greeley. The outward-facing panel features art that highlights Earth's connection to Europa. Linguists collected recordings of the word "water" spoken in 103 languages, from families of languages around the world. The audio files were converted into waveforms and etched into the plate. The waveforms radiate out from a symbol representing the American Sign Language sign for "water". The research organization METI International gathered the audio files for the words for "water", and its president Douglas Vakoch designed the water hole component of the message.
+
+File:Europa Clipper commemorative plate 1.jpg|The outside of the Europa Clipper commemorative plate features waveforms that are visual representations of the sound waves formed by the word "water" in 103 languages.
+File:Europa Clipper commemorative plate.jpg|The inside of a commemorative plate mounted on NASA's Europa Clipper spacecraft features U.S. Poet Laureate Ada Limón's handwritten "In Praise of Mystery: A Poem for Europa" (blurred for copyright reasons).
+
+== See also ==
+
+* 
+* 
+* 
+* 
+* 
+* 
+
+== References ==
+
+== Further reading ==
+* 
+* 
+* 
+
+== External links ==
+
+* 
+* [https://science.nasa.gov/jupiter/moons/europa NASA – Overview of Europa]
+* [https://www.youtube.com/watch?v=j6zT4p2CvTQ  Nontechnical talk on Europa Clipper by Dr. Robert Pappalardo in the Silicon Valley Astronomy Lecture Series]
+
+ 
+Category:2024 in Florida
+Category:October 2024 in the United States
+Category:Space probes launched in 2024
+Category:Extraterrestrial orbiters
+Category:Missions to Jupiter
+Category:NASA programs
+Category:Solar System Exploration program
+Category:SpaceX
+Category:Missions to Europa (moon)
+Category:Message artifacts
+Category:Mars flybys
+Category:Jet Propulsion Laboratory space probes
+Category:NASA space probes
+Category:Spacecraft launched by Falcon Heavy rockets
+Category:Arizona State University
+Category:NASA missions to Mars
+Category:2025 on Mars

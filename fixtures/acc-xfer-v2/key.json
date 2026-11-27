@@ -1,0 +1,320 @@
+{
+ "version": "acc-xfer-v2",
+ "scoring": "scoring.v2",
+ "questions": [
+  {
+   "id": "q01",
+   "question": "How many lifeboats was the Titanic equipped with?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "quantity",
+    "count",
+    "pair-quantity"
+   ],
+   "required_facts": [
+    {
+     "fact": "equipped with twenty lifeboats",
+     "acceptable": [
+      "titanic-a1#p3"
+     ],
+     "spans": [
+      "equipped with twenty lifeboats"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "q02",
+   "question": "At what distance in miles south of Kitty Hawk did the Wright brothers make their first controlled powered flight?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "quantity",
+    "measurement",
+    "pair-quantity"
+   ],
+   "required_facts": [
+    {
+     "fact": "four miles (6 km) south of Kitty Hawk",
+     "acceptable": [
+      "wright-a1#p1"
+     ],
+     "spans": [
+      "four miles (6 km) south of Kitty Hawk"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "q03",
+   "question": "How many propellers did the Wright Flyer have?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient",
+    "v30-class"
+   ],
+   "required_facts": [],
+   "unresolved_detail": "propellers discussed extensively (efficiency, thrust, design) but never counted in prose"
+  },
+  {
+   "id": "q04",
+   "question": "What is the height of Uhuru Peak in metres?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient",
+    "i05-class"
+   ],
+   "required_facts": [],
+   "unresolved_detail": "height value stripped with template conversion"
+  },
+  {
+   "id": "q05",
+   "question": "On what exact date did the Titanic sink?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "date",
+    "exact",
+    "pair-date"
+   ],
+   "required_facts": [
+    {
+     "fact": "sank in the early hours of 15 April 1912",
+     "acceptable": [
+      "titanic-a1#p1"
+     ],
+     "spans": [
+      "sank in the early hours of 15 April 1912"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "q06",
+   "question": "In what year did the United States open the Panama Canal?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "date",
+    "year-only",
+    "pair-date"
+   ],
+   "required_facts": [
+    {
+     "fact": "opened the canal in 1914",
+     "acceptable": [
+      "panama-a1#p3"
+     ],
+     "spans": [
+      "opened the canal in 1914"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "q07",
+   "question": "On what exact day did the United States take over the Panama Canal project?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient",
+    "i04-class"
+   ],
+   "required_facts": [],
+   "unresolved_detail": "only year 1904 present for the takeover"
+  },
+  {
+   "id": "q08",
+   "question": "In what year did the International Space Station deorbit?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient",
+    "i06-class"
+   ],
+   "required_facts": [],
+   "unresolved_detail": "never occurred: station planned to be de-orbited in the future"
+  },
+  {
+   "id": "q09",
+   "question": "What kind of volcano is Mount Kilimanjaro?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "framing-kind"
+   ],
+   "required_facts": [
+    {
+     "fact": "dormant stratovolcano",
+     "acceptable": [
+      "kili-a1#p1"
+     ],
+     "spans": [
+      "dormant stratovolcano"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "q10",
+   "question": "In which country is Mount Kilimanjaro located?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "framing-country",
+    "location"
+   ],
+   "required_facts": [
+    {
+     "fact": "stratovolcano in Tanzania",
+     "acceptable": [
+      "kili-a1#p1"
+     ],
+     "spans": [
+      "stratovolcano in Tanzania"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "q11",
+   "question": "On what exact day did the Wright brothers make their first controlled, sustained powered flight?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "framing-exact",
+    "date"
+   ],
+   "required_facts": [
+    {
+     "fact": "on December 17, 1903",
+     "acceptable": [
+      "wright-a1#p1"
+     ],
+     "spans": [
+      "on December 17, 1903"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "q12",
+   "question": "On what date did the glaze firing of batch K3 finish?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "dated-section-heading",
+    "synthetic"
+   ],
+   "required_facts": [
+    {
+     "fact": "The firing finished at 18:30 UTC",
+     "acceptable": [
+      "kilnlog-a1#p2"
+     ],
+     "spans": [
+      "The firing finished at 18:30 UTC"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "q13",
+   "question": "Did the glaze firing of batch K4 finish on April 3?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient",
+    "i01-class"
+   ],
+   "required_facts": [],
+   "unresolved_detail": "cooling measurement finished while the firing continued"
+  },
+  {
+   "id": "q14",
+   "question": "On what exact date was the Panama Canal inaugurated, and in what year did the United States take over the canal project?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "compound",
+    "requires-two-passages"
+   ],
+   "required_facts": [
+    {
+     "fact": "inauguration on 15 August 1914",
+     "acceptable": [
+      "panama-a1#p2"
+     ],
+     "spans": [
+      "inauguration on 15 August 1914"
+     ],
+     "answer_polarity": "affirmative"
+    },
+    {
+     "fact": "took over the project in 1904",
+     "acceptable": [
+      "panama-a1#p3"
+     ],
+     "spans": [
+      "took over the project in 1904"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "q15",
+   "question": "Which company operated the Titanic?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "entity"
+   ],
+   "required_facts": [
+    {
+     "fact": "operated by the White Star Line",
+     "acceptable": [
+      "titanic-a1#p2"
+     ],
+     "spans": [
+      "operated by the White Star Line"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "q16",
+   "question": "In what year did the Titanic complete its maiden voyage to New York?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient",
+    "u14-class"
+   ],
+   "required_facts": [],
+   "unresolved_detail": "inverted outcome: it sank and never completed the voyage"
+  }
+ ]
+}

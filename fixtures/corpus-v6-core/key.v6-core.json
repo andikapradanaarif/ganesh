@@ -1,0 +1,642 @@
+{
+ "version": "v6-core",
+ "scoring": "hit requires ok status plus evidence credit; insufficient correct when status insufficient_context",
+ "questions": [
+  {
+   "id": "w01",
+   "question": "On what exact date was the Terracotta Army discovered?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "exact-date",
+    "wiki"
+   ],
+   "required_facts": [
+    {
+     "fact": "discovered 29 March 1974",
+     "acceptable": [
+      "terracottaarmy-a1#p7"
+     ],
+     "spans": [
+      "29 March 1974"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w02",
+   "question": "On what exact date was the first step of the entrance staircase of Tutankhamun's tomb uncovered?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "exact-date",
+    "wiki"
+   ],
+   "required_facts": [
+    {
+     "fact": "step uncovered 4 November 1922",
+     "acceptable": [
+      "tutankhamun-a1#p106"
+     ],
+     "spans": [
+      "4 November 1922"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w03",
+   "question": "How high is the outer wall surrounding the Angkor Wat temple complex in metres?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "decimal-measurement",
+    "wiki"
+   ],
+   "required_facts": [
+    {
+     "fact": "outer wall 4.5 m high",
+     "acceptable": [
+      "angkorwat-a1#p32"
+     ],
+     "spans": [
+      "4.5 m"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w04",
+   "question": "How many items were found in Tutankhamun's tomb?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "count",
+    "wiki"
+   ],
+   "required_facts": [
+    {
+     "fact": "5,398 items found",
+     "acceptable": [
+      "tutankhamun-a1#p110"
+     ],
+     "spans": [
+      "5,398 items"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w05",
+   "question": "In which county were the figures of the Terracotta Army discovered?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "entity-location",
+    "wiki"
+   ],
+   "required_facts": [
+    {
+     "fact": "discovered in Lintong County",
+     "acceptable": [
+      "terracottaarmy-a1#p3"
+     ],
+     "spans": [
+      "Lintong County"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w06",
+   "question": "In what month and year did Tutankhamun's tomb reopen after its restoration closure?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "long-passage",
+    "wiki"
+   ],
+   "required_facts": [
+    {
+     "fact": "reopened February 2019",
+     "acceptable": [
+      "tutankhamun-a1#p110"
+     ],
+     "spans": [
+      "reopened in February 2019"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w07",
+   "question": "On what exact date was the Terracotta Army discovered, and what were the farmers who discovered it digging?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "compound",
+    "exact-date",
+    "wiki"
+   ],
+   "required_facts": [
+    {
+     "fact": "discovered 29 March 1974",
+     "acceptable": [
+      "terracottaarmy-a1#p7"
+     ],
+     "spans": [
+      "29 March 1974"
+     ],
+     "answer_polarity": "affirmative"
+    },
+    {
+     "fact": "digging a well",
+     "acceptable": [
+      "terracottaarmy-a1#p7"
+     ],
+     "spans": [
+      "digging a well"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w08",
+   "question": "On what exact date did France adopt Cambodia as a protectorate, and which country did France invade?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "compound",
+    "exact-date",
+    "split-vocabulary",
+    "wiki"
+   ],
+   "required_facts": [
+    {
+     "fact": "protectorate 11 August 1863",
+     "acceptable": [
+      "angkorwat-a1#p17"
+     ],
+     "spans": [
+      "11 August 1863"
+     ],
+     "answer_polarity": "affirmative"
+    },
+    {
+     "fact": "invaded Siam",
+     "acceptable": [
+      "angkorwat-a1#p17"
+     ],
+     "spans": [
+      "invaded Siam"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w09",
+   "question": "What length of ancient walls in kilometres was relieved of danger of collapse under the Great Pompeii Project?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "decimal-measurement",
+    "wiki"
+   ],
+   "required_facts": [
+    {
+     "fact": "2.5 km of walls relieved",
+     "acceptable": [
+      "pompeii-a1#p54"
+     ],
+     "spans": [
+      "2.5 km"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w10",
+   "question": "How many visitors did Angkor Wat receive in 1993?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "count",
+    "wiki"
+   ],
+   "required_facts": [
+    {
+     "fact": "7,650 visitors in 1993",
+     "acceptable": [
+      "angkorwat-a1#p59"
+     ],
+     "spans": [
+      "7,650 visitors"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w11",
+   "question": "How many years did it take Howard Carter to catalog the items from Tutankhamun's tomb?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "irregular-verb",
+    "count",
+    "wiki"
+   ],
+   "required_facts": [
+    {
+     "fact": "took 10 years to catalog",
+     "acceptable": [
+      "tutankhamun-a1#p110"
+     ],
+     "spans": [
+      "took 10 years"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w12",
+   "question": "Who led the excavation that discovered the tomb of Tutankhamun?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "entity",
+    "wiki"
+   ],
+   "required_facts": [
+    {
+     "fact": "Carter discovered the tomb",
+     "acceptable": [
+      "tutankhamun-a1#p106"
+     ],
+     "spans": [
+      "Carter discovered the actual tomb"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w13",
+   "question": "How long is Pit 1 of the Terracotta Army excavation site in metres?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "measurement",
+    "wiki"
+   ],
+   "required_facts": [
+    {
+     "fact": "Pit 1 is 230 m long",
+     "acceptable": [
+      "terracottaarmy-a1#p14"
+     ],
+     "spans": [
+      "230 m"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w14",
+   "question": "In the 2007 estimates, how many soldiers and how many chariots did the three pits of the Terracotta Army hold?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "compound",
+    "count",
+    "wiki"
+   ],
+   "required_facts": [
+    {
+     "fact": "more than 8,000 soldiers",
+     "acceptable": [
+      "terracottaarmy-a1#p3"
+     ],
+     "spans": [
+      "8,000 soldiers"
+     ],
+     "answer_polarity": "affirmative"
+    },
+    {
+     "fact": "130 chariots",
+     "acceptable": [
+      "terracottaarmy-a1#p3"
+     ],
+     "spans": [
+      "130 chariots"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w15",
+   "question": "How wide is the moat surrounding the Angkor Wat temple complex in metres?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "measurement",
+    "wiki"
+   ],
+   "required_facts": [
+    {
+     "fact": "moat 190 m wide",
+     "acceptable": [
+      "angkorwat-a1#p32"
+     ],
+     "spans": [
+      "190 m"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "w16",
+   "question": "According to alternative accounts, what is the name of the boy credited with discovering the first step of Tutankhamun's tomb?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "entity",
+    "wiki"
+   ],
+   "required_facts": [
+    {
+     "fact": "Hussein Abdul Rasoul",
+     "acceptable": [
+      "tutankhamun-a1#p106"
+     ],
+     "spans": [
+      "Hussein Abdul Rasoul"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "s01",
+   "question": "At what time did the upstream gate seal replacement finish?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "synthetic",
+    "time",
+    "completed-action"
+   ],
+   "required_facts": [
+    {
+     "fact": "finished at 07:55 UTC",
+     "acceptable": [
+      "lockmere-a1#p2"
+     ],
+     "spans": [
+      "finished at 07:55 UTC"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "s02",
+   "question": "At what time did the ground paddle gear lubrication finish?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "synthetic",
+    "time",
+    "completed-action"
+   ],
+   "required_facts": [
+    {
+     "fact": "finished at 12:40 UTC",
+     "acceptable": [
+      "lockmere-a1#p3"
+     ],
+     "spans": [
+      "finished at 12:40 UTC"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "s03",
+   "question": "What did the downstream water gauge read in metres before the first cycle on 9 May?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "synthetic",
+    "decimal-measurement"
+   ],
+   "required_facts": [
+    {
+     "fact": "gauge read 2.35 metres",
+     "acceptable": [
+      "lockmere-a1#p4"
+     ],
+     "spans": [
+      "2.35 metres"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "s04",
+   "question": "How many narrowboats passed through the lock during the day shift on 11 May?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "synthetic",
+    "count"
+   ],
+   "required_facts": [
+    {
+     "fact": "seventeen narrowboats",
+     "acceptable": [
+      "lockmere-a1#p5"
+     ],
+     "spans": [
+      "Seventeen narrowboats"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "s05",
+   "question": "At what time did the final vessel clear the lower gates on 11 May?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "synthetic",
+    "time"
+   ],
+   "required_facts": [
+    {
+     "fact": "cleared at 18:20 UTC",
+     "acceptable": [
+      "lockmere-a1#p5"
+     ],
+     "spans": [
+      "18:20 UTC"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "s06",
+   "question": "At what time did the culvert inspection finish?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "synthetic",
+    "time",
+    "completed-action"
+   ],
+   "required_facts": [
+    {
+     "fact": "finished at 15:10 UTC",
+     "acceptable": [
+      "lockmere-a1#p6"
+     ],
+     "spans": [
+      "finished at 15:10 UTC"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "s07",
+   "question": "At what time was the cracked balance beam on gate two swapped?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "synthetic",
+    "time",
+    "irregular-verb"
+   ],
+   "required_facts": [
+    {
+     "fact": "swapped at 10:25 UTC",
+     "acceptable": [
+      "lockmere-a1#p7"
+     ],
+     "spans": [
+      "swapped at 10:25 UTC"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "s08",
+   "question": "At what time did the downstream gate seal inspection finish?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "synthetic",
+    "time",
+    "completed-action"
+   ],
+   "required_facts": [
+    {
+     "fact": "finished at 09:45 UTC",
+     "acceptable": [
+      "lockmere-a1#p13"
+     ],
+     "spans": [
+      "finished at 09:45 UTC"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "i01",
+   "question": "On what exact calendar date did Carter begin his systematic search for the tomb of Tutankhamun?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "exact-date",
+    "year-only-trap",
+    "wiki"
+   ],
+   "required_facts": []
+  },
+  {
+   "id": "i02",
+   "question": "What was the depth in metres of the well the farmers were digging when they discovered the Terracotta Army?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "missing-measurement",
+    "wiki"
+   ],
+   "required_facts": []
+  },
+  {
+   "id": "i03",
+   "question": "How tall are the terracotta warrior figures in hands?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "wrong-unit",
+    "wiki"
+   ],
+   "required_facts": []
+  },
+  {
+   "id": "i04",
+   "question": "In what year did Yang Zhifa discover the tomb of Tutankhamun?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "false-premise",
+    "entity-swap",
+    "wiki"
+   ],
+   "required_facts": []
+  },
+  {
+   "id": "i05",
+   "question": "At what time was the curing of the new mooring bollard concrete verified?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "unverified-action",
+    "synthetic"
+   ],
+   "required_facts": []
+  },
+  {
+   "id": "i06",
+   "question": "At what time did the repainting of the depth signage on the north chamber wall finish?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "proposed-not-approved",
+    "synthetic"
+   ],
+   "required_facts": []
+  }
+ ]
+}

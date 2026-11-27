@@ -1,0 +1,162 @@
+{
+  "version": "dev.v1",
+  "corpus_version": "corpus.v1",
+  "split": "development",
+  "note": "Development questions target only articles in the dev family (java, php, rust, swift). Used to tune ranking and abstention. Not acceptance evidence.",
+  "questions": [
+    {
+      "id": "d01",
+      "question": "Who initiated the Java language project, and what was the language initially called?",
+      "tags": ["multi"],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": ["1386054413"],
+      "required_facts": [
+        {"fact": "Java language project was initiated by James Gosling, Mike Sheridan, and Patrick Naughton in June 1991", "acceptable": ["1386054413#p2"]},
+        {"fact": "The language was initially called Oak", "acceptable": ["1386054413#p2"]}
+      ]
+    },
+    {
+      "id": "d02",
+      "question": "Which Java versions are supported as long-term support releases?",
+      "tags": ["single"],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": ["1386054413"],
+      "required_facts": [
+        {"fact": "Java 8, 11, 17, 21, and 25 are supported as long-term support (LTS) versions (as of June 2026)", "acceptable": ["1386054413#p5"]}
+      ]
+    },
+    {
+      "id": "d03",
+      "question": "Which companies does the Oracle implementation of Java target, and what acquisition made Oracle the owner of the official Java SE implementation?",
+      "tags": ["single"],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": ["1386054413"],
+      "required_facts": [
+        {"fact": "Oracle Corporation owns the official implementation of the Java SE platform due to its acquisition of Sun Microsystems on January 27, 2010", "acceptable": ["1386054413#p26"]}
+      ]
+    },
+    {
+      "id": "d04",
+      "question": "Who rewrote the PHP parser in 1997, forming the base of PHP 3?",
+      "tags": ["single"],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": ["1387553929"],
+      "required_facts": [
+        {"fact": "Zeev Suraski and Andi Gutmans rewrote the parser in 1997 and formed the base of PHP 3", "acceptable": ["1387553929#p5"]}
+      ]
+    },
+    {
+      "id": "d05",
+      "question": "What is the mascot of the PHP project, and who designed it?",
+      "tags": ["multi"],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": ["1387553929"],
+      "required_facts": [
+        {"fact": "The mascot is the elePHPant, a blue elephant with the PHP logo on its side", "acceptable": ["1387553929#p13"]},
+        {"fact": "The elePHPant was designed by Vincent Pontier in 1998", "acceptable": ["1387553929#p13"]}
+      ]
+    },
+    {
+      "id": "d06",
+      "question": "On what date was PHP 8.0 released?",
+      "tags": ["single"],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": ["1387553929"],
+      "required_facts": [
+        {"fact": "PHP 8.0 was released on 26 November 2020", "acceptable": ["1387553929#p10"]}
+      ]
+    },
+    {
+      "id": "d07",
+      "question": "In Rust, how does a programmer declare a variable that can be modified after creation?",
+      "tags": ["paraphrase"],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": ["1386182972"],
+      "required_facts": [
+        {"fact": "Variables are immutable by default unless the mut keyword is added", "acceptable": ["1386182972#p10"]}
+      ]
+    },
+    {
+      "id": "d08",
+      "question": "Does Rust rely on garbage collection for memory management?",
+      "tags": ["scope", "paraphrase"],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": ["1386182972"],
+      "required_facts": [
+        {"fact": "Rust does not use garbage collection; memory is managed through resource acquisition is initialization (RAII) with optional reference counting / ownership", "acceptable": ["1386182972#p45", "1386182972#p27"]}
+      ]
+    },
+    {
+      "id": "d09",
+      "question": "What is the name of Rust's build system and package manager?",
+      "tags": ["single"],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": ["1386182972"],
+      "required_facts": [
+        {"fact": "Cargo is Rust's build system and package manager", "acceptable": ["1386182972#p57"]}
+      ]
+    },
+    {
+      "id": "d10",
+      "question": "Who created the Swift programming language, and when was it first released?",
+      "tags": ["multi"],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": ["1385265998"],
+      "required_facts": [
+        {"fact": "Swift was created by Chris Lattner in 2010 for Apple Inc.", "acceptable": ["1385265998#p1", "1385265998#p2"]},
+        {"fact": "Swift was first released in June 2014", "acceptable": ["1385265998#p1"]}
+      ]
+    },
+    {
+      "id": "d11",
+      "question": "Which automatic mechanism does Swift use to manage memory instead of tracing garbage collection?",
+      "tags": ["paraphrase"],
+      "expected_status": "ok",
+      "scope": "public",
+      "revisions": ["1385265998"],
+      "required_facts": [
+        {"fact": "Swift uses Automatic Reference Counting (ARC) to manage memory, removing the need for a garbage collector", "acceptable": ["1385265998#p30"]}
+      ]
+    },
+    {
+      "id": "d12",
+      "question": "What is the default maximum heap size of the Java virtual machine in megabytes?",
+      "tags": ["missing", "plausible"],
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "revisions": [],
+      "required_facts": [],
+      "missing_detail": "The Java article discusses automatic memory management and the heap at length but never states a default maximum heap size figure."
+    },
+    {
+      "id": "d13",
+      "question": "What is the default thread stack size in Rust in kilobytes?",
+      "tags": ["missing", "plausible"],
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "revisions": [],
+      "required_facts": [],
+      "missing_detail": "The Rust article mentions values being allocated on the stack by default but never states a thread stack size."
+    },
+    {
+      "id": "d14",
+      "question": "How many apps on the Apple App Store are written primarily in Swift?",
+      "tags": ["missing", "plausible"],
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "revisions": [],
+      "required_facts": [],
+      "missing_detail": "The Swift article mentions the App Store only in relation to Swift 2.0 availability; no count or share of apps is given anywhere in the corpus."
+    }
+  ]
+}

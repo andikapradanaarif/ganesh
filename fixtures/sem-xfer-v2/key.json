@@ -1,0 +1,309 @@
+{
+ "version": "sem-xfer-v2",
+ "scoring": "scoring.v2",
+ "questions": [
+  {
+   "id": "u01",
+   "question": "On what exact day was Napoleon crowned Emperor?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "date",
+    "competing-events"
+   ],
+   "required_facts": [
+    {
+     "fact": "on 2 December 1804",
+     "acceptable": [
+      "napoleon-a1#p56"
+     ],
+     "spans": [
+      "on 2 December 1804"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "u02",
+   "question": "When was Napoleon defeated at Waterloo?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "date",
+    "competing-events"
+   ],
+   "required_facts": [
+    {
+     "fact": "at the Battle of Waterloo in June 1815",
+     "acceptable": [
+      "napoleon-a1#p3"
+     ],
+     "spans": [
+      "at the Battle of Waterloo in June 1815"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "u03",
+   "question": "What was the final cost of the Sydney Opera House construction project?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "quantity",
+    "scope-project"
+   ],
+   "required_facts": [
+    {
+     "fact": "final $102 million cost",
+     "acceptable": [
+      "soh-a1#p38"
+     ],
+     "spans": [
+      "final $102 million cost"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "u04",
+   "question": "How many kilometres of previously unknown sections of the Ming wall were discovered in 2009?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "quantity",
+    "scope-section"
+   ],
+   "required_facts": [
+    {
+     "fact": "180 km of previously unknown sections",
+     "acceptable": [
+      "gwc-a1#p34"
+     ],
+     "spans": [
+      "180 km of previously unknown sections"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "u05",
+   "question": "On which Japanese island is Mount Fuji located?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "location"
+   ],
+   "required_facts": [
+    {
+     "fact": "located on the Japanese island of Honshu",
+     "acceptable": [
+      "fuji-a1#p1"
+     ],
+     "spans": [
+      "located on the Japanese island of Honshu"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "u06",
+   "question": "In which country is Machu Picchu located?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "location"
+   ],
+   "required_facts": [
+    {
+     "fact": "southern  Peru",
+     "acceptable": [
+      "mp-a1#p1"
+     ],
+     "spans": [
+      "southern  Peru"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "u07",
+   "question": "When was the Sydney Opera House formally opened, and what was its final cost?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "compound",
+    "requires-two-passages"
+   ],
+   "required_facts": [
+    {
+     "fact": "formally opened by Queen Elizabeth II on 20 October 1973",
+     "acceptable": [
+      "soh-a1#p2"
+     ],
+     "spans": [
+      "formally opened by Queen Elizabeth II on 20 October 1973"
+     ],
+     "answer_polarity": "affirmative"
+    },
+    {
+     "fact": "final $102 million cost",
+     "acceptable": [
+      "soh-a1#p38"
+     ],
+     "spans": [
+      "final $102 million cost"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "u08",
+   "question": "On what exact day was Napoleon crowned Emperor, and when was he defeated at Waterloo?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "compound",
+    "requires-two-passages",
+    "shared-facts-u01-u02"
+   ],
+   "required_facts": [
+    {
+     "fact": "on 2 December 1804",
+     "acceptable": [
+      "napoleon-a1#p56"
+     ],
+     "spans": [
+      "on 2 December 1804"
+     ],
+     "answer_polarity": "affirmative"
+    },
+    {
+     "fact": "at the Battle of Waterloo in June 1815",
+     "acceptable": [
+      "napoleon-a1#p3"
+     ],
+     "spans": [
+      "at the Battle of Waterloo in June 1815"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "u09",
+   "question": "Who brought Machu Picchu to international attention in 1911?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "entity"
+   ],
+   "required_facts": [
+    {
+     "fact": "Hiram Bingham",
+     "acceptable": [
+      "mp-a1#p3"
+     ],
+     "spans": [
+      "Hiram Bingham"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "u10",
+   "question": "Which river is the largest in the world by discharge volume of water?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "entity"
+   ],
+   "required_facts": [
+    {
+     "fact": "largest river in the world by discharge volume of water",
+     "acceptable": [
+      "amazon-a1#p1"
+     ],
+     "spans": [
+      "largest river in the world by discharge volume of water"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "u11",
+   "question": "On what date did balloon flight K7 finish?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "dated-section-heading",
+    "synthetic"
+   ],
+   "required_facts": [
+    {
+     "fact": "The balloon flight K7 finished at 12:10 UTC",
+     "acceptable": [
+      "opslog-a1#p4"
+     ],
+     "spans": [
+      "The balloon flight K7 finished at 12:10 UTC"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "u12",
+   "question": "On what exact day did construction of the Sydney Opera House begin?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient"
+   ],
+   "required_facts": [],
+   "unresolved_detail": "only stage years (1957-1959 planning, 1959-1963 stage II) present; no exact day in prose"
+  },
+  {
+   "id": "u13",
+   "question": "What is the summit elevation of Mount Fuji in metres?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient"
+   ],
+   "required_facts": [],
+   "unresolved_detail": "elevation value stripped with the infobox/template conversion; sentence reads \"summit elevation of .\""
+  },
+  {
+   "id": "u14",
+   "question": "In what year did Napoleon win the Battle of Waterloo?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient"
+   ],
+   "required_facts": [],
+   "unresolved_detail": "event never occurred: he was defeated at Waterloo in June 1815"
+  }
+ ]
+}

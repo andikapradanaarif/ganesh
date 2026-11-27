@@ -1,0 +1,264 @@
+{
+ "version": "questions.v1",
+ "scoring": {
+  "coverage_min": 6,
+  "coverage_total": 8,
+  "insufficient_min": 5,
+  "insufficient_total": 6
+ },
+ "questions": [
+  {
+   "id": "q01",
+   "question": "On what exact date was the saxophone patented?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "exact-date"
+   ],
+   "required_facts": [
+    {
+     "fact": "patented 28 june 1846",
+     "acceptable": [
+      "saxophone-a1#p1"
+     ],
+     "spans": [
+      "patented on 28 June 1846"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "q02",
+   "question": "In what year did Scipione Maffei write an enthusiastic article about the piano?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "irregular-verb"
+   ],
+   "required_facts": [
+    {
+     "fact": "maffei article 1711",
+     "acceptable": [
+      "piano-a1#p4"
+     ],
+     "spans": [
+      "wrote an enthusiastic article about it in 1711"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "q03",
+   "question": "How many inches of water does a wind pressure of 0.10 psi register as in a pipe organ?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "decimal-measurement"
+   ],
+   "required_facts": [
+    {
+     "fact": "2.75 inches of water",
+     "acceptable": [
+      "pipeorgan-a1#p11"
+     ],
+     "spans": [
+      "2.75 inches of water"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "q04",
+   "question": "How many violins did Charles IX order Andrea Amati to construct?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "count"
+   ],
+   "required_facts": [
+    {
+     "fact": "24 violins",
+     "acceptable": [
+      "violin-a1#p3"
+     ],
+     "spans": [
+      "construct 24 violins for him in 1560"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "q05",
+   "question": "Who invented the theremin?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "entity"
+   ],
+   "required_facts": [
+    {
+     "fact": "lev termen",
+     "acceptable": [
+      "theremin-a1#p2"
+     ],
+     "spans": [
+      "Russian physicist Lev Sergeyevich Termen"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "q06",
+   "question": "Which polycarbonate saxophone is in current production as a low-cost alternative to metal saxophones?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "realized-sibling"
+   ],
+   "required_facts": [
+    {
+     "fact": "vibratosax",
+     "acceptable": [
+      "saxophone-a1#p19"
+     ],
+     "spans": [
+      "Vibratosax is in current production as a low-cost alternative"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "q07",
+   "question": "On what exact date was the saxophone patented, and who invented it?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "compound",
+    "exact-date"
+   ],
+   "required_facts": [
+    {
+     "fact": "patented 28 june 1846",
+     "acceptable": [
+      "saxophone-a1#p1"
+     ],
+     "spans": [
+      "patented on 28 June 1846"
+     ]
+    },
+    {
+     "fact": "adolphe sax inventor",
+     "acceptable": [
+      "saxophone-a1#p1"
+     ],
+     "spans": [
+      "invented by the Belgian instrument maker Adolphe Sax"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "q08",
+   "question": "Who invented the theremin, and in what year was it invented?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "answerable",
+    "compound"
+   ],
+   "required_facts": [
+    {
+     "fact": "lev termen",
+     "acceptable": [
+      "theremin-a1#p2"
+     ],
+     "spans": [
+      "Russian physicist Lev Sergeyevich Termen"
+     ]
+    },
+    {
+     "fact": "invented october 1920",
+     "acceptable": [
+      "theremin-a1#p2"
+     ],
+     "spans": [
+      "invented in October 1920"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "q09",
+   "question": "On what exact calendar date did Scipione Maffei write his enthusiastic article about the piano?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient",
+    "year-only-exact-date"
+   ],
+   "required_facts": []
+  },
+  {
+   "id": "q10",
+   "question": "What is the weight of a typical harpsichord in kilograms?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient",
+    "missing-measurement"
+   ],
+   "required_facts": []
+  },
+  {
+   "id": "q11",
+   "question": "What is the total string tension of a modern grand piano in kilograms?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient",
+    "wrong-unit"
+   ],
+   "required_facts": []
+  },
+  {
+   "id": "q12",
+   "question": "In what year did the Teflon bushing experiment succeed in piano construction?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient",
+    "inverted-outcome"
+   ],
+   "required_facts": []
+  },
+  {
+   "id": "q13",
+   "question": "In what year did Paul Tanner invent the theremin?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient",
+    "entity-swap"
+   ],
+   "required_facts": []
+  },
+  {
+   "id": "q14",
+   "question": "In what year will production of the Grafton acrylic saxophone resume?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "insufficient",
+    "future-unoccurred"
+   ],
+   "required_facts": []
+  }
+ ]
+}

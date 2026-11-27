@@ -1,0 +1,33 @@
+Beacon Point lighthouse service log. Fictional operational log for evaluation use.
+
+== Lamp room April 3 ==
+The lamp rotation inspection finished at 08:20 UTC while the lens cleaning continued.
+Crew logged salt deposits on the northern pane.
+
+== Lens April 4 ==
+The lens cleaning of the main optic finished at 13:45 UTC with all panels clear.
+The lamp rotation drive was re-greased afterward.
+
+== Foghorn April 5 ==
+The foghorn pressure test finished at 10:05 UTC.
+The relief valve passed inspection.
+
+== Tower April 7 ==
+The stairway rust treatment began at 09:00 UTC and finished at 16:30 UTC.
+The handrail bolts were replaced afterward.
+
+== Generator April 8 ==
+The backup generator load test finished at 11:15 UTC with output stable.
+The fuel filter was clean.
+
+== Diaphragm April 10 ==
+The foghorn diaphragm replacement began at 08:40 UTC.
+Crew logged corrosion on the retaining ring.
+
+== Radio April 12 ==
+The radio beacon calibration finished at 14:50 UTC within tolerance.
+The antenna connections were re-sealed.
+
+== Lamp room April 15 ==
+The main lamp was relit at 19:05 UTC after the storm outage.
+The rotation drive ran smoothly.

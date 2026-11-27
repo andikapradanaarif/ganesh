@@ -1,0 +1,17 @@
+The Kestrel high-altitude balloon program is a fictional atmospheric research operation used as labeled synthetic material in the sem-xfer-v2 evaluation packet. This is its flight log.
+
+== Flight March 3 ==
+
+The balloon flight K6 launched at 07:00 UTC. The flight finished at 13:30 UTC and the payload was recovered intact.
+
+== Flight March 4 ==
+
+The balloon flight K7 launched at 07:15 UTC. The telemetry link finished its handshake at 07:45 UTC while the flight continued.
+
+== Flight March 5 ==
+
+The balloon flight K7 finished at 12:10 UTC. The payload was recovered by the ground crew.
+
+== Flight March 6 ==
+
+The balloon flight K8 launched at 06:50 UTC. The flight did not finish before the storm warning grounded operations.

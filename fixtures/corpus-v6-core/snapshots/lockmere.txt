@@ -1,0 +1,49 @@
+Lockmere canal lock operations log. Fictional operational log for evaluation use.
+
+== Gate seals May 6 ==
+The upstream gate seal replacement finished at 07:55 UTC with all bolts torqued.
+Crew logged minor scoring on the lower hinge pin.
+
+== Paddle gear May 7 ==
+The ground paddle gear lubrication finished at 12:40 UTC.
+The grease lines were flushed afterward.
+
+== Water gauge May 9 ==
+The downstream water gauge read 2.35 metres at 06:00 UTC before the first cycle.
+The gauge board was cleaned and recalibrated by 08:15 UTC.
+
+== Vessel count May 11 ==
+Seventeen narrowboats passed through the lock during the day shift.
+The final vessel cleared the lower gates at 18:20 UTC.
+
+== Culvert May 13 ==
+The culvert inspection began at 09:30 UTC and finished at 15:10 UTC.
+Crew logged silt buildup along the northern channel wall.
+
+== Balance beam May 15 ==
+The cracked balance beam on gate two was swapped at 10:25 UTC.
+The old beam was cut up and removed from the wharf.
+
+== Ladder May 16 ==
+The galvanised escape ladder installation began at 08:10 UTC.
+The masonry anchors were still curing at end of shift.
+
+== Bollards May 18 ==
+Four new mooring bollards were cast and bedded at 13:30 UTC.
+The concrete was still green; curing was not verified by end of shift.
+
+== Pump house May 20 ==
+The backpump impeller finished its vibration test at 11:05 UTC within tolerance.
+The discharge valve seals were re-seated afterward.
+
+== Bywash May 22 ==
+The bywash weir drew a reading of 0.82 metres at 07:30 UTC.
+Debris was cleared from the trash screen afterward.
+
+== Signage May 25 ==
+The lock keeper proposed repainting the depth signage at the north chamber wall.
+The proposal was still awaiting approval at the end of the month.
+
+== Gate seals May 27 ==
+The downstream gate seal inspection finished at 09:45 UTC with no leaks found.
+The lock reopened to traffic at 10:05 UTC.

@@ -1,0 +1,659 @@
+{
+ "version": "v6-broad",
+ "scoring": "hit requires ok status plus evidence credit; insufficient correct when status insufficient_context",
+ "questions": [
+  {
+   "id": "b01",
+   "question": "What time of day did the user decide to go jogging?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "personal-notes",
+    "paraphrased-lookup"
+   ],
+   "required_facts": [
+    {
+     "fact": "running moved to early mornings",
+     "acceptable": [
+      "personal_notes-a1#p2"
+     ],
+     "spans": [
+      "early mornings"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "b02",
+   "question": "On what date does the user fly to Lisbon?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "personal-notes",
+    "exact-date"
+   ],
+   "required_facts": [
+    {
+     "fact": "flight 3 November 2026",
+     "acceptable": [
+      "personal_notes-a1#p6"
+     ],
+     "spans": [
+      "3 November 2026"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "b03",
+   "question": "Which irrigation option did the user choose for the balcony in Project A?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "personal-notes",
+    "scoped-qualifier",
+    "project-scope"
+   ],
+   "required_facts": [
+    {
+     "fact": "chose drip line over sprinkler",
+     "acceptable": [
+      "personal_notes-a1#p4"
+     ],
+     "spans": [
+      "chose the drip line over the sprinkler"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "b04",
+   "question": "Which novel did the user abandon partway through?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "personal-notes",
+    "paraphrased-lookup"
+   ],
+   "required_facts": [
+    {
+     "fact": "gave up on Infinite Jest",
+     "acceptable": [
+      "personal_notes-a1#p7"
+     ],
+     "spans": [
+      "Infinite Jest"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "b05",
+   "question": "What version was the Project B controller firmware flashed to?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "project-b",
+    "exact-symbol",
+    "version"
+   ],
+   "required_facts": [
+    {
+     "fact": "firmware version 1.6.2",
+     "acceptable": [
+      "personal_project_b-a1#p3"
+     ],
+     "spans": [
+      "1.6.2"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "b06",
+   "question": "Which relay output controls the fan in the storage room in Project B?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "project-b",
+    "scoped-qualifier",
+    "paraphrased-lookup"
+   ],
+   "required_facts": [
+    {
+     "fact": "north relay channel drives fan",
+     "acceptable": [
+      "personal_project_b-a1#p3"
+     ],
+     "spans": [
+      "north relay channel drives the storage fan"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "b07",
+   "question": "How often does the Project B controller record sensor readings?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "project-b",
+    "paraphrased-lookup"
+   ],
+   "required_facts": [
+    {
+     "fact": "logs every five minutes",
+     "acceptable": [
+      "personal_project_b-a1#p5"
+     ],
+     "spans": [
+      "every five minutes"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "b08",
+   "question": "What error code does deployctl exit with when the --env flag is given an invalid value?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "engineering-rfc",
+    "exact-symbol",
+    "error-code"
+   ],
+   "required_facts": [
+    {
+     "fact": "error ENOINVENV",
+     "acceptable": [
+      "engineering_rfc-a1#p3"
+     ],
+     "spans": [
+      "ENOINVENV"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "b09",
+   "question": "What is the default value of DEPLOYCTL_MAX_PARALLEL when unset?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "engineering-rfc",
+    "exact-symbol",
+    "env-var"
+   ],
+   "required_facts": [
+    {
+     "fact": "defaults to 4",
+     "acceptable": [
+      "engineering_rfc-a1#p4"
+     ],
+     "spans": [
+      "defaults to 4"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "b10",
+   "question": "How long must a canary bake in staging before it can be promoted?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "engineering-rfc",
+    "scoped-qualifier",
+    "staging-scope"
+   ],
+   "required_facts": [
+    {
+     "fact": "bake 30 minutes in staging",
+     "acceptable": [
+      "engineering_rfc-a1#p6"
+     ],
+     "spans": [
+      "bake for at least 30 minutes"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "b11",
+   "question": "What values does the deployctl --env flag accept, and what percentage range does --canary accept?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "engineering-rfc",
+    "compound",
+    "exact-symbol",
+    "cli-flag"
+   ],
+   "required_facts": [
+    {
+     "fact": "env accepts staging or production",
+     "acceptable": [
+      "engineering_rfc-a1#p3"
+     ],
+     "spans": [
+      "staging or production"
+     ],
+     "answer_polarity": "affirmative"
+    },
+    {
+     "fact": "canary 1 to 50",
+     "acceptable": [
+      "engineering_rfc-a1#p3"
+     ],
+     "spans": [
+      "1 to 50"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "b12",
+   "question": "What error string appeared in the worker logs during the 17 August 2026 incident?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "incident-postmortem",
+    "exact-symbol",
+    "error-code"
+   ],
+   "required_facts": [
+    {
+     "fact": "ERR_QUORUM_TIMEOUT in logs",
+     "acceptable": [
+      "incident_postmortem-a1#p3"
+     ],
+     "spans": [
+      "ERR_QUORUM_TIMEOUT"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "b13",
+   "question": "What exact command was run to add capacity during the incident?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "incident-postmortem",
+    "exact-symbol",
+    "command"
+   ],
+   "required_facts": [
+    {
+     "fact": "kubectl scale deploy/relay --replicas=6",
+     "acceptable": [
+      "incident_postmortem-a1#p3"
+     ],
+     "spans": [
+      "kubectl scale deploy/relay --replicas=6"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "b14",
+   "question": "How quickly did the validation alert fire when it was deliberately tested in staging?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "incident-postmortem",
+    "long-passage",
+    "answer-past-word-350"
+   ],
+   "required_facts": [
+    {
+     "fact": "alert fired within ninety seconds",
+     "acceptable": [
+      "incident_postmortem-a1#p3"
+     ],
+     "spans": [
+      "within ninety seconds"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "b15",
+   "question": "At what time were the extra replicas scaled back down after the incident, and to what count?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "incident-postmortem",
+    "long-passage",
+    "compound",
+    "answer-past-word-350"
+   ],
+   "required_facts": [
+    {
+     "fact": "scaled back at 16:02 UTC",
+     "acceptable": [
+      "incident_postmortem-a1#p3"
+     ],
+     "spans": [
+      "16:02 UTC"
+     ],
+     "answer_polarity": "affirmative"
+    },
+    {
+     "fact": "normal count of three",
+     "acceptable": [
+      "incident_postmortem-a1#p3"
+     ],
+     "spans": [
+      "count of three"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "b16",
+   "question": "What value of max_inflight caused the incident, and what value was it corrected to?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "incident-postmortem",
+    "compound",
+    "root-cause"
+   ],
+   "required_facts": [
+    {
+     "fact": "max_inflight 0 caused it",
+     "acceptable": [
+      "incident_postmortem-a1#p2"
+     ],
+     "spans": [
+      "max_inflight value of 0"
+     ],
+     "answer_polarity": "affirmative"
+    },
+    {
+     "fact": "corrected to 250",
+     "acceptable": [
+      "incident_postmortem-a1#p2"
+     ],
+     "spans": [
+      "set max_inflight to 250"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "b17",
+   "question": "What day of the week was the retro moved to?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "meeting-transcript",
+    "meeting-decision"
+   ],
+   "required_facts": [
+    {
+     "fact": "retro moves to Tuesdays",
+     "acceptable": [
+      "meeting_transcript-a1#p2"
+     ],
+     "spans": [
+      "retro moves to Tuesdays"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "b18",
+   "question": "According to the meeting, in which environment was deployctl adopted for use?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "meeting-transcript",
+    "meeting-decision",
+    "scoped-qualifier",
+    "staging-scope"
+   ],
+   "required_facts": [
+    {
+     "fact": "adopted for staging only",
+     "acceptable": [
+      "meeting_transcript-a1#p2"
+     ],
+     "spans": [
+      "adopted for staging only"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "b19",
+   "question": "What was decided about production deploys for the December launch window?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "meeting-transcript",
+    "meeting-decision"
+   ],
+   "required_facts": [
+    {
+     "fact": "production frozen for two weeks",
+     "acceptable": [
+      "meeting_transcript-a1#p2"
+     ],
+     "spans": [
+      "production deploys are frozen for the two weeks"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "b20",
+   "question": "Who mentioned starting morning runs during the meeting?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "meeting-transcript",
+    "paraphrased-lookup",
+    "near-neighbor"
+   ],
+   "required_facts": [
+    {
+     "fact": "Sam started morning runs",
+     "acceptable": [
+      "meeting_transcript-a1#p2"
+     ],
+     "spans": [
+      "Sam: random personal note, I started morning runs"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "b21",
+   "question": "Who verified the staging canary bake item on the release checklist, and at what time?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "release-checklist",
+    "compound",
+    "checklist-completion"
+   ],
+   "required_facts": [
+    {
+     "fact": "verified by Priya",
+     "acceptable": [
+      "release_checklist-a1#p2"
+     ],
+     "spans": [
+      "by Priya"
+     ],
+     "answer_polarity": "affirmative"
+    },
+    {
+     "fact": "at 14:20 UTC",
+     "acceptable": [
+      "release_checklist-a1#p2"
+     ],
+     "spans": [
+      "14:20 UTC"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "b22",
+   "question": "How long did the database migration dry-run take on the staging copy?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "release-checklist",
+    "checklist-completion"
+   ],
+   "required_facts": [
+    {
+     "fact": "dry-run 12 minutes",
+     "acceptable": [
+      "release_checklist-a1#p2"
+     ],
+     "spans": [
+      "12 minutes"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "b23",
+   "question": "What is the current state of the runbook update item on the release checklist?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "release-checklist",
+    "paraphrased-lookup",
+    "started-state"
+   ],
+   "required_facts": [
+    {
+     "fact": "started, draft exists, not verified",
+     "acceptable": [
+      "release_checklist-a1#p3"
+     ],
+     "spans": [
+      "started by Sam"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "b24",
+   "question": "Why is the load-test of the production mirror blocked?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "release-checklist",
+    "blocked-state"
+   ],
+   "required_facts": [
+    {
+     "fact": "blocked waiting for mirror rebuild",
+     "acceptable": [
+      "release_checklist-a1#p4"
+     ],
+     "spans": [
+      "blocked waiting for the mirror environment rebuild"
+     ],
+     "answer_polarity": "affirmative"
+    }
+   ]
+  },
+  {
+   "id": "bi01",
+   "question": "In what year was the migration to autoscaling workers implemented?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "incident-postmortem",
+    "proposed-not-applied"
+   ],
+   "required_facts": []
+  },
+  {
+   "id": "bi02",
+   "question": "During which weekend hours are staging deploys frozen?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "engineering-rfc",
+    "wrong-environment"
+   ],
+   "required_facts": []
+  },
+  {
+   "id": "bi03",
+   "question": "Which airline did the user book for the flight to Lisbon?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "personal-notes",
+    "absent-detail"
+   ],
+   "required_facts": []
+  },
+  {
+   "id": "bi04",
+   "question": "What is the wattage of the power supply for the Project B controller?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "project-b",
+    "missing-measurement"
+   ],
+   "required_facts": []
+  },
+  {
+   "id": "bi05",
+   "question": "When will the team switch to the new issue tracker?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "meeting-transcript",
+    "unmade-decision"
+   ],
+   "required_facts": []
+  },
+  {
+   "id": "bi06",
+   "question": "At what time was the runbook update verified complete?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "release-checklist",
+    "started-not-verified"
+   ],
+   "required_facts": []
+  }
+ ]
+}
