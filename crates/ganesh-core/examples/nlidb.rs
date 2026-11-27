@@ -1,0 +1,36 @@
+fn main() {
+    use candle_core::{Device, Tensor};
+    use candle_nn::VarBuilder;
+    use candle_transformers::models::distilbert::{Config, DistilBertModel};
+    let dir = "fixtures/nli-verifier-model";
+    let config: Config = serde_json::from_str(&std::fs::read_to_string(format!("{dir}/config.json")).unwrap()).unwrap();
+    let tok = tokenizers::Tokenizer::from_file(format!("{dir}/tokenizer.json")).unwrap();
+    let device = Device::Cpu;
+    let vb = unsafe { VarBuilder::from_mmaped_safetensors(&[format!("{dir}/model.safetensors")], candle_core::DType::F32, &device).unwrap() };
+    let model = DistilBertModel::load(vb.pp("distilbert"), &config).unwrap();
+    let pre_w = vb.pp("pre_classifier").get((768, 768), "weight").unwrap();
+    let pre_b = vb.pp("pre_classifier").get(768, "bias").unwrap();
+    let cls_w = vb.pp("classifier").get((3, 768), "weight").unwrap();
+    let cls_b = vb.pp("classifier").get(3, "bias").unwrap();
+    println!("all loaded");
+    let prem = "Mauna Loa — Eruption\nThe next successful ascent was made on January 29, 1834.";
+    let hyp = "Question: When was the ascent? Answer: january 29, 1834";
+    let enc = match tok.encode((prem, hyp), true) { Ok(e) => e, Err(e) => { println!("ENC-ERR: {e}"); return; } };
+    let mut ids: Vec<u32> = enc.get_ids().to_vec();
+    ids.truncate(512);
+    let len = ids.len();
+    println!("encoded len {len}");
+    let input = Tensor::new(ids, &device).unwrap().reshape((1, len)).unwrap();
+    let mask = Tensor::zeros((1, len), candle_core::DType::U8, &device).unwrap();
+    let hidden = match model.forward(&input, &mask) { Ok(h) => h, Err(e) => { println!("FWD-ERR: {e}"); return; } };
+    println!("forward ok {:?}", hidden.dims());
+    let cls = hidden.narrow(1, 0, 1).unwrap().squeeze(1).unwrap();
+    let pre = match cls.matmul(&pre_w.t().unwrap()) { Ok(x) => x, Err(e) => { println!("MM1-ERR: {e}"); return; } };
+    let pre = match pre.broadcast_add(&pre_b) { Ok(x) => x, Err(e) => { println!("BA1-ERR: {e}"); return; } };
+    let pre = pre.relu().unwrap();
+    let logits = match pre.matmul(&cls_w.t().unwrap()) { Ok(x) => x, Err(e) => { println!("MM2-ERR: {e}"); return; } };
+    let logits = match logits.broadcast_add(&cls_b) { Ok(x) => x, Err(e) => { println!("BA2-ERR: {e}"); return; } };
+    let probs = candle_nn::ops::softmax_last_dim(&logits).unwrap();
+    let v: Vec<f32> = probs.flatten_all().unwrap().to_vec1().unwrap();
+    println!("probs: {:?}", v);
+}

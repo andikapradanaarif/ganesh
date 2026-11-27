@@ -126,7 +126,7 @@ pub fn available() -> bool {
 pub fn status_summary() -> String {
     let dir = model_dir();
     let weights = format!("{dir}/model.safetensors");
-    if std::path::Path::new(&weights).exists() && load().is_some() {
+    if std::path::Path::new(&weights).exists() && available() {
         let digest = sha256_prefix(&weights);
         format!("qa-verifier: active (model {dir}, sha256 {digest})")
     } else {
@@ -149,7 +149,7 @@ fn sha256_prefix(path: &str) -> String {
 
 /// Fail-loud guard mirroring the reranker guard.
 pub fn enforce_requirement(caller: &str) {
-    if std::env::var("GANESH_REQUIRE_QA_VERIFIER").ok().as_deref() == Some("1") && load().is_none() {
+    if std::env::var("GANESH_REQUIRE_QA_VERIFIER").ok().as_deref() == Some("1") && !available() {
         eprintln!(
             "FATAL: GANESH_REQUIRE_QA_VERIFIER=1 but the QA verifier model failed to load from `{}` ({caller}). Refusing silent skip.",
             model_dir()

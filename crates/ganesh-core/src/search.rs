@@ -46,11 +46,11 @@ impl Default for RetrievalConfig {
             min_union_coverage: 0.0,
             min_top_coverage: 0.0,
             candidate_limit: 50,
-            quantity_binding: std::env::var("GANESH_QUANTITY_BINDING").map(|v| v == "1").unwrap_or(false),
-            transition_check: std::env::var("GANESH_TRANSITION_CHECK").map(|v| v == "1").unwrap_or(false),
-            proposition_check: std::env::var("GANESH_PROPOSITION_CHECK").map(|v| v == "1").unwrap_or(false),
-            context_chain: std::env::var("GANESH_CONTEXT_CHAIN").map(|v| v == "1").unwrap_or(false),
-            action_check: std::env::var("GANESH_ACTION_CHECK").map(|v| v == "1").unwrap_or(false),
+            quantity_binding: std::env::var("GANESH_QUANTITY_BINDING").map(|v| v != "0").unwrap_or(true),
+            transition_check: std::env::var("GANESH_TRANSITION_CHECK").map(|v| v != "0").unwrap_or(true),
+            proposition_check: std::env::var("GANESH_PROPOSITION_CHECK").map(|v| v != "0").unwrap_or(true),
+            context_chain: std::env::var("GANESH_CONTEXT_CHAIN").map(|v| v != "0").unwrap_or(true),
+            action_check: std::env::var("GANESH_ACTION_CHECK").map(|v| v != "0").unwrap_or(true),
         }
     }
 }

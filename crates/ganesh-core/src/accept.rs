@@ -568,6 +568,83 @@ pub fn exact_date_query(query: &str) -> bool {
 }
 
 
+
+/// Canonical unit aliases keyed by canonical unit. Covers the measurement
+/// units appearing in measurement questions ("in meters", "in km/h", ...).
+const UNIT_ALIASES: &[(&str, &[&str])] = &[
+    ("m", &["m", "meter", "meters", "metre", "metres"]),
+    ("in", &["in", "inch", "inches"]),
+    ("ft", &["ft", "foot", "feet"]),
+    ("km", &["km", "kilometer", "kilometers", "kilometre", "kilometres"]),
+    ("mi", &["mi", "mile", "miles"]),
+    ("nm", &["nm", "nanometer", "nanometers", "nanometre", "nanometres"]),
+    ("cm", &["cm", "centimeter", "centimeters", "centimetre", "centimetres"]),
+    ("mm", &["mm", "millimeter", "millimeters", "millimetre", "millimetres"]),
+    ("kg", &["kg", "kilogram", "kilograms"]),
+    ("g", &["g", "gram", "grams"]),
+    ("km/h", &["km/h", "kmh", "kph", "kilometers per hour", "kilometres per hour"]),
+    ("m/s", &["m/s", "meters per second", "metres per second"]),
+    ("mph", &["mph", "miles per hour"]),
+    ("deg", &["degrees", "degree", "celsius", "fahrenheit"]),
+    ("byte", &["byte", "bytes", "mb", "gb", "kb"]),
+    ("bit", &["bit", "bits"]),
+];
+
+/// Extract the explicitly requested canonical unit from a measurement
+/// question phrased "in <unit>" (word boundary, end-or-punctuation anchored).
+pub fn requested_unit(query: &str) -> Option<&'static str> {
+    let q = query.to_lowercase();
+    for (canon, aliases) in UNIT_ALIASES {
+        for a in *aliases {
+            for form in [format!("in {a}"), format!("in {a}?"), format!("in {a} ")] {
+                if q.contains(&form) {
+                    return Some(canon);
+                }
+            }
+        }
+    }
+    None
+}
+
+/// Does the sentence carry the canonical unit near the given numeric token?
+/// Word-boundary aware; "in" as a unit requires non-word-verb context (we
+/// simply require the alias token to appear within 4 tokens after the digit).
+fn sentence_has_unit_near(sentence: &str, token: &str, canon: &str) -> bool {
+    let toks: Vec<String> = sentence
+        .split_whitespace()
+        .map(|t| {
+            t.trim_matches(|c: char| !c.is_alphanumeric() && c != '.' && c != '/')
+                .trim_end_matches('.')
+                .to_ascii_lowercase()
+        })
+        .collect();
+    let Some(pos) = toks.iter().position(|t| t == token || t.trim_end_matches('.') == token) else {
+        return false;
+    };
+    let aliases = UNIT_ALIASES.iter().find(|(c, _)| *c == canon).map(|(_, a)| *a).unwrap_or(&[]);
+    let window = &toks[pos..toks.len().min(pos + 5)];
+    window.iter().any(|t| aliases.contains(&t.as_str()))
+}
+
+/// Bare 4-digit historical year or "years ago" duration.
+fn is_year_or_duration_token(sentence: &str, token: &str) -> bool {
+    if token.len() == 4 && token.chars().all(|c| c.is_ascii_digit()) {
+        if let Ok(y) = token.parse::<u32>() {
+            if (1000..=2999).contains(&y) {
+                return true;
+            }
+        }
+    }
+    let low = sentence.to_lowercase();
+    low.contains(&format!("{token} years ago")) || low.contains(&format!("{token}-year"))
+}
+
+/// Non-temporal spatial/physical measurement stems: years and durations must
+/// never bind to these.
+const SPATIAL_MEASURE_STEMS: &[&str] = &[
+    "depth", "diamet", "height", "length", "width", "distanc", "altitude", "elevat", "speed",
+];
+
 /// Strict decimal-measurement test: the pure digits.digits token must be
 /// immediately followed (within 1–2 surface tokens) by an explicit measurement
 /// unit, and not immediately preceded by version/release/v/in or a capitalized
@@ -864,6 +941,13 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
                             && !quantifying_window(sentence, &token, &measured_terms, 8)
                         {
                             Some("numeric token outside quantifying window of measured property".to_string())
+                        } else if measured_terms.iter().any(|t| SPATIAL_MEASURE_STEMS.iter().any(|sp| t.starts_with(sp)))
+                            && is_year_or_duration_token(sentence, &token)
+                        {
+                            Some("bare year or duration is not a spatial measurement".to_string())
+                        } else if requested_unit(input.query).is_some_and(|u| !sentence_has_unit_near(sentence, &token, u))
+                        {
+                            Some(format!("requested unit absent near numeric token (question specifies unit)"))
                         } else {
                             None
                         };
@@ -921,9 +1005,18 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
         'outer: for (_pid, verbatim, section, _) in input.passages {
             for sentence in &sentences(verbatim) {
                 let ss = stemmed_query_like(sentence);
-                let event_hit = event_terms.iter().any(|t| {
-                    ss.iter().any(|st| stem_matches_eventually(t, st))
-                });
+                // Substantive event overlap: with 2+ event terms a single
+                // background noun never suffices — require majority overlap.
+                // Hyphen-insensitive eventual-stem matching.
+                let hits = event_terms
+                    .iter()
+                    .filter(|t| ss.iter().any(|st| stem_matches_eventually(t, st)))
+                    .count();
+                let event_hit = if event_terms.len() >= 2 {
+                    hits * 2 >= event_terms.len()
+                } else {
+                    hits >= 1
+                };
                 if crate::search::date_tier(sentence) >= 2.5 && event_hit && !sentence_is_planned(sentence) {
                     tied = true;
                     break 'outer;
@@ -932,9 +1025,15 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
             if crate::search::date_tier(section) >= 2.5 {
                 for sentence in &sentences(verbatim) {
                     let ss = stemmed_query_like(sentence);
-                    let event_hit = event_terms.iter().any(|t| {
-                        ss.iter().any(|st| stem_matches_eventually(t, st))
-                    });
+                    let hits = event_terms
+                        .iter()
+                        .filter(|t| ss.iter().any(|st| stem_matches_eventually(t, st)))
+                        .count();
+                    let event_hit = if event_terms.len() >= 2 {
+                        hits * 2 >= event_terms.len()
+                    } else {
+                        hits >= 1
+                    };
                     if event_hit && !sentence_is_planned(sentence) {
                         tied = true;
                         break 'outer;
@@ -1076,7 +1175,7 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
     }
 
     // ---- state/transition evidence --------------------------------------------
-    if input.transition_check {
+    if input.transition_check && !qa_extractive_question(input.query) {
         if let Some(required) = cue_class_of(&input.terms.to_vec()) {
             let q_env = {
                 let qt = crate::search::query_terms(input.query);
