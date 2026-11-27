@@ -1,0 +1,269 @@
+{
+  "version": "qa-xfer-v1",
+  "scoring": "hit requires ok status plus evidence credit; insufficient correct when status insufficient_context",
+  "questions": [
+    {
+      "id": "q01",
+      "question": "On what exact date did the Golden Gate Bridge open to the public?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [
+        "answerable",
+        "realized-date"
+      ],
+      "required_facts": [
+        {
+          "fact": "opened May 27 1937",
+          "acceptable": [
+            "goldengate-a1#p2"
+          ],
+          "spans": [
+            "May 27, 1937"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "q02",
+      "question": "On what exact date did construction of the Golden Gate Bridge begin?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [
+        "answerable",
+        "irregular-verb"
+      ],
+      "required_facts": [
+        {
+          "fact": "construction began January 5 1933",
+          "acceptable": [
+            "goldengate-a1#p22"
+          ],
+          "spans": [
+            "January 5, 1933"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "q03",
+      "question": "How many mature individuals was the global cheetah population estimated at in 2021?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [
+        "answerable",
+        "count"
+      ],
+      "required_facts": [
+        {
+          "fact": "6,517 mature individuals",
+          "acceptable": [
+            "cheetah-a1#p4"
+          ],
+          "spans": [
+            "6,517"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "q04",
+      "question": "What is the maximum reliably measured speed of a cheetah in km/h?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [
+        "answerable",
+        "decimal-unit"
+      ],
+      "required_facts": [
+        {
+          "fact": "100.1 km/h",
+          "acceptable": [
+            "cheetah-a1#p35"
+          ],
+          "spans": [
+            "100.1 km/h"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "q05",
+      "question": "In which city did Marie Curie found the first Curie Institute?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [
+        "answerable",
+        "entity-lookup"
+      ],
+      "required_facts": [
+        {
+          "fact": "Curie Institute in Paris",
+          "acceptable": [
+            "curie-a1#p4"
+          ],
+          "spans": [
+            "Paris"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "q06",
+      "question": "In which town is the Cheetah Conservation Fund field and research centre located?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [
+        "answerable",
+        "location"
+      ],
+      "required_facts": [
+        {
+          "fact": "Otjiwarongo",
+          "acceptable": [
+            "cheetah-a1#p74"
+          ],
+          "spans": [
+            "Otjiwarongo"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "q07",
+      "question": "On what exact date did construction of the Golden Gate Bridge begin, and on what exact date did it open to the public?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [
+        "answerable",
+        "compound"
+      ],
+      "required_facts": [
+        {
+          "fact": "construction began January 5 1933",
+          "acceptable": [
+            "goldengate-a1#p22"
+          ],
+          "spans": [
+            "January 5, 1933"
+          ],
+          "answer_polarity": "affirmative"
+        },
+        {
+          "fact": "opened May 27 1937",
+          "acceptable": [
+            "goldengate-a1#p2"
+          ],
+          "spans": [
+            "May 27, 1937"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "q08",
+      "question": "In what year did Marie Curie win the Nobel Prize in Physics, and in what year did she win the Nobel Prize in Chemistry?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [
+        "answerable",
+        "compound"
+      ],
+      "required_facts": [
+        {
+          "fact": "1903 Physics",
+          "acceptable": [
+            "curie-a1#p1"
+          ],
+          "spans": [
+            "1903"
+          ],
+          "answer_polarity": "affirmative"
+        },
+        {
+          "fact": "1911 Chemistry",
+          "acceptable": [
+            "curie-a1#p1",
+            "curie-a1#p37"
+          ],
+          "spans": [
+            "1911"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "q09",
+      "question": "In what year did Pierre Curie win the Nobel Prize in Chemistry?",
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "tags": [
+        "insufficient",
+        "entity-swap"
+      ],
+      "required_facts": []
+    },
+    {
+      "id": "q10",
+      "question": "In what year was the Cheetah Conservation Fund founded in South Africa?",
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "tags": [
+        "insufficient",
+        "entity-swap"
+      ],
+      "required_facts": []
+    },
+    {
+      "id": "q11",
+      "question": "In what year did the Asiatic cheetah go extinct?",
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "tags": [
+        "insufficient",
+        "undated-unoccurred"
+      ],
+      "required_facts": []
+    },
+    {
+      "id": "q12",
+      "question": "In what year did Hungary build the rock bed sill near Paks on the Danube?",
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "tags": [
+        "insufficient",
+        "planned-future"
+      ],
+      "required_facts": []
+    },
+    {
+      "id": "q13",
+      "question": "What is the length of a human mitochondrial DNA molecule in nanometers?",
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "tags": [
+        "insufficient",
+        "missing-unit"
+      ],
+      "required_facts": []
+    },
+    {
+      "id": "q14",
+      "question": "In what year did Marie Curie win the Nobel Prize in Literature?",
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "tags": [
+        "insufficient",
+        "false-premise"
+      ],
+      "required_facts": []
+    }
+  ]
+}
