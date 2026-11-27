@@ -104,3 +104,41 @@ fn score_with(enc: &CrossEncoder, question: &str, passage: &str) -> candle_core:
 pub fn available() -> bool {
     MODEL.get_or_init(load).is_some()
 }
+/// Reranker availability status for report certification.
+pub fn status_summary() -> String {
+    let dir = model_dir();
+    let weights = format!("{dir}/model.safetensors");
+    if std::path::Path::new(&weights).exists() && load().is_some() {
+        let digest = ganesh_sha256_prefix(&weights);
+        format!("reranker: active (model {dir}, sha256 {digest})")
+    } else {
+        "reranker: absent (BM25 fallback)".to_string()
+    }
+}
+
+fn ganesh_sha256_prefix(path: &str) -> String {
+    use std::io::Read;
+    let mut f = match std::fs::File::open(path) {
+        Ok(f) => f,
+        Err(_) => return "unknown".to_string(),
+    };
+    let mut buf = Vec::new();
+    if f.read_to_end(&mut buf).is_err() {
+        return "unknown".to_string();
+    }
+    crate::citation::sha256_hex(&buf).chars().take(12).collect()
+}
+
+/// Fail-loud guard: when GANESH_REQUIRE_RERANKER=1 the model must load;
+/// otherwise the process exits non-zero immediately rather than silently
+/// benchmarking a BM25 fallback.
+pub fn enforce_requirement(caller: &str) {
+    if std::env::var("GANESH_REQUIRE_RERANKER").ok().as_deref() == Some("1") && load().is_none() {
+        eprintln!(
+            "FATAL: GANESH_REQUIRE_RERANKER=1 but the reranker model failed to load from `{}` ({caller}). Refusing silent BM25 fallback.",
+            model_dir()
+        );
+        std::process::exit(2);
+    }
+}
+

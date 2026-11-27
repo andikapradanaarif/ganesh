@@ -67,6 +67,7 @@ struct StructuralFinding {
 }
 
 fn main() {
+    ganesh_core::rerank::enforce_requirement("ganesh-bench");
     let args: Vec<String> = std::env::args().collect();
     let mut questions_path = None;
     let mut report_path = None;
@@ -768,6 +769,7 @@ fn run(questions_path: &str, report_path: &str, corpus_dir: &str, details_path: 
         r.push_str(&format!("- scoring specification: `{}` (coverage {}/{}, insufficient {}/{}, adapter total {}, top {})\n", spec.version, spec.evidence_coverage_min, spec.evidence_coverage_total, spec.insufficient_min, spec.insufficient_total, spec.adapter_agreement_total, spec.top_k));
     }
     r.push('\n');
+    r.push_str(&format!("- {}\n", ganesh_core::rerank::status_summary()));
     r.push_str("## Summary\n\n");
     r.push_str(&format!("| Check | Result |\n| --- | --- |\n"));
     r.push_str(&format!("| Evidence coverage | {hits}/{} answerable hits |\n", answerable.len()));

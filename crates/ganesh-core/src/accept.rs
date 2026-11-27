@@ -580,7 +580,7 @@ pub fn unit_adjacent_decimal(sentence: &str, token: &str) -> bool {
         "in", "inch", "inches", "kg", "kilogram", "kilograms", "g", "gram", "grams",
         "lb", "lbs", "ton", "tons", "tonne", "tonnes", "w", "watt", "watts", "kw",
         "mw", "hz", "ghz", "mhz", "mb", "gb", "kb", "byte", "bytes", "%", "percent",
-        "million", "billion", "trillion", "celsius", "fahrenheit",
+        "million", "billion", "trillion", "celsius", "fahrenheit", "m/s", "km/s", "km/h", "mph",
     ];
     const PRE_BLOCKS: &[&str] = &["version", "v", "in", "release", "edition"];
     let toks: Vec<String> = sentence
@@ -678,14 +678,73 @@ pub fn stem_matches_eventually(query_stem: &str, sent_stem: &str) -> bool {
 /// Future/planning cues that prevent a dated sentence from settling a
 /// past-tense "did" question.
 pub const FUTURE_CUES: &[&str] = &[
-    "planned", "plan", "plans", "scheduled", "expected", "projected", "slated",
-    "intended", "proposed", "targeted", "aiming", "will", "would", "tentatively",
+    "planned", "plan", "plans", "planning", "scheduled", "expected", "projected",
+    "slated", "intended", "proposed", "proposal", "targeted", "aiming", "will",
+    "would", "tentatively", "future", "contemplated", "suggested",
 ];
 
 pub fn sentence_is_planned(sentence: &str) -> bool {
     let low = sentence.to_lowercase();
     let toks: Vec<&str> = low.split(|c: char| !c.is_alphabetic()).filter(|w| !w.is_empty()).collect();
-    toks.iter().any(|w| FUTURE_CUES.contains(w)) || low.contains("set to") || low.contains("due to")
+    toks.iter().any(|w| FUTURE_CUES.contains(w))
+        || low.contains("set to")
+        || low.contains("due to")
+        || low.contains("to develop")
+        || low.contains("contract to")
+        || low.contains("selected")
+        || low.contains("awarded")
+}
+
+
+/// Roman numerals and small Arabic mission ordinals usable as distinguishing
+/// mission qualifiers (Artemis III -> iii, Voyager 2 -> 2).
+pub fn mission_qualifiers(query: &str) -> Vec<String> {
+    const ROMAN: &[&str] = &["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x"];
+    let toks: Vec<String> = query
+        .split(|c: char| !c.is_alphanumeric())
+        .filter(|w| !w.is_empty())
+        .map(|w| w.to_string())
+        .collect();
+    let mut out = Vec::new();
+    for (i, t) in toks.iter().enumerate() {
+        let low = t.to_lowercase();
+        // roman numeral or arabic number adjacent to a capitalized proper noun
+        let near_proper = (i > 0 && toks[i - 1].chars().next().map(|c| c.is_ascii_uppercase()).unwrap_or(false))
+            || (i + 1 < toks.len() && toks[i + 1].chars().next().map(|c| c.is_ascii_uppercase()).unwrap_or(false));
+        if near_proper && (ROMAN.contains(&low.as_str()) && low.len() <= 3
+            || t.chars().all(|c| c.is_ascii_digit()) && t.len() <= 2)
+        {
+            out.push(low);
+        }
+    }
+    out.sort();
+    out.dedup();
+    out
+}
+
+/// Normalize hyphenated compounds so de-orbit/deorbit and re-entry/reentry
+/// share token forms.
+pub fn dehyphen(tok: &str) -> String {
+    tok.replace('-', "")
+}
+
+/// Does this sentence text mention the exact mission qualifier in a
+/// proper-noun position (e.g. "Artemis III" / "Voyager 2")? Matches numeral
+/// adjacent to a capitalized token, matching the query's own shape.
+pub fn sentence_mentions_qualifier(sentence: &str, qualifier: &str) -> bool {
+    let toks: Vec<String> = sentence.split_whitespace().map(|w| w.to_string()).collect();
+    for (i, t) in toks.iter().enumerate() {
+        let bare = t.trim_matches(|c: char| !c.is_alphanumeric()).to_lowercase();
+        if bare != qualifier {
+            continue;
+        }
+        let near_proper = (i > 0 && toks[i - 1].trim_matches(|c: char| !c.is_alphanumeric()).chars().next().map(|c| c.is_ascii_uppercase()).unwrap_or(false))
+            || (i + 1 < toks.len() && toks[i + 1].trim_matches(|c: char| !c.is_alphanumeric()).chars().next().map(|c| c.is_ascii_uppercase()).unwrap_or(false));
+        if near_proper {
+            return true;
+        }
+    }
+    false
 }
 
 /// Past-tense occurrence question: did-shaped date/year question.
@@ -875,6 +934,7 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
     // future-modal, abstain with a typed reason.
     if past_tense_date_query(input.query) {
         let framing = crate::search::framing_stems();
+        let qualifiers = mission_qualifiers(input.query);
         let event_terms: Vec<&String> = input
             .terms
             .iter()
@@ -889,12 +949,26 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
             .collect();
         let mut realized = false;
         let mut planned_only = false;
-        for (_pid, verbatim, _section, _) in input.passages {
+        for (_pid, verbatim, section, _) in input.passages {
             for sentence in &sentences(verbatim) {
                 let ss = stemmed_query_like(sentence);
-                let event_hit = event_terms.iter().any(|t| {
-                    ss.iter().any(|st| stem_matches_eventually(t, st))
-                });
+                // Substantive event overlap: at least one action/event stem,
+                // and when the query carries 2+ event terms a single
+                // background noun never suffices — require the verb-class or
+                // majority overlap. Hyphen-insensitive matching.
+                let hits = event_terms
+                    .iter()
+                    .filter(|t| {
+                        ss.iter().any(|st| {
+                            stem_matches_eventually(t, st) || stem_matches_eventually(&dehyphen(t), &dehyphen(st))
+                        })
+                    })
+                    .count();
+                let event_hit = if event_terms.len() >= 2 {
+                    hits * 2 >= event_terms.len()
+                } else {
+                    hits >= 1
+                };
                 if !event_hit {
                     continue;
                 }
@@ -905,6 +979,31 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
                 let dated = has_year || crate::search::date_tier(sentence) >= 1.0;
                 if !dated {
                     continue;
+                }
+                // Subject binding: when the query names a mission/ordinal
+                // qualifier, only a sentence (or its own single-mission
+                // section heading) mentioning that exact qualifier can count.
+                // Sibling missions never transfer realization.
+                if !qualifiers.is_empty() {
+                    let qhit = qualifiers.iter().any(|qv| {
+                        sentence_mentions_qualifier(sentence, qv)
+                            || sentence_mentions_qualifier(section, qv)
+                    });
+                    if !qhit {
+                        continue;
+                    }
+                } else {
+                    // Sub-component distractor guard: a sentence whose section
+                    // names a specific component and which never mentions the
+                    // queried subject itself cannot realize the main subject's
+                    // event.
+                    let subj_hit = input.subject_terms.iter().any(|st| ss.contains(st));
+                    let sec = stemmed_query_like(section);
+                    let section_specific = !section.is_empty()
+                        && input.subject_terms.iter().all(|st| !sec.contains(st));
+                    if !subj_hit && section_specific {
+                        continue;
+                    }
                 }
                 if sentence_is_planned(sentence) {
                     planned_only = true;
@@ -1355,6 +1454,39 @@ mod surgical_fix_tests {
         assert!(past_tense_date_query("In what year did the station deorbit?"));
         assert!(past_tense_date_query("In what year did Artemis III land astronauts on the Moon?"));
         assert!(!past_tense_date_query("What kind of planet is Jupiter?"));
+    }
+}
+
+#[cfg(test)]
+mod occurrence_guard_tests {
+    use super::*;
+
+    #[test]
+    fn mission_qualifier_extraction() {
+        assert_eq!(mission_qualifiers("In what year did Artemis III land astronauts on the Moon?"), vec!["iii"]);
+        assert!(mission_qualifiers("When was Voyager 2 launched?").contains(&"2".to_string()));
+        assert!(mission_qualifiers("What kind of planet is Jupiter?").is_empty());
+    }
+
+    #[test]
+    fn qualifier_sentence_binding() {
+        assert!(sentence_mentions_qualifier("Artemis III is planned for late 2027.", "iii"));
+        assert!(!sentence_mentions_qualifier("Artemis I flew on November 16, 2022.", "iii"));
+        assert!(sentence_mentions_qualifier("Voyager 2 launched on August 20, 1977.", "2"));
+        assert!(!sentence_mentions_qualifier("Voyager 1 launched in September 1977.", "2"));
+    }
+
+    #[test]
+    fn hyphen_insensitive_event_match() {
+        assert!(stem_matches_eventually(&dehyphen("de-orbit"), &dehyphen("deorbit")));
+        assert_eq!(dehyphen("de-orbit"), "deorbit");
+    }
+
+    #[test]
+    fn planned_development_cues() {
+        assert!(sentence_is_planned("In June 2024, NASA selected SpaceX to develop the U.S. Deorbit Vehicle."));
+        assert!(sentence_is_planned("NASA announced a planned date of January 2031 to de-orbit the ISS."));
+        assert!(!sentence_is_planned("Pirs was deorbited on 26 July 2021."));
     }
 }
 
