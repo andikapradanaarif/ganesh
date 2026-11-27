@@ -1,0 +1,3 @@
+== Mesh fleet freeze policy ==
+
+Freeze policy: the production fleet is frozen on weekends. No production rollout of any kind may start between Friday 18:00 and Monday 06:00. The staging fleet is exempt from the weekend freeze.

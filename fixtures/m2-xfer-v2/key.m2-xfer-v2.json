@@ -1,0 +1,420 @@
+{
+ "version": "key.v1",
+ "questions": [
+  {
+   "id": "x01",
+   "question": "What time does the part-time baker start in the morning?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "journal",
+    "paraphrased-lookup",
+    "time"
+   ],
+   "required_facts": [
+    {
+     "fact": "t",
+     "acceptable": [
+      "bakery-journal-a1#p4"
+     ],
+     "spans": [
+      "5:30 am"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "x02",
+   "question": "How much was the oven repair estimate?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "journal",
+    "paraphrased-lookup",
+    "cost"
+   ],
+   "required_facts": [
+    {
+     "fact": "t",
+     "acceptable": [
+      "bakery-journal-a1#p3"
+     ],
+     "spans": [
+      "380 dollars"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "x03",
+   "question": "On what exact date was the cranberry walnut batch first tried?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "journal",
+    "exact-date"
+   ],
+   "required_facts": [
+    {
+     "fact": "t",
+     "acceptable": [
+      "bakery-journal-a1#p5"
+     ],
+     "spans": [
+      "2026-11-08"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "x04",
+   "question": "How long is the planned coast loop ride in total?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "journal",
+    "paraphrased-lookup",
+    "distance"
+   ],
+   "required_facts": [
+    {
+     "fact": "t",
+     "acceptable": [
+      "bikepacking-notes-a1#p1"
+     ],
+     "spans": [
+      "310 kilometres"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "x05",
+   "question": "What time is the outward ferry sailing?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "journal",
+    "time"
+   ],
+   "required_facts": [
+    {
+     "fact": "t",
+     "acceptable": [
+      "bikepacking-notes-a1#p2"
+     ],
+     "spans": [
+      "06:40"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "x06",
+   "question": "What logging decision was made for the export job?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "meeting",
+    "meeting-decision",
+    "paraphrased-lookup"
+   ],
+   "required_facts": [
+    {
+     "fact": "t",
+     "acceptable": [
+      "teamstandup-chat-a1#p1"
+     ],
+     "spans": [
+      "adopt the structured logging format for the export job only"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "x07",
+   "question": "What is the payment webhook retry cap currently verified in production?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "meeting",
+    "count",
+    "scoped-qualifier"
+   ],
+   "required_facts": [
+    {
+     "fact": "t",
+     "acceptable": [
+      "teamstandup-chat-a1#p1"
+     ],
+     "spans": [
+      "capped at 5"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "x08",
+   "question": "Which environment variable controls the per-node rollout timeout?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "rfc",
+    "env-var",
+    "exact-symbol"
+   ],
+   "required_facts": [
+    {
+     "fact": "t",
+     "acceptable": [
+      "meshfleet-runbook-a1#p3"
+     ],
+     "spans": [
+      "MESHCTL_TIMEOUT"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "x09",
+   "question": "What is the exact command for a production mesh rollout?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "rfc",
+    "command",
+    "exact-symbol",
+    "scoped-qualifier"
+   ],
+   "required_facts": [
+    {
+     "fact": "t",
+     "acceptable": [
+      "meshfleet-runbook-a1#p2"
+     ],
+     "spans": [
+      "meshctl rollout --fleet production --ring stable --approve manual"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "x10",
+   "question": "Which error code does meshctl return when ring members fail to acknowledge a rollout?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "rfc",
+    "error-code",
+    "exact-symbol"
+   ],
+   "required_facts": [
+    {
+     "fact": "t",
+     "acceptable": [
+      "meshfleet-runbook-a1#p4"
+     ],
+     "spans": [
+      "ERR_QUORUM_LOST"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "x11",
+   "question": "Which ring does a staging rollout target?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "rfc",
+    "scoped-qualifier"
+   ],
+   "required_facts": [
+    {
+     "fact": "t",
+     "acceptable": [
+      "meshfleet-runbook-a1#p2"
+     ],
+     "spans": [
+      "--ring canary"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "x12",
+   "question": "On what date were the mill certificates archived?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "checklist",
+    "checklist-completion",
+    "exact-date"
+   ],
+   "required_facts": [
+    {
+     "fact": "t",
+     "acceptable": [
+      "supplier-checklist-a1#p2"
+     ],
+     "spans": [
+      "2026-10-30"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "x13",
+   "question": "Which flour was used in the trial bake?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "checklist",
+    "checklist-completion"
+   ],
+   "required_facts": [
+    {
+     "fact": "t",
+     "acceptable": [
+      "supplier-checklist-a1#p2"
+     ],
+     "spans": [
+      "new strong white flour"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "x14",
+   "question": "What was the root cause of the October mesh partition outage?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "postmortem",
+    "root-cause"
+   ],
+   "required_facts": [
+    {
+     "fact": "t",
+     "acceptable": [
+      "outage-postmortem-a1#p3"
+     ],
+     "spans": [
+      "stale ring membership entry"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "x15",
+   "question": "Why did the fallback gateway certificate initially look suspicious during the outage?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "postmortem",
+    "answer-past-word-350",
+    "long-passage"
+   ],
+   "required_facts": [
+    {
+     "fact": "t",
+     "acceptable": [
+      "outage-postmortem-a1#p2"
+     ],
+     "spans": [
+      "rotated the day before"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "x16",
+   "question": "How long did the mesh partition last, and how many edge nodes were isolated?",
+   "expected_status": "ok",
+   "scope": "public",
+   "tags": [
+    "postmortem",
+    "compound",
+    "count"
+   ],
+   "required_facts": [
+    {
+     "fact": "t",
+     "acceptable": [
+      "outage-postmortem-a1#p1"
+     ],
+     "spans": [
+      "47 minutes",
+      "eleven edge nodes"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "xi01",
+   "question": "What time was the export job moved to?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "meeting",
+    "unmade-decision"
+   ],
+   "required_facts": []
+  },
+  {
+   "id": "xi02",
+   "question": "Is automatic operator-managed renewal now used for certificate rotation?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "rfc",
+    "proposed-not-applied"
+   ],
+   "required_facts": []
+  },
+  {
+   "id": "xi03",
+   "question": "What error code does meshctl exit with in the staging weekend freeze?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "rfc",
+    "wrong-environment"
+   ],
+   "required_facts": []
+  },
+  {
+   "id": "xi04",
+   "question": "What amperage does the bakery deck oven draw?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "journal",
+    "missing-measurement"
+   ],
+   "required_facts": []
+  },
+  {
+   "id": "xi05",
+   "question": "Which brand of gravel tyres was fitted for the coast loop?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "journal",
+    "absent-detail"
+   ],
+   "required_facts": []
+  },
+  {
+   "id": "xi06",
+   "question": "Has the weekly delivery slot been agreed with the new flour supplier?",
+   "expected_status": "insufficient_context",
+   "scope": "public",
+   "tags": [
+    "checklist",
+    "started-not-verified"
+   ],
+   "required_facts": []
+  }
+ ]
+}

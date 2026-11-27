@@ -640,3 +640,279 @@ pub fn revision_project(store: &Store, revision: &str) -> String {
         )
         .unwrap_or_else(|_| "public".to_string())
 }
+
+// ---------------------------------------------------------------------------
+// M2 phase 2 — owner inspection, correction, withdrawal and source deletion
+// ---------------------------------------------------------------------------
+
+/// One revision row as presented to the owner API, with computed lifecycle status.
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct OwnerRevisionRow {
+    pub revision: String,
+    pub article_id: String,
+    pub title: String,
+    pub author: String,
+    pub source_type: String,
+    pub project: String,
+    pub scope: String,
+    pub authority: i64,
+    pub occurred_at: String,
+    pub effective_from: String,
+    pub effective_until: String,
+    pub ingested_at: String,
+    pub audience: String,
+    pub supersedes: String,
+    pub superseded_by: String,
+    pub status: String,
+    pub passages: usize,
+    pub claim_key: String,
+}
+
+/// Compute the current successor of a revision chain: the revision that
+/// transitively supersedes `revision`, or empty when `revision` is current.
+pub fn current_successor(store: &Store, revision: &str) -> String {
+    let mut cur = revision.to_string();
+    for _ in 0..64 {
+        let next: Option<String> = store
+            .conn
+            .query_row(
+                "SELECT revision FROM revisions WHERE supersedes = ?1",
+                params![cur],
+                |row| row.get(0),
+            )
+            .ok();
+        match next {
+            Some(n) => cur = n,
+            None => break,
+        }
+    }
+    if cur == revision {
+        String::new()
+    } else {
+        cur
+    }
+}
+
+/// Lifecycle status of one revision for the owner view.
+pub fn revision_status(store: &Store, revision: &str) -> String {
+    let gone: bool = store
+        .conn
+        .query_row("SELECT 1 FROM revisions WHERE revision = ?1", params![revision], |_| Ok(()))
+        .is_err();
+    if gone {
+        return "deleted".to_string();
+    }
+    let revoked_count: i64 = store
+        .conn
+        .query_row(
+            "SELECT COUNT(*) FROM revocations WHERE revision = ?1",
+            params![revision],
+            |row| row.get(0),
+        )
+        .unwrap_or(0);
+    let withdrawn: bool = store
+        .conn
+        .query_row(
+            "SELECT 1 FROM audit_events WHERE revision = ?1 AND event = 'withdraw'",
+            params![revision],
+            |_| Ok(()),
+        )
+        .is_ok();
+    if withdrawn {
+        return "withdrawn".to_string();
+    }
+    if !current_successor(store, revision).is_empty() {
+        return "superseded".to_string();
+    }
+    if revoked_count > 0 {
+        return "revoked".to_string();
+    }
+    "current".to_string()
+}
+
+/// List revisions visible to the given projects, with optional filters.
+pub fn list_revisions(
+    store: &Store,
+    projects: &[String],
+    project: &str,
+    scope: &str,
+    status: &str,
+    source_type: &str,
+) -> Vec<OwnerRevisionRow> {
+    let metas = all_revision_meta(store);
+    let mut out = Vec::new();
+    for m in metas {
+        if !visible_to(store, &m, projects) {
+            continue;
+        }
+        if !project.is_empty() && m.project != project {
+            continue;
+        }
+        if !scope.is_empty() && m.scope != scope {
+            continue;
+        }
+        if !source_type.is_empty() && m.source_type != source_type {
+            continue;
+        }
+        let st = revision_status(store, &m.revision);
+        if !status.is_empty() && st != status {
+            continue;
+        }
+        let title: String = store
+            .conn
+            .query_row(
+                "SELECT title FROM sources WHERE article_id = ?1",
+                params![m.article_id],
+                |row| row.get(0),
+            )
+            .unwrap_or_default();
+        let passages: usize = store
+            .conn
+            .query_row(
+                "SELECT COUNT(*) FROM passages WHERE revision = ?1",
+                params![m.revision],
+                |row| row.get::<_, i64>(0),
+            )
+            .unwrap_or(0) as usize;
+        out.push(OwnerRevisionRow {
+            revision: m.revision.clone(),
+            article_id: m.article_id.clone(),
+            title,
+            author: m.author.clone(),
+            source_type: m.source_type.clone(),
+            project: m.project.clone(),
+            scope: m.scope.clone(),
+            authority: m.authority,
+            occurred_at: m.occurred_at.clone().unwrap_or_default(),
+            effective_from: m.effective_from.clone().unwrap_or_default(),
+            effective_until: m.effective_until.clone().unwrap_or_default(),
+            ingested_at: String::new(),
+            audience: m.audience.clone(),
+            supersedes: m.supersedes.clone().unwrap_or_default(),
+            claim_key: m.claim_key.clone(),
+            superseded_by: current_successor(store, &m.revision),
+            status: st,
+            passages,
+        });
+    }
+    out.sort_by(|a, b| a.revision.cmp(&b.revision));
+    out
+}
+
+/// Audit timeline for one revision (and passages derived from it), newest last.
+pub fn revision_timeline(store: &Store, revision: &str) -> Vec<(String, String, String)> {
+    let mut out = Vec::new();
+    if let Ok(mut stmt) = store
+        .conn
+        .prepare("SELECT ts, event, detail FROM audit_events WHERE revision = ?1 ORDER BY id")
+    {
+        if let Ok(rows) = stmt.query_map(params![revision], |row| {
+            Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?, row.get::<_, String>(2)?))
+        }) {
+            for r in rows.flatten() {
+                out.push(r);
+            }
+        }
+    }
+    out
+}
+
+/// Verbatim passage texts of one revision (owner inspection).
+pub fn revision_passages(store: &Store, revision: &str) -> Vec<(String, String, String)> {
+    let mut out = Vec::new();
+    if let Ok(mut stmt) = store
+        .conn
+        .prepare("SELECT id, section, text FROM passages WHERE revision = ?1 ORDER BY id")
+    {
+        if let Ok(rows) = stmt.query_map(params![revision], |row| {
+            Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?, row.get::<_, String>(2)?))
+        }) {
+            for r in rows.flatten() {
+                out.push(r);
+            }
+        }
+    }
+    out
+}
+
+/// Withdraw a revision everywhere: revocation rows for every project plus the
+/// public sphere, audit-recorded as a distinct owner withdrawal. Reads (current
+/// and as-of) stop surfacing it immediately; history remains inspectable.
+pub fn withdraw_revision(store: &Store, revision: &str) -> Result<(), StoreError> {
+    let mut projects: Vec<String> = vec!["public".to_string()];
+    if let Ok(mut stmt) = store.conn.prepare("SELECT DISTINCT project FROM revisions") {
+        if let Ok(rows) = stmt.query_map([], |row| row.get::<_, String>(0)) {
+            for p in rows.flatten() {
+                if !projects.contains(&p) {
+                    projects.push(p);
+                }
+            }
+        }
+    }
+    let aud: String = store
+        .conn
+        .query_row(
+            "SELECT audience FROM revisions WHERE revision = ?1",
+            params![revision],
+            |row| row.get(0),
+        )
+        .unwrap_or_default();
+    for a in aud.split(',').map(|s| s.trim()).filter(|s| !s.is_empty()) {
+        if !projects.iter().any(|p| p == a) {
+            projects.push(a.to_string());
+        }
+    }
+    for p in &projects {
+        store.conn.execute(
+            "INSERT OR IGNORE INTO revocations (revision, project) VALUES (?1, ?2)",
+            params![revision, p],
+        )?;
+    }
+    store.conn.execute(
+        "INSERT INTO audit_events (ts, event, revision, detail) VALUES (?1, 'withdraw', ?2, ?3)",
+        params![crate::types::now_iso(), revision, format!("owner withdrawal across {} projects", projects.len())],
+    )?;
+    Ok(())
+}
+
+/// Delete an entire source: every revision of the article with all derived
+/// rows (passages, FTS, embeddings, citations), then the source row itself.
+/// Returns (revisions removed, passages removed).
+pub fn delete_source(store: &Store, article_id: &str) -> Result<(usize, usize), StoreError> {
+    let revs: Vec<String> = {
+        let mut stmt = store.conn.prepare("SELECT revision FROM revisions WHERE article_id = ?1")?;
+        stmt.query_map(params![article_id], |row| row.get(0))
+            .map(|r| r.filter_map(|x| x.ok()).collect())
+            .unwrap_or_default()
+    };
+    let mut total_passages = 0usize;
+    let nrevs = revs.len();
+    for rev in &revs {
+        total_passages += delete_revision(store, rev)?;
+    }
+    store.conn.execute("DELETE FROM sources WHERE article_id = ?1", params![article_id])?;
+    store.conn.execute(
+        "INSERT INTO audit_events (ts, event, revision, detail) VALUES (?1, 'delete-source', ?2, ?3)",
+        params![crate::types::now_iso(), article_id, format!("{nrevs} revisions, {total_passages} passages purged")],
+    )?;
+    Ok((nrevs, total_passages))
+}
+
+/// Whether a revision row exists (owner correction ordinal allocation).
+pub fn revision_exists(store: &Store, revision: &str) -> bool {
+    store
+        .conn
+        .query_row("SELECT 1 FROM revisions WHERE revision = ?1", params![revision], |_| Ok(()))
+        .is_ok()
+}
+
+/// Append one audit event (owner API corrections/annotations).
+pub fn insert_audit(store: &Store, event: &str, revision: &str, detail: &str) {
+    store
+        .conn
+        .execute(
+            "INSERT INTO audit_events (ts, event, revision, detail) VALUES (?1, ?2, ?3, ?4)",
+            params![crate::types::now_iso(), event, revision, detail],
+        )
+        .ok();
+}

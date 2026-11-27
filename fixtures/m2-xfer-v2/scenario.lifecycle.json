@@ -1,0 +1,141 @@
+{
+ "steps": [
+  {
+   "import": [
+    "meshfreeze-r1",
+    "ring-ev-a-r1",
+    "ring-ev-b-r1",
+    "ring-claim-r1",
+    "ring-private-r1",
+    "ring-lesson-r1"
+   ]
+  },
+  {
+   "start_server": true
+  },
+  {
+   "expect_search": {
+    "name": "L1.initial-freeze-visible",
+    "key": "key-alpha",
+    "query": "weekend freeze mesh fleet rollouts",
+    "status": "ok",
+    "must_include_rev": [
+     "meshfreeze-r1"
+    ]
+   }
+  },
+  {
+   "import": [
+    "meshfreeze-r2",
+    "meshfreeze-r3"
+   ]
+  },
+  {
+   "expect_search": {
+    "name": "L2.may-asof-old-rule",
+    "key": "key-alpha",
+    "query": "are staging rollouts frozen on weekends",
+    "as_of": "2026-05-15",
+    "status": "ok",
+    "must_include_rev": [
+     "meshfreeze-r1"
+    ],
+    "must_exclude_rev": [
+     "meshfreeze-r2"
+    ]
+   }
+  },
+  {
+   "expect_search": {
+    "name": "L2.current-staging-freeze",
+    "key": "key-alpha",
+    "query": "are staging rollouts frozen on weekends",
+    "as_of": "2026-07-01",
+    "status": "ok"
+   }
+  },
+  {
+   "expect_search": {
+    "name": "L3.multisource-claim-visible",
+    "key": "key-alpha",
+    "query": "ring stable maximum concurrent nodes",
+    "status": "ok",
+    "must_include_rev": [
+     "ring-claim-r1"
+    ]
+   }
+  },
+  {
+   "revoke": {
+    "revision": "ring-ev-a-r1",
+    "project": "alpha"
+   }
+  },
+  {
+   "expect_search": {
+    "name": "L4.claim-survives-one-revocation",
+    "key": "key-alpha",
+    "query": "ring stable maximum concurrent nodes",
+    "status": "ok",
+    "must_include_rev": [
+     "ring-claim-r1"
+    ]
+   }
+  },
+  {
+   "revoke": {
+    "revision": "ring-ev-b-r1",
+    "project": "alpha"
+   }
+  },
+  {
+   "expect_search": {
+    "name": "L5.claim-withheld-after-last-support",
+    "key": "key-alpha",
+    "query": "ring stable maximum concurrent nodes",
+    "status": "insufficient_context",
+    "must_exclude_rev": [
+     "ring-claim-r1"
+    ]
+   }
+  },
+  {
+   "expect_search": {
+    "name": "L6.private-not-visible-to-beta",
+    "key": "key-beta",
+    "query": "capacity projections ring stable Q1 budget",
+    "status": "insufficient_context"
+   }
+  },
+  {
+   "expect_search": {
+    "name": "L6.published-lesson-visible-to-beta",
+    "key": "key-beta",
+    "query": "mesh ring capacity planning concurrent nodes",
+    "status": "ok",
+    "must_include_rev": [
+     "ring-lesson-r1"
+    ]
+   }
+  },
+  {
+   "restart_server": true
+  },
+  {
+   "expect_search": {
+    "name": "L7.restart-zeroleak",
+    "key": "key-beta",
+    "query": "capacity projections ring stable Q1 budget",
+    "status": "insufficient_context"
+   }
+  },
+  {
+   "expect_search": {
+    "name": "L7.restart-claim-still-withheld",
+    "key": "key-alpha",
+    "query": "ring stable maximum concurrent nodes",
+    "status": "insufficient_context"
+   }
+  }
+ ]
+}

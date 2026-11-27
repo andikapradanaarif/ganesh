@@ -1,0 +1,17 @@
+{
+ "keys": {
+  "key-alpha": {
+   "installation": "laptop-a",
+   "projects": [
+    "alpha"
+   ],
+   "owner": true
+  },
+  "key-beta": {
+   "installation": "server-b",
+   "projects": [
+    "beta"
+   ]
+  }
+ }
+}

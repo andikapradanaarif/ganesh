@@ -1,0 +1,14 @@
+{
+  "article_id": "ring-ev-b",
+  "family": null,
+  "passages": [
+    {
+      "chars": 161,
+      "id": "ring-ev-b-r1#p1",
+      "section": "Ring capacity evaluation, field report B",
+      "seq": 1,
+      "text": "Field report B: during the October stress window the production stable ring showed sharply degraded convergence whenever membership exceeded 64 concurrent nodes."
+    }
+  ],
+  "revision": "ring-ev-b-r1"
+}

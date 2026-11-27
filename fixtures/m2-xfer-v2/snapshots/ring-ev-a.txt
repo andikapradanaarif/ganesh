@@ -1,0 +1,3 @@
+== Ring capacity evaluation, lab report A ==
+
+Lab report A: in controlled testing the stable ring maintained clean convergence up to 64 concurrent nodes; beyond 64 nodes convergence time degraded sharply.

@@ -1,0 +1,13 @@
+== Mesh fleet operations reference ==
+
+Cluster operations reference for the meshfleet edge mesh, staging and production fleets.
+
+Deploy a node update with meshctl. The command is `meshctl rollout --fleet staging --ring canary`. For production rollouts the required command is `meshctl rollout --fleet production --ring stable --approve manual`.
+
+Environment variables: MESHCTL_TIMEOUT controls the per-node rollout timeout and defaults to 45 seconds. MESHCTL_MAX_PARALLEL caps concurrent node updates and defaults to 4.
+
+Error codes: meshctl exits with ENODRIFT when a node drifts from its declared ring, and with ERR_QUORUM_LOST when fewer than half the ring members acknowledge a rollout.
+
+Weekend policy: the production fleet is frozen on weekends, staging is exempt, that is the standing rule. During the freeze, production rollouts exit with error code EFRZ-LOCK.
+
+TLS renewal: certificate rotation runs through the meshctl renew command with flag --rolling. The proposed switch to automatic operator-managed renewal was rejected; the team prefers manual approval for every rotation.

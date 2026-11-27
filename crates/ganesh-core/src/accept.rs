@@ -421,6 +421,12 @@ pub struct DecideInput<'a> {
     /// Experiment E (issue #169): positive support must be action-exact or a
     /// justified equivalent for the same subject and scope.
     pub action_check: bool,
+    /// M2 phase 2: wider retrieval-pool context passages scanned ONLY by the
+    /// epistemic guards — disqualifying evidence ("undecided", "exempt",
+    /// "rejected") is decision-relevant wherever it surfaces in the pool,
+    /// even when it is not among the selected answer passages. Never used
+    /// for positive coverage or quantity binding.
+    pub pool_context: &'a [(String, String, String, Vec<String>)],
 }
 
 fn stemmed_query_like(text: &str) -> Vec<String> {
@@ -617,6 +623,16 @@ pub fn canonical_unit(token: &str) -> Option<&'static str> {
         "m/s" => "m/s",
         "mph" => "mph",
         "deg" | "degree" | "degrees" => "deg",
+        "a" | "amp" | "amps" | "ampere" | "amperes" => "a",
+        "ma" => "ma",
+        "v" | "volt" | "volts" => "v",
+        "kwh" => "kwh",
+        "psi" => "psi",
+        "bar" => "bar",
+        "ms" | "millisecond" | "milliseconds" => "ms",
+        "gb" | "gigabyte" | "gigabytes" => "gb",
+        "mb" | "megabyte" | "megabytes" => "mb",
+        "tb" | "terabyte" | "terabytes" => "tb",
         "byte" | "bytes" => "byte",
         "bit" | "bits" => "bit",
         _ => return None,
@@ -1602,6 +1618,193 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
         }
     }
 
+    // ---- M2 phase 2 epistemic framing guards ----------------------------------
+    // Independent typed checks, each conservative (strong-overlap required plus
+    // an affirmative-evidence exception), added BEFORE the semantic coverage
+    // override so the override can never waive them:
+    //  (a) rejection/proposal-only guard for yes/no adoption-state questions
+    //  (b) scope-exemption consistency for scope-qualified questions
+    //  (c) unmade/deferred decision guard for change-target questions
+    let mut epistemic_block = false;
+    {
+        // Content stems of the query excluding framing/env words: overlap with
+        // these ties a guard sentence to the queried subject.
+        let env_stems_q = query_env_stems(input.query);
+        let content_terms: Vec<&String> = input
+            .terms
+            .iter()
+            .filter(|t| !env_stems_q.contains(*t) && t.len() > 2)
+            .collect();
+        // Overlap requires at least two distinct content terms (or one when the
+        // query has only one): a lone shared action verb ("move", "use") must
+        // not tie evidence about an unrelated subject to this query — e.g.
+        // "decided to move the mixing desk sessions" is not a realized decision
+        // about the backup window merely because both use "move".
+        let min_overlap = if content_terms.len() >= 2 { 2 } else { 1 };
+        let overlaps_query = |sent_stemmed: &[String]| -> bool {
+            content_terms.iter().filter(|t| sent_stemmed.contains(*t)).count() >= min_overlap
+        };
+
+        // (a) yes/no adoption/state question + explicit rejection/non-adoption
+        // framing on the queried subject. The answer to "is X now used?" when
+        // the record says "switching to X was rejected" is not an affirmative ok.
+        let ql = input.query.to_lowercase();
+        let yesno = ["is ", "are ", "does ", "do ", "did ", "was ", "were ", "has ", "have ", "had "]
+            .iter()
+            .any(|p| ql.starts_with(p));
+        const ADOPTION_STEMS: &[&str] = &["use", "us", "enabl", "activ", "deploy", "adopt", "live"];
+        let adoption_q = yesno && input.terms.iter().any(|t| ADOPTION_STEMS.contains(&t.as_str()));
+        const REJECTION_MARKERS: &[&str] = &[
+            "rejected", "declined", "not adopted", "never implemented", "never adopted",
+            "proposal only", "not implemented", "never deployed", "wasn't adopted",
+            "vetoed", "never rolled out", "not rolled out", "stayed manual",
+        ];
+        if adoption_q {
+            let mut rejection_hit = false;
+            let mut affirmative_hit = false;
+            for (_, verbatim, _, _) in input.passages.iter().chain(input.pool_context.iter()) {
+                for sentence in &sentences(verbatim) {
+                    let sl = sentence.to_lowercase();
+                    let ss = stemmed_query_like(sentence);
+                    if !overlaps_query(&ss) {
+                        continue;
+                    }
+                    if REJECTION_MARKERS.iter().any(|m| sl.contains(m)) {
+                        rejection_hit = true;
+                    } else if !negated(sentence)
+                        && ss.iter().any(|t| ADOPTION_STEMS.contains(&t.as_str()))
+                    {
+                        affirmative_hit = true;
+                    }
+                }
+            }
+            if rejection_hit && !affirmative_hit {
+                epistemic_block = true;
+                trace.reasons.push(
+                    "rejection-guard: evidence explicitly rejects/non-adopts the queried state; no affirmative adoption evidence".to_string(),
+                );
+            }
+        }
+
+        // (b) scope-exemption consistency: the query names an environment; every
+        // sentence mentioning that environment frames it as exempt/not-covered,
+        // so the rule's fact cannot bind to the queried scope.
+        // Detection is broader than query_env_stems: unambiguous environment
+        // nouns count in any position ("the staging weekend freeze"), while
+        // ambiguous ones (test/dev) keep the preposition-gated reading.
+        let mut guard_env_stems = env_stems_q.clone();
+        {
+            const UNAMBIGUOUS: &[&str] = &["production", "staging", "canary", "qa"];
+            let toks: Vec<String> = ql.split(|c: char| !c.is_alphanumeric()).filter(|w| !w.is_empty()).map(|w| w.to_string()).collect();
+            for t in &toks {
+                if UNAMBIGUOUS.contains(&t.as_str()) {
+                    // Stem through the real stemmer so the guard matches the
+                    // same token form the index carries (staging -> "stage").
+                    for st in crate::search::stemmed_tokens(t) {
+                        guard_env_stems.insert(st);
+                    }
+                }
+            }
+        }
+        if !guard_env_stems.is_empty() {
+            const EXEMPTION_MARKERS: &[&str] = &[
+                "exempt", "does not apply", "do not apply", "not apply", "except",
+                "excluding", "excluded", "not subject", "waiver", "waived",
+                "not covered", "outside the freeze", "not affected",
+            ];
+            let mut env_sentences = 0usize;
+            let mut exempt_sentences = 0usize;
+            for (_, verbatim, _, _) in input.passages.iter().chain(input.pool_context.iter()) {
+                for sentence in &sentences(verbatim) {
+                    let ss = stemmed_query_like(sentence);
+                    if !guard_env_stems.iter().any(|e| ss.contains(e)) {
+                        continue;
+                    }
+                    env_sentences += 1;
+                    let sl = sentence.to_lowercase();
+                    if EXEMPTION_MARKERS.iter().any(|m| sl.contains(m)) {
+                        exempt_sentences += 1;
+                    }
+                }
+            }
+            // Affirmative binding: a sentence mentioning the queried scope that
+            // overlaps the query subject WITHOUT exemption/negation framing —
+            // e.g. "staging rollouts target the canary ring" for a staging
+            // question. Existence of binding evidence overrides the exemption
+            // signal; otherwise an explicit exemption defeats the answer.
+            let mut binding_hit = false;
+            for (_, verbatim, _, _) in input.passages.iter().chain(input.pool_context.iter()) {
+                for sentence in &sentences(verbatim) {
+                    let ss = stemmed_query_like(sentence);
+                    if !guard_env_stems.iter().any(|e| ss.contains(e)) {
+                        continue;
+                    }
+                    if !overlaps_query(&ss) {
+                        continue;
+                    }
+                    let sl = sentence.to_lowercase();
+                    let exempt = EXEMPTION_MARKERS.iter().any(|m| sl.contains(m));
+                    if !exempt && !negated(sentence) {
+                        binding_hit = true;
+                    }
+                }
+            }
+            if env_sentences > 0 && exempt_sentences > 0 && !binding_hit {
+                epistemic_block = true;
+                trace.reasons.push(format!(
+                    "scope-exemption: evidence explicitly exempts the queried scope ({exempt_sentences}/{env_sentences} scope sentences); no affirmative binding"
+                ));
+            }
+        }
+
+        // (c) unmade/deferred decision guard: the query asks for a realized
+        // change target ("what time was X moved to?", "which tracker was
+        // chosen?") while the evidence marks the decision undecided/deferred
+        // and no sentence records a realized decision for it.
+        const CHANGE_PATTERNS: &[&str] = &[
+            "moved to", "changed to", "switched to", "rescheduled", "chosen", "chose",
+            "decided on", "picked", "selected", "new time", "migrated to",
+        ];
+        const INDECISION_MARKERS: &[&str] = &[
+            "undecided", "deferred", "tabled", "no decision", "not yet decided",
+            "still open", "to be decided", "postponed", "no consensus", "unresolved",
+            "put off", "no final decision",
+        ];
+        const DECISION_REALIZED: &[&str] = &[
+            "was moved to", "were moved to", "moved to", "decided to", "decided on",
+            "chose", "chosen", "was selected", "confirmed the move", "rescheduled to",
+        ];
+        let asks_change = CHANGE_PATTERNS.iter().any(|p| ql.contains(p));
+        if asks_change {
+            let mut indecision_hit = false;
+            let mut realized_hit = false;
+            for (_, verbatim, _, _) in input.passages.iter().chain(input.pool_context.iter()) {
+                for sentence in &sentences(verbatim) {
+                    let ss = stemmed_query_like(sentence);
+                    if !overlaps_query(&ss) {
+                        continue;
+                    }
+                    let sl = sentence.to_lowercase();
+                    if INDECISION_MARKERS.iter().any(|m| sl.contains(m)) {
+                        indecision_hit = true;
+                    }
+                    if DECISION_REALIZED.iter().any(|m| sl.contains(m))
+                        && !INDECISION_MARKERS.iter().any(|m| sl.contains(m))
+                        && !negated(sentence)
+                    {
+                        realized_hit = true;
+                    }
+                }
+            }
+            if indecision_hit && !realized_hit {
+                epistemic_block = true;
+                trace.reasons.push(
+                    "unmade-decision: evidence marks the queried change undecided/deferred with no realized decision".to_string(),
+                );
+            }
+        }
+    }
+
     // ---- M2 semantic-aware coverage calibration -------------------------------
     // The coverage gates are lexical by construction: a paraphrased query
     // ("jogging" for a "running" note, "abandon" for "gave up") shares few or
@@ -1619,7 +1822,7 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
         .unwrap_or(1.0);
     // Measurement/quantity questions are excluded: a missing measurement is
     // exact-evidence territory, and dense retrieval must never conjure one.
-    if input.dense_support && !input.quantity_question {
+    if input.dense_support && !input.quantity_question && !epistemic_block {
         if let Some(m) = trace.qa_margin {
             if m.is_finite() && m >= override_margin {
                 trace.reasons.retain(|r| {
@@ -1673,6 +1876,7 @@ mod sufficiency_tests {
             proposition_check: false,
             context_chain: true,
             action_check: false,
+            pool_context: &[],
         };
         decide(&input)
     }
@@ -1762,6 +1966,7 @@ mod sufficiency_tests {
             proposition_check: false,
             context_chain: true,
             action_check: false,
+            pool_context: &[],
         };
         let tr = decide(&input);
         assert!(!tr.reasons.iter().any(|r| r.contains("exact-date-precision")), "tied tier-3 must satisfy: {:?}", tr.reasons);
@@ -1791,6 +1996,7 @@ mod sufficiency_tests {
             proposition_check: false,
             context_chain: true,
             action_check: false,
+            pool_context: &[],
         };
         let tr = decide(&input);
         assert!(tr.reasons.iter().any(|r| r.contains("exact-date-precision")), "year-only must fail precision: {:?}", tr.reasons);
@@ -1885,5 +2091,108 @@ mod occurrence_guard_tests {
         assert!(sentence_is_planned("NASA announced a planned date of January 2031 to de-orbit the ISS."));
         assert!(!sentence_is_planned("Pirs was deorbited on 26 July 2021."));
     }
-}
 
+#[cfg(test)]
+mod m2p2_guard_tests {
+    use super::*;
+
+    fn mkpass(text: &str) -> Vec<(String, String, String, Vec<String>)> {
+        vec![("p1".to_string(), text.to_string(), String::new(), Vec::new())]
+    }
+
+    fn decide_q(query: &str, terms: Vec<String>, text: &str) -> AcceptanceTrace {
+        let passages = mkpass(text);
+        let nosubj = std::collections::BTreeSet::new();
+        let input = DecideInput {
+            query,
+            terms: &terms,
+            subject_terms: &nosubj,
+            passages: &passages,
+            idf_union_coverage: 1.0,
+            union_coverage: 1.0,
+            top_coverage: 1.0,
+            min_idf_union_coverage: 0.75,
+            min_union_coverage: 0.0,
+            min_top_coverage: 0.0,
+            quantity_question: false,
+            quantity_unit_missing: false,
+            any_numeric_token: true,
+            quantity_binding: true,
+            dense_support: true,
+            transition_check: false,
+            proposition_check: false,
+            context_chain: true,
+            action_check: false,
+            pool_context: &[],
+        };
+        decide(&input)
+    }
+
+    #[test]
+    fn unmade_decision_guard_fires() {
+        let text = "[2026-10-05 20:45] tom: undecided: whether we move the backup window from 03:00 to 02:00. nobody picked it up";
+        let tr = decide_q("What time was the backup window moved to?",
+            vec!["time".into(), "backup".into(), "window".into(), "move".into()], text);
+        eprintln!("xi02 reasons: {:?}", tr.reasons);
+        assert!(tr.reasons.iter().any(|r| r.starts_with("unmade-decision")), "guard should fire: {:?}", tr.reasons);
+    }
+
+    #[test]
+    fn rejection_guard_fires() {
+        let text = "The proposed-but-rejected fix of switching to cert-manager operator mode was rejected because the team prefers the static manifest workflow.";
+        let tr = decide_q("Is cert-manager operator mode now used for renewals?",
+            vec!["cert".into(), "manager".into(), "operator".into(), "mode".into(), "use".into(), "renewal".into()], text);
+        eprintln!("xi03 reasons: {:?}", tr.reasons);
+        assert!(tr.reasons.iter().any(|r| r.starts_with("rejection-guard")), "guard should fire: {:?}", tr.reasons);
+    }
+
+#[test]
+    fn m2p2_real_text_xi02() {
+        let text = std::fs::read_to_string("/tmp/xferdbg/passages/ops-chat.json").unwrap();
+        let parsed: serde_json::Value = serde_json::from_str(&text).unwrap();
+        let verbatim = parsed["passages"][0]["text"].as_str().unwrap().to_string();
+        let q = "What time was the backup window moved to?";
+        let terms = crate::search::stemmed_tokens(q);
+        eprintln!("REAL terms xi02: {:?}", terms);
+        let passages = vec![("p1".to_string(), verbatim.clone(), String::new(), Vec::new())];
+        let nosubj = std::collections::BTreeSet::new();
+        let input = DecideInput {
+            query: q,
+            terms: &terms,
+            subject_terms: &nosubj,
+            passages: &passages,
+            idf_union_coverage: 1.0,
+            union_coverage: 1.0,
+            top_coverage: 1.0,
+            min_idf_union_coverage: 0.75,
+            min_union_coverage: 0.0,
+            min_top_coverage: 0.0,
+            quantity_question: false,
+            quantity_unit_missing: false,
+            any_numeric_token: true,
+            quantity_binding: true,
+            dense_support: true,
+            transition_check: false,
+            proposition_check: false,
+            context_chain: true,
+            action_check: false,
+            pool_context: &[],
+        };
+        let tr = decide(&input);
+        eprintln!("REAL xi02 reasons: {:?}", tr.reasons);
+        // print sentence splitting of the real passage
+        for s in sentences(&verbatim) {
+            eprintln!("  sent: {}", &s[..s.len().min(120)]);
+        }
+    }
+
+    #[test]
+    fn scope_exemption_guard_fires() {
+        let text = "Weekend policy: the production namespace is frozen on weekends, staging is exempt, that is the standing rule. During the freeze production rollouts exit with error code EFRZ.";
+        let tr = decide_q("What error code does deployctl exit with in the staging weekend freeze?",
+            vec!["error".into(), "code".into(), "deployctl".into(), "exit".into(), "stag".into(), "weekend".into(), "freeze".into()], text);
+        eprintln!("xi06 reasons: {:?}", tr.reasons);
+        assert!(tr.reasons.iter().any(|r| r.starts_with("scope-exemption")), "guard should fire: {:?}", tr.reasons);
+    }
+}
+}

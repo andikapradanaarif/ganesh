@@ -1,0 +1,3 @@
+== Ring capacity evaluation, field report B ==
+
+Field report B: during the October stress window the production stable ring showed sharply degraded convergence whenever membership exceeded 64 concurrent nodes.

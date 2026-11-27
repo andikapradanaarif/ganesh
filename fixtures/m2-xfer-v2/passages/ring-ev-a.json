@@ -1,0 +1,14 @@
+{
+  "article_id": "ring-ev-a",
+  "family": null,
+  "passages": [
+    {
+      "chars": 158,
+      "id": "ring-ev-a-r1#p1",
+      "section": "Ring capacity evaluation, lab report A",
+      "seq": 1,
+      "text": "Lab report A: in controlled testing the stable ring maintained clean convergence up to 64 concurrent nodes; beyond 64 nodes convergence time degraded sharply."
+    }
+  ],
+  "revision": "ring-ev-a-r1"
+}

@@ -1,0 +1,14 @@
+{
+  "article_id": "ring-lesson",
+  "family": null,
+  "passages": [
+    {
+      "chars": 153,
+      "id": "ring-lesson-r1#p1",
+      "section": "Published operations lesson",
+      "seq": 1,
+      "text": "Published lesson: mesh rings should plan capacity so membership stays well below 64 concurrent nodes; beyond that threshold convergence degrades sharply."
+    }
+  ],
+  "revision": "ring-lesson-r1"
+}

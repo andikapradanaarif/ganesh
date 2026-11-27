@@ -1,0 +1,14 @@
+{
+  "article_id": "meshfreeze",
+  "family": null,
+  "passages": [
+    {
+      "chars": 194,
+      "id": "meshfreeze-r3#p1",
+      "section": "Mesh fleet freeze policy",
+      "seq": 1,
+      "text": "Freeze policy: the production fleet is frozen on weekends. No production rollout of any kind may start between Friday 18:00 and Monday 06:00. The staging fleet is exempt from the weekend freeze."
+    }
+  ],
+  "revision": "meshfreeze-r3"
+}
