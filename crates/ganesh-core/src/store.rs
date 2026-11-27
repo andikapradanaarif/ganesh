@@ -277,11 +277,22 @@ impl Store {
             count += 1;
         }
         // Rebuild dense embeddings alongside FTS so the two stay in sync.
+        // Passage text is immutable and the embedder deterministic, so rows
+        // that already carry a vector are correct by construction — only
+        // embed the missing ones (incremental) instead of re-computing all.
         if crate::embed::available() && !embed_rows.is_empty() {
-            self.conn.execute("DELETE FROM embeddings", [])?;
-            let rendered: Vec<String> = embed_rows.iter().map(|(_, r)| r.clone()).collect();
+            let mut have: std::collections::HashSet<String> = std::collections::HashSet::new();
+            if let Ok(mut hstmt) = self.conn.prepare("SELECT passage_id FROM embeddings") {
+                if let Ok(hrows) = hstmt.query_map([], |row| row.get::<_, String>(0)) {
+                    for h in hrows.flatten() {
+                        have.insert(h);
+                    }
+                }
+            }
+            let missing: Vec<(String, String)> = embed_rows.into_iter().filter(|(id, _)| !have.contains(id)).collect();
+            let rendered: Vec<String> = missing.iter().map(|(_, r)| r.clone()).collect();
             if let Some(vectors) = crate::embed::embed_batch(&rendered) {
-                for ((id, _), v) in embed_rows.iter().zip(vectors.iter()) {
+                for ((id, _), v) in missing.iter().zip(vectors.iter()) {
                     let blob: Vec<u8> = v.iter().flat_map(|x| x.to_le_bytes()).collect();
                     self.conn.execute(
                         "INSERT OR REPLACE INTO embeddings (passage_id, vector) VALUES (?1, ?2)",

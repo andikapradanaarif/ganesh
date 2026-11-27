@@ -88,6 +88,44 @@ pub fn score_batch(question: &str, passages: &[String]) -> Option<Vec<f32>> {
         sorted.push(std::mem::take(&mut items[i]));
     }
     let mut items = sorted;
+    // Chunked batching: cross-encoder scoring is per-passage independent, so
+    // chunks of at most 8 produce identical scores while capping transient
+    // activation memory (batch x seq x hidden dominates peak RSS).
+    const CHUNK: usize = 8;
+    if items.len() > CHUNK {
+        let mut out = vec![0f32; items.len()];
+        let mut start = 0;
+        while start < items.len() {
+            let end = (start + CHUNK).min(items.len());
+            let chunk_items: Vec<(Vec<i64>, Vec<i64>, Vec<i64>)> = items[start..end].iter().map(|(a, b, c)| (a.clone(), b.clone(), c.clone())).collect();
+            let maxlen = chunk_items.iter().map(|(ids, _, _)| ids.len()).max().unwrap_or(1);
+            let mut ids_flat: Vec<i64> = Vec::new();
+            let mut types_flat: Vec<i64> = Vec::new();
+            let mut mask_flat: Vec<i64> = Vec::new();
+            for (ids, types, mask) in chunk_items.into_iter() {
+                let pad = maxlen - ids.len();
+                ids_flat.extend(ids.iter().cloned().chain(std::iter::repeat(0).take(pad)));
+                types_flat.extend(types.iter().cloned().chain(std::iter::repeat(0).take(pad)));
+                mask_flat.extend(mask.iter().cloned().chain(std::iter::repeat(0).take(pad)));
+            }
+            let shape = vec![end - start, maxlen];
+            let ids_t = Tensor::from_array((shape.clone(), ids_flat)).ok()?;
+            let types_t = Tensor::from_array((shape.clone(), types_flat)).ok()?;
+            let mask_t = Tensor::from_array((shape, mask_flat)).ok()?;
+            let mut session = enc.session.lock().ok()?;
+            let outputs = session.run(ort::inputs![ids_t, mask_t, types_t]).ok()?;
+            let (_shape, data) = outputs[0].try_extract_tensor::<f32>().ok()?;
+            for pos in 0..(end - start) {
+                out[start + pos] = data.get(pos).cloned().unwrap_or(0.0);
+            }
+            start = end;
+        }
+        let mut final_out = vec![0f32; items.len()];
+        for (pos, &orig) in order.iter().enumerate() {
+            final_out[orig] = out[pos];
+        }
+        return Some(final_out);
+    }
     let batch = items.len();
     let maxlen = items.iter().map(|(ids, _, _)| ids.len()).max().unwrap_or(1);
     let mut ids_flat: Vec<i64> = Vec::with_capacity(batch * maxlen);

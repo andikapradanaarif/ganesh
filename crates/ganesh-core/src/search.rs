@@ -305,6 +305,17 @@ pub fn stemmed_index_text_meta(title: &str, section: &str, text: &str, occurred:
 /// Context-header rendering for the embedded and reranked view. The verbatim
 /// passage text returned to callers is never modified.
 pub fn rendered_context_text(occurred: &str, source_type: &str, author: &str, title: &str, section: &str, text: &str) -> String {
+    // Corpora without M2 temporal/provenance metadata (all M1 fixtures) keep
+    // the exact pre-M2 cross-encoder input bit-for-bit so certified scores
+    // reproduce; the structured header only applies when metadata exists.
+    if occurred.is_empty() && source_type.is_empty() && author.is_empty() {
+        return match (title.is_empty(), section.is_empty()) {
+            (false, false) => format!("{title} — {section}\n{text}"),
+            (false, true) => format!("{title}\n{text}"),
+            (true, false) => format!("{section}\n{text}"),
+            (true, true) => text.to_string(),
+        };
+    }
     let mut parts: Vec<String> = Vec::new();
     if !occurred.is_empty() {
         parts.push(occurred.to_string());
