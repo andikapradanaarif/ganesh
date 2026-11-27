@@ -1,0 +1,345 @@
+ 
+
+BepiColombo () is a joint mission of the European Space Agency (ESA) and the Japan Aerospace Exploration Agency (JAXA) which, in 2026, became the second mission ever to enter orbit around the planet Mercury, the first being MESSENGER. It comprises two orbiters: the Mercury Planetary Orbiter (MPO), built and operated by ESA, and Mio (Mercury Magnetospheric Orbiter, MMO), built and operated by JAXA. Together the spacecraft will perform a comprehensive study of Mercury, including characterization of its magnetic field, magnetosphere, and both interior and surface structure.
+
+== Overview ==
+
+=== Mission ===
+BepiColombo was launched on an Ariane 5 rocket on 20 October 2018, with a Mercury orbit insertion planned for December 2025 following one flyby of the Earth, two flybys of Venus, and six flybys of Mercury.thumb|left|BepiColombo in cruise configuration
+During launch and the cruise phase to reach Mercury, the orbiters were in a stacked configuration with two additional components: the Mercury Transfer Module (MTM), which provided power and solar electric propulsion for the cruise, and the Magnetospheric Orbiter Sunshield and Interface (MOSIF), which protects Mio from the harsh solar radiation until it is deployed. In 2024, a power-related anomaly limited the thrust of the probe's solar electric propulsion system, delaying its arrival at Mercury until November 2026.
+
+During the probe's final approach phase to Mercury, the MTM was jettisoned on 3&nbsp;September 2026, and the orbit insertion procedure for the MPO+MMO (Mio) stack was conducted at Mercury using a planned weak stability capture on 21 November 2026. However, a software glitch resulted in a shorter-than-planned thruster burn, causing the probe to orbit Mercury along a path that is longer than what was planned.
+
+MOSIF will be detached from MPO on 16 December 2026 after the Japanese orbiter MMO (Mio) is deployed as originally planned on 9 December 2026 (UTC). The scientific phase of the mission is expected to begin in April 2027.
+
+=== Spacecraft ===
+thumb|left|Four components of BepiColombo
+The mission involves four components, including two orbiters which will separate into independent spacecraft upon arrival at Mercury:
+
+* Mercury Transfer Module (MTM), providing chemical and solar electric propulsion up until the stacked probe's final approach to Mercury, built by ESA
+* Mercury Planetary Orbiter (MPO), built by ESA
+* Mercury Magnetospheric Orbiter (MMO) or Mio, by JAXA
+* Magnetospheric Orbiter Sunshield and Interface (MOSIF) to protect Mio during the probe's cruise, by ESA
+
+During the launch and cruise phases, these four components were joined to form the Mercury Composite Spacecraft (MCS).
+
+=== Team ===
+ESA is responsible for the overall mission, the design, development assembly and test of the propulsion and MPO modules, and the launch. The two orbiters are operated by mission controllers based in Darmstadt, Germany. The first spacecraft operations manager of BepiColombo was Elsa Montagnon, who held the position until she was promoted to mission manager by the second Mercury flyby on June 2022. Her deputy Emanuela Bordoni acted as operations manager shortly after the second Mercury flyby, and Montagnon's post was replaced by Ignacio Clerigo by 20 June 2023. ESA's Cebreros, Spain  ground station is the primary ground facility for communications during all mission phases.
+
+=== Naming ===
+BepiColombo is named after Giuseppe "Bepi" Colombo (1920–1984), a scientist, mathematician, and engineer at the University of Padua, Italy, who proposed the interplanetary gravity assist manoeuvre used by the 1974 Mariner 10 mission, a technique often used since then by other planetary probes.
+
+Mio, the name of the Mercury Magnetospheric Orbiter, was selected from thousands of suggestions by the Japanese public. In Japanese, mio () means a waterway, and according to JAXA, it symbolizes the research and development milestones reached thus far, and wishes for safe travel ahead. JAXA said the spacecraft will travel through the solar wind just like a ship traveling through the ocean. In Chinese and Japanese, Mercury is known as the "water star" () according to wǔxíng.
+
+=== Scientific objectives ===
+The main objectives of the mission are:
+
+* Study the origin and evolution of a planet close to its parent star
+* Study Mercury's form, interior, structure, geology, composition and craters
+* Investigate Mercury's exosphere, composition and dynamics, including generation and escape
+* Study the structure and dynamics of Mercury's magnetosphere
+* Investigate the origin of Mercury's magnetic field
+* Test Einstein's theory of general relativity by measuring the parameters gamma and beta of the parameterized post-Newtonian formalism with high accuracy.
+
+Mercury is too small and hot for its gravity to retain any significant atmosphere for long periods, but it has a tenuous surface-bounded exosphere containing hydrogen, helium, oxygen, sodium, calcium, potassium, and other trace elements. Its exosphere is not stable as atoms are continuously lost and replenished from a variety of sources. The mission will study the exosphere composition and dynamics, including generation and escape.
+
+The orbiters are equipped with scientific instruments provided by various European countries and Japan. The mission is designed to characterize the solid and liquid iron core ( of the planet's radius) and determine the size of each as well as to perform gravitational and magnetic field mappings. Russia provided the gamma ray and neutron spectrometer (MGNS) to test the presence of water ice in polar craters that are permanently in shadow from the Sun's rays.
+
+== History ==
+thumb|upright=1.0|right|BepiColombo, imaged at [[Northolt Branch Observatories, 16 hours after the Earth flyby. The bright satellite passing by is INSAT-2D.]]
+thumb|Venus during the 15 October 2020 flyby
+thumb|Mercury on 23 June 2022 during the 2nd gravity assist at the planet
+
+=== Before launch ===
+The BepiColombo mission proposal was selected by ESA in 2000. A request for proposals for the science payload was issued in 2004. In 2007, Astrium (now Airbus Defence and Space) was selected as the prime contractor, and Ariane 5 chosen as the launch vehicle. The mission was approved in November 2009, after years in proposal and planning as part of the European Space Agency's Horizon 2000+ programme. The initial target launch of July 2014 was postponed several times, mostly because of delays on the development of the solar electric propulsion system. In 2017, the spacecraft's cost was estimated at €1.65 billion (US$ billion).
+
+=== Launch ===
+The two orbiters were successfully launched together on 20&nbsp;October 2018. The launch took place on Ariane flight VA245 from Europe's Spaceport in Kourou, French Guiana.
+
+=== Gravity-assist maneuvers ===
+thumb|Mercury on 5 September 2024 during the 4th gravity assist at the planet
+thumb|Mercury in mid-infrared light, 1&nbsp;December 2024
+thumb|Mercury's north pole on 8&nbsp;January 2025 during the 6th and final gravity assist at the planet
+
+The stacked spacecraft left Earth with a hyperbolic excess velocity of . Initially, the craft was placed in a heliocentric orbit similar to Earth's. After both the spacecraft and Earth completed one and a half orbits, it returned to Earth to perform a gravity-assist maneuver and was deflected towards Venus.
+
+Following its Earth flyby in April 2020, BepiColombo was briefly mistaken for a near-Earth asteroid, receiving the provisional designation .
+
+Two consecutive Venus flybys reduced the perihelion near the Sun–Mercury distance with almost no need for thrust. A sequence of six Mercury flybys lowered the relative velocity to . After the fourth Mercury flyby in 2024, the spacecraft was in an orbit similar to that of Mercury and lingered in the general vicinity of the planet.
+
+=== Science during Venus flybys ===
+After the potential biomarker phosphine was tentatively discovered in the Venusian atmosphere in September 2020, ESA scientists suggested that BepiColombo might be able to detect the compound during its two Venus flybys in 2020 and 2021. However, it was not clear if the spacecraft's instruments were sufficiently sensitive and there has been no announcement of results. Since then, the claimed September 2020 detection has been disputed by follow-up studies.
+
+During the first Venus flyby in October 2020, seven science instruments and a radiation monitor onboard the Mercury Planetary Orbiter, and three instruments onboard Mio, were active and gathering data. The observations were coordinated with JAXA's Akatsuki, the only active spacecraft orbiting Venus at that time, as well as Earth-based observatories.
+
+The second Venus flyby in August 2021 happened only 33 hours after another interplanetary spacecraft by ESA, Solar Orbiter, completed its gravity assist at the same planet. Both spacecraft used their science instruments to study the magnetic, plasma, and particle environment around Venus during their flybys, offering unique multipoint datasets. The MPO's MERTIS instrument captured high resolution spectra of the Venus atmosphere and the Mercury Transfer Module's three monitoring cameras (M-CAM) captured a series of black-and-white images of the planet, documenting the various phases of the flyby.
+
+=== Science during Mercury flybys ===
+During the first Mercury flyby in October 2021, the spacecraft captured its first images of the target planet using the M-CAM monitoring cameras on the Mercury Transfer Module. Some of the scientific instruments on both orbiters were also active during the flyby, exploring the magnetic and particle environment around Mercury and measuring the planet's gravity. 
+
+During the second flyby in June 2022, the M-CAM cameras imaged, among other targets, the crater Heaney with a candidate volcano, an important target for the spacecraft's primary mission. This crater has been recently named after Seamus Heaney following a request from the M-CAM team. Some of the scientific instruments have been again active, measuring the magnetic, plasma, and particle environment around the spacecraft. 
+
+During the third flyby in June 2023, the MPPE suite of instruments on Mio was used to map the magnetosphere of Mercury. Based on these data, scientists described various expected features of the magnetosphere, but also made new discoveries: 1) a low latitude layer containing particles with much broader energy range than ever observed on Mercury, 2) energetic hydrogen ions trapped at low latitude and near the equator, and 3) cold plasma ions of oxygen and sodium, as well as signatures of potassium, which were probably ejected from the planet's surface by micrometeorites or the solar wind. Mios observations during this flyby also identified the chirping-like discrete whistler-mode emission waves previously observed in Earth's magnetosphere but so far unknown from Mercury.
+
+In May 2024, computers on BepiColombo (as well as on another ESA mission, Mars Express) reported a sharp increase in the number of memory errors, coinciding with a massive solar flare from the active region AR3664, at that time facing away from Earth. The event was also observed in detail by ESA's Solar Orbiter.
+
+During the fourth flyby in September 2024, the spacecraft had, for the first time, a clear view of Mercury's south pole. The M-CAM&nbsp;2 and 3 cameras provided images of the polar region, as well as the Vivaldi crater and a crater newly named Stoddart after Margaret Olrog Stoddart following a request from the M-CAM team. The altitude of the flyby (165 km) was even lower than the expected final science orbit of MPO and it coincided with elevated fluxes of high-energy charged solar particles. Scientists used this opportunity to study how these particles interacted with molecules on the surface, using the SIXS instrument.
+
+During the fifth flyby in December 2024, using the MERTIS instrument, BepiColombo became the first spacecraft ever to observe Mercury in mid-infrared light. During the sixth and final Mercury flyby in January 2025, the M-CAM&nbsp;1 camera imaged the permanently shadowed craters Prokofiev, Kandinsky, Tolkien, and Gordimer near the planet's north pole.
+
+=== Thruster problems ===
+On 15 May 2024, ESA reported a problem preventing the spacecraft's Mercury Transfer Module (MTM) thrusters from operating at full power during a scheduled manoeuvre on 26 April 2024. On 2 September 2024, ESA reported that to compensate for the reduced available thrust, a revised trajectory had been developed that would add 11 months to the cruise, delaying the expected arrival date from 5&nbsp;December 2025 to November 2026. The engineers at ESA were able to restore 90% of the module's thrust power and later identified that the problem was caused by unexpected parasitic electric currents between the MTM's solar arrays and the unit responsible for extracting and distributing power throughout the module.
+
+=== Arrival at Mercury ===
+thumb|BepiColombo delivering "[[selfie style" footage via its Mercury Transfer Module]]
+
+On 15 June 2026 at 13:24 UTC, BepiColombo switched off its solar electric propulsion for the last time in preparation for the Mercury Arrival Phase starting in September. Also in June, BepiColombo teams started a series of arrival simulations at ESOC. On 3 September 2026, the Mercury Transfer Module successfully separated from the two orbiters, marking the beginning of the Mercury Arrival Phase. On 15 September 2026, the MPO's multipurpose imaging instrument SIMBIO-SYS marked its first light, confirming that it is operating correctly. On 24 September 2026, the remaining stack performed a 11.4 m/s trajectory correction, testing the MPO's propulsion system before the planned orbit insertion.
+
+=== Orbit insertion ===
+thumb|Arrival at Mercury timeline
+The capture of the spacecraft by Mercury's gravity into polar orbit occurred in November 2026. On 21&nbsp;November 2026, at 18:24 UTC, while the stack was passing 635 km above Mercury's surface, four axial chemical thrusters of MPO started firing. During this braking manoeuvre, BepiColombo had to point its antenna away from Earth and temporarily cut communication with its operators until 21:37 UTC, when it reoriented itself and reestablished communication with ESTRACK's station at New Norcia in Western Australia. However, after the probe reestablished contact with Earth, it turned out that the burn was prematurely interrupted by a software problem and BepiColombo entered safe mode. Several hours later, ESA confirmed the orbital capture but reported that the thruster burn was shorter than the expected 37 minutes. ESA later established that the spacecraft stack achieved only around 77% of the total planned velocity change but it remained safe and entered a 75-hour orbit around the planet, slightly longer than the planned 58-hour orbit. The orbiters are planned to separate on 9&nbsp;December (UTC) and will adjust their orbits using chemical thrusters. According to ESA, the probe's remaining Mercury insertion sequence and manoeuvres have already been adapted to the new actual trajectory and require no additional thruster burns.
+
+== Trajectory and timeline ==
+, the mission schedule is:
+{| class="wikitable"
+! Date
+! Event
+!Flyby altitude
+! Comment
+
+|- bgcolor=#ccffcc
+| , 01:45UTC
+| Launch
+| –
+| From Guiana Space Centre on Ariane 5 flight VA254
+
+|- bgcolor=#ccffcc
+| , 04:25UTC
+| Earth flyby
+|
+| 1.5 years after launch
+
+|-  bgcolor=#ccffcc
+| , 03:58UTC
+| First Venus flyby
+|
+|
+
+|- bgcolor=#ccffcc
+| , 13:52UTC
+| Second Venus flyby
+|
+| 1.35 Venus years after first Venus flyby
+
+|- bgcolor=#ccffcc
+| , 23:35UTC
+| First Mercury flyby
+|
+| Occurred on the 101st anniversary of Giuseppe Colombo's birth 
+
+|- bgcolor=#ccffcc
+| , 09:44UTC
+| Second Mercury flyby
+|
+| ~2 orbits (3 Mercury years) after 1st Mercury flyby
+
+|- bgcolor=#ccffcc
+| , 19:34UTC
+| Third Mercury flyby
+|
+| ~3 orbits (4.1 Mercury years) after 2nd Mercury flyby
+|- bgcolor=#ccffcc
+| , 21:48UTC
+| Fourth Mercury flyby
+|
+| ~4 orbits (5.0 Mercury years) after 3rd Mercury flyby
+
+|-  bgcolor=#ccffcc
+| , 14:23UTC
+| Fifth Mercury flyby
+|
+| 1 orbit (1.0 Mercury year) after 4th Mercury flyby
+
+|-  bgcolor=#ccffcc
+| , 05:59UTC
+| Sixth Mercury flyby
+|
+| ~0.4 orbits (0.4 Mercury years) after 5th Mercury flyby 
+
+|-  bgcolor=#ccffcc
+| , 12:00&nbsp;UTC
+| MTM separation
+| –
+| First Mercury arrival manoeuvre
+
+|-  bgcolor=#ccffcc
+| , 18:24 UTC
+| Mercury orbit insertion
+| 
+| 7.8 Mercury years after 6th Mercury flyby; 75-hour orbital period (actual period caused by premature end of thruster burn; original plan was for a 58-hour orbital period)
+|-
+| 
+| , detaches from MPO
+| –
+| 9.3-hour orbital period
+
+|-
+| 
+| 
+| –
+| 2.36-hour orbital period
+
+|-
+| 
+| End of nominal mission
+| –
+|
+
+|-
+| 
+| End of planned extended mission
+| –
+|
+|}
+
+thumb|none|upright=3|Timeline of BepiColombo relative to the Sun. Vertical lines indicate flybys (notice the speed jumps). Faint lines represent the destination (Mercury).
+thumb|none|upright=3|Timeline of BepiColombo relative to Mercury. Vertical lines indicate flybys.
+thumb|none|upright=3|Timeline of BepiColombo Mercury orbit insertion in 2026. The distance scale is 1000 smaller than in the previous plot, and the time scale spans only 1.5&nbsp;months compared to 8&nbsp;years.
+
+File:Animation of BepiColombo trajectory.gif|Animation of BepiColombo trajectory from 20 October 2018 to 2 November 2025For more detailed animation, see this video
+File:Animation of BepiColombo trajectory around Mercury.gif|Animation of BepiColombos trajectory around Mercury
+File:MMO&MPO-Orbits.svg|Planned orbits for Mio and MPO, the two probes of the BepiColombo mission
+
+== Spacecraft design and components ==
+=== Mercury Transfer Module ===
+{| class="wikitable floatright"
+|+ QinetiQ T6 performance
+|-
+| Type || Kaufman ion engine
+|-
+| Units on board || 4
+|-
+| Diameter || 
+|-
+| Max. thrust ||  each
+|-
+| Specific impulse&nbsp;(Isp)  || 4,300 seconds
+|-
+| Propellant || Xenon
+|-
+| Total power || 4,628 W
+|}
+
+The Mercury Transfer Module (MTM) had a mass of , including  of xenon propellant, and was located at the base of the stack. Its role was to carry the two science orbiters to Mercury and to support them during the cruise.
+
+The MTM was equipped with a solar electric propulsion system as the main spacecraft propulsion. Its four QinetiQ-T6 ion thrusters operated singly or in pairs for a maximum combined thrust of , making it the most powerful ion engine array ever operated in space. The MTM supplied electrical power for the two stacked orbiters as well as for its solar electric propulsion system thanks to two  solar panels. The MTM solar arrays generated power up to 14&nbsp;kW at their peak output, with 10.6&nbsp;kW required to power the solar electric propulsion system. 
+
+The solar electric propulsion system has typically very high specific impulse and low thrust. This leads to a flight profile with months-long continuous low-thrust braking phases, interrupted by planetary gravity assists, to gradually reduce the velocity of the spacecraft. Prior to Mercury orbit insertion, the MTM was jettisoned from the spacecraft stack. After separation from the MTM, the MPO provides Mio all necessary power and data resources until Mio is delivered to its mission orbit. Separation of Mio from MPO will be accomplished by spin-ejection.
+
+File:Mercury Transfer Module in space simulator ESA387743.jpg|MTM in space simulator
+File:BepiColombo Mercury Transfer Module solar wing deployment.jpg|MTM solar wing deployment
+File:BepiColombo MTM ESTEC.jpg|MTM at ESTEC
+File:Mercury Transfer Module thruster detail(1).jpg|MTM thruster detail
+
+=== Mercury Planetary Orbiter ===
+The Mercury Planetary Orbiter (MPO) has a mass of  and uses a single-sided solar array capable of providing up to 1,000&nbsp;watts and featuring optical solar reflectors to keep its temperature below . The solar array requires continuous rotation keeping the Sun at a low incidence angle in order to generate adequate power while at the same time limiting the temperature.
+
+The MPO carries a payload of 11 instruments, comprising cameras, spectrometers (IR, UV, X-ray, γ-ray, neutron), a radiometer, a laser altimeter, a magnetometer, particle analysers, a Ka-band transponder, and an accelerometer. The payload components are mounted on the nadir side of the spacecraft to achieve low detector temperatures, apart from the MERTIS and PHEBUS spectrometers located directly at the main radiator to provide a better field of view.
+
+A high-temperature-resistant  diameter high-gain antenna is mounted on a short boom on the zenith side of the spacecraft. Communications will be on the X-band and Ka-band with an average bit rate of 50 kbit/s and a total data volume of 1550 Gbit/year. ESA's Cebreros, Spain  ground station is planned to be the primary ground facility for communications during all mission phases.
+
+File:BepiColombo MPO being placed in Phenix thermal vacuum test facility ESA287633.jpg|MPO being placed in Phenix thermal vacuum test facility
+File:Radio testing of BepiColombo orbiter ESA353568.jpg|Radio testing of MPO
+File:Mercury Planetary Orbiter radiator panel and instruments(1).jpg|MPO radiator panel and instruments
+File:BepiColombo MPO ESTEC.jpg|MPO at ESTEC before stacking
+
+==== Science payload of MPO ====
+thumb|MPO's science instruments
+
+The science payload of the Mercury Planetary Orbiter consists of eleven instruments:
+
+* BepiColombo Laser Altimeter (BELA), developed by DLR in cooperation with the University of Bern, the Max Planck Institute for Solar System Research (MPS) and the Instituto de Astrofísica de Andalucía.
+* Italian Spring Accelerometer (ISA), developed by Italy
+* Mercury Magnetometer (MPO-MAG, MERMAG), developed by Germany and United Kingdom
+* Mercury Radiometer and Thermal Infrared Spectrometer (MERTIS), developed by Germany
+* Mercury Gamma-ray and Neutron Spectrometer (MGNS), developed by Russia
+* Mercury Imaging X-ray Spectrometer (MIXS), developed and built by the University of Leicester, the Max Planck Institute for Solar System Research (MPS) and the Max Planck Institute for Extraterrestrial Physics (MPE).
+* Mercury Orbiter Radio-Science Experiment (MORE), developed by Italy and the United States
+* Probing of Hermean Exosphere by Ultraviolet Spectroscopy (PHEBUS), developed by France and Russia
+* Search for Exosphere Refilling and Emitted Neutral Abundances (SERENA), made up of two neutral and two ionised particle analysers:
+** ELENA (Emitted Low-Energy Neutral Atoms) developed by Italy;
+** STROFIO (Start From a Rotating Field Mass Spectrometer) developed by United States;
+** MIPA (Miniature Ion Precipitation Analyser) developed by Sweden;
+** PICAM (Planetary Ion Camera) developed by the Space Research Institute (Institut für Weltraumforschung, IWF), Russian Space Research Institute (IKI), Institut de recherche en sciences de l'environnement (CETP/IPSL), European Space Research and Technology Centre (ESTEC), Research Institute for Particle and Nuclear Physics (KFKI-RMKI) and the Max Planck Institute for Solar System Research (MPS).
+* Spectrometers and imagers for MPO BepiColombo Integrated Observatory System (SIMBIO-SYS), high resolution stereo cameras and a visual and near infrared spectrometer, developed by Italy, France and Switzerland
+* Solar Intensity X-ray and Particle Spectrometer (SIXS), developed by Finland and United Kingdom.
+
+=== Mio (Mercury Magnetospheric Orbiter) ===
+Mio, or the Mercury Magnetospheric Orbiter (MMO), developed and built mostly by Japan, has the shape of a short octagonal prism,  long from face to face and  high. It has a mass of , including a  scientific payload consisting of five instrument groups, four for plasma and dust measuring run by investigators from Japan, and one magnetometer from Austria.
+
+Mio will be spin stabilized at 15&nbsp;rpm with the spin axis perpendicular to the equator of Mercury. It will enter a polar orbit at an altitude of , outside of MPO's orbit. The top and bottom of the octagon act as radiators with louvers for active temperature control. The sides are covered with solar cells which provide 90&nbsp;watts. Communications with Earth will be through a  diameter X-band phased array high-gain antenna and two medium-gain antennas operating in the X-band. Telemetry will return 160&nbsp;Gb/year, about 5&nbsp;kbit/s over the lifetime of the spacecraft, which is expected to be greater than one year. The reaction and control system is based on cold gas thrusters. After its release in Mercury orbit, Mio will be operated by Sagamihara Space Operation Center using Usuda Deep Space Center  antenna located in Nagano, Japan.
+
+File:BepiColombo MMO ESTEC.jpg|Mio at ESTEC before stacking
+File:BepiColombo MMO'mio' Supended.jpg|Mio being lifted from the container by a crane
+File:Mercury Magnetospheric Orbiter on top of Mercury Planetary Orbiter.jpg|Mio on top of MPO (without sunshield)
+File:BepiColombo spacecraft model.png|Deployment of Mio
+
+==== Science payload of Mio ====
+Mio carries five groups of science instruments with a total mass of :
+
+* Mercury Plasma Particle Experiment (MPPE), studies the plasma and neutral particles from the planet, its magnetosphere, and the solar wind. It will employ these instruments:
+** Mercury Electron Analyzers (MEA1 and MEA2).
+** Mercury Ion Analyzer (MIA).
+** Mass Spectrum Analyzer (MSA), developed by Laboratory of Plasma Physics (LPP), Max Planck Institute for Solar System Research (MPS), IDA of Technical University of Braunschweig and Institute of Space and Astronautical Science (ISAS).
+** High-Energy Particle Instrument for Electrons (HEP-ele).
+** High-Energy Particle Instrument for Ions (HEP-ion).
+** Energetic Neutrals Analyzer (ENA).
+* Mercury Magnetometer (MMO-MGF), studies Mercury's magnetic field, magnetosphere, and interplanetary solar wind
+* Plasma Wave Investigation (PWI), studies the electric field, electromagnetic waves, and radio waves from the magnetosphere and solar wind. The PWI consists of three receivers: EWO, SORBET and AM2P, two sets of electric field sensors: MEFISTO and WPT and two sets of magnetic field sensors: LF-SC and DB-SC.
+** Mercury Electric Field In-Situ Tool (MEFISTO): Two sets of wire antenna,  in length,  tip-to-tip length, with a preamp and deployment unit and control electronics. It will measure electric fields in the range from DC to around 3 MHz.
+** Wire-Probe Antenna (WPT): Two sets of wire antenna,  in length,  tip-to-tip length, with a deployment unit and control electronics. It will measure electric fields in the range from DC to around 10&nbsp;MHz.
+** Low Frequency Search Coils (LF-SC): To measure magnetic field in the range of 0.1&nbsp;Hz to 20&nbsp;kHz.
+** Dual-Band Search Coil (DB-SC): To measure magnetic field in two bands with a lower band in the range of 0.1&nbsp;Hz to 20&nbsp;kHz and an upper band in the range of 10 to 640&nbsp;kHz.
+** EWO (EFD [Electric Field Detector], WFC [Waveform Capture] and OFA [Onboard Frequency Analyser]): EFD is a low-frequency electric field receiver (DC to 32&nbsp;Hz), WFC/OFA-E is a medium frequency electric field receiver (10&nbsp;Hz to 20/120&nbsp;kHz) and WFC/OFA-B is a medium frequency magnetic field receiver (0.1&nbsp;Hz to 20&nbsp;kHz).
+** SORBET (Spectroscopic Ondes Radio & Bruit Electrostatique Thermique): A high frequency electric and magnetic field receiver (2.5&nbsp;kHz to 10&nbsp;MHz in electric field and 10 to 640&nbsp;kHz in magnetic field) along with thermal noise spectroscopy.
+** AM2P (Active Measurement of Mercury's Plasma): Used for antenna impedance measurement and calibration signal source. 
+* Mercury Sodium Atmosphere Spectral Imager (MSASI), studies the thin sodium atmosphere of Mercury.
+* Mercury Dust Monitor (MDM), studies dust from the planet and interplanetary space.
+
+=== Magnetospheric Orbiter Sunshield and Interface ===
+thumb|upright=0.8|Full stack with sunshield on top
+
+The Mio orbiter requires additional thermal control on the cruise to Mercury, in addition to umbilicals to the MPO. The European Space Agency thus provided the Magnetospheric Orbiter Sunshield and Interface (MOSIF), a white shroud that is shaped like a conical frustrum to provide clearance, as Mio is spun up during its separation in 2026, before being ejected from the MPO.
+
+=== Mercury Surface Element (cancelled) ===
+The Mercury Surface Element (MSE) was cancelled in 2003 due to budgetary constraints. At the time of cancellation, MSE was meant to be a small, , lander designed to operate for about one week on the surface of Mercury. Shaped as a  diameter disc, it was designed to land at a latitude of 85° near the terminator region. Braking manoeuvres would bring the lander to zero velocity at an altitude of  at which point the propulsion unit would be ejected, airbags inflated, and the module would fall to the surface with a maximum impact velocity of . Scientific data would be stored onboard and relayed via a cross-dipole UHF antenna to either the MPO or Mio. The MSE would have carried a  payload consisting of an imaging system (a descent camera and a surface camera), a heat flow and physical properties package, an alpha particle X-ray spectrometer, a magnetometer, a seismometer, a soil penetrating device (mole), and a micro-rover.
+
+== See also ==
+* List of European Space Agency programmes and missions
+* Exploration of Mercury
+* MESSENGER – the first spacecraft to orbit Mercury
+
+== References ==
+
+== External links ==
+
+* [https://www.esa.int/Science_Exploration/Space_Science/BepiColombo BepiColombo website] by the European Space Agency
+* [http://www.esa.int/Our_Activities/Operations/BepiColombo_operations BepiColombo Operations website] by the European Space Agency
+* [https://global.jaxa.jp/projects/sas/bepi BepiColombo website] by JAXA
+* [http://www.isas.jaxa.jp/en/missions/spacecraft/developing/mmo.html BepiColombo website] by JAXA's Institute of Space and Astronautical Science
+* [https://solarsystem.nasa.gov/missions/bepicolombo/in-depth/ BepiColombo website] by NASA's Solar System Exploration
+* [https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=BEPICLMBO BepiColombo website];  by the National Space Science Data Center
+* [https://link.springer.com/journal/11214/topicalCollection/AC_76aacd1766d3980239c6d84531056577/page/1 The BepiColombo mission to Mercury], edited by Johannes Benkhoff, Go Murakami and Ayako Matsuoka. Space Science Reviews. 216–217 (2020–2021)
+* [https://www.eoportal.org/satellite-missions/bepicolombo BepiColombo article on eoPortal by ESA]
+
+Category:Missions to Mercury
+Category:European Space Agency space probes
+Category:Japanese space probes
+Category:Extraterrestrial orbiters
+Category:Space probes launched in 2018
+Category:Spacecraft electric propulsion
+Category:Spacecraft launched by Ariane 5 rockets
+Category:2018 in French Guiana
+Category:Earth flybys
+Category:Venus flybys
+Category:European Space Agency missions to Venus
