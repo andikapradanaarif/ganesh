@@ -167,6 +167,7 @@ fn past_tense(verb: &str) -> String {
 const VERB_SKIP: &[&str] = &[
     "the", "a", "an", "of", "to", "in", "on", "at", "by", "for", "with", "from",
     "first", "second", "third", "last", "many", "much", "more", "most", "new",
+    "attempt", "attempts", "series", "construction", "map", "kind",
 ];
 
 /// Convert a wh-question plus extracted answer span into a declarative claim
@@ -182,13 +183,19 @@ pub fn to_declarative_claim(question: &str, span: &str) -> String {
     let q = question.trim().trim_end_matches('?').trim().to_string();
     let low = q.to_lowercase();
     let yearish = span.trim().len() == 4 && span.trim().chars().all(|c| c.is_ascii_digit());
-    let prep = if yearish { "in" } else { "on" };
+    let prep = if yearish {
+        "in"
+    } else if span.contains(':') {
+        "at"
+    } else {
+        "on"
+    };
 
     // did-scaffold patterns: find the base-form main verb and conjugate.
     const DID_PREFIXES: &[&str] = &[
         "in what year did ", "in which year did ", "what year did ",
         "on what exact date did ", "on what date did ", "on what day did ",
-        "when did ",
+        "when did ", "at what time did ", "at what exact time did ",
     ];
     for p in DID_PREFIXES {
         if let Some(body) = low.strip_prefix(p).map(|_| q[p.len()..].to_string()) {
@@ -226,6 +233,49 @@ pub fn to_declarative_claim(question: &str, span: &str) -> String {
                     }
                     count += 1;
                 }
+            }
+            let mut stmt = words.join(" ");
+            if let Some(first) = stmt.get(..1) {
+                stmt = format!("{}{}", first.to_uppercase(), &stmt[1..]);
+            }
+            return format!("{stmt} {prep} {}.", span.trim());
+        }
+    }
+
+    // copula passive patterns: strip the wh+copula scaffold and reinsert the
+    // copula before the final token ("in what year was X completed" ->
+    // "X was completed in <span>").
+    const COPULA_PREFIXES: &[(&str, &str)] = &[
+        ("in what year was ", "was"), ("in which year was ", "was"),
+        ("on what exact date was ", "was"), ("on what date was ", "was"),
+        ("on what day was ", "was"), ("when was ", "was"),
+        ("in what year were ", "were"), ("in which year were ", "were"),
+        ("on what exact date were ", "were"), ("on what date were ", "were"),
+        ("when were ", "were"),
+    ];
+    for (p, cop) in COPULA_PREFIXES {
+        if low.starts_with(p) {
+            let body = &q[p.len()..];
+            let mut words: Vec<String> = body.split_whitespace().map(|w| w.to_string()).collect();
+            // the passive verb is the first lowercase verb-like token that is
+            // not part of a "to <verb>" infinitive
+            let mut insert_at = words.len().saturating_sub(1);
+            for (i, w) in words.iter().enumerate() {
+                let bare = w.trim_matches(|c: char| !c.is_alphanumeric()).to_lowercase();
+                if bare.len() <= 2 || VERB_SKIP.contains(&bare.as_str()) {
+                    continue;
+                }
+                if !w.chars().next().map(|c| c.is_ascii_lowercase()).unwrap_or(false) {
+                    continue;
+                }
+                if i > 0 && words[i - 1].trim_matches(|c: char| !c.is_alphanumeric()).to_lowercase() == "to" {
+                    continue;
+                }
+                insert_at = i;
+                break;
+            }
+            if words.len() >= 2 {
+                words.insert(insert_at, cop.to_string());
             }
             let mut stmt = words.join(" ");
             if let Some(first) = stmt.get(..1) {
