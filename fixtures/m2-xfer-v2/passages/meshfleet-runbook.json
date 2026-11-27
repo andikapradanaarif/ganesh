@@ -1,0 +1,49 @@
+{
+  "article_id": "meshfleet-runbook",
+  "family": null,
+  "passages": [
+    {
+      "chars": 88,
+      "id": "meshfleet-runbook-a1#p1",
+      "section": "Mesh fleet operations reference",
+      "seq": 1,
+      "text": "Cluster operations reference for the meshfleet edge mesh, staging and production fleets."
+    },
+    {
+      "chars": 215,
+      "id": "meshfleet-runbook-a1#p2",
+      "section": "Mesh fleet operations reference",
+      "seq": 2,
+      "text": "Deploy a node update with meshctl. The command is `meshctl rollout --fleet staging --ring canary`. For production rollouts the required command is `meshctl rollout --fleet production --ring stable --approve manual`."
+    },
+    {
+      "chars": 173,
+      "id": "meshfleet-runbook-a1#p3",
+      "section": "Mesh fleet operations reference",
+      "seq": 3,
+      "text": "Environment variables: MESHCTL_TIMEOUT controls the per-node rollout timeout and defaults to 45 seconds. MESHCTL_MAX_PARALLEL caps concurrent node updates and defaults to 4."
+    },
+    {
+      "chars": 169,
+      "id": "meshfleet-runbook-a1#p4",
+      "section": "Mesh fleet operations reference",
+      "seq": 4,
+      "text": "Error codes: meshctl exits with ENODRIFT when a node drifts from its declared ring, and with ERR_QUORUM_LOST when fewer than half the ring members acknowledge a rollout."
+    },
+    {
+      "chars": 176,
+      "id": "meshfleet-runbook-a1#p5",
+      "section": "Mesh fleet operations reference",
+      "seq": 5,
+      "text": "Weekend policy: the production fleet is frozen on weekends, staging is exempt, that is the standing rule. During the freeze, production rollouts exit with error code EFRZ-LOCK."
+    },
+    {
+      "chars": 218,
+      "id": "meshfleet-runbook-a1#p6",
+      "section": "Mesh fleet operations reference",
+      "seq": 6,
+      "text": "TLS renewal: certificate rotation runs through the meshctl renew command with flag --rolling. The proposed switch to automatic operator-managed renewal was rejected; the team prefers manual approval for every rotation."
+    }
+  ],
+  "revision": "meshfleet-runbook-a1"
+}

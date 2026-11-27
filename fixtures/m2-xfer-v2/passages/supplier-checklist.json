@@ -1,0 +1,21 @@
+{
+  "article_id": "supplier-checklist",
+  "family": null,
+  "passages": [
+    {
+      "chars": 68,
+      "id": "supplier-checklist-a1#p1",
+      "section": "Supplier onboarding checklist",
+      "seq": 1,
+      "text": "Flour supplier transition checklist for the bakery wholesale switch."
+    },
+    {
+      "chars": 516,
+      "id": "supplier-checklist-a1#p2",
+      "section": "Supplier onboarding checklist",
+      "seq": 2,
+      "text": "- [x] collect mill certificates from the new flour supplier (verified complete, certificates archived 2026-10-30)\n- [x] run a trial bake with the new strong white flour (completed, crumb acceptable)\n- [ ] negotiate the weekly delivery slot (started, first call done, no agreement yet)\n- [ ] update the cost model spreadsheet (not started)\n- [x] confirm the yeast supplier contract renewal (verified complete, signed 2026-11-02)\n- [ ] switch the rye flour order to the new mill (proposed, not yet approved by Marisol)"
+    }
+  ],
+  "revision": "supplier-checklist-a1"
+}

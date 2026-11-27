@@ -168,6 +168,9 @@ pub const MEASURE_PROPS: &[&str] = &[
     "diameter", "height", "length", "width", "depth", "weight", "mass", "distance",
     "area", "volume", "population", "speed", "temperature", "cost", "price", "size",
     "capacity", "altitude", "elevation", "tension", "wattage",
+    // M2 phase 2: electrical / engineering / computing quantities (xi05 class)
+    "amperage", "current", "voltage", "power", "frequency", "pressure",
+    "latency", "throughput", "bandwidth", "memory", "storage",
 ];
 
 /// Physical-unit vocabulary for the explicit `"in <unit>"` framing check.
@@ -182,6 +185,9 @@ const KNOWN_UNITS: &[&str] = &[
     "minutes", "hr", "hours", "w", "kw", "mw", "watt", "watts", "hz", "khz",
     "mhz", "ghz", "deg", "degree", "degrees", "byte", "bytes", "bit", "bits",
     "km/h", "m/s", "mph",
+    // M2 phase 2: electrical / pressure / latency units
+    "a", "amp", "amps", "ampere", "amperes", "ma", "v", "volt", "volts",
+    "kwh", "psi", "bar", "ms", "millisecond", "milliseconds", "gb", "mb", "tb",
 ];
 
 fn measurement_question(q: &str) -> bool {

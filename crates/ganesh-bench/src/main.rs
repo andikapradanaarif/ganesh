@@ -68,6 +68,8 @@ struct StructuralFinding {
 
 mod lifecycle;
 mod lifecheck;
+mod locomo;
+mod webaccept;
 
 fn main() {
     ganesh_core::rerank::enforce_requirement("ganesh-bench");
@@ -87,6 +89,38 @@ fn main() {
             }
         }
         std::process::exit(lifecycle::run_lifecycle(&cdir));
+    }
+    if args.len() >= 2 && args[1] == "locomo" {
+        // ganesh-bench locomo --data <locomo10.json> [--top-k 10] [--conversations N] [--out report.json] [--reader-cmd cmd]
+        let mut data = String::new();
+        let mut top_k = 10usize;
+        let mut maxc = 10usize;
+        let mut out = "/tmp/locomo-report.json".to_string();
+        let mut reader = String::new();
+        let mut j = 2;
+        while j < args.len() {
+            match args[j].as_str() {
+                "--data" => { data = args.get(j + 1).cloned().unwrap(); j += 2; }
+                "--top-k" => { top_k = args.get(j + 1).and_then(|v| v.parse().ok()).unwrap_or(10); j += 2; }
+                "--conversations" => { maxc = args.get(j + 1).and_then(|v| v.parse().ok()).unwrap_or(10); j += 2; }
+                "--out" => { out = args.get(j + 1).cloned().unwrap(); j += 2; }
+                "--reader-cmd" => { reader = args.get(j + 1).cloned().unwrap(); j += 2; }
+                other => { eprintln!("unknown argument: {other}"); std::process::exit(2); }
+            }
+        }
+        std::process::exit(locomo::run_locomo(&data, top_k, maxc, &out, &reader));
+    }
+    if args.len() >= 2 && args[1] == "web-acceptance" {
+        // ganesh-bench web-acceptance --corpus <dir>
+        let mut cdir = "fixtures/m2-lifecycle".to_string();
+        let mut j = 2;
+        while j < args.len() {
+            match args[j].as_str() {
+                "--corpus" => { cdir = args.get(j + 1).cloned().unwrap(); j += 2; }
+                other => { eprintln!("unknown argument: {other}"); std::process::exit(2); }
+            }
+        }
+        std::process::exit(webaccept::run_web_acceptance(&cdir));
     }
     if args.len() >= 2 && args[1] == "lifecheck" {
         // ganesh-bench lifecheck --corpus <dir> --scenario <scenario.json>
@@ -246,7 +280,7 @@ fn main() {
     std::process::exit(code);
 }
 
-struct McpClient {
+pub struct McpClient {
     child: Child,
     stdin: ChildStdin,
     rx: mpsc::Receiver<String>,
@@ -254,7 +288,7 @@ struct McpClient {
 }
 
 impl McpClient {
-    fn spawn_with_key(rest_url: &str, key: Option<&str>) -> McpClient {
+    pub fn spawn_with_key(rest_url: &str, key: Option<&str>) -> McpClient {
         if let Some(k) = key {
             std::env::set_var("GANESH_API_KEY", k);
         }
@@ -288,7 +322,7 @@ impl McpClient {
         McpClient { child, stdin, rx, next_id: 0 }
     }
 
-    fn call(&mut self, method: &str, params: Value) -> Result<Value, String> {
+    pub fn call(&mut self, method: &str, params: Value) -> Result<Value, String> {
         self.next_id += 1;
         let id = self.next_id;
         let msg = json!({ "jsonrpc": "2.0", "id": id, "method": method, "params": params });

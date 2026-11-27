@@ -1,0 +1,10 @@
+== Supplier onboarding checklist ==
+
+Flour supplier transition checklist for the bakery wholesale switch.
+
+- [x] collect mill certificates from the new flour supplier (verified complete, certificates archived 2026-10-30)
+- [x] run a trial bake with the new strong white flour (completed, crumb acceptable)
+- [ ] negotiate the weekly delivery slot (started, first call done, no agreement yet)
+- [ ] update the cost model spreadsheet (not started)
+- [x] confirm the yeast supplier contract renewal (verified complete, signed 2026-11-02)
+- [ ] switch the rye flour order to the new mill (proposed, not yet approved by Marisol)

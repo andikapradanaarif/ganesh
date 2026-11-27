@@ -1,0 +1,3 @@
+== Mesh fleet freeze policy (corrected, staging only) ==
+
+Freeze policy: the staging fleet is frozen on weekends. No staging rollout of any kind may start between Friday 18:00 and Monday 06:00.

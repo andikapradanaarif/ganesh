@@ -1,0 +1,14 @@
+{
+  "article_id": "ring-claim",
+  "family": null,
+  "passages": [
+    {
+      "chars": 118,
+      "id": "ring-claim-r1#p1",
+      "section": "Ring capacity claim",
+      "seq": 1,
+      "text": "The mesh ring stable supports at most 64 concurrent nodes, and exceeding that count degrades convergence time sharply."
+    }
+  ],
+  "revision": "ring-claim-r1"
+}

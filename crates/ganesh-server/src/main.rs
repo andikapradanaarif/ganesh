@@ -1,3 +1,5 @@
+mod owner;
+
 use axum::{
     extract::{Path, Query, State},
     http::StatusCode,
@@ -18,19 +20,22 @@ use std::sync::{Arc, Mutex};
 #[derive(Debug, Clone, serde::Deserialize)]
 struct Policy {
     #[serde(default)]
-    keys: HashMap<String, KeyEntry>,
+    pub keys: HashMap<String, KeyEntry>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize)]
-struct KeyEntry {
+pub struct KeyEntry {
     #[serde(default)]
     installation: String,
     #[serde(default)]
     projects: Vec<String>,
+    /// Owner keys may use the owner inspection/correction/deletion API and UI.
+    #[serde(default)]
+    pub owner: bool,
 }
 
 impl Policy {
-    fn resolve(&self, key: Option<&str>) -> Vec<String> {
+    pub fn resolve(&self, key: Option<&str>) -> Vec<String> {
         let mut projects = vec!["public".to_string()];
         if let Some(k) = key {
             if let Some(entry) = self.keys.get(k) {
@@ -45,10 +50,10 @@ impl Policy {
     }
 }
 
-struct AppState {
-    store: Mutex<Store>,
+pub struct AppState {
+    pub store: Mutex<Store>,
     config: RetrievalConfig,
-    policy: Policy,
+    pub policy: Policy,
 }
 
 #[tokio::main]
@@ -87,6 +92,13 @@ async fn main() {
         .route("/v1/search", post(search_handler))
         .route("/v1/citations/:token", get(citation_handler))
         .route("/v1/health", get(|| async { "ok" }))
+        .route("/v1/revisions", get(owner::list_revisions_handler))
+        .route("/v1/revisions/:id", get(owner::revision_detail_handler))
+        .route("/v1/revisions/:id/timeline", get(owner::revision_timeline_handler))
+        .route("/v1/revisions/:id/correct", post(owner::correct_revision_handler))
+        .route("/v1/revisions/:id/withdraw", post(owner::withdraw_revision_handler))
+        .route("/v1/sources/:id", axum::routing::delete(owner::delete_source_handler))
+        .route("/ui", get(owner::ui_handler))
         .with_state(state);
 
     let listener = tokio::net::TcpListener::bind(bind).await.expect("bind");

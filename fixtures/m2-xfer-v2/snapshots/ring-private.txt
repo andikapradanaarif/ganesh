@@ -1,0 +1,3 @@
+== Internal capacity planning note (private) ==
+
+Internal note: we expect ring stable membership to approach 64 nodes in Q1 as the retail onboarding wave lands. Budget review for the ring split is scheduled with finance. Do not share the capacity projections externally.

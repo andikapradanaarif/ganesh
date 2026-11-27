@@ -617,6 +617,16 @@ pub fn canonical_unit(token: &str) -> Option<&'static str> {
         "m/s" => "m/s",
         "mph" => "mph",
         "deg" | "degree" | "degrees" => "deg",
+        "a" | "amp" | "amps" | "ampere" | "amperes" => "a",
+        "ma" => "ma",
+        "v" | "volt" | "volts" => "v",
+        "kwh" => "kwh",
+        "psi" => "psi",
+        "bar" => "bar",
+        "ms" | "millisecond" | "milliseconds" => "ms",
+        "gb" | "gigabyte" | "gigabytes" => "gb",
+        "mb" | "megabyte" | "megabytes" => "mb",
+        "tb" | "terabyte" | "terabytes" => "tb",
         "byte" | "bytes" => "byte",
         "bit" | "bits" => "bit",
         _ => return None,
@@ -1602,6 +1612,165 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
         }
     }
 
+    // ---- M2 phase 2 epistemic framing guards ----------------------------------
+    // Independent typed checks, each conservative (strong-overlap required plus
+    // an affirmative-evidence exception), added BEFORE the semantic coverage
+    // override so the override can never waive them:
+    //  (a) rejection/proposal-only guard for yes/no adoption-state questions
+    //  (b) scope-exemption consistency for scope-qualified questions
+    //  (c) unmade/deferred decision guard for change-target questions
+    let mut epistemic_block = false;
+    {
+        // Content stems of the query excluding framing/env words: overlap with
+        // these ties a guard sentence to the queried subject.
+        let env_stems_q = query_env_stems(input.query);
+        let content_terms: Vec<&String> = input
+            .terms
+            .iter()
+            .filter(|t| !env_stems_q.contains(*t) && t.len() > 2)
+            .collect();
+        let overlaps_query = |sent_stemmed: &[String]| -> bool {
+            content_terms.iter().any(|t| sent_stemmed.contains(*t))
+        };
+
+        // (a) yes/no adoption/state question + explicit rejection/non-adoption
+        // framing on the queried subject. The answer to "is X now used?" when
+        // the record says "switching to X was rejected" is not an affirmative ok.
+        let ql = input.query.to_lowercase();
+        let yesno = ["is ", "are ", "does ", "do ", "did ", "was ", "were ", "has ", "have ", "had "]
+            .iter()
+            .any(|p| ql.starts_with(p));
+        const ADOPTION_STEMS: &[&str] = &["use", "us", "enabl", "activ", "deploy", "adopt", "live", "run", "oper"];
+        let adoption_q = yesno && input.terms.iter().any(|t| ADOPTION_STEMS.contains(&t.as_str()));
+        const REJECTION_MARKERS: &[&str] = &[
+            "rejected", "declined", "not adopted", "never implemented", "never adopted",
+            "proposal only", "not implemented", "never deployed", "wasn't adopted",
+            "vetoed", "never rolled out", "not rolled out", "stayed manual",
+        ];
+        if adoption_q {
+            let mut rejection_hit = false;
+            let mut affirmative_hit = false;
+            for (_, verbatim, _, _) in input.passages {
+                for sentence in &sentences(verbatim) {
+                    let sl = sentence.to_lowercase();
+                    let ss = stemmed_query_like(sentence);
+                    if !overlaps_query(&ss) {
+                        continue;
+                    }
+                    if REJECTION_MARKERS.iter().any(|m| sl.contains(m)) {
+                        rejection_hit = true;
+                    } else if !negated(sentence)
+                        && ss.iter().any(|t| ADOPTION_STEMS.contains(&t.as_str()))
+                    {
+                        affirmative_hit = true;
+                    }
+                }
+            }
+            if rejection_hit && !affirmative_hit {
+                epistemic_block = true;
+                trace.reasons.push(
+                    "rejection-guard: evidence explicitly rejects/non-adopts the queried state; no affirmative adoption evidence".to_string(),
+                );
+            }
+        }
+
+        // (b) scope-exemption consistency: the query names an environment; every
+        // sentence mentioning that environment frames it as exempt/not-covered,
+        // so the rule's fact cannot bind to the queried scope.
+        // Detection is broader than query_env_stems: unambiguous environment
+        // nouns count in any position ("the staging weekend freeze"), while
+        // ambiguous ones (test/dev) keep the preposition-gated reading.
+        let mut guard_env_stems = env_stems_q.clone();
+        {
+            const UNAMBIGUOUS: &[(&str, &str)] = &[
+                ("production", "product"), ("staging", "stag"), ("canary", "canari"), ("qa", "qa"),
+            ];
+            let toks: Vec<String> = ql.split(|c: char| !c.is_alphanumeric()).filter(|w| !w.is_empty()).map(|w| w.to_string()).collect();
+            for t in &toks {
+                for (surface, stem) in UNAMBIGUOUS {
+                    if t == surface {
+                        guard_env_stems.insert(stem.to_string());
+                    }
+                }
+            }
+        }
+        if !guard_env_stems.is_empty() {
+            const EXEMPTION_MARKERS: &[&str] = &[
+                "exempt", "does not apply", "do not apply", "not apply", "except",
+                "excluding", "excluded", "not subject", "waiver", "waived",
+                "not covered", "outside the freeze", "not affected",
+            ];
+            let mut env_sentences = 0usize;
+            let mut exempt_sentences = 0usize;
+            for (_, verbatim, _, _) in input.passages {
+                for sentence in &sentences(verbatim) {
+                    let ss = stemmed_query_like(sentence);
+                    if !guard_env_stems.iter().any(|e| ss.contains(e)) {
+                        continue;
+                    }
+                    env_sentences += 1;
+                    let sl = sentence.to_lowercase();
+                    if EXEMPTION_MARKERS.iter().any(|m| sl.contains(m)) {
+                        exempt_sentences += 1;
+                    }
+                }
+            }
+            if env_sentences > 0 && exempt_sentences == env_sentences {
+                epistemic_block = true;
+                trace.reasons.push(format!(
+                    "scope-exemption: all {env_sentences} sentences mentioning the queried scope explicitly exempt it"
+                ));
+            }
+        }
+
+        // (c) unmade/deferred decision guard: the query asks for a realized
+        // change target ("what time was X moved to?", "which tracker was
+        // chosen?") while the evidence marks the decision undecided/deferred
+        // and no sentence records a realized decision for it.
+        const CHANGE_PATTERNS: &[&str] = &[
+            "moved to", "changed to", "switched to", "rescheduled", "chosen", "chose",
+            "decided on", "picked", "selected", "new time", "migrated to",
+        ];
+        const INDECISION_MARKERS: &[&str] = &[
+            "undecided", "deferred", "tabled", "no decision", "not yet decided",
+            "still open", "to be decided", "postponed", "no consensus", "unresolved",
+            "put off", "no final decision",
+        ];
+        const DECISION_REALIZED: &[&str] = &[
+            "was moved to", "were moved to", "moved to", "decided to", "decided on",
+            "chose", "chosen", "was selected", "confirmed the move", "rescheduled to",
+        ];
+        let asks_change = CHANGE_PATTERNS.iter().any(|p| ql.contains(p));
+        if asks_change {
+            let mut indecision_hit = false;
+            let mut realized_hit = false;
+            for (_, verbatim, _, _) in input.passages {
+                for sentence in &sentences(verbatim) {
+                    let ss = stemmed_query_like(sentence);
+                    if !overlaps_query(&ss) {
+                        continue;
+                    }
+                    let sl = sentence.to_lowercase();
+                    if INDECISION_MARKERS.iter().any(|m| sl.contains(m)) {
+                        indecision_hit = true;
+                    }
+                    if DECISION_REALIZED.iter().any(|m| sl.contains(m))
+                        && !INDECISION_MARKERS.iter().any(|m| sl.contains(m))
+                        && !negated(sentence)
+                    {
+                        realized_hit = true;
+                    }
+                }
+            }
+            if indecision_hit && !realized_hit {
+                epistemic_block = true;
+                trace.reasons.push(
+                    "unmade-decision: evidence marks the queried change undecided/deferred with no realized decision".to_string(),
+                );
+            }
+        }
+    }
+
     // ---- M2 semantic-aware coverage calibration -------------------------------
     // The coverage gates are lexical by construction: a paraphrased query
     // ("jogging" for a "running" note, "abandon" for "gave up") shares few or
@@ -1619,7 +1788,7 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
         .unwrap_or(1.0);
     // Measurement/quantity questions are excluded: a missing measurement is
     // exact-evidence territory, and dense retrieval must never conjure one.
-    if input.dense_support && !input.quantity_question {
+    if input.dense_support && !input.quantity_question && !epistemic_block {
         if let Some(m) = trace.qa_margin {
             if m.is_finite() && m >= override_margin {
                 trace.reasons.retain(|r| {

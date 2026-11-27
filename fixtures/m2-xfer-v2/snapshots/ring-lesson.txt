@@ -1,0 +1,3 @@
+== Published operations lesson ==
+
+Published lesson: mesh rings should plan capacity so membership stays well below 64 concurrent nodes; beyond that threshold convergence degrades sharply.

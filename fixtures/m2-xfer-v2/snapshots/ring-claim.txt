@@ -1,0 +1,3 @@
+== Ring capacity claim ==
+
+The mesh ring stable supports at most 64 concurrent nodes, and exceeding that count degrades convergence time sharply.

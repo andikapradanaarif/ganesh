@@ -1,0 +1,8 @@
+== Team standup chat log ==
+
+[2026-10-12 09:31] ana: morning. quick one today. report: the invoice export job is verified live in production, the 02:15 run completed clean
+[2026-10-12 09:32] ravi: nice. reminder the search latency investigation is still open, no owner yet
+[2026-10-12 09:33] ana: undecided: whether we move the export job from 02:15 to 01:30. finance has not confirmed the cutoff change
+[2026-10-12 09:35] miriam: cache warming proposal: prewarm the catalog cache at 01:00. proposed but not approved, nobody has signed off
+[2026-10-12 09:37] ravi: the payment webhook retries are capped at 5 now, that change is verified in production since thursday
+[2026-10-12 09:39] ana: decision: we adopt the structured logging format for the export job only, other jobs stay as-is for now

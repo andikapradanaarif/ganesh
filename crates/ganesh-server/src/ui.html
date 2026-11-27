@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ganesh — Owner Memory Console</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root { --ink:#1a2233; --mut:#667085; --line:#e3e6ee; --acc:#2d5be3; --warn:#b42318; --ok:#067647; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:14px/1.5 -apple-system, "Segoe UI", system-ui, sans-serif; color:var(--ink); background:#f7f8fb; }
+  header { background:#101828; color:#fff; padding:12px 20px; display:flex; align-items:center; gap:14px; }
+  header h1 { font-size:16px; margin:0; font-weight:600; }
+  header input { background:#1d2939; color:#fff; border:1px solid #344054; border-radius:6px; padding:6px 10px; width:220px; }
+  header button { background:var(--acc); color:#fff; border:0; border-radius:6px; padding:7px 14px; cursor:pointer; }
+  main { display:grid; grid-template-columns: 380px 1fr; gap:0; height:calc(100vh - 49px); }
+  #list { overflow-y:auto; border-right:1px solid var(--line); background:#fff; }
+  #detail { overflow-y:auto; padding:20px 24px; }
+  .filters { padding:10px 14px; border-bottom:1px solid var(--line); display:flex; flex-wrap:wrap; gap:6px; position:sticky; top:0; background:#fff; z-index:2; }
+  .filters select, .filters input { font-size:12px; padding:4px 6px; border:1px solid var(--line); border-radius:5px; max-width:110px; }
+  .rev { padding:10px 14px; border-bottom:1px solid var(--line); cursor:pointer; }
+  .rev:hover { background:#f2f5ff; }
+  .rev.sel { background:#e8efff; border-left:3px solid var(--acc); }
+  .rev .rid { font-family:ui-monospace, monospace; font-size:12px; font-weight:600; }
+  .rev .meta { color:var(--mut); font-size:12px; }
+  .badge { display:inline-block; font-size:11px; border-radius:9px; padding:1px 8px; margin-left:6px; }
+  .b-current { background:#dcfae6; color:var(--ok); }
+  .b-superseded { background:#fef0c7; color:#93370d; }
+  .b-withdrawn, .b-revoked, .b-deleted { background:#fee4e2; color:var(--warn); }
+  h2 { font-size:15px; margin:18px 0 8px; }
+  .kv { display:grid; grid-template-columns:140px 1fr; gap:2px 10px; font-size:13px; }
+  .kv dt { color:var(--mut); } .kv dd { margin:0; font-family:ui-monospace,monospace; font-size:12px; }
+  .passage { background:#fff; border:1px solid var(--line); border-radius:8px; padding:10px 12px; margin:8px 0; font-size:13px; white-space:pre-wrap; }
+  .passage .pid { font-family:ui-monospace,monospace; font-size:11px; color:var(--mut); }
+  .tl { border-left:2px solid var(--line); margin:8px 0 8px 6px; padding-left:14px; }
+  .tl .ev { margin:6px 0; font-size:13px; }
+  .tl .ts { color:var(--mut); font-family:ui-monospace,monospace; font-size:11px; margin-right:8px; }
+  .tl .event { font-weight:600; }
+  button.act { border:1px solid var(--line); background:#fff; border-radius:6px; padding:6px 12px; cursor:pointer; margin-right:8px; font-size:13px; }
+  button.act.primary { background:var(--acc); color:#fff; border-color:var(--acc); }
+  button.act.danger { color:var(--warn); border-color:#fecdca; }
+  #editor { display:none; margin:14px 0; background:#fff; border:1px solid var(--line); border-radius:8px; padding:14px; }
+  #editor textarea { width:100%; min-height:110px; font:13px ui-monospace,monospace; border:1px solid var(--line); border-radius:6px; padding:8px; }
+  #editor input { font-size:13px; padding:5px 8px; border:1px solid var(--line); border-radius:6px; margin:6px 8px 6px 0; }
+  .msg { padding:10px 14px; border-radius:8px; margin:10px 0; font-size:13px; display:none; }
+  .msg.err { display:block; background:#fee4e2; color:var(--warn); }
+  .msg.ok { display:block; background:#dcfae6; color:var(--ok); }
+  .msg.conflict { display:block; background:#fef0c7; color:#93370d; }
+  .empty { color:var(--mut); padding:30px 16px; text-align:center; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Ganesh — Owner Memory Console</h1>
+  <input id="key" type="password" placeholder="owner credential key" autocomplete="off">
+  <button onclick="setKey()">Connect</button>
+  <span id="connmsg" style="font-size:12px;color:#98a2b3"></span>
+</header>
+<main>
+  <div id="list">
+    <div class="filters">
+      <input id="f-project" placeholder="project" onchange="loadList()">
+      <input id="f-scope" placeholder="scope" onchange="loadList()">
+      <select id="f-status" onchange="loadList()">
+        <option value="">any status</option><option>current</option><option>superseded</option><option>withdrawn</option><option>revoked</option>
+      </select>
+      <select id="f-stype" onchange="loadList()">
+        <option value="">any type</option><option>wiki</option><option>log</option><option>journal</option><option>meeting</option><option>rfc</option><option>postmortem</option><option>checklist</option><option>lesson</option><option>conversation</option>
+      </select>
+    </div>
+    <div id="rows"><div class="empty">connect with the owner key</div></div>
+  </div>
+  <div id="detail"><div class="empty">select a revision to inspect it</div></div>
+</main>
+<script>
+let KEY = "";
+let CUR = null;
+function setKey() {
+  KEY = document.getElementById("key").value.trim();
+  document.getElementById("connmsg").textContent = KEY ? "connected" : "";
+  loadList();
+}
+function qs(params) {
+  const u = new URLSearchParams(params); u.set("key", KEY); return u.toString();
+}
+async function api(path, opts) {
+  const r = await fetch(path, opts);
+  const j = await r.json().catch(() => ({}));
+  return { status: r.status, body: j };
+}
+async function loadList() {
+  if (!KEY) return;
+  const p = {};
+  for (const [id, k] of [["f-project","project"],["f-scope","scope"],["f-status","status"],["f-stype","source_type"]]) {
+    const v = document.getElementById(id).value.trim(); if (v) p[k] = v;
+  }
+  const { status, body } = await api("/v1/revisions?" + qs(p));
+  const rows = document.getElementById("rows");
+  if (status === 403) { rows.innerHTML = '<div class="empty">403 — owner credential required</div>'; return; }
+  const list = (body.revisions || []);
+  rows.innerHTML = list.length ? "" : '<div class="empty">no revisions match</div>';
+  for (const r of list) {
+    const d = document.createElement("div");
+    d.className = "rev" + (CUR === r.revision ? " sel" : "");
+    d.innerHTML = `<div class="rid">${esc(r.revision)}<span class="badge b-${esc(r.status)}">${esc(r.status)}</span></div>
+      <div class="meta">${esc(r.title)} · ${esc(r.source_type)} · ${esc(r.project)}${r.scope ? " · " + esc(r.scope) : ""} · ${r.passages}p</div>`;
+    d.onclick = () => openRev(r.revision);
+    rows.appendChild(d);
+  }
+}
+function esc(s) { return String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+async function openRev(id) {
+  CUR = id;
+  const { body } = await api("/v1/revisions/" + encodeURIComponent(id) + "?" + qs({}));
+  const tl = await api("/v1/revisions/" + encodeURIComponent(id) + "/timeline?" + qs({}));
+  if (!body.revision) { document.getElementById("detail").innerHTML = '<div class="empty">not found or not visible</div>'; return; }
+  const r = body.revision;
+  const evs = (tl.body && tl.body.events) || [];
+  document.getElementById("detail").innerHTML = `
+    <h2 style="margin-top:0">${esc(r.revision)} <span class="badge b-${esc(r.status)}">${esc(r.status)}</span></h2>
+    <div class="kv">
+      <dt>source</dt><dd>${esc(r.article_id)} — ${esc(r.title)}</dd>
+      <dt>author</dt><dd>${esc(r.author) || "—"}</dd>
+      <dt>source type</dt><dd>${esc(r.source_type)}</dd>
+      <dt>project / scope</dt><dd>${esc(r.project)}${r.scope ? " / " + esc(r.scope) : ""}</dd>
+      <dt>authority</dt><dd>${r.authority}</dd>
+      <dt>occurred_at</dt><dd>${esc(r.occurred_at) || "—"}</dd>
+      <dt>effective</dt><dd>${esc(r.effective_from) || "—"} → ${esc(r.effective_until) || "…"}</dd>
+      <dt>audience</dt><dd>${esc(r.audience) || "—"}</dd>
+      <dt>supersedes</dt><dd>${esc(r.supersedes) || "—"}</dd>
+      <dt>superseded by</dt><dd>${esc(r.superseded_by) || "—"}</dd>
+    </dl></div>
+    <div style="margin:14px 0">
+      <button class="act primary" onclick="openEditor()">correct / narrow</button>
+      <button class="act danger" onclick="withdraw()">withdraw</button>
+      <button class="act danger" onclick="deleteSource()">delete source “${esc(r.article_id)}”</button>
+    </div>
+    <div id="editor">
+      <textarea id="edit-text"></textarea><br>
+      <input id="edit-scope" placeholder="narrow scope (e.g. staging) — optional">
+      <input id="edit-reason" placeholder="reason (audit note)">
+      <button class="act primary" onclick="saveCorrection()">save correction</button>
+      <button class="act" onclick="document.getElementById('editor').style.display='none'">cancel</button>
+      <div id="edit-msg" class="msg"></div>
+    </div>
+    <h2>passages (verbatim)</h2>
+    ${(body.passages||[]).map(p => `<div class="passage"><div class="pid">${esc(p.passage_id)} · ${esc(p.section)}</div>${esc(p.text)}</div>`).join("") || '<div class="empty">no passages</div>'}
+    <h2>audit timeline</h2>
+    <div class="tl">${evs.map(e => `<div class="ev"><span class="ts">${esc(e.ts)}</span><span class="event">${esc(e.event)}</span> ${esc(e.detail)}</div>`).join("") || '<div class="empty">no events</div>'}</div>`;
+  loadList();
+}
+function openEditor() {
+  const ed = document.getElementById("editor");
+  ed.style.display = ed.style.display === "block" ? "none" : "block";
+  document.querySelectorAll(".passage")[0] && (document.getElementById("edit-text").value =
+    Array.from(document.querySelectorAll(".passage")).map(p => p.childNodes[1].textContent).join("\n\n"));
+}
+async function saveCorrection() {
+  const msg = document.getElementById("edit-msg");
+  msg.className = "msg"; msg.textContent = "";
+  const payload = {
+    key: KEY,
+    new_text: document.getElementById("edit-text").value,
+    narrow_scope: document.getElementById("edit-scope").value.trim(),
+    reason: document.getElementById("edit-reason").value.trim(),
+    expected_revision_id: CUR,
+  };
+  if (!payload.narrow_scope) delete payload.narrow_scope;
+  const r = await api("/v1/revisions/" + encodeURIComponent(CUR) + "/correct", {
+    method: "POST", headers: {"content-type":"application/json"}, body: JSON.stringify(payload),
+  });
+  if (r.status === 409) {
+    msg.className = "msg conflict";
+    msg.textContent = "409 conflict — this memory changed while open. Reloading the newer revision " + (r.body.current_head || "") + "…";
+    setTimeout(() => openRev(r.body.current_head), 1400);
+  } else if (r.status >= 400) {
+    msg.className = "msg err"; msg.textContent = "error: " + (r.body.error || r.status);
+  } else {
+    msg.className = "msg ok"; msg.textContent = "corrected → " + r.body.revision;
+    setTimeout(() => openRev(r.body.revision), 900);
+  }
+}
+async function withdraw() {
+  if (!confirm("withdraw " + CUR + " everywhere? history stays inspectable.")) return;
+  await api("/v1/revisions/" + encodeURIComponent(CUR) + "/withdraw", {
+    method: "POST", headers: {"content-type":"application/json"}, body: JSON.stringify({key: KEY}),
+  });
+  openRev(CUR);
+}
+async function deleteSource() {
+  const r0 = await api("/v1/revisions/" + encodeURIComponent(CUR) + "?" + qs({}));
+  const src = r0.body.revision ? r0.body.revision.article_id : "";
+  if (!confirm("DELETE source " + src + " and purge all passages, embeddings and citations? this cannot be undone.")) return;
+  const r = await api("/v1/sources/" + encodeURIComponent(src) + "?" + qs({}), { method: "DELETE" });
+  document.getElementById("detail").innerHTML = '<div class="empty">source deleted: ' + esc(src) + " — " + (r.body.passages_purged||0) + " passages purged</div>";
+  CUR = null; loadList();
+}
+</script>
+</body>
+</html>
