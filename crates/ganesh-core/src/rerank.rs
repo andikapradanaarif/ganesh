@@ -27,7 +27,7 @@ static MODEL: OnceLock<Option<CrossEncoder>> = OnceLock::new();
 /// The reranker batches the whole candidate pool in one padded forward
 /// pass; larger batches favor more intra-op threads. Overridable for
 /// calibration.
-const DEFAULT_THREADS: usize = 4;
+const DEFAULT_THREADS: usize = 6;
 
 fn model_dir() -> String {
     std::env::var("GANESH_RERANKER_MODEL_DIR")

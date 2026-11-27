@@ -45,7 +45,7 @@ impl Default for RetrievalConfig {
             min_idf_union_coverage: 0.75,
             min_union_coverage: 0.0,
             min_top_coverage: 0.0,
-            candidate_limit: std::env::var("GANESH_RERANK_POOL").ok().and_then(|v| v.parse().ok()).unwrap_or(50),
+            candidate_limit: std::env::var("GANESH_RERANK_POOL").ok().and_then(|v| v.parse().ok()).unwrap_or(40),
             quantity_binding: std::env::var("GANESH_QUANTITY_BINDING").map(|v| v != "0").unwrap_or(true),
             transition_check: std::env::var("GANESH_TRANSITION_CHECK").map(|v| v != "0").unwrap_or(true),
             proposition_check: std::env::var("GANESH_PROPOSITION_CHECK").map(|v| v != "0").unwrap_or(true),
