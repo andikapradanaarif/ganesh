@@ -1,0 +1,256 @@
+{
+  "version": "acc-xfer-v4",
+  "scoring": "scoring.v2",
+  "questions": [
+    {
+      "id": "q01",
+      "question": "In what year did Apollo 11 land astronauts on the Moon?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [
+        "answerable",
+        "realized-sibling"
+      ],
+      "required_facts": [
+        {
+          "fact": "landed July 20 1969",
+          "acceptable": [
+            "apollo-a1#p2",
+            "apollo-a1#p39",
+            "apollo-a1#p83",
+            "apollo-a1#p112",
+            "apollo-a1#p114"
+          ],
+          "spans": [
+            "July 20, 1969"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "q02",
+      "question": "On what exact date was Europa Clipper launched?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [
+        "answerable",
+        "realized-exact-date"
+      ],
+      "required_facts": [
+        {
+          "fact": "launched October 14 2024",
+          "acceptable": [
+            "clipper-a1#p1",
+            "clipper-a1#p16",
+            "clipper-a1#p64"
+          ],
+          "spans": [
+            "October 14, 2024"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "q03",
+      "question": "In what year did Apollo 18 land astronauts on the Moon?",
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "tags": [
+        "insufficient",
+        "planned-sibling"
+      ],
+      "required_facts": []
+    },
+    {
+      "id": "q04",
+      "question": "In what year did Europa Clipper enter Jupiter orbit?",
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "tags": [
+        "insufficient",
+        "planned-future"
+      ],
+      "required_facts": []
+    },
+    {
+      "id": "q05",
+      "question": "On what exact date did the S-II stage make its uncontrolled re-entry?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [
+        "answerable",
+        "irregular-verb"
+      ],
+      "required_facts": [
+        {
+          "fact": "re-entry January 11 1975",
+          "acceptable": [
+            "saturnv-a1#p61"
+          ],
+          "spans": [
+            "January 11, 1975"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "q06",
+      "question": "At what speed in m/s did the remaining BepiColombo stack perform its September 2026 trajectory correction?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [
+        "answerable",
+        "decimal-measurement"
+      ],
+      "required_facts": [
+        {
+          "fact": "11.4 m/s",
+          "acceptable": [
+            "bepi-a1#p33"
+          ],
+          "spans": [
+            "11.4 m/s"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "q07",
+      "question": "On what exact calendar date was the Apollo program established?",
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "tags": [
+        "insufficient",
+        "date-precision"
+      ],
+      "required_facts": []
+    },
+    {
+      "id": "q08",
+      "question": "What kind of mission is BepiColombo?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [
+        "answerable",
+        "framing"
+      ],
+      "required_facts": [
+        {
+          "fact": "joint mission",
+          "acceptable": [
+            "bepi-a1#p1"
+          ],
+          "spans": [
+            "joint mission"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "q09",
+      "question": "What is the diameter of the James Webb primary mirror in inches?",
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "tags": [
+        "insufficient",
+        "measurement-absent-unit"
+      ],
+      "required_facts": []
+    },
+    {
+      "id": "q10",
+      "question": "Which company built the Starliner capsule?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [
+        "answerable",
+        "entity"
+      ],
+      "required_facts": [
+        {
+          "fact": "Boeing Starliner",
+          "acceptable": [
+            "shuttle-a1#p15",
+            "shuttle-a1#p53",
+            "shuttle-a1#p57"
+          ],
+          "spans": [
+            "Starliner"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "q11",
+      "question": "On what exact date did Apollo 11 land on the Moon, and who were the astronauts who landed?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [
+        "answerable",
+        "compound"
+      ],
+      "required_facts": [
+        {
+          "fact": "July 20 1969",
+          "acceptable": [
+            "apollo-a1#p2",
+            "apollo-a1#p39",
+            "apollo-a1#p83",
+            "apollo-a1#p112",
+            "apollo-a1#p114"
+          ],
+          "spans": [
+            "July 20, 1969"
+          ],
+          "answer_polarity": "affirmative"
+        },
+        {
+          "fact": "Armstrong and Aldrin",
+          "acceptable": [
+            "apollo-a1#p2",
+            "apollo-a1#p3",
+            "apollo-a1#p57",
+            "apollo-a1#p78",
+            "apollo-a1#p83",
+            "apollo-a1#p114",
+            "apollo-a1#p130"
+          ],
+          "spans": [
+            "Armstrong"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "q12",
+      "question": "On what exact date did the James Webb Space Telescope launch take place?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [
+        "answerable",
+        "exact-date"
+      ],
+      "required_facts": [
+        {
+          "fact": "25 December 2021",
+          "acceptable": [
+            "jwst-a1#p3",
+            "jwst-a1#p89",
+            "jwst-a1#p93"
+          ],
+          "spans": [
+            "25 December 2021"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    }
+  ]
+}

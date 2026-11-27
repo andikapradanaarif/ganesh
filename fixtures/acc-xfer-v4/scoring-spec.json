@@ -1,0 +1,3 @@
+{
+  "scoring": "hit requires ok status plus evidence credit; insufficient correct when status insufficient_context"
+}
