@@ -408,6 +408,9 @@ pub struct DecideInput<'a> {
     pub quantity_unit_missing: bool,
     pub any_numeric_token: bool,
     pub quantity_binding: bool,
+    /// M2: at least one selected passage entered the pool through dense
+    /// embedding recall — enables the semantic coverage override.
+    pub dense_support: bool,
     pub transition_check: bool,
     /// Experiment C: proposition-level verdicts. Negated compatible evidence
     /// contradicts and can settle a yes/no question with an explicit negative.
@@ -1599,6 +1602,33 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
         }
     }
 
+    // ---- M2 semantic-aware coverage calibration -------------------------------
+    // The coverage gates are lexical by construction: a paraphrased query
+    // ("jogging" for a "running" note, "abandon" for "gave up") shares few or
+    // no stems with its evidence and false-abstains even when dense retrieval
+    // surfaced the right passage and the QA verifier extracts a confident
+    // span. When (a) a dense-recalled candidate is among the selected
+    // passages and (b) the QA span-vs-null margin is strongly positive, the
+    // coverage reasons — and ONLY the coverage reasons — are waived. Every
+    // typed deterministic check (quantity binding, unit verification,
+    // transition/proposition cues) and the QA-unanswerability guard itself
+    // are untouched, so abstention integrity is preserved exactly.
+    let override_margin: f32 = std::env::var("GANESH_SEMANTIC_OVERRIDE_MARGIN")
+        .ok()
+        .and_then(|v| v.parse().ok())
+        .unwrap_or(1.0);
+    if input.dense_support {
+        if let Some(m) = trace.qa_margin {
+            if m.is_finite() && m >= override_margin {
+                trace.reasons.retain(|r| {
+                    !r.starts_with("idf-union-coverage")
+                        && !r.starts_with("union-coverage")
+                        && !r.starts_with("top-coverage")
+                });
+            }
+        }
+    }
+
     trace.decision = if trace.reasons.is_empty() {
         "ok".to_string()
     } else {
@@ -1636,6 +1666,7 @@ mod sufficiency_tests {
             quantity_unit_missing: false,
             any_numeric_token: true,
             quantity_binding: true,
+            dense_support: false,
             transition_check: false,
             proposition_check: false,
             context_chain: true,
@@ -1724,6 +1755,7 @@ mod sufficiency_tests {
             quantity_unit_missing: false,
             any_numeric_token: false,
             quantity_binding: false,
+            dense_support: false,
             transition_check: false,
             proposition_check: false,
             context_chain: true,
@@ -1752,6 +1784,7 @@ mod sufficiency_tests {
             quantity_unit_missing: false,
             any_numeric_token: false,
             quantity_binding: false,
+            dense_support: false,
             transition_check: false,
             proposition_check: false,
             context_chain: true,

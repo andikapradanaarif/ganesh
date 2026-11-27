@@ -259,7 +259,78 @@ pub fn stemmed_tokens(text: &str) -> Vec<String> {
 
 /// Stemmed index text for one passage: article title, heading context and body.
 pub fn stemmed_index_text(title: &str, section: &str, text: &str) -> String {
-    stemmed_tokens(&format!("{title} {section} {text}")).join(" ")
+    stemmed_index_text_meta(title, section, text, "", "", "")
+}
+
+/// Checkbox normalization for the indexed/search view: markdown task states
+/// become legible search tokens. Verbatim stored/returned text is untouched.
+pub fn normalize_checkboxes(text: &str) -> String {
+    text.replace("[x]", " checkboxchecked ").replace("[X]", " checkboxchecked ").replace("[ ]", " checkboxunchecked ")
+}
+
+/// Symbol-preserving aliases: `--flag` CLI tokens additionally index as
+/// `dd<name>` so flag and bare-name queries both resolve, and tokens bearing
+/// uppercase letters (error codes, env vars) additionally index their exact
+/// lowercase unstemmed form alongside the stemmed one.
+fn symbol_alias_tokens(text: &str) -> Vec<String> {
+    let mut out = Vec::new();
+    for word in text.split_whitespace() {
+        let w = word.trim_matches(|c: char| c == ',' || c == ';' || c == ')' || c == '(');
+        if let Some(flag) = w.strip_prefix("--") {
+            let name: String = flag.chars().filter(|c| c.is_alphanumeric() || *c == '-').collect();
+            if name.len() >= 2 {
+                out.push(format!("dd{}", name.replace('-', "").to_lowercase()));
+            }
+        }
+        if word.chars().any(|c| c.is_ascii_uppercase()) {
+            let low: String = word.chars().filter(|c| c.is_alphanumeric()).collect::<String>().to_lowercase();
+            if low.len() >= 2 {
+                out.push(low);
+            }
+        }
+    }
+    out
+}
+
+/// Metadata-aware index text: title, section, body plus occurred-at date,
+/// source type and author/speaker so temporal and genre qualifiers are
+/// searchable. Checkbox state normalized; symbols preserved.
+pub fn stemmed_index_text_meta(title: &str, section: &str, text: &str, occurred: &str, source_type: &str, author: &str) -> String {
+    let normalized = normalize_checkboxes(text);
+    let mut tokens = stemmed_tokens(&format!("{title} {section} {occurred} {source_type} {author} {normalized}"));
+    tokens.extend(symbol_alias_tokens(&normalized).into_iter().map(|t| normalize_token(&t)));
+    tokens.join(" ")
+}
+
+/// Context-header rendering for the embedded and reranked view. The verbatim
+/// passage text returned to callers is never modified.
+pub fn rendered_context_text(occurred: &str, source_type: &str, author: &str, title: &str, section: &str, text: &str) -> String {
+    let mut parts: Vec<String> = Vec::new();
+    if !occurred.is_empty() {
+        parts.push(occurred.to_string());
+    }
+    if !source_type.is_empty() {
+        parts.push(source_type.to_string());
+    }
+    if !author.is_empty() {
+        parts.push(author.to_string());
+    }
+    let mut ts = String::new();
+    if !title.is_empty() && !section.is_empty() && section != "(lead)" {
+        ts = format!("{title} — {section}");
+    } else if !title.is_empty() {
+        ts = title.to_string();
+    } else if !section.is_empty() {
+        ts = section.to_string();
+    }
+    if !ts.is_empty() {
+        parts.push(ts);
+    }
+    if parts.is_empty() {
+        text.to_string()
+    } else {
+        format!("[{}]\n{text}", parts.join(" | "))
+    }
 }
 
 /// Distinct stemmed content terms of a query.
@@ -507,12 +578,36 @@ pub struct CandidateRow {
     pub section: String,
     pub text: String,
     pub title: String,
+    /// Rank in the dense cosine list when this candidate came in through or
+    /// was also seen by the embedding retriever (None = pure BM25 hit).
+    pub dense_rank: Option<usize>,
+    pub occurred_at: String,
+    pub source_type: String,
+    pub author: String,
+    pub claim_key: String,
 }
 
 impl CorpusView {
     /// Runs every SQLite read the pipeline needs. `terms` are the already-
     /// normalized query terms (the FTS MATCH expression derives from them).
-    pub fn fetch(store: &Store, terms: &[String], cfg: &RetrievalConfig) -> Option<CorpusView> {
+    /// Eligibility (M2): only passages whose revision is visible to the
+    /// caller's projects, inside its effective window at `as_of`, and not
+    /// superseded in scope enter EITHER retriever — lexical or dense — so no
+    /// restricted or retired candidate can ever reach the reranker.
+    pub fn fetch(
+        store: &Store,
+        terms: &[String],
+        cfg: &RetrievalConfig,
+        projects: &[String],
+        as_of: &str,
+        query_scope: &str,
+    ) -> Option<CorpusView> {
+        let eligible_revs = crate::store::eligible_revisions(store, projects, as_of, query_scope);
+        if eligible_revs.is_empty() {
+            return None;
+        }
+
+        // ---- lexical recall: BM25 over FTS5, overfetched then filtered ----
         let q = fts_query(terms);
         let mut stmt = store.conn.prepare(
             "SELECT passage_id, bm25(passages_fts) AS score FROM passages_fts
@@ -520,67 +615,121 @@ impl CorpusView {
              ORDER BY score ASC, passage_id ASC
              LIMIT ?2",
         ).ok()?;
+        let overfetch = (cfg.candidate_limit as i64) * 4;
         let rows = stmt
-            .query_map(rusqlite::params![q, cfg.candidate_limit as i64], |row| {
+            .query_map(rusqlite::params![q, overfetch], |row| {
                 Ok((row.get::<_, String>(0)?, row.get::<_, f64>(1)?))
             })
             .map(|r| r.filter_map(|x| x.ok()).collect::<Vec<_>>())
             .unwrap_or_default();
-        if rows.is_empty() {
+
+        let rev_of = |pid: &str| -> String {
+            pid.split('#').next().unwrap_or("").to_string()
+        };
+        let bm25_hits: Vec<(String, f64)> = rows
+            .into_iter()
+            .filter(|(pid, _)| eligible_revs.contains_key(&rev_of(pid)))
+            .take(cfg.candidate_limit)
+            .collect();
+
+        // ---- dense recall: cosine over eligible embeddings only ----
+        let mut dense_order: Vec<String> = Vec::new();
+        if crate::embed::available() {
+            if let Some(qvec) = crate::embed::embed_one(&terms.join(" ")) {
+                let mut scored: Vec<(String, f32)> = Vec::new();
+                if let Ok(mut estmt) = store.conn.prepare(
+                    "SELECT e.passage_id, e.vector, p.revision FROM embeddings e JOIN passages p ON e.passage_id = p.id",
+                ) {
+                    if let Ok(erows) = estmt.query_map([], |row| {
+                        Ok((row.get::<_, String>(0)?, row.get::<_, Vec<u8>>(1)?, row.get::<_, String>(2)?))
+                    }) {
+                        for row in erows.flatten() {
+                            let (pid, blob, rev) = row;
+                            if !eligible_revs.contains_key(&rev) {
+                                continue;
+                            }
+                            let vec: Vec<f32> = blob
+                                .chunks_exact(4)
+                                .map(|c| f32::from_le_bytes([c[0], c[1], c[2], c[3]]))
+                                .collect();
+                            scored.push((pid, crate::embed::dot(&qvec, &vec)));
+                        }
+                    }
+                }
+                scored.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
+                dense_order = scored.into_iter().take(cfg.candidate_limit).map(|(p, _)| p).collect();
+            }
+        }
+
+        // ---- reciprocal rank fusion of the two recall lists ----
+        const RRF_K: f64 = 60.0;
+        let mut rrf: std::collections::HashMap<String, (f64, usize, Option<usize>, f64)> = std::collections::HashMap::new();
+        for (rank, (pid, score)) in bm25_hits.iter().enumerate() {
+            rrf.insert(pid.clone(), (1.0 / (RRF_K + rank as f64 + 1.0), rank, None, *score));
+        }
+        for (rank, pid) in dense_order.iter().enumerate() {
+            rrf.entry(pid.clone())
+                .and_modify(|e| {
+                    e.0 += 1.0 / (RRF_K + rank as f64 + 1.0);
+                    e.2 = Some(rank);
+                })
+                .or_insert((1.0 / (RRF_K + rank as f64 + 1.0), usize::MAX, Some(rank), 0.0));
+        }
+        let mut fused: Vec<(String, f64, usize, Option<usize>, f64)> = rrf
+            .into_iter()
+            .map(|(pid, (s, brank, drank, bm))| (pid, s, brank, drank, bm))
+            .collect();
+        fused.sort_by(|a, b| {
+            b.1.partial_cmp(&a.1)
+                .unwrap_or(std::cmp::Ordering::Equal)
+                .then(a.2.cmp(&b.2))
+                .then(a.0.cmp(&b.0))
+        });
+        fused.truncate(cfg.candidate_limit);
+        if fused.is_empty() {
             return None;
         }
+
         let mut candidates = Vec::new();
-        for (passage_id, score) in rows {
-            let index_text: String = store
+        for (passage_id, _rrf_score, _bm_rank, dense_rank, bm25_score) in fused {
+            let row: Option<(String, String, String, String, String, String, String, String, String)> = store
                 .conn
                 .query_row(
-                    "SELECT index_text FROM passages_fts WHERE passage_id = ?1",
+                    "SELECT f.index_text, p.revision, p.section, p.text, r.article_id, s.title,
+                            COALESCE(r.occurred_at,''), r.source_type, r.author
+                     FROM passages p
+                     JOIN revisions r ON p.revision = r.revision
+                     JOIN sources s ON r.article_id = s.article_id
+                     JOIN passages_fts f ON f.passage_id = p.id
+                     WHERE p.id = ?1",
                     rusqlite::params![passage_id],
-                    |row| row.get(0),
+                    |row| {
+                        Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?, row.get(4)?, row.get(5)?, row.get(6)?, row.get(7)?, row.get(8)?))
+                    },
                 )
-                .unwrap_or_default();
-            let article_id: String = store
-                .conn
-                .query_row(
-                    "SELECT r.article_id FROM passages p JOIN revisions r ON p.revision = r.revision WHERE p.id = ?1",
-                    rusqlite::params![passage_id],
-                    |row| row.get(0),
-                )
-                .unwrap_or_default();
-            let body_text: String = store
-                .conn
-                .query_row(
-                    "SELECT text FROM passages WHERE id = ?1",
-                    rusqlite::params![passage_id],
-                    |row| row.get(0),
-                )
-                .unwrap_or_default();
-            let ctx_row: (String, String, String) = store
-                .conn
-                .query_row(
-                    "SELECT p.section, p.text, s.title FROM passages p JOIN revisions r ON p.revision = r.revision JOIN sources s ON r.article_id = s.article_id WHERE p.id = ?1",
-                    rusqlite::params![passage_id],
-                    |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
-                )
-                .unwrap_or_default();
-            let revision: String = store
-                .conn
-                .query_row(
-                    "SELECT p.revision FROM passages p WHERE p.id = ?1",
-                    rusqlite::params![passage_id],
-                    |row| row.get(0),
-                )
-                .unwrap_or_default();
+                .ok();
+            let Some((index_text, revision, section, text, article_id, title, occurred, stype, author)) = row else {
+                continue;
+            };
+            let claim_key = eligible_revs.get(&revision).map(|m| m.claim_key.clone()).unwrap_or_default();
             candidates.push(CandidateRow {
                 passage_id,
-                score,
+                score: bm25_score,
                 index_text,
                 article_id,
                 revision,
-                section: ctx_row.0,
-                text: body_text,
-                title: ctx_row.2,
+                section,
+                text,
+                title,
+                dense_rank,
+                occurred_at: occurred,
+                source_type: stype,
+                author,
+                claim_key,
             });
+        }
+        if candidates.is_empty() {
+            return None;
         }
         let mut sources = Vec::new();
         if let Ok(mut stmt) = store.conn.prepare("SELECT article_id, title FROM sources") {
@@ -619,6 +768,47 @@ pub fn search(store: &Store, query: &str, caller: &str, cfg: &RetrievalConfig) -
     search_debug(store, query, caller, cfg).0
 }
 
+/// Full M2 read path: explicit permitted projects (resolved from credentials
+/// upstream), effective time and per-request top_k.
+pub fn search_full(
+    store: &Store,
+    query: &str,
+    projects: &[String],
+    as_of: &str,
+    top_k: usize,
+    query_scope: &str,
+    cfg: &RetrievalConfig,
+) -> SearchResponse {
+    let mut cfg2 = cfg.clone();
+    cfg2.top_k = top_k.clamp(1, 15);
+    let terms = query_terms(query);
+    if terms.is_empty() {
+        return SearchResponse {
+            status: "insufficient_context".to_string(),
+            query: query.to_string(),
+            passages: vec![],
+            confidence: "insufficient_context".to_string(),
+            top_margin: None,
+            effective_time: as_of.to_string(),
+        };
+    }
+    match CorpusView::fetch(store, &terms, &cfg2, projects, as_of, query_scope) {
+        Some(view) => {
+            let (mut resp, _dbg) = evaluate(&view, query, "", &cfg2);
+            resp.effective_time = as_of.to_string();
+            resp
+        }
+        None => SearchResponse {
+            status: "insufficient_context".to_string(),
+            query: query.to_string(),
+            passages: vec![],
+            confidence: "insufficient_context".to_string(),
+            top_margin: None,
+            effective_time: as_of.to_string(),
+        },
+    }
+}
+
 pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalConfig) -> (SearchResponse, SearchDebug) {
     let terms = query_terms(query);
     let empty_debug = |terms: &[String]| SearchDebug {
@@ -638,12 +828,21 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
         status: "insufficient_context".to_string(),
         query: query.to_string(),
         passages: vec![],
+        confidence: "insufficient_context".to_string(),
+        top_margin: None,
+        effective_time: crate::types::now_iso(),
     };
     if terms.is_empty() || !permitted(caller, "public") {
         return (empty, empty_debug(&terms));
     }
-    match CorpusView::fetch(store, &terms, cfg) {
-        Some(view) => evaluate(&view, query, caller, cfg),
+    let projects = vec!["public".to_string()];
+    let now = crate::types::now_iso();
+    match CorpusView::fetch(store, &terms, cfg, &projects, &now, "") {
+        Some(view) => {
+            let (mut r, d) = evaluate(&view, query, caller, cfg);
+            r.effective_time = now;
+            (r, d)
+        }
         None => (empty, empty_debug(&terms)),
     }
 }
@@ -666,6 +865,9 @@ fn evaluate(view: &CorpusView, query: &str, caller: &str, cfg: &RetrievalConfig)
         status: status.to_string(),
         query: query.to_string(),
         passages: vec![],
+        confidence: "insufficient_context".to_string(),
+        top_margin: None,
+        effective_time: crate::types::now_iso(),
     };
 
     let terms = query_terms(query);
@@ -807,12 +1009,14 @@ fn evaluate(view: &CorpusView, query: &str, caller: &str, cfg: &RetrievalConfig)
             let section = view.candidates[i].section.clone();
             let text = view.candidates[i].text.clone();
             let title = view.candidates[i].title.clone();
-            let ctx = match (title.is_empty(), section.is_empty()) {
-                (false, false) => format!("{title} — {section}\n{text}"),
-                (false, true) => format!("{title}\n{text}"),
-                (true, false) => format!("{section}\n{text}"),
-                (true, true) => text.clone(),
-            };
+            let ctx = rendered_context_text(
+                &view.candidates[i].occurred_at,
+                &view.candidates[i].source_type,
+                &view.candidates[i].author,
+                &title,
+                &section,
+                &text,
+            );
             if rerank_inputs.len() <= i {
                 rerank_inputs.resize(i + 1, String::new());
             }
@@ -1100,6 +1304,9 @@ fn evaluate(view: &CorpusView, query: &str, caller: &str, cfg: &RetrievalConfig)
         quantity_unit_missing,
         any_numeric_token: any_numeric,
         quantity_binding: cfg.quantity_binding,
+        dense_support: passage_texts.iter().any(|(pid, _)| {
+            view.candidates.iter().any(|c| c.passage_id == *pid && c.dense_rank.is_some())
+        }),
         transition_check: cfg.transition_check || cfg.proposition_check,
         proposition_check: cfg.proposition_check,
         context_chain: cfg.context_chain,
@@ -1132,10 +1339,38 @@ fn evaluate(view: &CorpusView, query: &str, caller: &str, cfg: &RetrievalConfig)
         }
     }
 
+    // Conflicting-evidence detection: two eligible, non-superseding revisions
+    // sharing one claim key among the selected evidence means equally
+    // authoritative incompatible claims — surface both, never pick a winner.
+    let mut claim_revs: std::collections::BTreeMap<String, std::collections::BTreeSet<String>> = std::collections::BTreeMap::new();
+    for h in &hits {
+        if let Some(row) = view.candidates.iter().find(|c| c.passage_id == h.passage_id) {
+            if !row.claim_key.is_empty() {
+                claim_revs.entry(row.claim_key.clone()).or_default().insert(row.revision.clone());
+            }
+        }
+    }
+    let conflicted = claim_revs.values().any(|set| set.len() > 1);
+
+    let margin = if debug.rerank_scores.len() >= 2 {
+        Some((debug.rerank_scores[0].1 - debug.rerank_scores[1].1) as f64)
+    } else {
+        None
+    };
+    let qa_margin = debug.trace.qa_margin.unwrap_or(0.0) as f64;
+    let confidence = if debug.idf_union_coverage >= 0.9 && qa_margin >= 0.5 {
+        "supported"
+    } else {
+        "uncertain"
+    };
+
     (SearchResponse {
-        status: "ok".to_string(),
+        status: if conflicted { "conflicting_evidence".to_string() } else { "ok".to_string() },
         query: query.to_string(),
         passages: hits,
+        confidence: confidence.to_string(),
+        top_margin: margin,
+        effective_time: crate::types::now_iso(),
     }, debug)
 }
 

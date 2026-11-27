@@ -1,7 +1,8 @@
 pub mod accept;
 pub mod citation;
-pub mod rerank;
+pub mod embed;
 pub mod qa_verify;
+pub mod rerank;
 pub mod search;
 pub mod segment;
 pub mod store;

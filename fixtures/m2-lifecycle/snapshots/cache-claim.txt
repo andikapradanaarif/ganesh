@@ -1,0 +1,3 @@
+== Cache fleet lesson ==
+
+Lesson for capacity planning: the cache fleet in the primary region runs c7i instances, so size memory budgets for the c7i family.

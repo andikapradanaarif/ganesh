@@ -1,0 +1,3 @@
+== Published lesson: generated clients ==
+
+Lesson shared across projects: when a generated client's schema changes, regenerate the client before deploying. Applicability: only if your client is generated from that schema — check locally first.

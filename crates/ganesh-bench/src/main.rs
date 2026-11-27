@@ -66,10 +66,27 @@ struct StructuralFinding {
     problem: String,
 }
 
+mod lifecycle;
+
 fn main() {
     ganesh_core::rerank::enforce_requirement("ganesh-bench");
+    ganesh_core::embed::enforce_requirement("ganesh-bench");
     ganesh_core::qa_verify::enforce_requirement("ganesh-bench");
     let args: Vec<String> = std::env::args().collect();
+    if args.len() >= 2 && args[1] == "lifecycle" {
+        // ganesh-bench lifecycle --corpus fixtures/m2-lifecycle
+        // M2 lifecycle replay gate (roadmap section 7): drives a live server
+        // through all five lifecycle scenarios over REST and MCP.
+        let mut cdir = "fixtures/m2-lifecycle".to_string();
+        let mut j = 2;
+        while j < args.len() {
+            match args[j].as_str() {
+                "--corpus" => { cdir = args.get(j + 1).cloned().unwrap(); j += 2; }
+                other => { eprintln!("unknown argument: {other}"); std::process::exit(2); }
+            }
+        }
+        std::process::exit(lifecycle::run_lifecycle(&cdir));
+    }
     let mut questions_path = None;
     let mut report_path = None;
     let mut corpus_dir = "fixtures/corpus".to_string();
@@ -771,6 +788,7 @@ fn run(questions_path: &str, report_path: &str, corpus_dir: &str, details_path: 
     }
     r.push('\n');
     r.push_str(&format!("- {}\n", ganesh_core::rerank::status_summary()));
+    r.push_str(&format!("- {}\n", ganesh_core::embed::status_summary()));
     r.push_str(&format!("- {}\n", ganesh_core::qa_verify::status_summary()));
     r.push_str("## Summary\n\n");
     r.push_str(&format!("| Check | Result |\n| --- | --- |\n"));

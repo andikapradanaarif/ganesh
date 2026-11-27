@@ -1,0 +1,3 @@
+== Incident 77 root cause report (infrastructure team, scope narrowed) ==
+
+After investigation, the root cause of incident 77 in the staging environment was certificate expiry on the edge gateway, which dropped TLS connections fleet-wide.

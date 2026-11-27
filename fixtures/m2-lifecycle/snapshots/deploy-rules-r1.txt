@@ -1,0 +1,3 @@
+== Deployment approval rules ==
+
+All deployments to the staging environment and the production environment require manual approval by the release captain before any rollout begins.
