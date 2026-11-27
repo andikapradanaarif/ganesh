@@ -1,32 +1,24 @@
-//! Local cross-encoder passage reranker (issue: semantic reranker experiment).
+//! Local cross-encoder passage reranker — INT8 ONNX Runtime edition.
 //!
-//! Predeclared configuration, frozen before any outcome inspection:
-//! - Model: cross-encoder/ms-marco-MiniLM-L-6-v2 (Apache-2.0), safetensors,
-//!   BERT architecture, 6 layers, hidden 384, single-logit sequence classifier.
-//! - Runtime: candle (pure Rust), CPU, fp32, no provider calls, no network.
-//! - Input pair: [CLS] question [SEP] passage [SEP]. Question truncated to at
-//!   most 64 wordpiece tokens; passage to the first 384 tokens of its body;
-//!   total sequence capped at 512 tokens per model maximum.
-//! - The reranker scores every eligible candidate for every question,
-//!   including date and quantity questions. It replaces bm25 ordering and all
-//!   prior promotion logic inside selection; candidate generation, the top-50
-//!   pool, eligibility, acceptance, and the REST/MCP contract are unchanged.
-//! - Compound preservation: greedy selection in cross-encoder score order,
-//!   skipping a candidate whose whitespace-token Jaccard overlap with any
-//!   already-selected passage is >= 0.7, until three passages are selected.
+//! Frozen configuration:
+//! - Model: cross-encoder/ms-marco-MiniLM-L-6-v2, dynamic INT8 ONNX
+//!   (temsa/ms-marco-MiniLM-L-6-v2-onnx-cpu-qint8, sha256 logged per report).
+//! - Runtime: ONNX Runtime CPU execution provider via `ort`, zero network at
+//!   runtime, no provider calls.
+//! - Input pair: [CLS] question [SEP] passage [SEP]. Question truncated to 64
+//!   whitespace tokens; passage to 384; total sequence capped at 512.
+//! - Batched inference: the whole candidate pool is scored in as few forward
+//!   passes as possible (padding to the batch maximum length).
+//! - Selection policy is unchanged: greedy slots in cross-encoder order with
+//!   token-Jaccard >= 0.7 diversity skip; hybrid coverage final slot.
 
-use candle_core::{Device, Tensor};
-use candle_nn::VarBuilder;
-use candle_transformers::models::bert::{BertModel, Config};
-use std::sync::OnceLock;
+use ort::session::{builder::GraphOptimizationLevel, Session};
+use ort::value::Tensor;
+use std::sync::{Mutex, OnceLock};
 use tokenizers::Tokenizer;
 
 struct CrossEncoder {
-    model: BertModel,
-    pooler_w: Tensor,
-    pooler_b: Tensor,
-    classifier_w: Tensor,
-    classifier_b: Tensor,
+    session: Mutex<Session>,
     tokenizer: Tokenizer,
 }
 
@@ -39,84 +31,108 @@ fn model_dir() -> String {
 
 fn load() -> Option<CrossEncoder> {
     let dir = model_dir();
-    let config: Config =
-        serde_json::from_str(&std::fs::read_to_string(format!("{dir}/config.json")).ok()?).ok()?;
-    let tokenizer =
-        Tokenizer::from_file(format!("{dir}/tokenizer.json")).ok()?;
-    let weights = format!("{dir}/model.safetensors");
-    let device = Device::Cpu;
-    let vb = unsafe {
-        VarBuilder::from_mmaped_safetensors(&[weights], candle_core::DType::F32, &device).ok()?
+    let tokenizer = Tokenizer::from_file(format!("{dir}/tokenizer.json")).ok()?;
+    let weights = format!("{dir}/model-int8.onnx");
+    if !std::path::Path::new(&weights).exists() {
+        return None;
+    }
+    let session = Session::builder().ok()?
+        .with_optimization_level(GraphOptimizationLevel::Level3).ok()?
+        .with_intra_threads(4).ok()?
+        .commit_from_file(weights).ok()?;
+    Some(CrossEncoder { session: Mutex::new(session), tokenizer })
+}
+
+fn encode_pair(tok: &Tokenizer, question: &str, passage: &str) -> (Vec<i64>, Vec<i64>, Vec<i64>) {
+    let q_trunc: String = question.split_whitespace().take(64).collect::<Vec<_>>().join(" ");
+    let p_trunc: String = passage.split_whitespace().take(384).collect::<Vec<_>>().join(" ");
+    let encoding = match tok.encode((q_trunc.as_str(), p_trunc.as_str()), true) {
+        Ok(e) => e,
+        Err(_) => return (vec![], vec![], vec![]),
     };
-    let model = BertModel::load(vb.pp("bert"), &config).ok()?;
-    let pooler_w = vb.pp("bert.pooler.dense").get((config.hidden_size, config.hidden_size), "weight").ok()?;
-    let pooler_b = vb.pp("bert.pooler.dense").get(config.hidden_size, "bias").ok()?;
-    let classifier_w = vb.pp("classifier").get((1, config.hidden_size), "weight").ok()?;
-    let classifier_b = vb.pp("classifier").get(1, "bias").ok()?;
-    Some(CrossEncoder { model, pooler_w, pooler_b, classifier_w, classifier_b, tokenizer })
+    let mut ids: Vec<i64> = encoding.get_ids().iter().map(|&x| x as i64).collect();
+    let mut types: Vec<i64> = encoding.get_type_ids().iter().map(|&x| x as i64).collect();
+    let mut mask: Vec<i64> = encoding.get_attention_mask().iter().map(|&x| x as i64).collect();
+    ids.truncate(512);
+    types.truncate(512);
+    mask.truncate(512);
+    (ids, types, mask)
+}
+
+/// Score a batch of (question, passage) pairs sharing one question in a
+/// single padded forward pass. None when the model is unavailable.
+pub fn score_batch(question: &str, passages: &[String]) -> Option<Vec<f32>> {
+    let enc = MODEL.get_or_init(load).as_ref()?;
+    if passages.is_empty() {
+        return Some(Vec::new());
+    }
+    let mut items: Vec<(Vec<i64>, Vec<i64>, Vec<i64>)> = passages
+        .iter()
+        .map(|p| encode_pair(&enc.tokenizer, question, p))
+        .collect();
+    if items.iter().any(|(ids, _, _)| ids.is_empty()) {
+        return None;
+    }
+    // Length-sorted batching: score in ascending-length order so padding waste
+    // stays minimal, then restore the caller's original ordering. Attention
+    // masks make padded positions exact no-ops, so scores are unchanged.
+    let mut order: Vec<usize> = (0..items.len()).collect();
+    order.sort_by_key(|&i| items[i].0.len());
+    let mut sorted: Vec<(Vec<i64>, Vec<i64>, Vec<i64>)> = Vec::with_capacity(items.len());
+    for &i in &order {
+        sorted.push(std::mem::take(&mut items[i]));
+    }
+    let mut items = sorted;
+    let batch = items.len();
+    let maxlen = items.iter().map(|(ids, _, _)| ids.len()).max().unwrap_or(1);
+    let mut ids_flat: Vec<i64> = Vec::with_capacity(batch * maxlen);
+    let mut types_flat: Vec<i64> = Vec::with_capacity(batch * maxlen);
+    let mut mask_flat: Vec<i64> = Vec::with_capacity(batch * maxlen);
+    for (ids, types, mask) in items.drain(..) {
+        let pad = maxlen - ids.len();
+        ids_flat.extend(ids.iter().cloned().chain(std::iter::repeat(0).take(pad)));
+        types_flat.extend(types.iter().cloned().chain(std::iter::repeat(0).take(pad)));
+        mask_flat.extend(mask.iter().cloned().chain(std::iter::repeat(0).take(pad)));
+    }
+    let shape = vec![batch, maxlen];
+    let ids_t = Tensor::from_array((shape.clone(), ids_flat)).ok()?;
+    let types_t = Tensor::from_array((shape.clone(), types_flat)).ok()?;
+    let mask_t = Tensor::from_array((shape, mask_flat)).ok()?;
+    let mut session = enc.session.lock().ok()?;
+    let outputs = session
+        .run(ort::inputs![ids_t, mask_t, types_t])
+        .ok()?;
+    let (_shape, data) = outputs[0].try_extract_tensor::<f32>().ok()?;
+    let mut out = vec![0f32; batch];
+    for (pos, &orig) in order.iter().enumerate() {
+        out[orig] = data.get(pos).cloned().unwrap_or(0.0);
+    }
+    Some(out)
 }
 
 /// Score one (question, passage) pair. Returns None if the model is
 /// unavailable or inference fails; callers treat None as "reranker absent".
 pub fn score_pair(question: &str, passage: &str) -> Option<f32> {
-    let enc = MODEL.get_or_init(load).as_ref()?;
-    score_with(enc, question, passage).ok()
-}
-
-fn score_with(enc: &CrossEncoder, question: &str, passage: &str) -> candle_core::Result<f32> {
-    // Truncation policy: question first 64 tokens, passage first 384 tokens.
-    let q_trunc: String = question.split_whitespace().take(64).collect::<Vec<_>>().join(" ");
-    let p_trunc: String = passage.split_whitespace().take(384).collect::<Vec<_>>().join(" ");
-    let encoding = enc
-        .tokenizer
-        .encode((q_trunc.as_str(), p_trunc.as_str()), true)
-        .map_err(|e| candle_core::Error::Msg(format!("tokenize: {e}")))?;
-    let mut ids: Vec<u32> = encoding.get_ids().to_vec();
-    let mut types: Vec<u32> = encoding.get_type_ids().to_vec();
-    let mut mask: Vec<u32> = encoding.get_attention_mask().to_vec();
-    ids.truncate(512);
-    types.truncate(512);
-    mask.truncate(512);
-    let device = Device::Cpu;
-    let len = ids.len();
-    let ids_t = Tensor::from_vec(ids, (1, len), &device)?;
-    let types_t = Tensor::from_vec(types, (1, len), &device)?;
-    let mask_t = Tensor::from_vec(mask, (1, len), &device)?;
-    let hidden = enc.model.forward(&ids_t, &types_t, Some(&mask_t))?;
-    // CLS embedding: first token position.
-    let cls = hidden.get(0)?.get(0)?; // [hidden]
-    // Standard BertForSequenceClassification path: pooler dense + tanh, then
-    // the classification head.
-    let pooled = enc
-        .pooler_w
-        .matmul(&cls.unsqueeze(1)?)?
-        .squeeze(1)?
-        .add(&enc.pooler_b)?
-        .tanh()?;
-    let logits = pooled
-        .unsqueeze(0)?
-        .matmul(&enc.classifier_w.t()?)?
-        .squeeze(0)?
-        .add(&enc.classifier_b)?; // [1]
-    logits.get(0)?.to_scalar::<f32>()
+    score_batch(question, &[passage.to_string()]).and_then(|v| v.first().cloned())
 }
 
 pub fn available() -> bool {
     MODEL.get_or_init(load).is_some()
 }
-/// Reranker availability status for report certification.
+
+/// Status line for report certification, reusing the OnceLock.
 pub fn status_summary() -> String {
     let dir = model_dir();
-    let weights = format!("{dir}/model.safetensors");
-    if std::path::Path::new(&weights).exists() && load().is_some() {
-        let digest = ganesh_sha256_prefix(&weights);
-        format!("reranker: active (model {dir}, sha256 {digest})")
+    let weights = format!("{dir}/model-int8.onnx");
+    if std::path::Path::new(&weights).exists() && available() {
+        let digest = sha256_prefix(&weights);
+        format!("reranker: active (model {dir}/model-int8.onnx int8-onnx, sha256 {digest})")
     } else {
-        "reranker: absent (BM25 fallback)".to_string()
+        "reranker: absent".to_string()
     }
 }
 
-fn ganesh_sha256_prefix(path: &str) -> String {
+fn sha256_prefix(path: &str) -> String {
     use std::io::Read;
     let mut f = match std::fs::File::open(path) {
         Ok(f) => f,
@@ -129,16 +145,14 @@ fn ganesh_sha256_prefix(path: &str) -> String {
     crate::citation::sha256_hex(&buf).chars().take(12).collect()
 }
 
-/// Fail-loud guard: when GANESH_REQUIRE_RERANKER=1 the model must load;
-/// otherwise the process exits non-zero immediately rather than silently
-/// benchmarking a BM25 fallback.
+/// Fail-loud guard: refuse to run silently degraded when the operator
+/// explicitly requires the neural reranker.
 pub fn enforce_requirement(caller: &str) {
-    if std::env::var("GANESH_REQUIRE_RERANKER").ok().as_deref() == Some("1") && load().is_none() {
+    if std::env::var("GANESH_REQUIRE_RERANKER").ok().as_deref() == Some("1") && !available() {
         eprintln!(
-            "FATAL: GANESH_REQUIRE_RERANKER=1 but the reranker model failed to load from `{}` ({caller}). Refusing silent BM25 fallback.",
+            "FATAL: GANESH_REQUIRE_RERANKER=1 but the reranker model failed to load from `{}` ({caller}). Refusing silent skip.",
             model_dir()
         );
         std::process::exit(2);
     }
 }
-

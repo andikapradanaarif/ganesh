@@ -1,28 +1,24 @@
-//! Local SQuAD 2.0 extractive-QA unanswerability verifier.
+//! Local SQuAD 2.0 extractive-QA unanswerability verifier — INT8 ONNX edition.
 //!
-//! Predeclared configuration, frozen before any transfer-packet evaluation:
-//! - Model: deepset/minilm-uncased-squad2 (MiniLM, BERT architecture,
-//!   BertForQuestionAnswering head), safetensors, CPU fp32, pure Rust candle,
-//!   zero network at runtime.
+//! Frozen configuration:
+//! - Model: deepset/minilm-uncased-squad2, dynamically quantized INT8 ONNX
+//!   (quantized locally with onnxruntime dynamic quantization; sha256 logged).
+//! - Runtime: ONNX Runtime CPU execution provider via `ort`, zero network.
 //! - Input: [CLS] question [SEP] "{title} — {section}\n{text}" [SEP], question
 //!   capped at 64 wordpiece tokens, passage at 384, total capped at 512.
 //! - Scoring per selected passage: null_score = start[0]+end[0] over the CLS
 //!   position; best_span = max start[i]+end[j] over passage positions
 //!   (token_type==1, excluding special tokens), i<=j, j-i<30.
-//!   margin = best_span - null_score. Positive: an answer span beats no-answer.
-//! - The verifier runs ONLY on the final top-3 selected passages inside
-//!   acceptance (~3 forward passes per query).
+//!   margin = best_span - null_score.
+//! - Runs ONLY on the final top-3 selected passages inside acceptance.
 
-use candle_core::{Device, Tensor};
-use candle_nn::VarBuilder;
-use candle_transformers::models::bert::{BertModel, Config};
-use std::sync::OnceLock;
+use ort::session::{builder::GraphOptimizationLevel, Session};
+use ort::value::Tensor;
+use std::sync::{Mutex, OnceLock};
 use tokenizers::Tokenizer;
 
 struct QaModel {
-    model: BertModel,
-    qa_w: Tensor, // [2, hidden]
-    qa_b: Tensor, // [2]
+    session: Mutex<Session>,
     tokenizer: Tokenizer,
 }
 
@@ -33,20 +29,18 @@ fn model_dir() -> String {
         .unwrap_or_else(|_| "fixtures/qa-verifier-model".to_string())
 }
 
-fn load() -> Option<QaModel> {
+pub(crate) fn load() -> Option<QaModel> {
     let dir = model_dir();
-    let config: Config =
-        serde_json::from_str(&std::fs::read_to_string(format!("{dir}/config.json")).ok()?).ok()?;
     let tokenizer = Tokenizer::from_file(format!("{dir}/tokenizer.json")).ok()?;
-    let weights = format!("{dir}/model.safetensors");
-    let device = Device::Cpu;
-    let vb = unsafe {
-        VarBuilder::from_mmaped_safetensors(&[weights], candle_core::DType::F32, &device).ok()?
-    };
-    let model = BertModel::load(vb.pp("bert"), &config).ok()?;
-    let qa_w = vb.pp("qa_outputs").get((2, config.hidden_size), "weight").ok()?;
-    let qa_b = vb.pp("qa_outputs").get(2, "bias").ok()?;
-    Some(QaModel { model, qa_w, qa_b, tokenizer })
+    let weights = format!("{dir}/model-int8.onnx");
+    if !std::path::Path::new(&weights).exists() {
+        return None;
+    }
+    let session = Session::builder().ok()?
+        .with_optimization_level(GraphOptimizationLevel::Level3).ok()?
+        .with_intra_threads(2).ok()?
+        .commit_from_file(weights).ok()?;
+    Some(QaModel { session: Mutex::new(session), tokenizer })
 }
 
 pub struct QaVerdict {
@@ -62,33 +56,35 @@ pub fn verify_pair(question: &str, passage: &str) -> Option<QaVerdict> {
     score_with(m, question, passage).ok()
 }
 
-fn score_with(m: &QaModel, question: &str, passage: &str) -> candle_core::Result<QaVerdict> {
+fn score_with(m: &QaModel, question: &str, passage: &str) -> ort::Result<QaVerdict> {
     let q_trunc: String = question.split_whitespace().take(64).collect::<Vec<_>>().join(" ");
     let p_trunc: String = passage.split_whitespace().take(384).collect::<Vec<_>>().join(" ");
     let encoding = m
         .tokenizer
         .encode((q_trunc.as_str(), p_trunc.as_str()), true)
-        .map_err(|e| candle_core::Error::Msg(format!("tokenize: {e}")))?;
-    let mut ids: Vec<u32> = encoding.get_ids().to_vec();
-    let mut types: Vec<u32> = encoding.get_type_ids().to_vec();
-    let mut mask: Vec<u32> = encoding.get_attention_mask().to_vec();
+        .map_err(|e| ort::Error::new(format!("tokenize: {e}")))?;
+    let mut ids: Vec<i64> = encoding.get_ids().iter().map(|&x| x as i64).collect();
+    let mut types: Vec<i64> = encoding.get_type_ids().iter().map(|&x| x as i64).collect();
+    let mut mask: Vec<i64> = encoding.get_attention_mask().iter().map(|&x| x as i64).collect();
     ids.truncate(512);
     types.truncate(512);
     mask.truncate(512);
-    let device = Device::Cpu;
     let len = ids.len();
-    let ids_t = Tensor::from_vec(ids.clone(), (1, len), &device)?;
-    let types_t = Tensor::from_vec(types.clone(), (1, len), &device)?;
-    let mask_t = Tensor::from_vec(mask, (1, len), &device)?;
-    let hidden = m.model.forward(&ids_t, &types_t, Some(&mask_t))?; // [1, seq, hidden]
-    // qa_outputs projection: hidden @ qa_w.T + qa_b -> [seq, 2]
-    let flat = hidden.squeeze(0)?; // [seq, hidden]
-    let logits = flat.matmul(&m.qa_w.t()?)?.broadcast_add(&m.qa_b)?; // [seq, 2]
-    let start: Vec<f32> = logits.narrow(1, 0, 1)?.squeeze(1)?.to_vec1::<f32>()?;
-    let end: Vec<f32> = logits.narrow(1, 1, 1)?.squeeze(1)?.to_vec1::<f32>()?;
+    let shape = vec![1usize, len];
+    let ids_t = Tensor::from_array((shape.clone(), ids.clone()))?;
+    let types_t = Tensor::from_array((shape.clone(), types.clone()))?;
+    let mask_t = Tensor::from_array((shape, mask))?;
+    let (start, end) = {
+        let mut session = m.session.lock().map_err(|e| ort::Error::new(format!("lock: {e}")))?;
+        let outputs = session.run(ort::inputs![ids_t, mask_t, types_t])?;
+        let (s_shape, s_data) = outputs[0].try_extract_tensor::<f32>()?;
+        let (_e_shape, e_data) = outputs[1].try_extract_tensor::<f32>()?;
+        let seq_len = s_shape[1] as usize;
+        (s_data[..seq_len].to_vec(), e_data[..seq_len].to_vec())
+    };
     let null_score = start[0] + end[0];
     // passage positions: token_type==1, excluding [SEP] (id 102) and padding
-    let sep_id = 102u32;
+    let sep_id = 102i64;
     let cls_positions: Vec<usize> = (0..len)
         .filter(|&p| types[p] == 1 && ids[p] != sep_id)
         .collect();
@@ -109,12 +105,8 @@ fn score_with(m: &QaModel, question: &str, passage: &str) -> candle_core::Result
     if best == f32::NEG_INFINITY {
         best = null_score;
     }
-    // decode span tokens
-    let vocab_ids = &ids[best_ij.0..=best_ij.1.min(len - 1)];
-    let span = m
-        .tokenizer
-        .decode(&vocab_ids[..], true)
-        .unwrap_or_default();
+    let vocab_ids: Vec<u32> = ids[best_ij.0..=best_ij.1.min(len - 1)].iter().map(|&x| x as u32).collect();
+    let span = m.tokenizer.decode(&vocab_ids[..], true).unwrap_or_default();
     Ok(QaVerdict { margin: best - null_score, span, null_score, best_span_score: best })
 }
 
@@ -122,13 +114,13 @@ pub fn available() -> bool {
     MODEL.get_or_init(load).is_some()
 }
 
-/// Status line for report certification.
+/// Status line for report certification, reusing the OnceLock.
 pub fn status_summary() -> String {
     let dir = model_dir();
-    let weights = format!("{dir}/model.safetensors");
-    if std::path::Path::new(&weights).exists() && load().is_some() {
+    let weights = format!("{dir}/model-int8.onnx");
+    if std::path::Path::new(&weights).exists() && available() {
         let digest = sha256_prefix(&weights);
-        format!("qa-verifier: active (model {dir}, sha256 {digest})")
+        format!("qa-verifier: active (model {dir}/model-int8.onnx int8-onnx, sha256 {digest})")
     } else {
         "qa-verifier: absent".to_string()
     }
@@ -147,9 +139,9 @@ fn sha256_prefix(path: &str) -> String {
     crate::citation::sha256_hex(&buf).chars().take(12).collect()
 }
 
-/// Fail-loud guard mirroring the reranker guard.
+/// Fail-loud guard mirroring the reranker guard, reusing the OnceLock.
 pub fn enforce_requirement(caller: &str) {
-    if std::env::var("GANESH_REQUIRE_QA_VERIFIER").ok().as_deref() == Some("1") && load().is_none() {
+    if std::env::var("GANESH_REQUIRE_QA_VERIFIER").ok().as_deref() == Some("1") && !available() {
         eprintln!(
             "FATAL: GANESH_REQUIRE_QA_VERIFIER=1 but the QA verifier model failed to load from `{}` ({caller}). Refusing silent skip.",
             model_dir()

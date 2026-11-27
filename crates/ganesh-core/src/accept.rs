@@ -129,6 +129,8 @@ pub struct AcceptanceTrace {
     pub state_spans: Vec<StateSpan>,
     pub qa_margin: Option<f32>,
     pub qa_span: String,
+    pub fc_entailment: Option<f32>,
+    pub fc_claim: String,
 }
 
 const NUMBER_WORDS: &[&str] = &[
@@ -557,6 +559,130 @@ pub fn query_env_stems(query: &str) -> std::collections::BTreeSet<String> {
     out
 }
 
+/// Split a compound question into clauses on coordinating boundaries, so
+/// per-clause precision checks apply only where their trigger lives.
+pub fn question_clauses(query: &str) -> Vec<String> {
+    let mut out = vec![String::new()];
+    let q = query.to_lowercase();
+    let mut rest = q.as_str();
+    const BOUNDARIES: &[&str] = &[
+        ", and which ", ", and who ", ", and what ", ", and where ",
+        ", and when ", ", and how ", ", and ", "; ",
+    ];
+    while !rest.is_empty() {
+        let hit = BOUNDARIES
+            .iter()
+            .filter_map(|b| rest.find(b).map(|pos| (pos, b.len())))
+            .min_by_key(|(pos, _)| *pos);
+        match hit {
+            Some((pos, blen)) => {
+                out.last_mut().unwrap().push_str(&rest[..pos]);
+                out.push(String::new());
+                rest = &rest[pos + blen..];
+            }
+            None => {
+                out.last_mut().unwrap().push_str(rest);
+                break;
+            }
+        }
+    }
+    out.into_iter().filter(|c| !c.trim().is_empty()).collect()
+}
+
+/// Future-tense date/year question: asks when something WILL happen.
+pub fn future_tense_date_query(query: &str) -> bool {
+    let q = query.to_lowercase();
+    q.contains("in what year will")
+        || q.contains("in which year will")
+        || q.contains("what year will")
+        || q.starts_with("when will")
+        || q.contains("on what date will")
+        || q.contains("on what exact date will")
+        || q.contains("when will")
+}
+
+/// Canonical unit aliases: surface form -> canonical unit.
+pub fn canonical_unit(token: &str) -> Option<&'static str> {
+    Some(match token {
+        "m" | "meter" | "meters" | "metre" | "metres" => "m",
+        "in" | "inch" | "inches" => "in",
+        "ft" | "foot" | "feet" => "ft",
+        "km" | "kilometer" | "kilometers" | "kilometre" | "kilometres" => "km",
+        "mi" | "mile" | "miles" => "mi",
+        "nm" | "nanometer" | "nanometers" | "nanometre" | "nanometres" => "nm",
+        "cm" | "centimeter" | "centimeters" | "centimetre" | "centimetres" => "cm",
+        "mm" | "millimeter" | "millimeters" | "millimetre" | "millimetres" => "mm",
+        "yd" | "yard" | "yards" => "yd",
+        "kg" | "kilogram" | "kilograms" => "kg",
+        "g" | "gram" | "grams" => "g",
+        "mg" | "milligram" | "milligrams" => "mg",
+        "t" | "ton" | "tons" | "tonne" | "tonnes" => "t",
+        "lb" | "lbs" | "pound" | "pounds" => "lb",
+        "oz" | "ounce" | "ounces" => "oz",
+        "l" | "liter" | "liters" | "litre" | "litres" => "l",
+        "ml" | "milliliter" | "milliliters" | "millilitre" | "millilitres" => "ml",
+        "s" | "sec" | "second" | "seconds" => "s",
+        "min" | "minute" | "minutes" => "min",
+        "hr" | "hrs" | "hour" | "hours" => "hr",
+        "w" | "watt" | "watts" => "w",
+        "kw" | "kilowatt" | "kilowatts" => "kw",
+        "mw" | "megawatt" | "megawatts" => "mw",
+        "hz" | "hertz" => "hz",
+        "khz" => "khz",
+        "mhz" => "mhz",
+        "ghz" => "ghz",
+        "km/h" | "kmh" | "kph" => "km/h",
+        "m/s" => "m/s",
+        "mph" => "mph",
+        "deg" | "degree" | "degrees" => "deg",
+        "byte" | "bytes" => "byte",
+        "bit" | "bits" => "bit",
+        _ => return None,
+    })
+}
+
+/// The unit explicitly requested by an "in <unit>" measurement question, if any.
+pub fn requested_unit(query: &str) -> Option<&'static str> {
+    let toks: Vec<String> = query
+        .split_whitespace()
+        .map(|t| t.trim_matches(|c: char| !c.is_alphanumeric() && c != '/').to_ascii_lowercase())
+        .collect();
+    for (i, t) in toks.iter().enumerate() {
+        if t == "in" {
+            if let Some(u) = toks.get(i + 1).and_then(|n| canonical_unit(n)) {
+                return Some(u);
+            }
+        }
+    }
+    None
+}
+
+/// The canonical unit token adjacent (within 2 surface tokens) after a digit
+/// literal in a sentence, if present.
+pub fn adjacent_unit(sentence: &str, token: &str) -> Option<&'static str> {
+    let toks: Vec<String> = sentence
+        .split_whitespace()
+        .map(|t| t.trim_matches(|c: char| !c.is_alphanumeric() && c != '/' && c != '.' && c != ',').to_ascii_lowercase())
+        .collect();
+    for (i, t) in toks.iter().enumerate() {
+        let bare = t.replace(',', "").trim_matches('.').to_string();
+        if bare != token {
+            continue;
+        }
+        for j in 1..=2usize {
+            if let Some(next) = toks.get(i + j) {
+                if let Some(u) = canonical_unit(next) {
+                    return Some(u);
+                }
+                if next.chars().any(|c| c.is_ascii_digit()) {
+                    break;
+                }
+            }
+        }
+    }
+    None
+}
+
 /// Exact-date trigger: the question explicitly demands calendar-day precision.
 pub fn exact_date_query(query: &str) -> bool {
     let q = query.to_lowercase();
@@ -897,6 +1023,74 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
         }
     }
 
+    // ---- requested-unit verification -----------------------------------------
+    // An explicit "in <unit>" measurement question requires a bound digit
+    // literal carrying the canonically matching unit within the quantifying
+    // window of the measured property. Year-like literals stay excluded; a
+    // unit mismatch (inches when the dimension exists in cm, tonnes when no
+    // tonne measurement binds the mass) abstains.
+    if input.quantity_question {
+        if let Some(want) = requested_unit(input.query) {
+            // Circular-binding guard: unit terms extracted into the measured
+            // property set (e.g. "tonn" from "in tonnes") must not witness the
+            // quantifying window — otherwise any digit adjacent to its own
+            // unit token self-satisfies without binding the measured property.
+            const UNIT_SURFACE: &[&str] = &[
+                "m", "meter", "meters", "metre", "metres", "in", "inch", "inches",
+                "ft", "foot", "feet", "km", "kilometer", "kilometers", "kilometre",
+                "kilometres", "mi", "mile", "miles", "nm", "nanometer", "nanometers",
+                "cm", "mm", "yd", "yard", "yards", "kg", "kilogram", "kilograms",
+                "g", "gram", "grams", "mg", "t", "ton", "tons", "tonne", "tonnes",
+                "lb", "lbs", "pound", "pounds", "oz", "ounce", "ounces", "l", "liter",
+                "liters", "litre", "litres", "ml", "s", "sec", "second", "seconds",
+                "min", "minute", "minutes", "hr", "hour", "hours", "w", "watt", "watts",
+                "kw", "mw", "hz", "khz", "mhz", "ghz", "kmh", "kph", "mph", "deg",
+                "degree", "degrees", "byte", "bytes", "bit", "bits",
+            ];
+            let unit_stems: std::collections::BTreeSet<String> = UNIT_SURFACE
+                .iter()
+                .flat_map(|u| crate::search::stemmed_tokens(u))
+                .collect();
+            let measured_terms: Vec<String> = measured_property_terms(input.query)
+                .into_iter()
+                .filter(|t| !unit_stems.contains(t))
+                .collect();
+            let mut matched = false;
+            'unit: for (_pid, verbatim, _, _) in input.passages {
+                for sentence in &sentences(verbatim) {
+                    for (token, exclusion) in quantity_candidates(sentence) {
+                        // Decimal measurements ("172.5") are shape-identical to
+                        // dotted versions; when the token carries the requested
+                        // measurement unit it is a measurement, not a version.
+                        let decimal_unit = exclusion.as_deref() == Some("version or identifier token")
+                            && token.contains('.')
+                            && adjacent_unit(sentence, &token) == Some(want);
+                        if exclusion.is_some() && !decimal_unit {
+                            continue;
+                        }
+                        if !token.chars().any(|c| c.is_ascii_digit()) {
+                            continue;
+                        }
+                        if adjacent_unit(sentence, &token) != Some(want) {
+                            continue;
+                        }
+                        let window_ok = measured_terms.is_empty()
+                            || quantifying_window(sentence, &token, &measured_terms, 8);
+                        if window_ok {
+                            matched = true;
+                            break 'unit;
+                        }
+                    }
+                }
+            }
+            if !matched {
+                trace.reasons.push(format!(
+                    "requested-unit-verification: no measurement in the requested unit '{want}' bound to the measured property in the selected passages"
+                ));
+            }
+        }
+    }
+
     // ---- exact-date precision verification -----------------------------------
     // When the question demands calendar-day precision, at least one selected
     // passage must tie a real adjacent month-day date to the queried event in
@@ -904,6 +1098,98 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
     // event appears in the passage. Open "when" and year-only questions are
     // not constrained by this rule.
     if exact_date_query(input.query) {
+        let framing = crate::search::framing_stems();
+        let base_filter = |t: &&String| {
+            !input.subject_terms.contains(*t)
+                && !framing.contains(*t)
+                && !VERIFY_CUES.contains(&t.as_str())
+                && !PROPOSE_CUES.contains(&t.as_str())
+                && !ATTEMPT_CUES.contains(&t.as_str())
+                && !TRANSITION_CUES.contains(&t.as_str())
+        };
+        // Clause scoping: in a compound question, the exact-date requirement
+        // binds only the event vocabulary of the clause(s) carrying the
+        // exact-date trigger — sibling-clause terms ("which architect designed
+        // it") must not inflate the overlap requirement.
+        let clauses = question_clauses(input.query);
+        let triggered: Vec<&String> = clauses
+            .iter()
+            .filter(|c| exact_date_query(c))
+            .collect();
+        let scoped: std::collections::BTreeSet<String> = if triggered.is_empty() {
+            std::collections::BTreeSet::new()
+        } else {
+            let mut acc = std::collections::BTreeSet::new();
+            for c in triggered {
+                for t in stemmed_query_like(c) {
+                    acc.insert(t);
+                }
+            }
+            acc
+        };
+        let all_event: Vec<&String> = input.terms.iter().filter(base_filter).collect();
+        let event_terms: Vec<&String> = if scoped.is_empty() {
+            all_event.clone()
+        } else {
+            let in_scope: Vec<&String> = all_event
+                .iter()
+                .filter(|t| scoped.contains(t.as_str()) || scoped.iter().any(|st| stem_matches_eventually(t, st)))
+                .cloned()
+                .collect();
+            if in_scope.is_empty() { all_event.clone() } else { in_scope }
+        };
+        let substantive_hit = |ss: &[String]| {
+            let hits = event_terms
+                .iter()
+                .filter(|t| {
+                    ss.iter().any(|st| {
+                        stem_matches_eventually(t, st) || stem_matches_eventually(&dehyphen(t), &dehyphen(st))
+                    })
+                })
+                .count();
+            if event_terms.len() >= 2 {
+                hits * 2 >= event_terms.len()
+            } else {
+                hits >= 1
+            }
+        };
+        let mut tied = false;
+        'outer: for (_pid, verbatim, section, _) in input.passages {
+            for sentence in &sentences(verbatim) {
+                let ss = stemmed_query_like(sentence);
+                if crate::search::date_tier(sentence) >= 2.5 && substantive_hit(&ss) && !sentence_is_planned(sentence) {
+                    tied = true;
+                    break 'outer;
+                }
+            }
+            if crate::search::date_tier(section) >= 2.5 {
+                for sentence in &sentences(verbatim) {
+                    let ss = stemmed_query_like(sentence);
+                    if substantive_hit(&ss) && !sentence_is_planned(sentence) {
+                        tied = true;
+                        break 'outer;
+                    }
+                }
+            }
+        }
+        if !tied {
+            trace.reasons.push(
+                "exact-date-precision: no adjacent month-day calendar date tied to the queried event in the selected passages"
+                    .to_string(),
+            );
+        }
+    }
+
+    // ---- future-tense date guard ---------------------------------------------
+    // "In what year will X ..." is not settled by bare historical past-event
+    // dates: the matching sentence must carry explicit future/planned/
+    // predicted cues alongside its date or year mention.
+    if future_tense_date_query(input.query) {
+        const FUTURE_CUES: &[&str] = &[
+            "will", "scheduled", "schedule", "planned", "plan", "predicted", "predict",
+            "expected", "expect", "projected", "project", "forecast", "proposed", "propose",
+            "intend", "intended", "due", "set to", "slated", "anticipat",
+        ];
         let framing = crate::search::framing_stems();
         let event_terms: Vec<&String> = input
             .terms
@@ -917,34 +1203,41 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
                     && !TRANSITION_CUES.contains(&t.as_str())
             })
             .collect();
-        let mut tied = false;
-        'outer: for (_pid, verbatim, section, _) in input.passages {
+        let mut future_dated = false;
+        'fut: for (_pid, verbatim, _, _) in input.passages {
             for sentence in &sentences(verbatim) {
-                let ss = stemmed_query_like(sentence);
-                let event_hit = event_terms.iter().any(|t| {
-                    ss.iter().any(|st| stem_matches_eventually(t, st))
-                });
-                if crate::search::date_tier(sentence) >= 2.5 && event_hit && !sentence_is_planned(sentence) {
-                    tied = true;
-                    break 'outer;
+                let low = sentence.to_ascii_lowercase();
+                let has_future_cue = FUTURE_CUES.iter().any(|c| low.contains(c));
+                if !has_future_cue {
+                    continue;
                 }
-            }
-            if crate::search::date_tier(section) >= 2.5 {
-                for sentence in &sentences(verbatim) {
-                    let ss = stemmed_query_like(sentence);
-                    let event_hit = event_terms.iter().any(|t| {
-                        ss.iter().any(|st| stem_matches_eventually(t, st))
+                let ss = stemmed_query_like(sentence);
+                let hits = event_terms
+                    .iter()
+                    .filter(|t| {
+                        ss.iter().any(|st| {
+                            stem_matches_eventually(t, st) || stem_matches_eventually(&dehyphen(t), &dehyphen(st))
+                        })
+                    })
+                    .count();
+                let event_hit = if event_terms.len() >= 2 { hits * 2 >= event_terms.len() } else { hits >= 1 };
+                if !event_hit {
+                    continue;
+                }
+                let has_date_or_year = crate::search::date_tier(sentence) >= 1.0
+                    || sentence.split_whitespace().any(|w| {
+                        let b = w.trim_matches(|c: char| !c.is_ascii_digit());
+                        b.len() == 4 && b.chars().all(|c| c.is_ascii_digit())
                     });
-                    if event_hit && !sentence_is_planned(sentence) {
-                        tied = true;
-                        break 'outer;
-                    }
+                if has_date_or_year {
+                    future_dated = true;
+                    break 'fut;
                 }
             }
         }
-        if !tied {
+        if !future_dated {
             trace.reasons.push(
-                "exact-date-precision: no adjacent month-day calendar date tied to the queried event in the selected passages"
+                "future-event-date: no explicit future/planned date tied to the queried event in the selected passages"
                     .to_string(),
             );
         }
@@ -1073,11 +1366,77 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
                 "qa-unanswerable: max span-vs-null margin {max_margin:.2} below threshold 0.00 (best span `{best_span}`)"
             ));
         }
+
+        // ---- fact-checking encoder: declarative-claim entailment -----------
+        // Runs ONLY when QA extraction succeeded (margin >= 0) — there is no
+        // claim to check otherwise. The extracted span is verbalized into a
+        // declarative claim; at least one selected passage must entail it.
+        let fc_enabled = std::env::var("GANESH_FACTCHECK").map(|v| v != "0").unwrap_or(true);
+        if fc_enabled
+            && max_margin.is_finite()
+            && max_margin >= 0.0
+            && !best_span.is_empty()
+            && crate::factcheck::available()
+        {
+            let claim = crate::factcheck::to_declarative_claim(input.query, &best_span);
+            let mut max_entail = f32::NEG_INFINITY;
+            for (pid, verbatim, section, _) in input.passages {
+                let article = pid.split('-').next().unwrap_or("");
+                let prem = format!("{article} — {section}
+{verbatim}");
+                if let Some(v) = crate::factcheck::verify_pair(&prem, &claim) {
+                    if v.entailment > max_entail {
+                        max_entail = v.entailment;
+                    }
+                }
+            }
+            trace.fc_entailment = Some(max_entail);
+            trace.fc_claim = claim.clone();
+            let tau: f32 = std::env::var("GANESH_FACTCHECK_TAU")
+                .ok()
+                .and_then(|v| v.parse().ok())
+                .unwrap_or(0.5);
+            if max_entail.is_finite() && max_entail < tau {
+                trace.reasons.push(format!(
+                    "factcheck-unentailed: max entailment {max_entail:.3} below threshold {tau:.2} (claim `{claim}`)"
+                ));
+            }
+        }
     }
 
     // ---- state/transition evidence --------------------------------------------
     if input.transition_check {
-        if let Some(required) = cue_class_of(&input.terms.to_vec()) {
+        // Generic occurrence verbs (occur/happen) are not verification cues:
+        // "on what date did the eruption occur" is an extractive date question,
+        // not an operational-state question. Genuine state cues (verified,
+        // complete, deployed, ...) still activate, including on wh-questions.
+        // Activation lexicon: generic occurrence verbs (occur/happen) never
+        // activate. On extractive wh-questions (on what date did X begin),
+        // only strict operational-state cues activate — weak activity verbs
+        // (begin/start/open/perform/take/reach/continu) are ordinary event
+        // vocabulary there. Yes/no state questions keep the full lexicon.
+        const STRICT_STATE_CUES: &[&str] = &[
+            "verifi", "confirm", "unverifi", "unconfirm", "deploy", "complet",
+            "finish", "pass", "fail", "cancel", "skip", "live",
+        ];
+        let wh_extractive = qa_extractive_question(input.query);
+        let activation_terms: Vec<String> = input
+            .terms
+            .to_vec()
+            .into_iter()
+            .filter(|t| t != "occur" && t != "happen")
+            .filter(|t| {
+                if !wh_extractive {
+                    return true;
+                }
+                // On wh-extractive questions a term activates only when it is
+                // a strict state cue or not a cue at all; weak cues are
+                // dropped so they cannot manufacture a verify requirement.
+                !matches!(t.as_str(), "begin" | "began" | "start" | "open" | "perform" | "take" | "reach" | "continu" | "underway" | "run" | "succeed")
+                    || STRICT_STATE_CUES.contains(&t.as_str())
+            })
+            .collect();
+        if let Some(required) = cue_class_of(&activation_terms) {
             let q_env = {
                 let qt = crate::search::query_terms(input.query);
                 env_of(&qt)
