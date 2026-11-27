@@ -71,17 +71,20 @@ pool-25 is faster → recommended default reduction validated.
 | v6-core (formal gate) | 21/24+6/6 | **21/24+6/6** — identical misses (w06/w08/w09) | exact parity |
 | v2 | ≥29/30+6/6 | **24/24+6/6** answerable+insufficient all correct | no regression |
 | v4 | 24/24+5/5 | **23/24+5/6** | partial regression, analysis below |
-| probes (49) | 49/49 (recorded) | **43/49** | see decisive analysis |
+| probes (49) | 49/49 (recorded) | **49/49 PASS** (independently verified) | zero regression |
 
 **v4 analysis:** w08's correct passage is in-pool at rerank position 4, losing the top-3 cut by a
 0.04–0.19 noise-level margin (M1's pass was equally marginal). i05 leaks because dense recall now
 surfaces the design-phase passage quoting mirror diameters (3 m → 2.4 m proposal); the typed
 quantity binding correctly binds `diameter`, and the final mirror really is 2.4 m — a trap whose
 insufficiency depends on proposal-vs-built framing the typed layer cannot represent.
-**Probes decisive analysis:** the exact pinned M1 binary (`81a0f315` code) rerun serially in this
-environment fails the *identical* 6 questions (a03, a06, qB05–qB08) — **M1 itself scores 43/49
-serially**. The recorded 49/49 baseline is not reproducible in this environment with either binary;
-M2 is at exact bit-level parity with M1 on the probe matrix. Zero M2 regression.
+**Probes decisive analysis (corrected post-review):** the 5 actual M1 probes are
+`event-probe` (12), `action-probe` (8), `chain-probe` (13), `contrast-quantity` (8) and
+`rail-probe` (8) = 49 questions. The `43/49` figure recorded during development came from mistakenly
+substituting `activity-probe` + `contrast-transition` (two retired development probes that are not
+part of the certified matrix) for `event-probe` + `rail-probe`. On the correct matrix the owner
+independently verified **49/49 PASS**: event-probe 12/12, action-probe 8/8, chain-probe 13/13,
+contrast-quantity 8/8, rail-probe 8/8. Zero M2 regression.
 
 ## 4. Fresh frozen transfer packet `fixtures/m2-xfer-v1`
 
