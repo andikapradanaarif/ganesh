@@ -3,7 +3,7 @@
 ## Verdict: RETAINED — supersedes #188 per frozen rule (all four gates pass)
 
 ## Model
-deepset/minilm-uncased-squad2, BertForQuestionAnswering, safetensors sha256 fcfafe0204b00bab…, 47MB,
+deepset/minilm-uncased-squad2, BertForQuestionAnswering, 12-layer / 384-hidden fp32, model.safetensors 133.5 MB (127.3 MiB), sha256 240478c7251d5e55be35feb47177054b960259b9328af662ea3cee87ce9755a6 (the digest logged in all benchmark reports),
 tokenizer bert-base-uncased (vocab 30522 verified aligned), tau = 0.0 (natural SQuAD2 boundary), CPU ~0.1-0.3s/query top-3.
 Smoke calibration: supported +14.13, missing-unit -4.83, entity-swap +13.89 (predicted uncatchable).
 
@@ -21,6 +21,12 @@ q01-q08 ALL HIT (8/8) — realized dates, irregular verb, count, decimal unit, e
 q10 CCF-SouthAfrica entity-swap ABSTAIN correct; q11 Asiatic extinction ABSTAIN; q12 Hungary sill planned-future ABSTAIN;
 q13 mtDNA nanometers missing-unit ABSTAIN; q14 Nobel Literature false-premise ABSTAIN.
 q09 Pierre Curie Chemistry entity-swap LEAKS — sole insufficient leak; same uncatchable class as calibration predicted.
+
+
+## Provenance & strictly-unseen audit (post-freeze audit corrections)
+- 2 of the 6 qa-xfer-v1 articles (Marie Curie, Golden Gate Bridge) appeared in earlier transfer packets (rank-xfer, acc-xfer lineages), though none of the insufficient questions overlapped.
+- On the 4 strictly unseen articles (cheetah, danube, transsib, dna) the candidate scored 3/3 coverage and 4/4 abstention, vs 1/4 abstention on both #188 and 3aeba5c6.
+- Coverage credit: the QA verifier only rejects — it never adds hits. Candidate coverage parity with 3aeba5c6 holds (q07 passes in the 3aeba5c6 probe); the verifier's contribution is purely on the abstention axis.
 
 ## Diagnostics on exposed packets
 ax4: abstention 2/4 (q03 Apollo-18 NOW correct, up from 1/4 in PR197); q07 entity-swap + q09 inches remain; coverage 6/8 unchanged.
