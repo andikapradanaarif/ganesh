@@ -1,0 +1,49 @@
+{
+  "article_id": "personal_project_b",
+  "family": "corpus-v6-broad",
+  "passages": [
+    {
+      "chars": 92,
+      "id": "personal_project_b-a1#p1",
+      "section": "(lead)",
+      "seq": 1,
+      "text": "Project B notes, home sensor network. Fictional personal project fixture for evaluation use."
+    },
+    {
+      "chars": 247,
+      "id": "personal_project_b-a1#p2",
+      "section": "Overview",
+      "seq": 2,
+      "text": "Project B is my home sensor network: a raspberry pi controller in the hallway closet reading temperature and humidity sensors in three rooms. It shares nothing with the balcony irrigation except the raspberry pi parts bin and my limited free time."
+    },
+    {
+      "chars": 245,
+      "id": "personal_project_b-a1#p3",
+      "section": "Hardware October 3",
+      "seq": 3,
+      "text": "The hallway controller is a raspberry pi 4 with a relay hat that switches the fan in the storage room. The north relay channel drives the storage fan; the second channel is unused. Flashed the controller firmware to version 1.6.2 in the evening."
+    },
+    {
+      "chars": 248,
+      "id": "personal_project_b-a1#p4",
+      "section": "Sensor placement October 6",
+      "seq": 4,
+      "text": "Bedroom sensor mounted above the wardrobe, hallway sensor near the controller, storage room sensor clipped to the middle shelf. The storage room sensor keeps losing pairing; moving it thirty centimetres away from the metal shelf fixed the dropouts."
+    },
+    {
+      "chars": 260,
+      "id": "personal_project_b-a1#p5",
+      "section": "Software October 9",
+      "seq": 5,
+      "text": "The controller logs readings every five minutes to a sqlite file on the sd card. Wrote a small dashboard script that shows the last reading per room. The storage fan relay switches on when the storage humidity exceeds 65 percent for three consecutive readings."
+    },
+    {
+      "chars": 225,
+      "id": "personal_project_b-a1#p6",
+      "section": "Open items October 12",
+      "seq": 6,
+      "text": "Still want to add a water leak sensor under the washing machine, but the part has not been ordered yet. Also considering whether the controller should poll every two minutes instead of five; undecided because of sd card wear."
+    }
+  ],
+  "revision": "personal_project_b-a1"
+}

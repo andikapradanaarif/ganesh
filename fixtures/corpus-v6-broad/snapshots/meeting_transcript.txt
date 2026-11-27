@@ -1,0 +1,24 @@
+Team sync transcript 6 October 2026. Fictional meeting fixture for evaluation use.
+
+== Transcript ==
+Priya: morning everyone. First item, the retro scheduling. Can we move it?
+Marco: yes please. Mondays are terrible for me now.
+June: I am fine with Tuesdays.
+Priya: okay, decided: the retro moves to Tuesdays starting next week. I will update the invite.
+Sam: second item then, deployctl adoption.
+Priya: my proposal is we adopt deployctl for staging only for now. Production stays on the old path until we trust it.
+Marco: agreed. Staging only. I do not want production surprises.
+June: fine by me.
+Priya: decided then, deployctl is adopted for staging only as of today. Production usage stays forbidden until a later review.
+Sam: I would like to propose switching our issue tracker while we are at it.
+Priya: noted as a proposal. We are not deciding that today; I want a written comparison first.
+Marco: seconded, no decision on the tracker.
+June: next, the December launch window. I propose freezing production deploys for the full two weeks.
+Priya: any objections?
+Sam: none. Makes sense after the August incident.
+Priya: decided: production deploys are frozen for the two weeks of the December launch window. Exact dates go in the calendar today.
+Marco: what about the budget for the new test bench?
+Priya: that one I am deferring. No decision on the test bench budget until finance comes back to us. Maybe November.
+Sam: random personal note, I started morning runs and they are great.
+Marco: careful, you will become one of those people who talks about running at parties.
+Priya: anything else? No? Then we are done, and remember the retro moves to Tuesdays.

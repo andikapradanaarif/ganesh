@@ -1,0 +1,21 @@
+{
+  "article_id": "meeting_transcript",
+  "family": "corpus-v6-broad",
+  "passages": [
+    {
+      "chars": 82,
+      "id": "meeting_transcript-a1#p1",
+      "section": "(lead)",
+      "seq": 1,
+      "text": "Team sync transcript 6 October 2026. Fictional meeting fixture for evaluation use."
+    },
+    {
+      "chars": 1564,
+      "id": "meeting_transcript-a1#p2",
+      "section": "Transcript",
+      "seq": 2,
+      "text": "Priya: morning everyone. First item, the retro scheduling. Can we move it?\nMarco: yes please. Mondays are terrible for me now.\nJune: I am fine with Tuesdays.\nPriya: okay, decided: the retro moves to Tuesdays starting next week. I will update the invite.\nSam: second item then, deployctl adoption.\nPriya: my proposal is we adopt deployctl for staging only for now. Production stays on the old path until we trust it.\nMarco: agreed. Staging only. I do not want production surprises.\nJune: fine by me.\nPriya: decided then, deployctl is adopted for staging only as of today. Production usage stays forbidden until a later review.\nSam: I would like to propose switching our issue tracker while we are at it.\nPriya: noted as a proposal. We are not deciding that today; I want a written comparison first.\nMarco: seconded, no decision on the tracker.\nJune: next, the December launch window. I propose freezing production deploys for the full two weeks.\nPriya: any objections?\nSam: none. Makes sense after the August incident.\nPriya: decided: production deploys are frozen for the two weeks of the December launch window. Exact dates go in the calendar today.\nMarco: what about the budget for the new test bench?\nPriya: that one I am deferring. No decision on the test bench budget until finance comes back to us. Maybe November.\nSam: random personal note, I started morning runs and they are great.\nMarco: careful, you will become one of those people who talks about running at parties.\nPriya: anything else? No? Then we are done, and remember the retro moves to Tuesdays."
+    }
+  ],
+  "revision": "meeting_transcript-a1"
+}

@@ -1,0 +1,49 @@
+{
+  "article_id": "incident_postmortem",
+  "family": "corpus-v6-broad",
+  "passages": [
+    {
+      "chars": 101,
+      "id": "incident_postmortem-a1#p1",
+      "section": "(lead)",
+      "seq": 1,
+      "text": "Incident postmortem INC-2026-08-17 relay backpressure. Fictional incident fixture for evaluation use."
+    },
+    {
+      "chars": 617,
+      "id": "incident_postmortem-a1#p2",
+      "section": "Summary",
+      "seq": 2,
+      "text": "On 17 August 2026 the relay service dropped approximately nine percent of production messages over a forty-minute window. The root cause was a misconfigured max_inflight value of 0 in the production configuration, which silently disabled the queue worker's backpressure limit and let a slow consumer stall the entire partition. The applied fix was to set max_inflight to 250 in the production configuration and to add a validation alert. A proposal to migrate the service to autoscaling workers was discussed and rejected for the time being, because the team judged the migration risk higher than the recurrence risk."
+    },
+    {
+      "chars": 3481,
+      "id": "incident_postmortem-a1#p3",
+      "section": "Timeline",
+      "seq": 3,
+      "text": "At 14:03 UTC the on-call engineer received the first page for elevated error rates on the relay partition. The error string ERR_QUORUM_TIMEOUT appeared in the worker logs beginning at 14:01 UTC, roughly two minutes before customer-visible impact. At 14:09 UTC the on-call engineer escalated to the incident commander, who opened the incident channel and started the timeline document. Between 14:12 and 14:25 UTC the team tried restarting individual workers one at a time, which did not change the error pattern because the workers were not the bottleneck; the consumer lag metric kept climbing regardless of restarts. At 14:19 UTC a second engineer joined the call and began checking the consumer lag dashboard per partition, confirming that the lag was concentrated on the partition served by the slow consumer rather than spread evenly across the fleet, which ruled out a broker-wide problem. At 14:22 UTC the team inspected the broker metrics for disk saturation and network saturation and found both within normal ranges, which shifted suspicion away from infrastructure and toward worker configuration. At 14:24 UTC someone noted that the deadlock detector had not fired, meaning the workers were technically alive and processing heartbeats, just not making progress on the stalled partition. At 14:27 UTC the commander asked for a configuration diff between staging and production, which showed that production carried max_inflight equal to 0 while staging carried 250. The zero value had been introduced three weeks earlier during a configuration cleanup and had never been validated because the staging environment used the correct nonzero value. At 14:31 UTC the team ran kubectl scale deploy/relay --replicas=6 to add capacity while the configuration change was prepared, which reduced the backlog growth rate but did not drain the queue. At 14:38 UTC the corrected configuration with max_inflight set to 250 was rolled out, and the backlog began draining almost immediately. By 14:43 UTC the error rate returned to baseline and the incident commander declared the mitigation complete. The total customer-visible window was forty minutes. No data was lost because the queue is persistent, but nine percent of messages were delayed beyond the service level objective. The follow-up validation alert now pages whenever max_inflight is zero in any environment, and the configuration cleanup process now requires a staging soak of at least one hour before any production change. The commander noted that the restart attempts between 14:12 and 14:25 consumed response time without helping, and the timeline section records them deliberately so that future responders check configuration diffs before restarting workers. After the declaration, the team spent another twenty minutes verifying the drain: at 14:51 UTC the consumer lag for the affected partition fell below one hundred messages, and at 15:05 UTC the lag was zero for the first time since the incident began. The validation alert that now guards the configuration was tested deliberately at 15:20 UTC by temporarily setting max_inflight to zero in the staging environment; the alert fired within ninety seconds, confirming the guard works end to end. The rollback plan that had been prepared in case the configuration change made things worse was never executed, and the extra replicas added at 14:31 UTC were scaled back down to the normal count of three at 16:02 UTC once the queue stayed empty for a full hour."
+    },
+    {
+      "chars": 175,
+      "id": "incident_postmortem-a1#p4",
+      "section": "Root cause",
+      "seq": 4,
+      "text": "The zero value of max_inflight disabled the worker backpressure limit. Because the setting was valid in staging, no alarm existed for the production-specific misconfiguration."
+    },
+    {
+      "chars": 131,
+      "id": "incident_postmortem-a1#p5",
+      "section": "What was applied",
+      "seq": 5,
+      "text": "The applied fix was the configuration correction to max_inflight 250 plus the new validation alert, both live since 17 August 2026."
+    },
+    {
+      "chars": 154,
+      "id": "incident_postmortem-a1#p6",
+      "section": "What was proposed but not applied",
+      "seq": 6,
+      "text": "The migration to autoscaling workers was proposed during the postmortem and rejected. It remains unimplemented, and the document does not claim otherwise."
+    }
+  ],
+  "revision": "incident_postmortem-a1"
+}

@@ -1,0 +1,98 @@
+{
+  "article_id": "lockmere",
+  "family": "corpus-v6-core",
+  "passages": [
+    {
+      "chars": 81,
+      "id": "lockmere-a1#p1",
+      "section": "(lead)",
+      "seq": 1,
+      "text": "Lockmere canal lock operations log. Fictional operational log for evaluation use."
+    },
+    {
+      "chars": 130,
+      "id": "lockmere-a1#p2",
+      "section": "Gate seals May 6",
+      "seq": 2,
+      "text": "The upstream gate seal replacement finished at 07:55 UTC with all bolts torqued.\nCrew logged minor scoring on the lower hinge pin."
+    },
+    {
+      "chars": 98,
+      "id": "lockmere-a1#p3",
+      "section": "Paddle gear May 7",
+      "seq": 3,
+      "text": "The ground paddle gear lubrication finished at 12:40 UTC.\nThe grease lines were flushed afterward."
+    },
+    {
+      "chars": 139,
+      "id": "lockmere-a1#p4",
+      "section": "Water gauge May 9",
+      "seq": 4,
+      "text": "The downstream water gauge read 2.35 metres at 06:00 UTC before the first cycle.\nThe gauge board was cleaned and recalibrated by 08:15 UTC."
+    },
+    {
+      "chars": 122,
+      "id": "lockmere-a1#p5",
+      "section": "Vessel count May 11",
+      "seq": 5,
+      "text": "Seventeen narrowboats passed through the lock during the day shift.\nThe final vessel cleared the lower gates at 18:20 UTC."
+    },
+    {
+      "chars": 126,
+      "id": "lockmere-a1#p6",
+      "section": "Culvert May 13",
+      "seq": 6,
+      "text": "The culvert inspection began at 09:30 UTC and finished at 15:10 UTC.\nCrew logged silt buildup along the northern channel wall."
+    },
+    {
+      "chars": 114,
+      "id": "lockmere-a1#p7",
+      "section": "Balance beam May 15",
+      "seq": 7,
+      "text": "The cracked balance beam on gate two was swapped at 10:25 UTC.\nThe old beam was cut up and removed from the wharf."
+    },
+    {
+      "chars": 116,
+      "id": "lockmere-a1#p8",
+      "section": "Ladder May 16",
+      "seq": 8,
+      "text": "The galvanised escape ladder installation began at 08:10 UTC.\nThe masonry anchors were still curing at end of shift."
+    },
+    {
+      "chars": 131,
+      "id": "lockmere-a1#p9",
+      "section": "Bollards May 18",
+      "seq": 9,
+      "text": "Four new mooring bollards were cast and bedded at 13:30 UTC.\nThe concrete was still green; curing was not verified by end of shift."
+    },
+    {
+      "chars": 132,
+      "id": "lockmere-a1#p10",
+      "section": "Pump house May 20",
+      "seq": 10,
+      "text": "The backpump impeller finished its vibration test at 11:05 UTC within tolerance.\nThe discharge valve seals were re-seated afterward."
+    },
+    {
+      "chars": 111,
+      "id": "lockmere-a1#p11",
+      "section": "Bywash May 22",
+      "seq": 11,
+      "text": "The bywash weir drew a reading of 0.82 metres at 07:30 UTC.\nDebris was cleared from the trash screen afterward."
+    },
+    {
+      "chars": 146,
+      "id": "lockmere-a1#p12",
+      "section": "Signage May 25",
+      "seq": 12,
+      "text": "The lock keeper proposed repainting the depth signage at the north chamber wall.\nThe proposal was still awaiting approval at the end of the month."
+    },
+    {
+      "chars": 121,
+      "id": "lockmere-a1#p13",
+      "section": "Gate seals May 27",
+      "seq": 13,
+      "text": "The downstream gate seal inspection finished at 09:45 UTC with no leaks found.\nThe lock reopened to traffic at 10:05 UTC."
+    }
+  ],
+  "revision": "lockmere-a1"
+}
