@@ -1,5 +1,11 @@
 {
- "version": "manifest.v1",
+ "version": "acc-xfer-v5",
+ "created": "2026-02-12T00:00:00Z",
+ "frame": "frozen semantic-verification transfer packet",
+ "seed": 0,
+ "exclusions": [],
+ "sampling": "hand-selected public documents",
+ "snapshot_format": "clean plaintext",
  "articles": [
   {
    "article_id": "piano",
