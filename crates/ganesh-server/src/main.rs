@@ -58,27 +58,37 @@ async fn search_handler(
     Json(req): Json<SearchRequest>,
 ) -> Json<ganesh_core::types::SearchResponse> {
     let caller = req.caller.clone().unwrap_or_else(|| "anonymous".to_string());
-    // The SQLite mutex is held only for the snapshot fetch (fast indexed
-    // reads). Cross-encoder reranking, acceptance, and QA verification run
-    // lock-free on the materialized view, so concurrent inference neither
-    // blocks nor is blocked by other readers, citations, or health checks.
-    let view = {
-        let store = state.store.lock().unwrap();
-        let terms = ganesh_core::search::query_terms(&req.query);
-        if terms.is_empty() {
+    // All blocking work lives on the blocking thread pool so the async
+    // runtime stays responsive for health checks, citations, and concurrent
+    // searches. Inside, the SQLite mutex is held only for the snapshot fetch
+    // (fast indexed reads); cross-encoder reranking, acceptance, and QA
+    // verification then run lock-free on the materialized view.
+    let query = req.query.clone();
+    let cfg = state.config.clone();
+    let state2 = Arc::clone(&state);
+    let response = tokio::task::spawn_blocking(move || {
+        let terms = ganesh_core::search::query_terms(&query);
+        let view = if terms.is_empty() {
             None
         } else {
-            ganesh_core::search::CorpusView::fetch(&store, &terms, &state.config)
+            let guard = state2.store.lock().unwrap();
+            ganesh_core::search::CorpusView::fetch(&guard, &terms, &cfg)
+        };
+        match view {
+            Some(view) => ganesh_core::search::evaluate_view(&view, &query, &caller, &cfg).0,
+            None => ganesh_core::types::SearchResponse {
+                status: "insufficient_context".to_string(),
+                query,
+                passages: vec![],
+            },
         }
-    };
-    let response = match view {
-        Some(view) => ganesh_core::search::evaluate_view(&view, &req.query, &caller, &state.config).0,
-        None => ganesh_core::types::SearchResponse {
-            status: "insufficient_context".to_string(),
-            query: req.query.clone(),
-            passages: vec![],
-        },
-    };
+    })
+    .await
+    .unwrap_or_else(|_| ganesh_core::types::SearchResponse {
+        status: "insufficient_context".to_string(),
+        query: req.query.clone(),
+        passages: vec![],
+    });
     Json(response)
 }
 
