@@ -24,6 +24,10 @@ struct QaModel {
 
 static MODEL: OnceLock<Option<QaModel>> = OnceLock::new();
 
+/// QA verifier runs single-pass scoring on at most 3 passages per query;
+/// small batches favor fewer threads. Overridable for calibration.
+const DEFAULT_THREADS: usize = 2;
+
 fn model_dir() -> String {
     std::env::var("GANESH_QA_VERIFIER_MODEL_DIR")
         .unwrap_or_else(|_| "fixtures/qa-verifier-model".to_string())
@@ -38,7 +42,7 @@ pub(crate) fn load() -> Option<QaModel> {
     }
     let session = Session::builder().ok()?
         .with_optimization_level(GraphOptimizationLevel::Level3).ok()?
-        .with_intra_threads(2).ok()?
+        .with_intra_threads(std::env::var("GANESH_ORT_THREADS").ok().and_then(|v| v.parse().ok()).unwrap_or(DEFAULT_THREADS)).ok()?
         .commit_from_file(weights).ok()?;
     Some(QaModel { session: Mutex::new(session), tokenizer })
 }

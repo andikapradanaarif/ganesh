@@ -298,6 +298,7 @@ pub struct SearchDebug {
     pub candidates: Vec<(String, f64)>,
     pub selected: Vec<String>,
     pub trace: AcceptanceTrace,
+    pub rerank_scores: Vec<(String, f32)>,
 }
 
 fn title_subject_terms(title: &str) -> std::collections::BTreeSet<String> {
@@ -631,6 +632,7 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
         candidates: vec![],
         selected: vec![],
         trace: AcceptanceTrace::default(),
+        rerank_scores: vec![],
     };
     let empty = SearchResponse {
         status: "insufficient_context".to_string(),
@@ -658,6 +660,7 @@ fn evaluate(view: &CorpusView, query: &str, caller: &str, cfg: &RetrievalConfig)
         candidates: vec![],
         selected: vec![],
         trace: AcceptanceTrace::default(),
+        rerank_scores: vec![],
     };
     let empty = |status: &str| SearchResponse {
         status: status.to_string(),
@@ -829,6 +832,9 @@ fn evaluate(view: &CorpusView, query: &str, caller: &str, cfg: &RetrievalConfig)
             scored.push((*i, scores.get(i).cloned().unwrap_or(f32::MIN)));
         }
         scored.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
+        for (i, s) in &scored {
+            debug.rerank_scores.push((rows[*i].passage_id.clone(), *s));
+        }
         rerank_order = Some(scored.into_iter().map(|(i, _)| i).collect());
     }
 

@@ -931,6 +931,8 @@ fn probe(questions_path: &str, corpus_dir: &str) {
         let cands: Vec<String> = dbg.candidates.iter().take(10).map(|(id, s)| format!("{id}({s:.2})")).collect();
         println!("   candidates: {}", cands.join(" "));
         println!("   selected:   {}", dbg.selected.join(" "));
+        let rrs: Vec<String> = dbg.rerank_scores.iter().take(10).map(|(id, s)| format!("{id}({s:.3})")).collect();
+        println!("   rerank:     {}", rrs.join(" "));
         println!("   coverage:   u:{:.2} iu:{:.2} unmatched: {}", dbg.union_coverage, dbg.idf_union_coverage, dbg.unmatched_terms.join(","));
         println!("   decision:   {} | {}", dbg.trace.decision, dbg.trace.reasons.join(" ; "));
         for m in &dbg.trace.quantity_mentions {

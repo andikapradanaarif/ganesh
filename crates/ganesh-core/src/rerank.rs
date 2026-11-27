@@ -24,6 +24,11 @@ struct CrossEncoder {
 
 static MODEL: OnceLock<Option<CrossEncoder>> = OnceLock::new();
 
+/// The reranker batches the whole candidate pool in one padded forward
+/// pass; larger batches favor more intra-op threads. Overridable for
+/// calibration.
+const DEFAULT_THREADS: usize = 4;
+
 fn model_dir() -> String {
     std::env::var("GANESH_RERANKER_MODEL_DIR")
         .unwrap_or_else(|_| "fixtures/reranker-model".to_string())
@@ -38,7 +43,7 @@ fn load() -> Option<CrossEncoder> {
     }
     let session = Session::builder().ok()?
         .with_optimization_level(GraphOptimizationLevel::Level3).ok()?
-        .with_intra_threads(4).ok()?
+        .with_intra_threads(std::env::var("GANESH_ORT_THREADS").ok().and_then(|v| v.parse().ok()).unwrap_or(DEFAULT_THREADS)).ok()?
         .commit_from_file(weights).ok()?;
     Some(CrossEncoder { session: Mutex::new(session), tokenizer })
 }
