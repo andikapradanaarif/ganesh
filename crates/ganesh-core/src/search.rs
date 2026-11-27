@@ -167,7 +167,7 @@ fn exact_number_unit(token: &str) -> bool {
 pub const MEASURE_PROPS: &[&str] = &[
     "diameter", "height", "length", "width", "depth", "weight", "mass", "distance",
     "area", "volume", "population", "speed", "temperature", "cost", "price", "size",
-    "capacity", "altitude", "elevation", "tension",
+    "capacity", "altitude", "elevation", "tension", "wattage",
 ];
 
 /// Physical-unit vocabulary for the explicit `"in <unit>"` framing check.

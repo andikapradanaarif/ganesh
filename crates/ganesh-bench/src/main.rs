@@ -67,6 +67,7 @@ struct StructuralFinding {
 }
 
 mod lifecycle;
+mod lifecheck;
 
 fn main() {
     ganesh_core::rerank::enforce_requirement("ganesh-bench");
@@ -86,6 +87,20 @@ fn main() {
             }
         }
         std::process::exit(lifecycle::run_lifecycle(&cdir));
+    }
+    if args.len() >= 2 && args[1] == "lifecheck" {
+        // ganesh-bench lifecheck --corpus <dir> --scenario <scenario.json>
+        let mut cdir = String::new();
+        let mut scen = String::new();
+        let mut j = 2;
+        while j < args.len() {
+            match args[j].as_str() {
+                "--corpus" => { cdir = args.get(j + 1).cloned().unwrap(); j += 2; }
+                "--scenario" => { scen = args.get(j + 1).cloned().unwrap(); j += 2; }
+                other => { eprintln!("unknown argument: {other}"); std::process::exit(2); }
+            }
+        }
+        std::process::exit(lifecheck::run_scenario(&cdir, &scen));
     }
     let mut questions_path = None;
     let mut report_path = None;

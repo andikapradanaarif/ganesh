@@ -1617,7 +1617,9 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
         .ok()
         .and_then(|v| v.parse().ok())
         .unwrap_or(1.0);
-    if input.dense_support {
+    // Measurement/quantity questions are excluded: a missing measurement is
+    // exact-evidence territory, and dense retrieval must never conjure one.
+    if input.dense_support && !input.quantity_question {
         if let Some(m) = trace.qa_margin {
             if m.is_finite() && m >= override_margin {
                 trace.reasons.retain(|r| {

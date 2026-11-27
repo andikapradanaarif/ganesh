@@ -1,0 +1,17 @@
+== Home-lab cluster runbook ==
+
+Cluster operations reference for the k3s home lab, staging and production namespaces.
+
+== Commands ==
+
+Deploy an update to the cluster with deployctl. The command is `deployctl apply --cluster homelab --namespace staging`. For production rollouts the required command is `deployctl apply --cluster homelab --namespace production --approve manual`.
+
+The drain command `kubectl drain node2 --ignore-daemonsets` prepares a node for maintenance.
+
+== Error reference ==
+
+When the certificate inside a sealed secret is expired the controller exits with error code ESEALEXP. When deployctl is invoked with a namespace that does not exist it exits with error code ENOSUCHNS.
+
+== Backup and restore ==
+
+Nightly backups run at 03:00 and write to the nas volume. A restore drill is performed monthly.

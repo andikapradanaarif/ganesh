@@ -1,0 +1,10 @@
+== Home-lab ops chat transcript ==
+
+[2026-10-05 20:14] miriam: the k3s cluster keeps evicting pods on node2, memory pressure again
+[2026-10-05 20:15] tom: we could add a third node, I have the spare nuc
+[2026-10-05 20:16] miriam: proposal, not decided. first tell me what the memory ceiling is
+[2026-10-05 20:22] tom: agreed decision: we cap the jellyfin transcode jobs at 2 concurrent, that was approved
+[2026-10-05 20:23] miriam: yes approved. the third node stays a proposal for now
+[2026-10-05 20:31] tom: I also started migrating the ingress to traefik but it is not finished, certs are still on nginx
+[2026-10-05 20:44] miriam: for the record: production namespace is frozen on weekends, staging is exempt, that is the standing rule
+[2026-10-05 20:45] tom: undecided: whether we move the backup window from 03:00 to 02:00. nobody picked it up
