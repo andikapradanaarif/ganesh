@@ -1,0 +1,147 @@
+The theremin (; originally known as the ætherphone, etherphone, thereminophone or termenvox/thereminvox) is an electronic musical instrument controlled without physical contact by the performer (who is known as a thereminist). It is named after its inventor, Leon Theremin, who patented the device in 1928.
+The instrument's controlling section usually consists of two metal antennas that function not as radio antennas but rather as position sensors. Each antenna forms one half of a capacitor, with the thereminist's hand as the other half. These antennas capacitively sense the relative position of the hands and control oscillators, one hand determining frequency and the other amplitude (volume). The electric signals from the theremin are amplified and sent to a loudspeaker.
+The sound of the instrument is often associated with eerie situations.
+thumb|Leon Theremin demonstrating and playing the theremin
+thumb|Alexandra Stepanoff playing the theremin on NBC Radio Network|NBC Radio
+
+History
+The theremin was the product of Soviet government–sponsored research into proximity sensors. The instrument was invented in October 1920 by the Russian physicist Lev Sergeyevich Termen, known in the West as Leon Theremin. After a lengthy tour of Europe, during which he demonstrated his invention to packed houses, Theremin moved to the United States, where he patented his invention in 1928. Subsequently, Theremin granted commercial production rights to RCA.
+Although the RCA Thereminvox (released immediately following the stock market crash of 1929) was not a commercial success, it fascinated audiences in America and abroad. Clara Rockmore, a well-known thereminist, toured to wide acclaim, performing a classical repertoire in concert halls around the United States, often sharing the bill with bass-baritone Paul Robeson. Joseph Whiteley (1894–1984) performed under the stage name Musaire, and his 1930 RCA Theremin can be seen, played, and heard at the Musical Museum, Brentford, England.
+During the 1930s, Lucie Bigelow Rosen was also taken with the theremin and, together with her husband Walter Bigelow Rosen, provided both financial and artistic support to the development and popularisation of the instrument.
+In 1938, Theremin left the United States, though the circumstances related to his departure are in dispute. Many accounts claim he was taken from his New York City apartment by agents of the NKVD (the forerunner of the KGB), taken back to the Soviet Union and made to work in a sharashka laboratory prison camp at Magadan, Siberia. He reappeared 30 years later. In his 2000 biography of the inventor, Theremin: Ether Music and Espionage, Albert Glinsky suggested he had fled to escape crushing personal debts and had then been caught up in Stalin's political purges. In any case, Theremin did not return to the United States until 1991.
+thumb|The components of a modern Moog Music|Moog theremin, in kit form
+After a flurry of interest in America following the end of the Second World War, the theremin soon fell into disuse among professional musicians, mainly because newer electronic instruments were introduced that were easier to play. However, a niche interest in the theremin persisted, mostly among electronics enthusiasts and kit-building hobbyists. One of these electronics enthusiasts, Robert Moog, began building theremins in the 1950s while he was a high-school student. Moog subsequently published a number of articles about building theremins and sold theremin kits that were intended to be assembled by the customer. Moog credited what he learned from the experience with leading directly to his synthesizer, the Moog. (Around 1955, a colleague of Moog's, electronic music pioneer Raymond Scott, purchased one of Moog's theremin subassemblies to incorporate into a new invention, the Clavivox, which was intended to be an easy-to-use keyboard theremin.)
+Both theremin instruments and kits are available. The Open Theremin, an open-hardware and open-software project, was developed by Swiss microengineer Urs Gaudenz; it combines the original heterodyne oscillator architecture with an Arduino microcontroller. With a few extra components, a MIDI interface can be added to the Open Theremin, enabling a player to use their theremin to control different instrument sounds.
+The theremin's contactless method of operation has been praised for providing an accessible route to music-making for people with disabilities.
+
+Operating principles
+thumb|upright=1.5|Block diagram of a theremin. Volume control in blue, pitch control in yellow and audio output in red.
+The theremin is distinguished among musical instruments in that it is played without physical contact. The thereminist stands in front of the instrument and moves their hands in the proximity of two metal antennas. While commonly called antennas, they are not used as radio antennas for receiving or broadcasting radio waves, but rather act as plates of capacitors. The distance from one antenna determines frequency (pitch), and the distance from the other controls amplitude (volume). Higher notes are played by moving the hand closer to the pitch antenna. Louder notes are played by moving the hand away from the volume antenna.
+Most frequently, the right hand controls the pitch and the left controls the volume, although some performers reverse this arrangement. Some low-cost theremins use a conventional, knob-operated volume control and have only the pitch antenna.
+The theremin uses the heterodyne principle to generate an audio signal. The instrument's pitch circuitry includes two radio-frequency oscillators set below 500kHz to minimise radio interference. One oscillator operates at a fixed frequency. The frequency of the other oscillator is almost identical and is controlled by the performer's distance from the pitch-control antenna.
+The performer's hand has significant body capacitance, and thus can be treated as the grounded plate of a variable capacitor in an LC (inductance–capacitance) circuit, which is part of the oscillator and determines its frequency. In the simplest designs, the antenna is directly coupled to the tuned circuit of the oscillator, and the "pitch field"—that is, the change of note with distance—is highly nonlinear, as the capacitance change with distance is far greater near the antenna. In such systems, when the antenna is removed, the oscillator moves up in frequency.
+To partly linearise the pitch field, the antenna may be wired in series with an inductor to form a series tuned circuit, resonating with the parallel combination of the antenna's intrinsic capacitance and the capacitance of the player's hand in proximity to the antenna. This series tuned circuit is then connected in parallel with the parallel tuned circuit of the variable-pitch oscillator. With the antenna circuit disconnected, the oscillator is tuned to a frequency slightly higher than the stand-alone resonant frequency of the antenna circuit. At that frequency, the antenna and its linearising coil present an inductive impedance, and when connected, behave as an inductor in parallel with the oscillator. Thus, connecting the antenna and linearising coil raises the oscillation frequency. Close to the resonant frequency of the antenna circuit, the effective inductance is small, and the effect on the oscillator is greatest; farther from that frequency, the effective inductance is larger, and the fractional change in the oscillator's frequency is reduced.
+When the hand is distant from the antenna, the resonant frequency of the antenna series circuit is at its highest; i.e., it is closest to the free-running frequency of the oscillator, and small changes in antenna capacitance have the greatest effect. Under this condition, the effective inductance in the tank circuit is at its minimum and the oscillation frequency is at its maximum. The steepening rate of change of shunt impedance with hand position compensates for the reduced influence of the hand being farther away. With careful tuning, a near-linear region of pitch field can be created over the central two or three octaves of operation. With optimised pitch-field linearisation, circuits can be made where a change in capacitance between the performer and the instrument in the order of 0.01picofarads produces a full octave of frequency shift.
+The mixer produces the audio-range difference between the frequencies of the two oscillators at each moment, which is the tone that is then wave-shaped, amplified, and sent to a loudspeaker.
+To control volume, the performer's other hand acts as the grounded plate of another variable capacitor. As in the tone circuit, the distance between the performer's hand and the volume-control antenna determines the capacitance and hence the natural resonant frequency of an LC circuit inductively coupled to another fixed LC oscillator circuit operating at a slightly higher resonant frequency. When a hand approaches the antenna, the natural frequency of that circuit is lowered by the extra capacitance, which detunes the oscillator and lowers its resonant plate current.
+In the earliest theremins, the radio-frequency plate current of the oscillator is picked up by another winding and used to power the filament of another diode-connected triode, which thus acts as a variable conductance element changing the output amplitude. The harmonic timbre of the output, not being a pure tone, was an important feature of the theremin. Theremin's original design included audio-frequency series and parallel LC formant filters as well as a three-winding variable-saturation transformer to control or induce harmonics in the audio output.
+Modern circuit designs often simplify this circuit and avoid the complexity of two heterodyne oscillators by having a single pitch oscillator, akin to the original theremin's volume circuit. This approach is usually less stable and cannot generate the low frequencies that a heterodyne oscillator can. Some designs (e.g., Moog, Theremax) use two pairs of heterodyne oscillators, for both pitch and volume.
+
+Performance technique
+thumbnail|A robot playing the theremin
+Important in theremin articulation is the use of the volume-control antenna. Unlike touched instruments, where simply halting play or damping a resonator in the traditional sense silences the instrument, the thereminist must "play the rests, as well as the notes", as Clara Rockmore observed.
+If the pitch hand is moved between notes without first lowering the volume hand, the result is a "swooping" sound akin to a swanee whistle or a portamento played on the violin. Small flutters of the pitch hand can be used to produce a vibrato effect. To produce distinct notes requires a pecking action with the volume hand to mute the volume while the pitch hand moves between positions.
+thumb|"8 finger position technique" invented by Carolina Eyck
+In 2004, thereminist Carolina Eyck invented a new and precise way to play the theremin, called the "8 finger position technique". For every octave there is a fixed arm position, and for notes within the octave fixed positions of the fingers, allowing very fast transitions between adjacent notes. With this technique, the player is able to tune the theremin to their hand and rely on their finger positions rather than correcting notes after they are audible.
+Although volume technique is less developed than pitch technique, some thereminists have worked to extend it, especially Pamelia Kurstin, with her "walking bass" technique, and Rupert Chappelle.
+The critic Harold C. Schonberg described the sound of the theremin as "[a] cello lost in a dense fog, crying because it does not know how to get home".
+
+Uses
+thumb|right|RCA Corporation|RCA AR-1264 Theremin in Musical Instrument Museum, Phoenix, Arizona
+
+Orchestral music
+The first orchestral composition written for theremin was Symphonic Mystery, which premiered in 1924. However, most of the sheet music was lost after its second performance. In 1934, Edgard Varèse completed the composition Ecuatorial, originally scored for two theremin cellos alongside bass voice, brass, piano, organ, and percussion. His work was a stated influence throughout the career of Frank Zappa, who also composed for theremin.
+Maverick composer Percy Grainger chose to use ensembles of four or six theremins (in preference to a string quartet) for his two earliest experimental Free Music compositions (1935–1937) because of the instrument's complete "gliding" freedom of pitch. Musician Jean-Michel Jarre used the instrument in his concerts Oxygène in Moscow in 1997 and Space of Freedom in Gdańsk in 2005, also providing a short history of Leon Theremin's life.
+The five-piece Spaghetti Western Orchestra use a theremin as a replacement for Edda Dell'Orso's vocals in their interpretation of Ennio Morricone's "Once Upon a Time in the West".
+A large-scale theremin concerto, Kalevi Aho's Concerto for Theremin and Chamber Orchestra Eight Seasons (2011), was written for Carolina Eyck. The recording of the premiere won an Echo Klassik in the category "Concert Recording of the Year" in 2015. The theremin concerto Dancefloor with Pulsing by the French composer Régis Campo was also written for Eyck and premiered with the Brussels Philharmonic in 2018.
+Other concert composers who have written for theremin include Bohuslav Martinů, Percy Grainger, Christian Wolff, Joseph Schillinger, Moritz Eggert, Iraida Yusupova, Jorge Antunes, Vladimir Komarov, Anis Fuleihan, Fazıl Say, and Dalit Warshaw.
+In 2019 in Kobe, Japan, the Matryomin ensemble, a group of 289 theremin players that included Natasha Theremin, Masha Theremin, and Peter Theremin—the daughter, granddaughter, and great-grandson of the inventor—achieved a Guinness World Record as the largest ensemble of the instrument. The name Matryomin is a portmanteau, coined by its inventor, of the words matryoshka and theremin.
+Other notable contemporary theremin players include Lydia Kavina, Pamelia Kurstin, Katica Illényi, and Thorwald Jørgensen.
+
+Popular music
+Theremins and theremin-like sounds started to be incorporated into popular music from the late 1940s (with a series of Samuel Hoffman–Harry Revel collaborations) and have continued, with varying degrees of popularity, to the present.
+Lothar and the Hand People were the first rock band known to perform live with a theremin in November 1965. In fact, Lothar was the name they gave to their Moog theremin.
+The Beach Boys' 1966 single "Good Vibrations"—though it does not contain a theremin—is the most frequently cited example of a theremin-like sound in pop music. The song features a similar-sounding instrument invented by Paul Tanner called an Electro-Theremin. Upon release, the single prompted an unexpected revival of interest in theremins and increased awareness of analog synthesizers. In response to requests by the band, Moog Music began producing its own brand of ribbon-controlled instruments that would mimic the sound of a theremin.
+Frank Zappa included the theremin on the albums Freak Out! (1966) and We're Only in It for the Money (1967).
+Jimmy Page of Led Zeppelin used a variation of the theremin (pitch antenna only) during performances of "Whole Lotta Love" and "No Quarter". He also incorporated the instrument in live solos and in his soundtrack to the 1982 action film Death Wish II.
+Brian Jones of the Rolling Stones also used the instrument on the group's 1967 albums Between the Buttons and Their Satanic Majesties Request.
+Tesla guitarist Frank Hannon used a theremin in the band's song "Edison's Medicine" from the 1991 album Psychotic Supper. Hannon is also seen using the instrument in the song's music video at the 2:40 mark.
+The Lothars are a Boston-area band formed in early 1997 whose CDs have featured as many as four theremins played at once—a first for pop music.
+Although credited with a on the track "Mysterons" from the album Dummy, Portishead used a monophonic synthesizer to achieve theremin-like effects, as confirmed by Adrian Utley, who is credited as playing the instrument; on the songs "Half Day Closing", "Humming", "The Rip", and "Machine Gun" he has used a custom-made theremin.
+Page McConnell, keyboardist of the American rock band Phish, plays the theremin on rare occasions. His last notable performance was on 6 August 2017, the final evening of the band's 13-night residency at Madison Square Garden.
+When Simon and Garfunkel performed their song "The Boxer" during a concert at Madison Square Garden in December 2003, they used a theremin. The original recording of the song had featured a steel guitar and a piccolo trumpet in unison in the solo interlude, but for this performance, thereminist Rob Schwimmer played the solo.
+Francis Tobolsky of the German band Wucan uses a theremin during live performances; she has also used this instrument on several studio recordings, notably on the album Axioms.
+
+Film music
+Russian composer Dmitri Shostakovich was one of the first to incorporate parts for the theremin in orchestral pieces, including a use in his score for the film (, 1931, directed by Leonid Trauberg and Grigori Kozintsev). While the theremin was not widely used in classical music performances, the instrument found great success in many motion pictures, notably Spellbound, The Lost Weekend, The Red House (all three written by Miklós Rózsa, the composer who pioneered the use of the instrument in Hollywood scores), The Spiral Staircase, Rocketship X-M, The Day the Earth Stood Still, The Thing from Another World, Castle in the Air, and The Ten Commandments. The theremin is played and identified as such in the Jerry Lewis film The Delicate Delinquent. The score for the 1956 short film A Short Vision, composed by Mátyás Seiber, features the theremin prominently; the film aired on The Ed Sullivan Show that year. More recent appearances in film scores include Ed Wood (1994), The Machinist (2004), and The Electrical Life of Louis Wain (2021)—all three featuring Lydia Kavina—as well as Monster House (2006) and First Man (2018).
+A theremin was not used for the soundtrack of Forbidden Planet, for which Bebe and Louis Barron built disposable oscillator circuits and a ring modulator to create the electronic tonalities used in the film.
+Los Angeles–based thereminist Charles Richard Lester is featured on the soundtrack of Monster House and performed the US premiere of Gavriil Popov's 1932 score for Komsomol – Patron of Electrification with the Los Angeles Philharmonic and Esa-Pekka Salonen in 2007.
+In Lenny Abrahamson's 2014 film Frank, Clara, the character played by Maggie Gyllenhaal, plays the theremin in a band named Soronprfbs.
+
+Theatre and performing arts
+Charlie Rosen, orchestrator of the Broadway musical Be More Chill, credits the show as being the first on Broadway to have a theremin in its band.
+In 2005, composer Lera Auerbach wrote for a theremin in her ballet music for The Little Mermaid by choreographer John Neumeier. In 2011, she used it again in her ballet music for Cinderella.
+
+Television
+In May 2007, the White Castle American hamburger restaurant chain introduced a television advertisement centred on a live theremin performance by musician Jon Bernhardt of the Lothars. It is the only known example of a theremin performance being the focus of an advertisement.
+Celia Sheen plays the theremin in the Midsomer Murders series.
+In October 2008, comedian, musician, and theremin enthusiast Bill Bailey played a theremin during his performance of Bill Bailey's Remarkable Guide to the Orchestra at the Royal Albert Hall, a performance that was subsequently televised. He had also previously written an article, presented a radio show, and incorporated the theremin in some of his televised comedy tours.
+Charlie Draper plays the theremin in the soundtrack (written by Natalie Holt) for the TV series Loki on Disney+.
+In the January 2011 The Big Bang Theory episode "The Bus Pants Utilization", Jim Parsons's character Sheldon Cooper plays the theremin. Parsons did not feel he played it well.
+
+Video games
+A theremin-inspired tune serves as the theme for the Edison family in the NES port of Maniac Mansion.
+Lydia Kavina's solo theremin is featured on the soundtrack for the 2006 MMORPG Soul of the Ultimate Nation, composed by Howard Shore.
+
+The First Theremin Concert for Extraterrestrials
+right|thumb|Theremin performer Anton Kerchenko and his young pupil at the Yevpatoria RT-70 radio telescope station
+The First Theremin Concert for Extraterrestrials was the world's first musical METI broadcast, transmitted from the Yevpatoria deep-space communications complex in Crimea seven years before NASA's Across the Universe message. Seven different melodies were transmitted from audio-cassette recordings of the theremin being played by Lydia Kavina, Yana Aksenova, and Anton Kerchenko, all from the Moscow Theremin Center. These seven melodies were:
+"Vykhozhu odin ya na dorogu" ("Alone I Set Out on the Road") by E. Shashina
+Finale of the 9th Symphony by Beethoven
+The Four Seasons: "Spring" – Allegro by Vivaldi
+"The Swan" by Saint-Saëns
+"Vocalise" by Rachmaninoff
+"Summertime" by Gershwin
+Russian folk song "Kalinka"
+They were played in succession six times over three days spanning late August and early September 2001 during the transmission of Teen Age Message, an interstellar radio message.
+
+Similar instruments
+thumb|upright|Ini Archibong interacting with Artifact #VII at the [[Prince Consort Gallery, Victoria and Albert Museum, London]]
+The Ondes Martenot, 1928, also uses the principle of heterodyning oscillators, but has a keyboard as well as a slide controller and is touched while playing.
+The Electronde, invented in 1929 by Martin Taubman, has an antenna for pitch control, a handheld switch for articulation, and a foot pedal for volume control.
+The Croix Sonore () is based on the theremin. It was developed by Russian composer Nicolas Obouchov in France, after he saw Lev Theremin demonstrate the theremin in 1924.
+The terpsitone, also invented by Theremin, consisted of a platform fitted with space-controlling antennas, through and around which a dancer would control the musical performance. By most accounts, the instrument was nearly impossible to control. Of the three instruments built, only the last one, made in 1978 for Lydia Kavina, survives.
+The Z.Vex Effects Fuzz Probe, Wah Probe, and Tremolo Probe use a theremin to control their effects. The Fuzz Probe can also be played as a theremin, since it can create tones of any pitch through feedback oscillation.
+The MC-505 by Roland, which can use its integrated D-Beam sensor like a theremin.
+The AudioCubes by Percussa are light-emitting smart blocks that have four sensors on each side (optical theremin). The sensors measure the distance to the player's hands to control an effect or sound.
+A three-radio theremin (Super Theremin, ) invented by Tomoya Yamamoto (), composed of three independent radio sets. Radio set 1 is used to listen to and record the signal at around 1600kHz. Radio set 2 is tuned to 1145kHz so that its local oscillator of around 1600kHz is received by radio set 1. Radio set 3 is also tuned to 1145kHz so that its local oscillator produces a beat with radio set 2. The operator's hand movement around the bar antenna of radio set 3 affects the local oscillator to produce tonal change.
+The Chimaera is a digital offspring of the theremin and a touchless ribbon controller, based on distance sensing of permanent magnets. An array of linear Hall-effect sensors, each acting as an individual theremin in a changing magnetic field, responds to multiple moving neodymium magnets worn on fingers and forms a continuous interaction space in two dimensions.
+Artifact #VII by Ini Archibong is a theremin nested in a "pod-like sculpture" made of Japanese Tsugaru Nuri lacquerware.
+The Tettix Wave Accumulator is a complex instrument composed of oscillators and filters that manipulate sound sources, invented by Grasshopper from the band Mercury Rev. The instrument played a significant role in the band's recordings in the 1990s, offering sound-manipulation capabilities at a time when similar effects were not easily achievable with software. It features on their albums See You on the Other Side and Deserter's Songs.
+
+See also
+List of Russian inventions
+Ring modulation
+
+References
+
+Sources
+
+In German as
+
+Further reading
+
+Film and video
+
+External links
+Carolina Eyck's TEDx talk on the symbiosis of self-control and freedom while playing the theremin.
+Online platform ThereminSchool for classes and exercises, authored by Lydia Kavina.
+Pamelia Kurstin on TED.com
+Theremin Times
+ThereminVox.com
+Thereminworld.com
+TECI : Theremin Enthusiasts Club International
+Theremin Family
+Theremin Argentina
+
+Category:Electronic musical instruments
+Category:Continuous pitch instruments
+Category:Inventions by Leon Theremin
+Category:Experimental musical instruments
+Category:Monophonic synthesizers
+Category:Musical instruments invented in the 1920s
+Category:1928 introductions
+Category:1928 in the Soviet Union
+Category:Soviet inventions
+Category:Russian inventions
+Category:Theremin

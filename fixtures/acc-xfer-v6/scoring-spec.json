@@ -1,0 +1,8 @@
+{
+ "coverage_min": 6,
+ "coverage_total": 8,
+ "insufficient_min": 5,
+ "insufficient_total": 6,
+ "adapter_agreement_total": 14,
+ "top_k": 3
+}
