@@ -1330,18 +1330,14 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
     if qa_extractive_question(input.query) {
         let mut max_margin = f32::NEG_INFINITY;
         let mut best_span = String::new();
-        let texts: Vec<String> = input
-            .passages
-            .iter()
-            .map(|(pid, verbatim, section, _)| {
-                let article = pid.split('-').next().unwrap_or("");
-                format!("{article} — {section}\n{verbatim}")
-            })
-            .collect();
-        for v in crate::qa_verify::verify_batch(input.query, &texts).into_iter().flatten() {
-            if v.margin > max_margin {
-                max_margin = v.margin;
-                best_span = v.span.clone();
+        for (pid, verbatim, section, _) in input.passages {
+            let article = pid.split('-').next().unwrap_or("");
+            let text = format!("{article} — {section}\n{verbatim}");
+            if let Some(v) = crate::qa_verify::verify_pair(input.query, &text) {
+                if v.margin > max_margin {
+                    max_margin = v.margin;
+                    best_span = v.span.clone();
+                }
             }
         }
         trace.qa_margin = Some(max_margin);
