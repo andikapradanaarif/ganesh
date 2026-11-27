@@ -1,0 +1,526 @@
+{
+  "version": "v5",
+  "scoring": "hit requires ok status plus evidence credit; insufficient correct when status insufficient_context",
+  "questions": [
+    {
+      "id": "w01",
+      "question": "On what date did the series of lesser eruptions of Krakatoa begin in 1883?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [],
+      "required_facts": [
+        {
+          "fact": "began 20 May 1883",
+          "acceptable": [
+            "krakatoa-a1#p30"
+          ],
+          "spans": [
+            "20 May 1883"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "w02",
+      "question": "At least how many people died in the 1883 eruption of Krakatoa?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [],
+      "required_facts": [
+        {
+          "fact": "36,417 died",
+          "acceptable": [
+            "krakatoa-a1#p6"
+          ],
+          "spans": [
+            "36,417"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "w03",
+      "question": "To what height in meters was the volcano reduced following the collapse in December 2018?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [],
+      "required_facts": [
+        {
+          "fact": "110 meters",
+          "acceptable": [
+            "krakatoa-a1#p7"
+          ],
+          "spans": [
+            "110 meters"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "w04",
+      "question": "In what year did a map first mention Krakatoa by name in the western world?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [],
+      "required_facts": [
+        {
+          "fact": "1611 map",
+          "acceptable": [
+            "krakatoa-a1#p8"
+          ],
+          "spans": [
+            "1611"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "w05",
+      "question": "On what exact date did the most recent eruption of Mauna Loa begin?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [],
+      "required_facts": [
+        {
+          "fact": "began November 27 2022",
+          "acceptable": [
+            "maunaloa-a1#p4"
+          ],
+          "spans": [
+            "November 27, 2022"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "w06",
+      "question": "On what exact date was the next successful ascent of Mauna Loa made in 1834?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [],
+      "required_facts": [
+        {
+          "fact": "January 29 1834",
+          "acceptable": [
+            "maunaloa-a1#p51"
+          ],
+          "spans": [
+            "January 29, 1834"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "w07",
+      "question": "What kind of volcano is Mauna Loa?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [],
+      "required_facts": [
+        {
+          "fact": "shield volcano",
+          "acceptable": [
+            "maunaloa-a1#p1"
+          ],
+          "spans": [
+            "shield volcano"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "w08",
+      "question": "On what date did the most recent eruption of Mauna Loa end?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [],
+      "required_facts": [
+        {
+          "fact": "ended December 13",
+          "acceptable": [
+            "maunaloa-a1#p4"
+          ],
+          "spans": [
+            "December 13"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "w09",
+      "question": "On what exact date did Mount St. Helens erupt in 1980?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [],
+      "required_facts": [
+        {
+          "fact": "erupted May 18 1980",
+          "acceptable": [
+            "sthelens-a1#p28"
+          ],
+          "spans": [
+            "May 18, 1980"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "w10",
+      "question": "What was the highest elevation of Mount St. Helens in meters as measured in 2009?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [],
+      "required_facts": [
+        {
+          "fact": "2,539 m",
+          "acceptable": [
+            "sthelens-a1#p6"
+          ],
+          "spans": [
+            "2,539 m"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "w11",
+      "question": "How many people were killed in the 1980 eruption of Mount St. Helens?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [],
+      "required_facts": [
+        {
+          "fact": "57 people",
+          "acceptable": [
+            "sthelens-a1#p2",
+            "sthelens-a1#p33"
+          ],
+          "spans": [
+            "57"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "w12",
+      "question": "In which county is Mount St. Helens located?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [],
+      "required_facts": [
+        {
+          "fact": "Skamania County",
+          "acceptable": [
+            "sthelens-a1#p1",
+            "sthelens-a1#p8",
+            "sthelens-a1#p92"
+          ],
+          "spans": [
+            "Skamania County"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "w13",
+      "question": "On what exact date did the climactic eruption of Mount Pinatubo occur?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [],
+      "required_facts": [
+        {
+          "fact": "June 15 1991",
+          "acceptable": [
+            "pinatubo-a1#p20",
+            "pinatubo-a1#p25"
+          ],
+          "spans": [
+            "June 15, 1991"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "w14",
+      "question": "What VEI rating is the 1991 eruption of Mount Pinatubo known for?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [],
+      "required_facts": [
+        {
+          "fact": "VEI-6",
+          "acceptable": [
+            "pinatubo-a1#p2"
+          ],
+          "spans": [
+            "VEI-6"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "w15",
+      "question": "What kind of volcano is ancestral Pinatubo?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [],
+      "required_facts": [
+        {
+          "fact": "somma volcano",
+          "acceptable": [
+            "pinatubo-a1#p12"
+          ],
+          "spans": [
+            "somma volcano"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "w16",
+      "question": "How many people were killed and how many homes were destroyed in the 1980 eruption of Mount St. Helens?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [],
+      "required_facts": [
+        {
+          "fact": "57 people",
+          "acceptable": [
+            "sthelens-a1#p2",
+            "sthelens-a1#p33"
+          ],
+          "spans": [
+            "57"
+          ],
+          "answer_polarity": "affirmative"
+        },
+        {
+          "fact": "200 homes",
+          "acceptable": [
+            "sthelens-a1#p2",
+            "sthelens-a1#p33"
+          ],
+          "spans": [
+            "200"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "s01",
+      "question": "At what time did the lamp rotation inspection finish?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [],
+      "required_facts": [
+        {
+          "fact": "08:20 UTC",
+          "acceptable": [
+            "beaconlog-a1#p2"
+          ],
+          "spans": [
+            "08:20"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "s02",
+      "question": "At what time did the lens cleaning of the main optic finish?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [],
+      "required_facts": [
+        {
+          "fact": "13:45 UTC",
+          "acceptable": [
+            "beaconlog-a1#p3"
+          ],
+          "spans": [
+            "13:45"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "s03",
+      "question": "At what time did the foghorn pressure test finish?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [],
+      "required_facts": [
+        {
+          "fact": "10:05 UTC",
+          "acceptable": [
+            "beaconlog-a1#p4"
+          ],
+          "spans": [
+            "10:05"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "s04",
+      "question": "At what time did the stairway rust treatment finish?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [],
+      "required_facts": [
+        {
+          "fact": "16:30 UTC",
+          "acceptable": [
+            "beaconlog-a1#p5"
+          ],
+          "spans": [
+            "16:30"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "s05",
+      "question": "At what time did the backup generator load test finish?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [],
+      "required_facts": [
+        {
+          "fact": "11:15 UTC",
+          "acceptable": [
+            "beaconlog-a1#p6"
+          ],
+          "spans": [
+            "11:15"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "s06",
+      "question": "At what time did the radio beacon calibration finish?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [],
+      "required_facts": [
+        {
+          "fact": "14:50 UTC",
+          "acceptable": [
+            "beaconlog-a1#p8"
+          ],
+          "spans": [
+            "14:50"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "s07",
+      "question": "At what time was the main lamp relit after the storm outage?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [],
+      "required_facts": [
+        {
+          "fact": "19:05 UTC",
+          "acceptable": [
+            "beaconlog-a1#p9"
+          ],
+          "spans": [
+            "19:05"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "s08",
+      "question": "What did the crew log on the northern pane?",
+      "expected_status": "ok",
+      "scope": "public",
+      "tags": [],
+      "required_facts": [
+        {
+          "fact": "salt deposits",
+          "acceptable": [
+            "beaconlog-a1#p2"
+          ],
+          "spans": [
+            "salt deposits"
+          ],
+          "answer_polarity": "affirmative"
+        }
+      ]
+    },
+    {
+      "id": "i01",
+      "question": "On what exact calendar date was the first western-world map mentioning Krakatoa by name published?",
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "tags": [],
+      "required_facts": []
+    },
+    {
+      "id": "i02",
+      "question": "What is the depth in meters of the caldera floor of Mauna Loa below its rim?",
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "tags": [],
+      "required_facts": []
+    },
+    {
+      "id": "i03",
+      "question": "In what year will the next eruption of Mount St. Helens occur?",
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "tags": [],
+      "required_facts": []
+    },
+    {
+      "id": "i04",
+      "question": "In what year did the first attempt of the Vancouver Expedition to summit Mauna Loa succeed?",
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "tags": [],
+      "required_facts": []
+    },
+    {
+      "id": "i05",
+      "question": "At what time did the repainting of the lighthouse tower finish?",
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "tags": [],
+      "required_facts": []
+    },
+    {
+      "id": "i06",
+      "question": "At what time was the foghorn diaphragm replacement verified complete?",
+      "expected_status": "insufficient_context",
+      "scope": "public",
+      "tags": [],
+      "required_facts": []
+    }
+  ]
+}
