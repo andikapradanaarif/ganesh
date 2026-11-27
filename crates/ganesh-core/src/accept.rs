@@ -127,6 +127,8 @@ pub struct AcceptanceTrace {
     pub reasons: Vec<String>,
     pub quantity_mentions: Vec<QuantityMention>,
     pub state_spans: Vec<StateSpan>,
+    pub qa_margin: Option<f32>,
+    pub qa_span: String,
 }
 
 const NUMBER_WORDS: &[&str] = &[
@@ -747,6 +749,27 @@ pub fn sentence_mentions_qualifier(sentence: &str, qualifier: &str) -> bool {
     false
 }
 
+
+/// Extractive wh-/factual question activation for the SQuAD 2.0 verifier:
+/// yes/no state questions (did/was/were/is/are/does/do/has/have at start) are
+/// excluded — the deterministic transition/proposition/action checks carry
+/// those. Everything extractive activates.
+pub fn qa_extractive_question(query: &str) -> bool {
+    let q = query.to_lowercase();
+    const YESNO: &[&str] = &["did ", "was ", "were ", "is ", "are ", "does ", "do ", "has ", "have ", "had "];
+    for p in YESNO {
+        if q.starts_with(p) {
+            return false;
+        }
+    }
+    const WH: &[&str] = &[
+        "who", "what", "when", "where", "which", "how many", "how much", "how long",
+        "how far", "how high", "how tall", "how deep", "how fast", "on what", "in what",
+        "in which", "at what", "for what", "by what", "from what",
+    ];
+    WH.iter().any(|w| q.starts_with(w) || q.contains(&format!(" {w}")))
+}
+
 /// Past-tense occurrence question: did-shaped date/year question.
 pub fn past_tense_date_query(query: &str) -> bool {
     let q = query.to_lowercase();
@@ -1017,6 +1040,38 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
                 "date-occurrence: only planned/future-modal date mentions found for past-tense event query"
                     .to_string(),
             );
+        }
+    }
+
+    // ---- SQuAD 2.0 extractive unanswerability verification -------------------
+    // Activation: extractive wh-/factual questions only (yes/no state questions
+    // are carried by the deterministic checks). Frozen threshold tau = 0.0 —
+    // the natural SQuAD 2.0 boundary where the best extracted span must
+    // strictly beat the [CLS] no-answer score on at least one selected passage.
+    // Exposed calibration (acc-xfer-v4): answerable hits +4.6..+17.2, undated
+    // sibling trap -4.47, missing-unit borderline positive — zero false
+    // abstention margin at tau=0 for every answerable exposed case measured.
+    if qa_extractive_question(input.query) {
+        let mut max_margin = f32::NEG_INFINITY;
+        let mut best_span = String::new();
+        for (pid, verbatim, section, _) in input.passages {
+            let article = pid.split('-').next().unwrap_or("");
+            let text = format!("{article} — {section}\n{verbatim}");
+            if let Some(v) = crate::qa_verify::verify_pair(input.query, &text) {
+                if v.margin > max_margin {
+                    max_margin = v.margin;
+                    best_span = v.span.clone();
+                }
+            }
+        }
+        trace.qa_margin = Some(max_margin);
+        trace.qa_span = best_span.clone();
+        // Inert when the verifier is absent (no verdict obtained on any
+        // passage): negative-infinity is the no-data sentinel, not evidence.
+        if max_margin.is_finite() && max_margin < 0.0 {
+            trace.reasons.push(format!(
+                "qa-unanswerable: max span-vs-null margin {max_margin:.2} below threshold 0.00 (best span `{best_span}`)"
+            ));
         }
     }
 

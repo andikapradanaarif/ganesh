@@ -1,0 +1,25 @@
+The Andvari seed vault is a fictional cryogenic conservation facility used as labeled synthetic material in the v4 evaluation packet. This is its germination testing log.
+
+== Batch January 5 ==
+
+The germination test of seed lot G11 started at 08:00 UTC. The test finished at 16:00 UTC and the viability count passed.
+
+== Batch January 6 ==
+
+The germination test of seed lot G11 started at 08:00 UTC. The test did not finish before the frost warning halted work.
+
+== Batch January 7 ==
+
+The germination test of seed lot G12 started at 08:00 UTC. The moisture reading finished at 09:00 UTC while the test continued.
+
+== Batch January 8 ==
+
+The germination test of seed lot G11 started at 08:00 UTC. The test of seed lot G12 started at 08:05 UTC. It finished at 15:00 UTC.
+
+== Batch January 9 ==
+
+The germination test of seed lot G12 started at 08:00 UTC. The moisture reading finished at 09:00 UTC while the test continued. The test finished at 14:30 UTC.
+
+== Batch January 10 ==
+
+The germination test of seed lot G13 finished at 12:00 UTC.

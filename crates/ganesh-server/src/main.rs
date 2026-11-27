@@ -19,6 +19,7 @@ struct AppState {
 #[tokio::main]
 async fn main() {
     ganesh_core::rerank::enforce_requirement("ganesh-server");
+    ganesh_core::qa_verify::enforce_requirement("ganesh-server");
     let mut db_path = None;
     let mut bind: SocketAddr = "127.0.0.1:0".parse().unwrap();
     let mut args = std::env::args().skip(1);

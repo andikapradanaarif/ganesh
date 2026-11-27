@@ -68,6 +68,7 @@ struct StructuralFinding {
 
 fn main() {
     ganesh_core::rerank::enforce_requirement("ganesh-bench");
+    ganesh_core::qa_verify::enforce_requirement("ganesh-bench");
     let args: Vec<String> = std::env::args().collect();
     let mut questions_path = None;
     let mut report_path = None;
@@ -770,6 +771,7 @@ fn run(questions_path: &str, report_path: &str, corpus_dir: &str, details_path: 
     }
     r.push('\n');
     r.push_str(&format!("- {}\n", ganesh_core::rerank::status_summary()));
+    r.push_str(&format!("- {}\n", ganesh_core::qa_verify::status_summary()));
     r.push_str("## Summary\n\n");
     r.push_str(&format!("| Check | Result |\n| --- | --- |\n"));
     r.push_str(&format!("| Evidence coverage | {hits}/{} answerable hits |\n", answerable.len()));
