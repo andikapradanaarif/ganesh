@@ -665,6 +665,7 @@ pub struct OwnerRevisionRow {
     pub superseded_by: String,
     pub status: String,
     pub passages: usize,
+    pub claim_key: String,
 }
 
 /// Compute the current successor of a revision chain: the revision that
@@ -788,6 +789,7 @@ pub fn list_revisions(
             ingested_at: String::new(),
             audience: m.audience.clone(),
             supersedes: m.supersedes.clone().unwrap_or_default(),
+            claim_key: m.claim_key.clone(),
             superseded_by: current_successor(store, &m.revision),
             status: st,
             passages,

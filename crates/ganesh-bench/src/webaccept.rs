@@ -83,7 +83,7 @@ pub fn run_web_acceptance(corpus_dir: &str) -> i32 {
     // owner flow uses r1 only).
     let import_rev = |store: &mut Store, rev: &str| {
         let entry = manifest.articles.iter().find(|a| a.revision == rev).expect("entry");
-        let bytes = std::fs::read(format!("{corpus_dir}/{}", entry.file)).expect("bytes");
+        let bytes = std::fs::read(format!("{corpus_dir}/snapshots/{}", entry.file)).expect("bytes");
         store.import_snapshot(entry, &bytes).expect("import");
     };
     {

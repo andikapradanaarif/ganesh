@@ -1251,6 +1251,28 @@ fn evaluate(view: &CorpusView, query: &str, caller: &str, cfg: &RetrievalConfig)
         .collect();
     debug.selected = passage_texts.iter().map(|(pid, _)| pid.clone()).collect();
 
+    // M2 phase 2: assemble guard-scanning pool context — passages that entered
+    // the fused pool but were not selected. Disqualifying epistemic evidence
+    // (rejection/exemption/indecision) anywhere in this pool blocks waiver.
+    let mut pool_context: Vec<(String, String, String, Vec<String>)> = Vec::new();
+    {
+        let selected_ids: std::collections::BTreeSet<String> =
+            passage_texts.iter().map(|(pid, _)| pid.clone()).collect();
+        for c in view.candidates.iter().take(16) {
+            if selected_ids.contains(&c.passage_id) || pool_context.len() >= 12 {
+                continue;
+            }
+            // Candidates carry their verbatim text directly — resolving through
+            // verbatim_by_id would yield empty strings for unselected passages
+            // and blind the epistemic guards.
+            if c.text.is_empty() {
+                continue;
+            }
+            let toks = crate::search::stemmed_tokens(&c.text);
+            pool_context.push((c.passage_id.clone(), c.text.clone(), c.section.clone(), toks));
+        }
+    }
+
     // Query terms that name a source subject are not measured properties.
     let mut subject_query_terms = std::collections::BTreeSet::new();
     for (_, title) in &view.sources {
@@ -1328,6 +1350,7 @@ fn evaluate(view: &CorpusView, query: &str, caller: &str, cfg: &RetrievalConfig)
         proposition_check: cfg.proposition_check,
         context_chain: cfg.context_chain,
         action_check: cfg.action_check,
+        pool_context: &pool_context,
     };
     let trace = accept::decide(&input);
     let abstain = trace.decision != "ok";

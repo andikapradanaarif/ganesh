@@ -209,7 +209,7 @@ pub async fn correct_revision_handler(
         } else {
             "full".to_string()
         },
-        claim_key: String::new(),
+        claim_key: orig.claim_key.clone(),
         audience: orig.audience.clone(),
         supports: vec![],
     };
