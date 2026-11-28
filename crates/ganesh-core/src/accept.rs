@@ -891,6 +891,41 @@ pub fn past_tense_date_query(query: &str) -> bool {
         || exact_date_query(query) && q.contains(" did ")
 }
 
+/// Entity-binding protection for the semantic coverage override. Extractive
+/// QA cannot represent entity binding: asked "In what year did Yang Zhifa
+/// discover the tomb of Tutankhamun?", the Carter passage yields a confident
+/// "1922" regardless of the asked entity, so a strong QA margin cannot vouch
+/// for responsiveness when the question bears entities the evidence never
+/// mentions. Lexical coverage is the only entity signal the system has — so
+/// when any capitalized proper-noun term of the raw query has no stem match
+/// in the selected passages, the coverage waiver must not fire. Sentence-
+/// initial tokens are included: interrogatives/auxiliaries evaporate through
+/// stopword stripping, while a leading genuine entity is still checked.
+pub fn entity_coverage_blocks_override(
+    query: &str,
+    passages: &[(String, String, String, Vec<String>)],
+) -> bool {
+    let passage_stems: std::collections::BTreeSet<&str> = passages
+        .iter()
+        .flat_map(|p| p.3.iter().map(|s| s.as_str()))
+        .collect();
+    for tok in query.split_whitespace() {
+        let clean: String = tok.chars().filter(|c| c.is_alphanumeric()).collect();
+        if clean.len() < 2 {
+            continue;
+        }
+        if !clean.chars().next().map(|c| c.is_uppercase()).unwrap_or(false) {
+            continue;
+        }
+        for stem in crate::search::stemmed_tokens(&clean.to_lowercase()) {
+            if !passage_stems.contains(stem.as_str()) {
+                return true;
+            }
+        }
+    }
+    false
+}
+
 pub fn decide(input: &DecideInput) -> AcceptanceTrace {
     let mut trace = AcceptanceTrace::default();
     let qenv_stems = query_env_stems(input.query);
@@ -1620,8 +1655,9 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
     // Measurement/quantity questions are excluded: a missing measurement is
     // exact-evidence territory, and dense retrieval must never conjure one.
     if input.dense_support && !input.quantity_question {
+        let entity_blocked = entity_coverage_blocks_override(input.query, input.passages);
         if let Some(m) = trace.qa_margin {
-            if m.is_finite() && m >= override_margin {
+            if m.is_finite() && m >= override_margin && !entity_blocked {
                 trace.reasons.retain(|r| {
                     !r.starts_with("idf-union-coverage")
                         && !r.starts_with("union-coverage")
@@ -1675,6 +1711,34 @@ mod sufficiency_tests {
             action_check: false,
         };
         decide(&input)
+    }
+
+    #[test]
+    fn entity_coverage_override_guard() {
+        // i04-class: false-premise entity swap. The evidence mentions
+        // Tutankhamun (Carter, 1922) but never Yang/Zhifa — the capitalized
+        // entity terms are unmatched, so the waiver must stay disarmed even
+        // with dense support and a strong QA margin.
+        let passages = vec![(
+            "tutankhamun-a1#p6".to_string(),
+            "Howard Carter discovered the tomb of Tutankhamun in 1922.".to_string(),
+            String::new(),
+            crate::search::stemmed_tokens("howard carter discovered the tomb of tutankhamun in 1922"),
+        )];
+        assert!(entity_coverage_blocks_override(
+            "In what year did Yang Zhifa discover the tomb of Tutankhamun?",
+            &passages
+        ));
+        // control: when every capitalized entity IS covered, no block.
+        assert!(!entity_coverage_blocks_override(
+            "In what year did Howard Carter discover the tomb of Tutankhamun?",
+            &passages
+        ));
+        // control: lowercase paraphrase queries bear no entity terms at all.
+        assert!(!entity_coverage_blocks_override(
+            "when was the tomb discovered?",
+            &passages
+        ));
     }
 
     #[test]

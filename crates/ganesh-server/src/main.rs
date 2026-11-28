@@ -129,9 +129,13 @@ async fn search_handler(
         // over SQLite-blob embeddings) — reranking and QA verification run
         // lock-free on the fetched view so concurrent searches do not
         // serialize behind the SQLite mutex.
-        let mut cfg2 = cfg.clone();
-        cfg2.top_k = top_k.clamp(1, 15);
-        let terms = ganesh_core::search::query_terms(&query);
+        // Shared orchestration with search_full (no drift): fetch under the
+        // store lock, neural evaluation lock-free. Note: inside fetch the
+        // query embedding and the dense cosine scan still run under the lock
+        // (single pass, fixture-scale fine), and throughput across concurrent
+        // searches remains bounded by the per-model Mutex<Session> in
+        // embed/rerank/qa_verify — the wins here are that citation opens no
+        // longer block behind inference and the acceptance phase parallelizes.
         let insufficient = |q: &str, t: &str| ganesh_core::types::SearchResponse {
             status: "insufficient_context".to_string(),
             query: q.to_string(),
@@ -140,22 +144,12 @@ async fn search_handler(
             top_margin: None,
             effective_time: t.to_string(),
         };
-        if terms.is_empty() {
-            return insufficient(&query, &as_of2);
-        }
-        // Query embedding is neural inference — compute it BEFORE taking the
-        // store lock so the lock covers only metadata/candidate reads.
-        let qvec = ganesh_core::embed::embed_one(&query);
         let view = {
             let guard = state2.store.lock().unwrap();
-            ganesh_core::search::CorpusView::fetch(&guard, &terms, qvec.as_deref(), &cfg2, &projects, &as_of2, &query_scope)
+            ganesh_core::search::fetch_phase(&guard, &query, &projects, &as_of2, top_k, &query_scope, &cfg)
         };
-        match view {
-            Some(v) => {
-                let (mut resp, _dbg) = ganesh_core::search::evaluate_view(&v, &query, "", &cfg2);
-                resp.effective_time = as_of2.clone();
-                resp
-            }
+        match view.0 {
+            Some(v) => ganesh_core::search::evaluate_phase(&v, &query, &as_of2, &view.1),
             None => insufficient(&query, &as_of2),
         }
     })

@@ -88,9 +88,9 @@ fn timebounded_revision_citation_opens_inside_window() {
     let mut stmt = store.conn.prepare(
         "SELECT c.token FROM citations c JOIN passages p ON c.passage_id = p.id WHERE p.revision = 'timebox-r1' LIMIT 1",
     ).unwrap();
-    let token: Option<String> = stmt.query_row([], |r| r.get(0)).ok();
-    if let Some(tok) = token {
-        let opened = store.open_citation(&tok, "public").unwrap();
-        assert!(opened.is_some(), "citation must open inside the effective window");
-    }
+    let token: String = stmt
+        .query_row([], |r| r.get(0))
+        .expect("import must create a citation token for the passage");
+    let opened = store.open_citation(&token, "public").unwrap();
+    assert!(opened.is_some(), "citation must open inside the effective window");
 }
