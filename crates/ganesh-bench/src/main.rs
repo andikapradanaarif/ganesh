@@ -102,7 +102,7 @@ fn main() {
             match args[j].as_str() {
                 "--data" => { data = args.get(j + 1).cloned().unwrap(); j += 2; }
                 "--top-k" => { top_k = args.get(j + 1).and_then(|v| v.parse().ok()).unwrap_or(10); j += 2; }
-                "--conversations" => { maxc = args.get(j + 1).and_then(|v| v.parse().ok()).unwrap_or(10); j += 2; }
+                "--conversations" | "--max-convs" => { maxc = args.get(j + 1).and_then(|v| v.parse().ok()).unwrap_or(10); j += 2; }
                 "--out" => { out = args.get(j + 1).cloned().unwrap(); j += 2; }
                 "--reader-cmd" => { reader = args.get(j + 1).cloned().unwrap(); j += 2; }
                 other => { eprintln!("unknown argument: {other}"); std::process::exit(2); }

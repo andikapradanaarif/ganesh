@@ -35,6 +35,19 @@ fn spawn_server(db: &std::path::Path, policy: &std::path::Path) -> Server {
     let mut line = String::new();
     stdout.read_line(&mut line).expect("server readiness line");
     let addr = line.trim().strip_prefix("listening ").expect("listening line").to_string();
+    // Keep draining stdout on a background thread for the server's lifetime:
+    // dropping the read end here would close the pipe and any later server
+    // log write could fail with EPIPE/SIGPIPE mid-benchmark.
+    std::thread::spawn(move || {
+        let mut sink = String::new();
+        loop {
+            sink.clear();
+            match stdout.read_line(&mut sink) {
+                Ok(0) | Err(_) => break,
+                Ok(_) => {}
+            }
+        }
+    });
     Server { child, rest: format!("http://{addr}") }
 }
 
@@ -143,12 +156,20 @@ pub fn run_locomo(data_path: &str, top_k: usize, max_convs: usize, out_path: &st
             let date_raw = c[format!("{sk}_date_time")].as_str().unwrap_or("");
             let date = normalize_date(date_raw);
             let turns = c[sk].as_array().unwrap();
-            let mut text = format!("Conversation {sample_id} {sk} between {spk_a} and {spk_b} on {date}\n");
-            for t in turns {
+            // Chunk each session into compact 4-turn windows separated by
+            // blank lines so the segmenter produces clean ~100-150 word
+            // passages instead of one giant single-newline blob; every turn
+            // keeps its [dia_id] [date] speaker prefix so evidence recall
+            // against the ground-truth dia ids stays exact.
+            let mut text = format!("Conversation {sample_id} {sk} between {spk_a} and {spk_b} on {date}\n\n");
+            for (i, t) in turns.iter().enumerate() {
                 let dia = t["dia_id"].as_str().unwrap_or("");
                 let speaker = t["speaker"].as_str().unwrap_or("");
                 let body = t["text"].as_str().unwrap_or("");
                 text.push_str(&format!("[{dia}] [{date}] {speaker}: {body}\n"));
+                if (i + 1) % 4 == 0 && i + 1 < turns.len() {
+                    text.push('\n');
+                }
             }
             let file = format!("snapshots/{sample_id}-{sk}.txt");
             let bytes = text.as_bytes().to_vec();

@@ -45,7 +45,7 @@ impl Default for RetrievalConfig {
             min_idf_union_coverage: 0.75,
             min_union_coverage: 0.0,
             min_top_coverage: 0.0,
-            candidate_limit: std::env::var("GANESH_RERANK_POOL").ok().and_then(|v| v.parse().ok()).unwrap_or(40),
+            candidate_limit: std::env::var("GANESH_RERANK_POOL").ok().and_then(|v| v.parse().ok()).unwrap_or(25),
             quantity_binding: std::env::var("GANESH_QUANTITY_BINDING").map(|v| v != "0").unwrap_or(true),
             transition_check: std::env::var("GANESH_TRANSITION_CHECK").map(|v| v != "0").unwrap_or(true),
             proposition_check: std::env::var("GANESH_PROPOSITION_CHECK").map(|v| v != "0").unwrap_or(true),
@@ -169,7 +169,7 @@ pub const MEASURE_PROPS: &[&str] = &[
     "area", "volume", "population", "speed", "temperature", "cost", "price", "size",
     "capacity", "altitude", "elevation", "tension", "wattage",
     // M2 phase 2: electrical / engineering / computing quantities (xi05 class)
-    "amperage", "current", "voltage", "power", "frequency", "pressure",
+    "amperage", "voltage", "power", "frequency", "pressure",
     "latency", "throughput", "bandwidth", "memory", "storage",
 ];
 

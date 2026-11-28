@@ -51,9 +51,9 @@ Coverage is pool-invariant in this range; **pool 25 frozen** as the fastest equi
 | M1 probes — rail-probe | **8/8** | 8/8 | parity |
 | **probes total** | **49/49** | 49/49 | **parity** |
 | v2 | **24/24 + 6/6 = 30/30** | 30/30 | parity |
-| v4 | 23/24 + 5/6 (miss w08, leak i05) | 23/24 + 5/6 | parity (identical misses) |
+| v4 | **24/24 + 5/6** (zero answerable misses; residual leak i05) | 23/24 + 5/6 | coverage improved |
 | v6-core | **21/24 + 6/6** (miss w06,w08,w09) | 21/24 + 6/6 | exact parity, identical misses |
-| v6-broad | see §4 | 19/24 + 6/6 | — |
+| v6-broad | **20/24 + 6/6** (see §4) | 19/24 + 6/6 | improved, zero leaks |
 | m2-lifecycle replay | **37/37 PASS** | 37/37 | parity |
 | m2-xfer-v1 lifecycle scenario | **14/14 PASS** | 14/14 | parity |
 | owner web-acceptance replay | see §3 | — | — |
@@ -74,29 +74,32 @@ Routes (server-embedded, zero external CDN, vanilla JS at `/ui`):
 - policy entries carry an `owner` flag; non-owner mutation attempts return `403 Forbidden`
 
 Web-acceptance replay results (automated `ganesh-bench web-acceptance`, m2-lifecycle corpus,
-owner=key-alpha, non-owner=key-beta):
+owner=key-alpha, non-owner=key-beta, final synchronized binary):
 
-- **16/19 checks PASS** — inspection endpoints (revisions list/detail/timeline), withdrawal
-  visibility, 404 on missing revision, stale-capture replay immunity of revision ordering,
-  source deletion with full purge: **zero leakage on current reads, `as_of` reads, citation
-  open (404), and after full server restart**; non-owner enforcement: correction and even
-  read-only owner-list attempts both return **403 Forbidden**.
-- 3 remaining failures (w6/w7/w9 correction-visibility): the owner correction revision is
-  created and audited (`deployrules-r1-oc1`), but subsequent reads did not surface it in this
-  build — root-caused to the correction missing the original `claim_key` (supersede/retirement
-  propagation), fixed late in the branch; full re-validation is pending reviewer confirmation.
+- **19/19 checks PASS, 0 FAIL** — inspection endpoints (revisions list/detail/timeline),
+  withdrawal visibility, 404 on missing revision, stale-capture replay immunity of revision
+  ordering, correction visibility on both scoped and unscoped reads (w6/w7/w9 fixed by
+  full-supersession default for owner corrections — scope-narrowing corrections retire the
+  overbroad predecessor immediately), source deletion with full purge: **zero leakage on
+  current reads, `as_of` reads, citation open (404), and after full server restart**;
+  non-owner enforcement: correction and even read-only owner-list attempts both return
+  **403 Forbidden**.
+- Regression test: `owner_correction_scope_narrow_retires_predecessor` (ganesh-store
+  integration test) confirms scope-narrowing corrections retire the predecessor on both
+  scoped and unscoped reads.
 
 ## 4. Pillar 1 — exposed-packet before/after
 
 | packet | before (M2P1) | after (M2P2) |
 |--------|---------------|--------------|
-| m2-xfer-v1 coverage | 15/16 (miss x07) | XFER1FINAL |
-| m2-xfer-v1 abstention | 2/6 (leaks xi02,xi03,xi05,xi06) | XFER1FINAL-INS |
-| v6-broad coverage | 19/24 + 6/6 | 18/24 + 6/6 (pool-invariant; guards add one honest abstention, b23 — see note) |
+| m2-xfer-v1 coverage | 15/16 (miss x07) | **15/16** (miss x07 — identical) |
+| m2-xfer-v1 abstention | 2/6 (leaks xi02,xi03,xi05,xi06) | **4/6** (xi02 unmade-decision + xi05 measurement now correct; residual leaks xi03,xi06 — root-caused below) |
+| v6-broad coverage | 19/24 + 6/6 | **20/24 + 6/6** (misses b02,b03,b18,b20; b23 **recovered**, b07 recovered — improvement) |
 
-v6-broad note: the stem-fixed scope guard converts b23's former wrong-passage hit into an
-abstention-class miss (misses b02,b03,b07,b18,b20,b23 across pools 25/30/40 — identical
-selections). Abstention integrity holds at 6/6 throughout.
+v6-broad note: the finishing pass removed `current` from the measurement vocabulary
+("current state" is temporal, not electrical) and refined guard overlap to subject terms.
+b23 now passes; the residual misses (b02,b03,b18,b20) are retrieval-rank quality exposures,
+not acceptance-guard artifacts. Abstention integrity holds at 6/6 with zero leaks.
 
 ## 5. Pillar 3 — standardized benchmarks
 
@@ -114,15 +117,28 @@ Ingestion: every dialogue turn as a revision with `occurred_at` = session timest
 `author` = speaker, `source_type` = "conversation", `project` = conversation id — context headers
 `[date | conversation | speaker]` give temporal/speaker grounding at zero ingest cost.
 
-LoCoMo Mode-1 results: the benchmark runner (`ganesh-bench locomo --data fixtures/benchmarks/
-locomo10.json --top-k 10`) is implemented end-to-end — per-turn ingestion with first-class M2
-metadata, Recall@3/5/10 by category, category-5 adversarial abstention rates, citation integrity,
-latency/ingest/store/RSS accounting, provider-call counter (0 throughout) and the reader hook.
-Execution on this branch was started twice but the long-running ingest+query pass did not complete
-within the session's wall-clock budget (the runner deadlocked once under heavy concurrent
-verification load and was restarted clean); **the Mode-1 numbers are therefore reported as pending
-and are the first follow-up item for the review cycle** — the harness, dataset cache and provenance
-are frozen and committed so the run is one command. No partial numbers are invented.
+LoCoMo Mode-1 results — COMPLETE, all 10 conversations, **1,986 QA items**, `top_k = 10`,
+serial run, **0 provider calls** (`/tmp/p3/locomo-full.json`, runner `ganesh-bench locomo`):
+
+**Evidence recall by category** (ground-truth `dia_id` inside returned cited passages):
+
+| category | n | Recall@3 | Recall@5 | Recall@10 |
+|----------|---|----------|----------|-----------|
+| cat1 single-hop | 282 | 24/282 (8.5%) | 49/282 (17.4%) | 74/282 (26.2%) |
+| cat2 temporal | 321 | 153/321 (47.7%) | 165/321 (51.4%) | 178/321 (55.5%) |
+| cat3 multi-hop | 96 | 26/96 (27.1%) | 28/96 (29.2%) | 31/96 (32.3%) |
+| cat4 open-domain | 841 | 496/841 (59.0%) | 553/841 (65.8%) | 590/841 (70.2%) |
+| cat5 adversarial | 446 | 229/446 | 249/446 | 267/446 |
+
+**Category-5 adversarial abstention: 299/446 correct (67.1%)** at top_k = 3..10
+(counting `insufficient_context` or `confidence: uncertain` per the runner contract;
+uncertain-confidence responses across all 1,986 questions: 483).
+
+**Efficiency & integrity:** citation integrity **1384/1384 = 100%**; mean query latency
+1007.7 ms, p95 1465.1 ms (top_k = 10 on ~500-passage conversation stores, single-server
+REST, CPU-only); total ingest 165.3 s for all 10 conversations (283 sessions, zero-cost
+metadata-only ingestion — no LLM); total store size 8.49 MB; **peak server RSS 470 MB**;
+provider calls **0**.
 
 The `--reader-cmd` / `--openai-compat-url` hook exists in the runner for later apples-to-apples
 reader-LLM comparison; **no external LLM was called in this run** (0 provider calls end to end).
@@ -136,12 +152,26 @@ reader-LLM comparison; **no external LLM was called in this run** (0 provider ca
   grep-audited insufficient controls (trap values exist only inside undecided/exempt framing)
 - 16 answerable + 6 insufficient + lifecycle scenario
 
-Single-shot results (run under concurrency with the xfer-v1 validation — latency inflated,
-pass/fail unaffected): coverage 10/16 (misses x02,x03,x04,x07,x10,x12), insufficient 4/6
-(leaks xi05 tyre-brand, xi06 delivery-slot). The coverage misses are dominated by over-strict
-epistemic guards on first calibration — honest single-shot preserved; the guards' precision/recall
-trade-off is the documented Phase-3 acceptance-tuning agenda. Adapter/citations: see report details.
-xfer-v2 lifecycle scenario: see §2 lifecheck line.
+Single-shot results (frozen record, preserved per protocol): coverage 10/16 (misses
+x02,x03,x04,x07,x10,x12), insufficient 4/6 (leaks xi05 tyre-brand, xi06 delivery-slot).
+
+**Post-fix exposed diagnostic** (clearly labeled re-run after the acceptance fixes, NOT the
+single-shot record): coverage **10/16** (same misses x02,x03,x04,x07,x10,x12), insufficient
+**4/6** (xi01–xi04 correct; residual leaks xi05,xi06). The answerable misses are genuine
+engine-calibration exposures, not contention artifacts — diagnosed individually:
+
+- x02: quantity question ("oven repair estimate") with low IDF-union coverage 0.578;
+  quantity questions are deliberately excluded from the semantic-margin waiver.
+- x03: exact-date-precision requires an adjacent month-day calendar date; ISO-only evidence
+  ("2026-09-14") is rejected.
+- x07/x10: the token "verified" in the question activates transition-verify machinery even
+  though the query is primarily extractive.
+- x04/x12: QA-margin quality on paraphrased evidence.
+
+These are the documented Phase-3 acceptance-tuning agenda. xfer-v2 lifecycle scenario:
+**10/10 PASS** on the final binary (ring-buffer claim visibility fixed by computing QA margin
+for keyword queries — the margin is only *blocking* for extractive questions, so keyword-query
+behavior otherwise unchanged).
 
 ## 7. Performance, cost, verification
 
@@ -160,11 +190,21 @@ xfer-v2 lifecycle scenario: see §2 lifecheck line.
 
 ### Honest status summary for reviewers
 
-Done and validated: measurement vocabulary expansion (xi05 class fixed — now abstains), probe
-parity 49/49, v2 30/30, v4/v6-core parity, pool-25 freeze, owner API surface with 403 enforcement,
-deletion/purge/restart correctness, xfer-v2 freeze protocol and single-shot recording.
-In progress / known gaps: production activation of the three epistemic guards (unit-verified in
-isolation with real corpus text; the production-path integration — pool-context plumbing and
-overlap precision — underwent two fix iterations late in the branch and validation is reported as
-of the final commit), owner correction-visibility (claim_key propagation fix, revalidation pending),
-LoCoMo Mode-1 execution.
+All gates validated on synchronized release binaries (single serial chain, fail-loud model
+guards `GANESH_REQUIRE_RERANKER=1 GANESH_REQUIRE_QA_VERIFIER=1 GANESH_REQUIRE_EMBEDDER=1`):
+
+- web-acceptance **19/19 PASS** (owner full-supersession fix verified end-to-end)
+- m2-lifecycle **37/37**, xfer-v1 lifecheck **14/14**, xfer-v2 lifecheck **10/10**
+- M1 probes **49/49**, v2 **30/30**, v6-core **21/24+6/6**, v6-broad **20/24+6/6** (b23
+  recovered), v4 **24/24+5/6** (zero answerable misses)
+- xfer-v1 **15/16 + 4/6** — xi02/xi05 fixed in production; residual leaks xi03/xi06 root-caused:
+  - xi03: the rejection guard fires, but its affirmative-evidence exception matches follow-up
+    *action-item* vocabulary ("add the reloader annotation … so future certificate rotations
+    reload automatically") — distinguishing planned actions from realized adoption requires
+    semantic binding depth beyond lexical scanning (documented M3 agenda).
+  - xi06: chat-format evidence merges multi-line chat into single sentences with mixed
+    undecided/exempt framing, defeating sentence-granular exemption detection.
+- LoCoMo Mode-1 completed on all 10 conversations (see §5): strongest on open-domain recall
+  (R@10 70.2%) and temporal (R@10 55.5%); weak on single-hop ranking (R@10 26.2%) and multi-hop
+  composition (32.3%) — conversational coreference-aware indexing and abstention calibration
+  are the top M3 opportunities.

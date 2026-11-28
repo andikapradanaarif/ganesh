@@ -1346,10 +1346,23 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
     // Exposed calibration (acc-xfer-v4): answerable hits +4.6..+17.2, undated
     // sibling trap -4.47, missing-unit borderline positive — zero false
     // abstention margin at tau=0 for every answerable exposed case measured.
-    if qa_extractive_question(input.query) {
+    {
+        // The margin is computed for every query shape — including keyword /
+        // noun-phrase lifecycle probes — because a confident positive margin is
+        // the semantic answer signal the coverage override keys on. The
+        // negative-margin BLOCK remains restricted to natural extractive
+        // questions: the verifier's null-answer calibration assumes a real
+        // question, so a weak margin on a keyword query is never evidence
+        // against answerability. This asymmetry can only convert false
+        // abstentions into answers, never suppress a passing answer.
+        let extractive = qa_extractive_question(input.query);
         let mut max_margin = f32::NEG_INFINITY;
         let mut best_span = String::new();
-        for (pid, verbatim, section, _) in input.passages {
+        // QA verification is a sequential cross-encoder pass per passage;
+        // capping at the top-3 keeps top_k > 3 retrieval (multi-hop evidence
+        // recall) from multiplying latency, and is bit-identical whenever the
+        // selected set has three or fewer passages.
+        for (pid, verbatim, section, _) in input.passages.iter().take(3) {
             let article = pid.split('-').next().unwrap_or("");
             let text = format!("{article} — {section}\n{verbatim}");
             if let Some(v) = crate::qa_verify::verify_pair(input.query, &text) {
@@ -1363,7 +1376,7 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
         trace.qa_span = best_span.clone();
         // Inert when the verifier is absent (no verdict obtained on any
         // passage): negative-infinity is the no-data sentinel, not evidence.
-        if max_margin.is_finite() && max_margin < 0.0 {
+        if extractive && max_margin.is_finite() && max_margin < 0.0 {
             trace.reasons.push(format!(
                 "qa-unanswerable: max span-vs-null margin {max_margin:.2} below threshold 0.00 (best span `{best_span}`)"
             ));
@@ -1630,10 +1643,21 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
         // Content stems of the query excluding framing/env words: overlap with
         // these ties a guard sentence to the queried subject.
         let env_stems_q = query_env_stems(input.query);
+        // Subject terms exclude the adoption verbs and temporal framers
+        // themselves: "use"/"now" are near-stopwords shared by every operational
+        // sentence ("Using the SPL meter daily now."), so counting them as
+        // overlap ties unrelated evidence to the query. What identifies the
+        // subject is the query's distinctive nouns (cert-manager, operator,
+        // renewal).
+        const GENERIC_OVERLAP: &[&str] = &[
+            "use", "us", "enabl", "activ", "deploy", "adopt", "live", "now",
+            "current", "currentli", "today", "doe", "does",
+        ];
         let content_terms: Vec<&String> = input
             .terms
             .iter()
             .filter(|t| !env_stems_q.contains(*t) && t.len() > 2)
+            .filter(|t| !GENERIC_OVERLAP.contains(&t.as_str()))
             .collect();
         // Overlap requires at least two distinct content terms (or one when the
         // query has only one): a lone shared action verb ("move", "use") must
@@ -1675,8 +1699,14 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
                         && ss.iter().any(|t| ADOPTION_STEMS.contains(&t.as_str()))
                     {
                         affirmative_hit = true;
+                        if std::env::var("GANESH_GUARD_DEBUG").is_ok() {
+                            eprintln!("GUARDDBG affirmative sentence: {}", &sentence[..sentence.len().min(140)]);
+                        }
                     }
                 }
+            }
+            if std::env::var("GANESH_GUARD_DEBUG").is_ok() {
+                eprintln!("GUARDDBG rejection scan: hit={rejection_hit} affirmative={affirmative_hit} yesno={yesno} adoption_q={adoption_q}");
             }
             if rejection_hit && !affirmative_hit {
                 epistemic_block = true;
@@ -1718,6 +1748,16 @@ pub fn decide(input: &DecideInput) -> AcceptanceTrace {
                 for sentence in &sentences(verbatim) {
                     let ss = stemmed_query_like(sentence);
                     if !guard_env_stems.iter().any(|e| ss.contains(e)) {
+                        continue;
+                    }
+                    // The exemption sentence must relate to the query subject,
+                    // but a single shared content term suffices here: these
+                    // sentences are dense rule statements ("production frozen
+                    // on weekends, staging is exempt") whose only query overlap
+                    // may be one rule word ("weekend"). The binding scan below
+                    // keeps the stricter multi-term bar because affirmative
+                    // evidence must actually tie the subject to the scope.
+                    if !content_terms.iter().any(|t| ss.contains(*t)) {
                         continue;
                     }
                     env_sentences += 1;

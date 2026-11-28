@@ -115,6 +115,11 @@ pub struct CorrectBody {
     expected_revision_id: Option<String>,
     /// Owner note recorded in the audit timeline.
     reason: Option<String>,
+    /// Explicit opt-in to partial supersession. Default is full: an owner
+    /// correction — including scope narrowing ("all deployments" -> "staging
+    /// only") — retires the overbroad predecessor everywhere, because the
+    /// owner has asserted the old claim is wrong as stated.
+    partial: Option<bool>,
 }
 
 pub async fn correct_revision_handler(
@@ -204,7 +209,7 @@ pub async fn correct_revision_handler(
         scope: body.narrow_scope.clone().filter(|s| !s.trim().is_empty()).unwrap_or_else(|| orig.scope.clone()),
         authority: orig.authority.max(1),
         supersedes: Some(head.clone()),
-        supersede_mode: if body.narrow_scope.as_deref().map(|s| !s.trim().is_empty()).unwrap_or(false) {
+        supersede_mode: if body.partial.unwrap_or(false) {
             "partial".to_string()
         } else {
             "full".to_string()
