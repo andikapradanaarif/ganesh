@@ -897,30 +897,44 @@ pub fn past_tense_date_query(query: &str) -> bool {
 /// "1922" regardless of the asked entity, so a strong QA margin cannot vouch
 /// for responsiveness when the question bears entities the evidence never
 /// mentions. Lexical coverage is the only entity signal the system has — so
-/// when any capitalized proper-noun term of the raw query has no stem match
-/// in the selected passages, the coverage waiver must not fire. Sentence-
-/// initial tokens are included: interrogatives/auxiliaries evaporate through
-/// stopword stripping, while a leading genuine entity is still checked.
+/// when any mid-sentence capitalized proper-noun token of the raw query is
+/// completely absent from the selected passages, the coverage waiver must
+/// not fire. Lowercase paraphrased verbs/common nouns ("jogging", "abandon")
+/// carry no entity signal and continue to be waived normally.
 pub fn entity_coverage_blocks_override(
     query: &str,
     passages: &[(String, String, String, Vec<String>)],
 ) -> bool {
-    let passage_stems: std::collections::BTreeSet<&str> = passages
+    const MONTHS_DAYS: &[&str] = &[
+        "january", "february", "march", "april", "may", "june", "july", "august",
+        "september", "october", "november", "december", "monday", "tuesday",
+        "wednesday", "thursday", "friday", "saturday", "sunday",
+    ];
+    // Evidence surface, case-folded: passage id (carries the article prefix),
+    // verbatim text, section heading and stemmed index tokens.
+    let evidence = passages
         .iter()
-        .flat_map(|p| p.3.iter().map(|s| s.as_str()))
-        .collect();
-    for tok in query.split_whitespace() {
-        let clean: String = tok.chars().filter(|c| c.is_alphanumeric()).collect();
-        if clean.len() < 2 {
+        .map(|p| format!("{} {} {} {}", p.0, p.1, p.2, p.3.join(" ")).to_lowercase())
+        .collect::<Vec<_>>()
+        .join(" ");
+    for (i, tok) in query.split_whitespace().enumerate() {
+        if i == 0 {
+            continue; // sentence-initial capitalization is ambiguous
+        }
+        let stripped = tok.trim_end_matches(|c: char| !c.is_alphanumeric());
+        let stripped = stripped.strip_suffix("\'s").unwrap_or(stripped);
+        if stripped.len() < 2 {
+            continue; // single-letter tokens ("I") carry no entity signal
+        }
+        if !stripped.chars().next().map(|c| c.is_uppercase()).unwrap_or(false) {
             continue;
         }
-        if !clean.chars().next().map(|c| c.is_uppercase()).unwrap_or(false) {
+        let low = stripped.to_lowercase();
+        if MONTHS_DAYS.contains(&low.as_str()) {
             continue;
         }
-        for stem in crate::search::stemmed_tokens(&clean.to_lowercase()) {
-            if !passage_stems.contains(stem.as_str()) {
-                return true;
-            }
+        if !evidence.contains(&low) {
+            return true;
         }
     }
     false
@@ -1715,6 +1729,31 @@ mod sufficiency_tests {
 
     #[test]
     fn entity_coverage_override_guard() {
+        // spec case 1 — missing proper noun: "Yang"/"Zhifa" never appear in
+        // the Tutankhamun/Carter evidence; the waiver must stay disarmed.
+        let tut_passage = vec![(
+            "tutankhamun-a1#p6".to_string(),
+            "Howard Carter discovered the tomb of Tutankhamun in 1922.".to_string(),
+            "Discovery".to_string(),
+            crate::search::stemmed_tokens("howard carter discovered the tomb of tutankhamun in 1922"),
+        )];
+        assert!(entity_coverage_blocks_override(
+            "In what year did Yang Zhifa discover the tomb of Tutankhamun?",
+            &tut_passage
+        ));
+        // spec case 2 — lowercase paraphrase: no mid-sentence capitals at all,
+        // so nothing blocks the waiver (paraphrases waive normally).
+        let jog_passage = vec![(
+            "journal-a1#p1".to_string(),
+            "Moved morning runs to 06:00.".to_string(),
+            String::new(),
+            crate::search::stemmed_tokens("moved morning runs to 06:00"),
+        )];
+        assert!(!entity_coverage_blocks_override(
+            "What time of day did the user decide to go jogging?",
+            &jog_passage
+        ));
+
         // i04-class: false-premise entity swap. The evidence mentions
         // Tutankhamun (Carter, 1922) but never Yang/Zhifa — the capitalized
         // entity terms are unmatched, so the waiver must stay disarmed even
