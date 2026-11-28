@@ -608,6 +608,7 @@ impl CorpusView {
     pub fn fetch(
         store: &Store,
         terms: &[String],
+        qvec: Option<&[f32]>,
         cfg: &RetrievalConfig,
         projects: &[String],
         as_of: &str,
@@ -646,7 +647,11 @@ impl CorpusView {
         // ---- dense recall: cosine over eligible embeddings only ----
         let mut dense_order: Vec<String> = Vec::new();
         if crate::embed::available() {
-            if let Some(qvec) = crate::embed::embed_one(&terms.join(" ")) {
+            // Dense recall uses the RAW query embedded by the caller BEFORE
+            // the store lock is taken: bge-small expects natural text with
+            // question structure and word order intact, matching how passages
+            // are embedded. Stemmed/alphabetized term-soup destroys both.
+            if let Some(qvec) = qvec {
                 let mut scored: Vec<(String, f32)> = Vec::new();
                 if let Ok(mut estmt) = store.conn.prepare(
                     "SELECT e.passage_id, e.vector, p.revision FROM embeddings e JOIN passages p ON e.passage_id = p.id",
@@ -803,7 +808,7 @@ pub fn search_full(
             effective_time: as_of.to_string(),
         };
     }
-    match CorpusView::fetch(store, &terms, &cfg2, projects, as_of, query_scope) {
+    match CorpusView::fetch(store, &terms, crate::embed::embed_one(query).as_deref(), &cfg2, projects, as_of, query_scope) {
         Some(view) => {
             let (mut resp, _dbg) = evaluate(&view, query, "", &cfg2);
             resp.effective_time = as_of.to_string();
@@ -848,7 +853,7 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
     }
     let projects = vec!["public".to_string()];
     let now = crate::types::now_iso();
-    match CorpusView::fetch(store, &terms, cfg, &projects, &now, "") {
+    match CorpusView::fetch(store, &terms, crate::embed::embed_one(query).as_deref(), cfg, &projects, &now, "") {
         Some(view) => {
             let (mut r, d) = evaluate(&view, query, caller, cfg);
             r.effective_time = now;

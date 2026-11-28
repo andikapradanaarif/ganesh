@@ -21,7 +21,7 @@ Schema: Tier-1 revisions carry `occurred_at`, `effective_from/until`, `ingested_
 `source_type`, `project`, `scope`, `authority`, `supersedes`, `supersede_mode`, `claim_key`,
 `audience`, plus `supports` (multi-source links) and a `revocations` table. M1 fixtures default
 cleanly (`project=public`, `source_type=wiki`) and replay unchanged. Reads compute eligibility in
-SQLite before Stage-1 retrieval: visible-to-caller, inside effective window at `as_of` (default:
+SQLite revision metadata before Stage-1 retrieval (the FTS scan itself runs unfiltered and is post-filtered in Rust with 4x overfetch — the security property holds, but heavy ineligible ranking can crowd out eligible candidates): visible-to-caller, inside effective window at `as_of` (default:
 now), not superseded by an eligible successor in scope, still backed by a visible support.
 API: `as_of` + `top_k` (1–15) on REST `POST /v1/search` and MCP `search_context`; responses add
 `confidence` (supported/uncertain/insufficient_context), `top_margin`, `effective_time`; conflicting
@@ -102,7 +102,8 @@ The leaks are genuine semantic-judgment gaps exposed by strong dense recall on a
 near-miss content about proposals/staging is retrieved correctly, and the acceptance layer cannot
 yet distinguish proposed-vs-applied or staging-vs-production framing. v6b's same-category controls
 pass because its traps were authored pre-hybrid; these harder traps define the M2-Phase-2 agenda.
-**Lifecycle scenario: 14/14 PASS** through REST+MCP including restart persistence and zero-leak
+**Lifecycle scenario: 14/14 PASS** over REST (the `lifecheck` runner is REST-only; the
+hardcoded m2-lifecycle gate covers REST+MCP at 37/37) including restart persistence and zero-leak
 revocation. Paired M1 comparison: not meaningful — M1 has no scope/temporal model (imports the
 packet as flat public documents, answered lifecycle-trap content it should withhold); the static
 comparison run produced no valid data because the M1 harness lacks credential plumbing entirely.

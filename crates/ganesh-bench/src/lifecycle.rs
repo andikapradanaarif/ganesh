@@ -268,9 +268,13 @@ pub fn run_lifecycle(corpus_dir: &str) -> i32 {
     let now = rest_search(&server.rest, "key-alpha", "does staging require manual approval", None, None);
     cx.check("s2.current-staging-returns-r2", revision_set(&now).contains(&"deployrules-r2".to_string()), format!("revs {:?}", revision_set(&now)));
 
-    // Late arrival: reimport the older snapshot after the correction.
+    // Late arrival, made genuine: DELETE the older revision first, then
+    // reimport it — so r1 truly arrives in the store AFTER its successor r2.
+    // (A plain reimport returns AlreadyPresent and writes nothing, which
+    // cannot distinguish read-time supersession from ingestion-order luck.)
     {
         let mut store = Store::open(&db_path).expect("open");
+        delete_revision(&store, "deployrules-r1").expect("delete r1");
         import(&mut store, "deployrules-r1");
         store.rebuild_index().expect("rebuild");
     }
@@ -377,9 +381,12 @@ pub fn run_lifecycle(corpus_dir: &str) -> i32 {
     let r3read = rest_search(&server.rest, "key-alpha", "does staging require manual approval", None, None);
     cx.check("s5.owner-correction-live", revision_set(&r3read).contains(&"deployrules-r3".to_string()), format!("revs {:?}", revision_set(&r3read)));
 
-    // replay the old captures
+    // replay the old captures — again genuine: delete first so the r1/r2
+    // replays truly re-arrive after the owner correction r3 is live.
     {
         let mut store = Store::open(&db_path).expect("open");
+        delete_revision(&store, "deployrules-r1").expect("delete r1");
+        delete_revision(&store, "deployrules-r2").expect("delete r2");
         import(&mut store, "deployrules-r1");
         import(&mut store, "deployrules-r2");
     }

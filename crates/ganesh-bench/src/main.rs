@@ -381,7 +381,7 @@ fn citation_openings(adapter_json: &Value, mut open: impl FnMut(&str) -> Option<
 fn adapter_shape_findings(question_id: &str, adapter: &str, response: &Value, top_k: usize) -> Vec<StructuralFinding> {
     let mut findings = Vec::new();
     let status = response["status"].as_str().unwrap_or("");
-    if status != "ok" && status != "insufficient_context" {
+    if status != "ok" && status != "insufficient_context" && status != "conflicting_evidence" {
         findings.push(StructuralFinding {
             question_id: question_id.to_string(),
             problem: format!("{adapter} status is missing or not an approved status"),
@@ -526,9 +526,21 @@ fn run(questions_path: &str, report_path: &str, corpus_dir: &str, details_path: 
     // 4. Start REST service.
     let server_bin = sibling_binary("ganesh-server");
     let policy_path = std::path::PathBuf::from(format!("{corpus_dir}/policy.json"));
+    // Gate identity must be deterministic: prefer key-alpha, then fall back
+    // to the alphabetically-first key WITH a loud warning rather than silently
+    // testing an arbitrary identity.
     let gate_key: Option<String> = std::fs::read_to_string(&policy_path).ok()
         .and_then(|s| serde_json::from_str::<Value>(&s).ok())
-        .and_then(|v| v["keys"].as_object().and_then(|o| o.keys().next().cloned()));
+        .and_then(|v| v["keys"].as_object().and_then(|o| {
+            if o.contains_key("key-alpha") {
+                Some("key-alpha".to_string())
+            } else {
+                o.keys().next().map(|k| {
+                    eprintln!("warning: policy has no key-alpha; gate identity falls back to '{k}'");
+                    k.clone()
+                })
+            }
+        }));
     let mut server_cmd = Command::new(server_bin);
     server_cmd
         .arg("--db").arg(&db_path)

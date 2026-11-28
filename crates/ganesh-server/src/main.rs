@@ -124,8 +124,40 @@ async fn search_handler(
     let cfg = state.config.clone();
     let state2 = Arc::clone(&state);
     let response = tokio::task::spawn_blocking(move || {
-        let guard = state2.store.lock().unwrap();
-        ganesh_core::search::search_full(&guard, &query, &projects, &as_of2, top_k, &query_scope, &cfg)
+        // Lock only for the store-backed candidate fetch; neural inference
+        // (dense scan already inside fetch is the exception — it is one pass
+        // over SQLite-blob embeddings) — reranking and QA verification run
+        // lock-free on the fetched view so concurrent searches do not
+        // serialize behind the SQLite mutex.
+        let mut cfg2 = cfg.clone();
+        cfg2.top_k = top_k.clamp(1, 15);
+        let terms = ganesh_core::search::query_terms(&query);
+        let insufficient = |q: &str, t: &str| ganesh_core::types::SearchResponse {
+            status: "insufficient_context".to_string(),
+            query: q.to_string(),
+            passages: vec![],
+            confidence: "insufficient_context".to_string(),
+            top_margin: None,
+            effective_time: t.to_string(),
+        };
+        if terms.is_empty() {
+            return insufficient(&query, &as_of2);
+        }
+        // Query embedding is neural inference — compute it BEFORE taking the
+        // store lock so the lock covers only metadata/candidate reads.
+        let qvec = ganesh_core::embed::embed_one(&query);
+        let view = {
+            let guard = state2.store.lock().unwrap();
+            ganesh_core::search::CorpusView::fetch(&guard, &terms, qvec.as_deref(), &cfg2, &projects, &as_of2, &query_scope)
+        };
+        match view {
+            Some(v) => {
+                let (mut resp, _dbg) = ganesh_core::search::evaluate_view(&v, &query, "", &cfg2);
+                resp.effective_time = as_of2.clone();
+                resp
+            }
+            None => insufficient(&query, &as_of2),
+        }
     })
     .await
     .unwrap_or_else(|_| ganesh_core::types::SearchResponse {
