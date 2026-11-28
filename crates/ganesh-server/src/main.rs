@@ -124,8 +124,34 @@ async fn search_handler(
     let cfg = state.config.clone();
     let state2 = Arc::clone(&state);
     let response = tokio::task::spawn_blocking(move || {
-        let guard = state2.store.lock().unwrap();
-        ganesh_core::search::search_full(&guard, &query, &projects, &as_of2, top_k, &query_scope, &cfg)
+        // Lock only for the store-backed candidate fetch; neural inference
+        // (dense scan already inside fetch is the exception — it is one pass
+        // over SQLite-blob embeddings) — reranking and QA verification run
+        // lock-free on the fetched view so concurrent searches do not
+        // serialize behind the SQLite mutex.
+        // Shared orchestration with search_full (no drift): fetch under the
+        // store lock, neural evaluation lock-free. Note: inside fetch the
+        // query embedding and the dense cosine scan still run under the lock
+        // (single pass, fixture-scale fine), and throughput across concurrent
+        // searches remains bounded by the per-model Mutex<Session> in
+        // embed/rerank/qa_verify — the wins here are that citation opens no
+        // longer block behind inference and the acceptance phase parallelizes.
+        let insufficient = |q: &str, t: &str| ganesh_core::types::SearchResponse {
+            status: "insufficient_context".to_string(),
+            query: q.to_string(),
+            passages: vec![],
+            confidence: "insufficient_context".to_string(),
+            top_margin: None,
+            effective_time: t.to_string(),
+        };
+        let view = {
+            let guard = state2.store.lock().unwrap();
+            ganesh_core::search::fetch_phase(&guard, &query, &projects, &as_of2, top_k, &query_scope, &cfg)
+        };
+        match view.0 {
+            Some(v) => ganesh_core::search::evaluate_phase(&v, &query, &as_of2, &view.1),
+            None => insufficient(&query, &as_of2),
+        }
     })
     .await
     .unwrap_or_else(|_| ganesh_core::types::SearchResponse {

@@ -157,7 +157,7 @@ fn score_window(m: &QaModel, question: &str, passage: &str) -> ort::Result<QaVer
         let (s_shape, s_data) = outputs[0].try_extract_tensor::<f32>()?;
         let (_e_shape, e_data) = outputs[1].try_extract_tensor::<f32>()?;
         let seq_len = s_shape[1] as usize;
-        (s_data[..seq_len].to_vec(), e_data[..seq_len].to_vec())
+        (s_data.get(..seq_len).unwrap_or(&[]).to_vec(), e_data[..seq_len].to_vec())
     };
     let null_score = start[0] + end[0];
     // passage positions: token_type==1, excluding [SEP] (id 102) and padding

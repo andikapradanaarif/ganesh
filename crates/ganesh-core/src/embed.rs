@@ -109,7 +109,13 @@ pub fn embed_batch(texts: &[String]) -> Option<Vec<Vec<f32>>> {
     let mut out: Vec<Vec<f32>> = Vec::with_capacity(n);
     for row in 0..n {
         let base = row * maxlen * DIM;
-        let mut v: Vec<f32> = data[base..base + DIM].to_vec();
+        // Panic-free slicing: an unexpected tensor shape must yield no
+        // embedding rather than panic inside the locked inference region
+        // (a poisoned mutex would abort every subsequent search/open).
+        let mut v: Vec<f32> = match data.get(base..base + DIM) {
+            Some(slice) => slice.to_vec(),
+            None => return None,
+        };
         let norm: f32 = v.iter().map(|x| x * x).sum::<f32>().sqrt();
         if norm > 0.0 {
             for x in v.iter_mut() {

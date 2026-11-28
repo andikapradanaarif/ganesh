@@ -608,6 +608,7 @@ impl CorpusView {
     pub fn fetch(
         store: &Store,
         terms: &[String],
+        qvec: Option<&[f32]>,
         cfg: &RetrievalConfig,
         projects: &[String],
         as_of: &str,
@@ -646,7 +647,11 @@ impl CorpusView {
         // ---- dense recall: cosine over eligible embeddings only ----
         let mut dense_order: Vec<String> = Vec::new();
         if crate::embed::available() {
-            if let Some(qvec) = crate::embed::embed_one(&terms.join(" ")) {
+            // Dense recall uses the RAW query embedded by the caller BEFORE
+            // the store lock is taken: bge-small expects natural text with
+            // question structure and word order intact, matching how passages
+            // are embedded. Stemmed/alphabetized term-soup destroys both.
+            if let Some(qvec) = qvec {
                 let mut scored: Vec<(String, f32)> = Vec::new();
                 if let Ok(mut estmt) = store.conn.prepare(
                     "SELECT e.passage_id, e.vector, p.revision FROM embeddings e JOIN passages p ON e.passage_id = p.id",
@@ -779,6 +784,41 @@ pub fn search(store: &Store, query: &str, caller: &str, cfg: &RetrievalConfig) -
     search_debug(store, query, caller, cfg).0
 }
 
+/// Fetch phase of the full M2 read path — the ONLY phase that needs the
+/// store. Pair with [`evaluate_phase`] so callers (the server) can drop the
+/// store lock before neural inference. Returns the view and the effective
+/// config (top_k clamped), or None when no candidates survive eligibility.
+pub fn fetch_phase(
+    store: &Store,
+    query: &str,
+    projects: &[String],
+    as_of: &str,
+    top_k: usize,
+    query_scope: &str,
+    cfg: &RetrievalConfig,
+) -> (Option<CorpusView>, RetrievalConfig) {
+    let mut cfg2 = cfg.clone();
+    cfg2.top_k = top_k.clamp(1, 15);
+    let terms = query_terms(query);
+    if terms.is_empty() {
+        return (None, cfg2);
+    }
+    let qvec = crate::embed::embed_one(query);
+    (
+        CorpusView::fetch(store, &terms, qvec.as_deref(), &cfg2, projects, as_of, query_scope),
+        cfg2,
+    )
+}
+
+/// Evaluate phase of the full M2 read path — pure computation on the fetched
+/// view, no store access: reranking, QA verification and acceptance run
+/// lock-free.
+pub fn evaluate_phase(view: &CorpusView, query: &str, as_of: &str, cfg: &RetrievalConfig) -> SearchResponse {
+    let (mut resp, _dbg) = evaluate(view, query, "", cfg);
+    resp.effective_time = as_of.to_string();
+    resp
+}
+
 /// Full M2 read path: explicit permitted projects (resolved from credentials
 /// upstream), effective time and per-request top_k.
 pub fn search_full(
@@ -803,12 +843,8 @@ pub fn search_full(
             effective_time: as_of.to_string(),
         };
     }
-    match CorpusView::fetch(store, &terms, &cfg2, projects, as_of, query_scope) {
-        Some(view) => {
-            let (mut resp, _dbg) = evaluate(&view, query, "", &cfg2);
-            resp.effective_time = as_of.to_string();
-            resp
-        }
+    match CorpusView::fetch(store, &terms, crate::embed::embed_one(query).as_deref(), &cfg2, projects, as_of, query_scope) {
+        Some(view) => evaluate_phase(&view, query, as_of, &cfg2),
         None => SearchResponse {
             status: "insufficient_context".to_string(),
             query: query.to_string(),
@@ -848,7 +884,7 @@ pub fn search_debug(store: &Store, query: &str, caller: &str, cfg: &RetrievalCon
     }
     let projects = vec!["public".to_string()];
     let now = crate::types::now_iso();
-    match CorpusView::fetch(store, &terms, cfg, &projects, &now, "") {
+    match CorpusView::fetch(store, &terms, crate::embed::embed_one(query).as_deref(), cfg, &projects, &now, "") {
         Some(view) => {
             let (mut r, d) = evaluate(&view, query, caller, cfg);
             r.effective_time = now;

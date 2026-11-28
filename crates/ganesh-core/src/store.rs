@@ -7,6 +7,9 @@ use std::fmt;
 #[derive(Debug)]
 pub enum StoreError {
     Sqlite(rusqlite::Error),
+    /// The on-disk schema predates the M2 lifecycle columns — fail loud
+    /// instead of silently degrading every read to insufficient_context.
+    SchemaMismatch { detail: String },
     /// Snapshot bytes do not match the digest recorded in the manifest.
     DigestMismatch { article_id: String, expected: String, actual: String },
     /// A revision identifier already exists with different bytes.
@@ -18,6 +21,7 @@ impl fmt::Display for StoreError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             StoreError::Sqlite(e) => write!(f, "sqlite: {e}"),
+            StoreError::SchemaMismatch { detail } => write!(f, "schema mismatch: {detail}"),
             StoreError::DigestMismatch { article_id, expected, actual } => {
                 write!(f, "digest mismatch for {article_id}: manifest {expected}, snapshot {actual}")
             }
@@ -114,6 +118,20 @@ impl Store {
                passage_id TEXT NOT NULL REFERENCES passages(id)
              );",
         )?;
+        // Schema-version guard: a pre-M2 revisions table lacks the lifecycle
+        // columns and would otherwise silently degrade every read.
+        let cols: Vec<String> = {
+            let mut cstmt = conn.prepare("PRAGMA table_info(revisions)")?;
+            cstmt
+                .query_map([], |row| row.get::<_, String>(1))
+                .map(|rows| rows.filter_map(|r| r.ok()).collect())
+                .unwrap_or_default()
+        };
+        if !cols.is_empty() && !cols.iter().any(|c| c == "claim_key") {
+            return Err(StoreError::SchemaMismatch {
+                detail: "revisions table predates the M2 lifecycle schema; rebuild the store from snapshots".to_string(),
+            });
+        }
         Ok(Store { conn })
     }
 
@@ -348,7 +366,11 @@ impl Store {
             if !visible_to(self, meta, &projects) {
                 return Ok(None);
             }
-            let elig = eligible_revisions(self, &projects, "9999-12-31", "");
+            // Citation eligibility uses no temporal horizon: a citation is the
+            // audit record of what was shown while the revision was served, so
+            // window expiry must not retroactively kill it. Revocation,
+            // visibility, supersession and support still apply.
+            let elig = eligible_revisions_inner(self, &projects, None, "");
             if !elig.contains_key(&revision) {
                 return Ok(None);
             }
@@ -417,19 +439,30 @@ fn csv_contains(csv: &str, item: &str) -> bool {
 /// A revision is visible when any caller project grants access and no
 /// revocation row blocks that granting project.
 pub fn visible_to(store: &Store, meta: &RevisionMeta, projects: &[String]) -> bool {
+    // Collect every distinct granting source for this caller, then require at
+    // least one source without a matching revocation row. Keying the revocation
+    // check to the granting source is essential: for a public revision the
+    // grant comes from "public" itself, so only a (revision, "public")
+    // revocation blocks it — checking each caller project instead would let
+    // every credentialed caller (who always carries projects beyond the
+    // granting one) bypass the revocation entirely.
+    let mut sources: Vec<String> = Vec::new();
+    if meta.project == "public" || csv_contains(&meta.audience, "public") {
+        sources.push("public".to_string());
+    }
     for p in projects {
-        let grants = meta.project == "public"
-            || meta.project == *p
-            || csv_contains(&meta.audience, p)
-            || csv_contains(&meta.audience, "public");
-        if !grants {
-            continue;
+        if meta.project == *p || csv_contains(&meta.audience, p) {
+            sources.push(p.clone());
         }
+    }
+    sources.sort();
+    sources.dedup();
+    for src_project in &sources {
         let revoked: bool = store
             .conn
             .query_row(
                 "SELECT 1 FROM revocations WHERE revision = ?1 AND project = ?2",
-                params![meta.revision, p],
+                params![meta.revision, src_project],
                 |_| Ok(()),
             )
             .is_ok();
@@ -508,13 +541,20 @@ fn supersedes_in_scope(s: &RevisionMeta, query_scope: &str) -> bool {
 /// least one visible support. Computed at read time, so import order and
 /// late arrivals can never revive a superseded revision.
 pub fn eligible_revisions(store: &Store, projects: &[String], as_of: &str, query_scope: &str) -> std::collections::HashMap<String, RevisionMeta> {
+    eligible_revisions_inner(store, projects, Some(as_of), query_scope)
+}
+
+/// `as_of` of `None` skips the temporal window checks entirely (citation
+/// opens): visibility, revocation, supersession and support still apply.
+fn eligible_revisions_inner(store: &Store, projects: &[String], as_of: Option<&str>, query_scope: &str) -> std::collections::HashMap<String, RevisionMeta> {
+    let temporal = |m: &RevisionMeta| as_of.map_or(true, |a| temporal_ok(m, a));
     let all = all_revision_meta(store);
     let mut base: std::collections::HashMap<String, RevisionMeta> = std::collections::HashMap::new();
     for m in &all {
         if !visible_to(store, m, projects) {
             continue;
         }
-        if !temporal_ok(m, as_of) {
+        if !temporal(m) {
             continue;
         }
         base.insert(m.revision.clone(), m.clone());
@@ -532,7 +572,7 @@ pub fn eligible_revisions(store: &Store, projects: &[String], as_of: &str, query
     let unfiltered = {
         let mut u = std::collections::HashMap::new();
         for m in &all {
-            if visible_to(store, m, projects) && temporal_ok(m, as_of) {
+            if visible_to(store, m, projects) && temporal(m) {
                 u.insert(m.revision.clone(), m.clone());
             }
         }
@@ -576,7 +616,7 @@ pub fn eligible_revisions(store: &Store, projects: &[String], as_of: &str, query
         }
         let any_valid = supports.iter().any(|sup| {
             all.iter().any(|m| {
-                m.revision == *sup && visible_to(store, m, projects) && temporal_ok(m, as_of)
+                m.revision == *sup && visible_to(store, m, projects) && temporal(m)
             })
         });
         if !any_valid {
